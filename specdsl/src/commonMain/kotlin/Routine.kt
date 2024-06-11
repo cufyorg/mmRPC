@@ -28,10 +28,10 @@ sealed interface Routine : Element {
     val outputProps: Props
 
     override fun collectChildren() = sequence {
-        yieldAll(endpoints)
-        yieldAll(fault.unionList)
-        yield(inputProps)
-        yield(outputProps)
+        yieldAll(endpoints.asSequence().flatMap { it.collect() })
+        yieldAll(fault.unionList.asSequence().flatMap { it.collect() })
+        yieldAll(inputProps.collect())
+        yieldAll(outputProps.collect())
     }
 }
 
@@ -67,10 +67,10 @@ data class RoutineDefinition(
     override val isInline = false
 
     override fun collectChildren() = sequence {
-        yieldAll(endpoints)
-        yieldAll(fault.unionList)
-        yield(inputProps)
-        yield(outputProps)
+        yieldAll(endpoints.asSequence().flatMap { it.collect() })
+        yieldAll(fault.unionList.asSequence().flatMap { it.collect() })
+        yieldAll(inputProps.collect())
+        yieldAll(outputProps.collect())
     }
 }
 

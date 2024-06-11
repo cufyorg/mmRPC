@@ -23,7 +23,7 @@ sealed interface TypeArray : Type {
     val type: Type
 
     override fun collectChildren() =
-        sequence { yield(type) }
+        sequence { yieldAll(type.collect()) }
 }
 
 ////////////////////////////////////////
@@ -36,7 +36,7 @@ data class TypeArrayDefinition(
     override val description: String,
 ) : TypeArray, TypeDefinition {
     override fun collectChildren() =
-        sequence { yield(type) }
+        sequence { yieldAll(type.collect()) }
 }
 
 ////////////////////////////////////////

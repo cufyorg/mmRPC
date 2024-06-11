@@ -55,6 +55,9 @@ class UnnamedProvider<T>(val block: (Namespace, String) -> T) {
 }
 
 sealed interface Element {
+    fun collect(): Sequence<Element> =
+        sequenceOf(this) + collectChildren()
+
     fun collectChildren(): Sequence<Element>
 }
 
@@ -74,6 +77,9 @@ sealed interface ElementDefinition : Element {
         }
 
     val isInline: Boolean
+
+    override fun collect(): Sequence<ElementDefinition> =
+        sequenceOf(this) + collectChildren()
 
     override fun collectChildren(): Sequence<ElementDefinition>
 }

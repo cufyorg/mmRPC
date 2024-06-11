@@ -24,7 +24,7 @@ sealed interface Struct : Type {
     val fields: List<Prop>
 
     override fun collectChildren() =
-        sequence { yieldAll(fields) }
+        sequence { yieldAll(fields.asSequence().flatMap { it.collect() }) }
 }
 
 abstract class StructBuilder {
@@ -51,7 +51,7 @@ data class StructDefinition(
     override val fields: List<PropDefinition>,
 ) : Struct, TypeDefinition {
     override fun collectChildren() =
-        sequence { yieldAll(fields) }
+        sequence { yieldAll(fields.asSequence().flatMap { it.collect() }) }
 }
 
 ////////////////////////////////////////

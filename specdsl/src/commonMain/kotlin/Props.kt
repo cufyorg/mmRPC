@@ -22,7 +22,7 @@ sealed interface Props : Element {
     val propsList: List<Prop>
 
     override fun collectChildren() =
-        sequence { yieldAll(propsList) }
+        sequence { yieldAll(propsList.asSequence().flatMap { it.collect() }) }
 }
 
 abstract class PropsBuilder {
@@ -52,7 +52,7 @@ data class PropsDefinition(
     override val isInline = false
 
     override fun collectChildren() =
-        sequence { yieldAll(propsList) }
+        sequence { yieldAll(propsList.asSequence().flatMap { it.collect() }) }
 }
 
 ////////////////////////////////////////

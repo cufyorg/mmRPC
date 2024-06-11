@@ -24,7 +24,7 @@ sealed interface TypeInter : Type {
     val interList: List<Type>
 
     override fun collectChildren() =
-        sequence { yieldAll(interList) }
+        sequence { yieldAll(interList.asSequence().flatMap { it.collect() }) }
 }
 
 abstract class TypeInterBuilder {
@@ -43,7 +43,7 @@ data class TypeInterDefinition(
     override val interList: List<TypeDefinition>,
 ) : TypeInter, TypeDefinition {
     override fun collectChildren() =
-        sequence { yieldAll(interList) }
+        sequence { yieldAll(interList.asSequence().flatMap { it.collect() }) }
 }
 
 open class TypeInterDefinitionBuilder : TypeInterBuilder() {

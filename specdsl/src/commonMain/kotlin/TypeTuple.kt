@@ -23,7 +23,7 @@ sealed interface TypeTuple : Type {
     val tupleList: List<Type>
 
     override fun collectChildren() =
-        sequence { yieldAll(tupleList) }
+        sequence { yieldAll(tupleList.asSequence().flatMap { it.collect() }) }
 }
 
 ////////////////////////////////////////
@@ -36,7 +36,7 @@ data class TypeTupleDefinition(
     override val tupleList: List<TypeDefinition>,
 ) : TypeTuple, TypeDefinition {
     override fun collectChildren() =
-        sequence { yieldAll(tupleList) }
+        sequence { yieldAll(tupleList.asSequence().flatMap { it.collect() }) }
 }
 
 ////////////////////////////////////////

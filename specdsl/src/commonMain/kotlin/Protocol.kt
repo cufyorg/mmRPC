@@ -28,7 +28,7 @@ data class ProtocolDefinition(
     override val isInline = false
 
     override fun collectChildren() =
-        sequence { yieldAll(routines) }
+        sequence { yieldAll(routines.asSequence().flatMap { it.collect() }) }
 }
 
 open class ProtocolDefinitionBuilder {

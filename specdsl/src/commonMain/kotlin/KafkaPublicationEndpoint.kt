@@ -31,7 +31,7 @@ interface KafkaPublicationEndpoint : Endpoint {
     val key: TypeTuple?
 
     override fun collectChildren() =
-        sequence { key?.let { yield(it) } }
+        sequence { key?.let { yieldAll(it.collect()) } }
 }
 
 abstract class KafkaPublicationEndpointBuilder {
@@ -60,7 +60,7 @@ open class KafkaPublicationEndpointDefinition(
     override val isInline = false
 
     override fun collectChildren() =
-        sequence { key?.let { yield(it) } }
+        sequence { key?.let { yieldAll(it.collect()) } }
 }
 
 ////////////////////////////////////////

@@ -27,8 +27,8 @@ sealed interface Prop : Element {
     val description: String
 
     override fun collectChildren() = sequence {
-        yield(type)
-        default?.let { yield(it) }
+        yieldAll(type.collect())
+        default?.let { yieldAll(it.collect()) }
     }
 }
 
@@ -57,8 +57,8 @@ data class PropDefinition(
     override val isInline = false
 
     override fun collectChildren() = sequence {
-        yield(type)
-        default?.let { yield(it) }
+        yieldAll(type.collect())
+        default?.let { yieldAll(it.collect()) }
     }
 }
 

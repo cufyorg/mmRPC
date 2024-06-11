@@ -24,7 +24,7 @@ sealed interface TypeUnion : Type {
     val unionList: List<Type>
 
     override fun collectChildren() =
-        sequence { yieldAll(unionList) }
+        sequence { yieldAll(unionList.asSequence().flatMap { it.collect() }) }
 }
 
 abstract class TypeUnionBuilder {
@@ -43,7 +43,7 @@ data class TypeUnionDefinition(
     override val unionList: List<TypeDefinition>,
 ) : TypeUnion, TypeDefinition {
     override fun collectChildren() =
-        sequence { yieldAll(unionList) }
+        sequence { yieldAll(unionList.asSequence().flatMap { it.collect() }) }
 }
 
 open class TypeUnionDefinitionBuilder : TypeUnionBuilder() {
