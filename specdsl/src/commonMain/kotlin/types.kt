@@ -40,7 +40,7 @@ open class Namespace(vararg val segments: String) {
         other is Namespace && other.segments contentEquals segments
 
     override fun toString() =
-        "Namespace(${segments.joinToString()})"
+        "Namespace($canonicalName)"
 
     val canonicalName by lazy { segments.joinToString(".") }
 
