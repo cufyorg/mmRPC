@@ -54,7 +54,7 @@ abstract class HttpEndpointBuilder {
 
 ////////////////////////////////////////
 
-open class HttpEndpointDefinition(
+data class HttpEndpointDefinition(
     override val name: String,
     override val namespace: Namespace,
     override val path: String?,
@@ -70,7 +70,7 @@ open class HttpEndpointDefinition(
 
 ////////////////////////////////////////
 
-open class AnonymousHttpEndpoint(
+data class AnonymousHttpEndpoint(
     override val name: String,
     override val path: String?,
     override val method: HttpMethodUnion,

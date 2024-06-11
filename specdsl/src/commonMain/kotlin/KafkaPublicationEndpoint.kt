@@ -49,7 +49,7 @@ abstract class KafkaPublicationEndpointBuilder {
 
 ////////////////////////////////////////
 
-open class KafkaPublicationEndpointDefinition(
+data class KafkaPublicationEndpointDefinition(
     override val name: String,
     override val namespace: Namespace,
     override val topic: String?,
@@ -65,7 +65,7 @@ open class KafkaPublicationEndpointDefinition(
 
 ////////////////////////////////////////
 
-open class AnonymousKafkaPublicationEndpoint(
+data class AnonymousKafkaPublicationEndpoint(
     override val name: String,
     override val topic: String?,
     override val security: KafkaPublicationSecurityInter,

@@ -49,7 +49,7 @@ abstract class KafkaEndpointBuilder {
 
 ////////////////////////////////////////
 
-open class KafkaEndpointDefinition(
+data class KafkaEndpointDefinition(
     override val name: String,
     override val namespace: Namespace,
     override val topic: String?,
@@ -65,7 +65,7 @@ open class KafkaEndpointDefinition(
 
 ////////////////////////////////////////
 
-open class AnonymousKafkaEndpoint(
+data class AnonymousKafkaEndpoint(
     override val name: String,
     override val topic: String?,
     override val security: KafkaSecurityInter,

@@ -33,6 +33,15 @@ open class Namespace(vararg val segments: String) {
     abstract inner class Namespace(vararg segments: String) :
         org.cufy.specdsl.Namespace(*this.segments, *segments)
 
+    override fun hashCode() =
+        segments.contentHashCode()
+
+    override fun equals(other: Any?) =
+        other is Namespace && other.segments contentEquals segments
+
+    override fun toString() =
+        "Namespace(${segments.joinToString()})"
+
     val canonicalName by lazy { segments.joinToString(".") }
 
     operator fun plus(name: String) =

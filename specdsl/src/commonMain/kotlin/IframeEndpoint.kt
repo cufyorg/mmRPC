@@ -47,7 +47,7 @@ abstract class IframeEndpointBuilder {
 
 ////////////////////////////////////////
 
-open class IframeEndpointDefinition(
+data class IframeEndpointDefinition(
     override val name: String,
     override val namespace: Namespace,
     override val path: String?,
@@ -62,7 +62,7 @@ open class IframeEndpointDefinition(
 
 ////////////////////////////////////////
 
-open class AnonymousIframeEndpoint(
+data class AnonymousIframeEndpoint(
     override val name: String,
     override val path: String?,
     override val security: IframeSecurityInter,
