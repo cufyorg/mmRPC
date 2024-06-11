@@ -18,8 +18,6 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(kotlin("stdlib"))
-
-                api("com.github.lsafer-meemer.jetbrains-annotations:jetbrains-annotations:be20592be9")
             }
         }
         commonTest {

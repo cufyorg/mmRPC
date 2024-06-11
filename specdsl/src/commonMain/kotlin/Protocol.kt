@@ -15,8 +15,6 @@
  */
 package org.cufy.specdsl
 
-import org.intellij.lang.annotations.Language
-
 ////////////////////////////////////////
 
 data class ProtocolDefinition(
@@ -35,8 +33,12 @@ open class ProtocolDefinitionBuilder {
     open lateinit var name: String
     open lateinit var namespace: Namespace
 
-    @Language("Markdown")
+    // language=markdown
     open var description = ""
+
+    open operator fun String.unaryPlus() {
+        description += this
+    }
 
     protected open val routines = mutableListOf<RoutineDefinition>()
     protected open val anonymousRoutines = mutableListOf<AnonymousRoutine>()

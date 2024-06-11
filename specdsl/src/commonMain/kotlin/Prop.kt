@@ -15,8 +15,6 @@
  */
 package org.cufy.specdsl
 
-import org.intellij.lang.annotations.Language
-
 ////////////////////////////////////////
 
 sealed interface Prop : Element {
@@ -38,8 +36,12 @@ abstract class PropBuilder {
     abstract var default: Const?
     abstract var isOptional: Boolean
 
-    @Language("Markdown")
+    // language=markdown
     abstract var description: String
+
+    operator fun String.unaryPlus() {
+        description += this
+    }
 
     abstract fun build(): Prop
 }
@@ -70,7 +72,7 @@ open class PropDefinitionBuilder : PropBuilder() {
     override var default: Const? = null
     override var isOptional = false
 
-    @Language("Markdown")
+    // language=markdown
     override var description = ""
 
     override fun build(): PropDefinition {
@@ -141,7 +143,7 @@ open class AnonymousPropBuilder : PropBuilder() {
     override var default: Const? = null
     override var isOptional = false
 
-    @Language("Markdown")
+    // language=markdown
     override var description = ""
 
     override fun build(): AnonymousProp {

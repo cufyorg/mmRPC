@@ -15,8 +15,6 @@
  */
 package org.cufy.specdsl
 
-import org.intellij.lang.annotations.Language
-
 ////////////////////////////////////////
 
 data class KafkaPublicationSecurity(val name: String)
@@ -39,8 +37,12 @@ abstract class KafkaPublicationEndpointBuilder {
     abstract var topic: String?
     abstract var key: TypeTuple?
 
-    @Language("Markdown")
+    // language=markdown
     abstract var description: String
+
+    operator fun String.unaryPlus() {
+        description += this
+    }
 
     abstract operator fun KafkaPublicationSecurity.unaryPlus()
 
@@ -94,7 +96,7 @@ open class AnonymousKafkaPublicationEndpointBuilder : KafkaPublicationEndpointBu
     override var topic: String? = null
     override var key: TypeTuple? = null
 
-    @Language("Markdown")
+    // language=markdown
     override var description = ""
 
     protected open var securityInterList = mutableSetOf<KafkaPublicationSecurity>()

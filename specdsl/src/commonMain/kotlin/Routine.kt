@@ -15,8 +15,6 @@
  */
 package org.cufy.specdsl
 
-import org.intellij.lang.annotations.Language
-
 ////////////////////////////////////////
 
 sealed interface Routine : Element {
@@ -38,8 +36,12 @@ sealed interface Routine : Element {
 abstract class RoutineBuilder {
     abstract var name: String
 
-    @Language("Markdown")
+    // language=markdown
     abstract var description: String
+
+    operator fun String.unaryPlus() {
+        description += this
+    }
 
     abstract operator fun Endpoint.unaryPlus()
     abstract operator fun FaultDefinition.unaryPlus()
@@ -113,7 +115,7 @@ data class AnonymousRoutine(
 open class AnonymousRoutineBuilder : RoutineBuilder() {
     override lateinit var name: String
 
-    @Language("Markdown")
+    // language=markdown
     override var description = ""
 
     protected open val endpoints = mutableListOf<Endpoint>()

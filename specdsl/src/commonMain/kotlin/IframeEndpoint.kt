@@ -15,8 +15,6 @@
  */
 package org.cufy.specdsl
 
-import org.intellij.lang.annotations.Language
-
 ////////////////////////////////////////
 
 data class IframeSecurity(val name: String)
@@ -37,8 +35,12 @@ abstract class IframeEndpointBuilder {
     abstract var name: String
     abstract var path: String?
 
-    @Language("Markdown")
+    // language=markdown
     abstract var description: String
+
+    operator fun String.unaryPlus() {
+        description += this
+    }
 
     abstract operator fun IframeSecurity.unaryPlus()
 
@@ -83,7 +85,7 @@ open class AnonymousIframeEndpointBuilder : IframeEndpointBuilder() {
     override var name: String = "iframe"
     override var path: String? = null
 
-    @Language("Markdown")
+    // language=markdown
     override var description = ""
 
     protected open var securityInterList = mutableSetOf<IframeSecurity>()

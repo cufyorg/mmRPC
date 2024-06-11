@@ -15,7 +15,6 @@
  */
 package org.cufy.specdsl
 
-import org.intellij.lang.annotations.Language
 import kotlin.reflect.KProperty
 
 ////////////////////////////////////////
@@ -60,8 +59,12 @@ open class StructDefinitionBuilder : StructBuilder() {
     open lateinit var name: String
     open lateinit var namespace: Namespace
 
-    @Language("Markdown")
+    // language=markdown
     open var description = ""
+
+    open operator fun String.unaryPlus() {
+        description += this
+    }
 
     protected open var fields = mutableListOf<PropDefinition>()
     protected open var anonymousFields = mutableListOf<AnonymousProp>()

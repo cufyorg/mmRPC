@@ -15,8 +15,6 @@
  */
 package org.cufy.specdsl
 
-import org.intellij.lang.annotations.Language
-
 ////////////////////////////////////////
 
 data class ScalarDefinition(
@@ -34,8 +32,12 @@ open class ScalarDefinitionBuilder {
     open lateinit var name: String
     open lateinit var namespace: Namespace
 
-    @Language("Markdown")
+    // language=markdown
     open var description = ""
+
+    open operator fun String.unaryPlus() {
+        description += this
+    }
 
     open fun build(): ScalarDefinition {
         return ScalarDefinition(

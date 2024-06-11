@@ -15,8 +15,6 @@
  */
 package org.cufy.specdsl
 
-import org.intellij.lang.annotations.Language
-
 ////////////////////////////////////////
 
 data class FaultDefinitionUnion(val unionList: List<FaultDefinition>)
@@ -38,8 +36,12 @@ open class FaultDefinitionBuilder {
     open lateinit var name: String
     open lateinit var namespace: Namespace
 
-    @Language("Markdown")
+    // language=markdown
     open var description = ""
+
+    open operator fun String.unaryPlus() {
+        description += this
+    }
 
     open fun build(): FaultDefinition {
         return FaultDefinition(

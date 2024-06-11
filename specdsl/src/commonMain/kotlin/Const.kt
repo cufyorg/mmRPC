@@ -15,7 +15,6 @@
  */
 package org.cufy.specdsl
 
-import org.intellij.lang.annotations.Language
 import kotlin.reflect.KProperty
 
 ////////////////////////////////////////
@@ -51,8 +50,12 @@ open class ConstDefinitionBuilder : ConstBuilder() {
     open lateinit var namespace: Namespace
     override lateinit var value: String
 
-    @Language("Markdown")
-    open var description: String = ""
+    // language=markdown
+    open var description = ""
+
+    open operator fun String.unaryPlus() {
+        description += this
+    }
 
     override fun build(): ConstDefinition {
         return ConstDefinition(
