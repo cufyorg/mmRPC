@@ -52,6 +52,8 @@ open class Namespace(vararg val segments: String) {
 }
 
 class Unnamed<T>(val block: (Namespace, String) -> T) {
+    constructor(block: (Namespace) -> T) : this({ ns, _ -> block(ns) })
+
     private val values = mutableMapOf<Pair<Namespace, String>, T>()
 
     operator fun getValue(namespace: Namespace, property: KProperty<*>): T =
@@ -59,6 +61,8 @@ class Unnamed<T>(val block: (Namespace, String) -> T) {
 }
 
 class UnnamedProvider<T>(val block: (Namespace, String) -> T) {
+    constructor(block: (Namespace) -> T) : this({ ns, _ -> block(ns) })
+
     operator fun provideDelegate(thisRef: Any?, property: KProperty<*>) =
         Unnamed { namespace, name -> block(namespace, name) }
 }
