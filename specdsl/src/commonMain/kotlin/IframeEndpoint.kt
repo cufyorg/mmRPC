@@ -39,7 +39,7 @@ abstract class IframeEndpointBuilder {
     abstract var description: String
 
     operator fun String.unaryPlus() {
-        description += this
+        description += this.trimIndent()
     }
 
     abstract operator fun IframeSecurity.unaryPlus()

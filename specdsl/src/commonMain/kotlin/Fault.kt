@@ -40,7 +40,7 @@ open class FaultDefinitionBuilder {
     open var description = ""
 
     open operator fun String.unaryPlus() {
-        description += this
+        description += this.trimIndent()
     }
 
     open fun build(): FaultDefinition {

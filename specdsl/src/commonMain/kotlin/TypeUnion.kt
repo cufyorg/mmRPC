@@ -53,7 +53,7 @@ open class TypeUnionDefinitionBuilder : TypeUnionBuilder() {
     open var description = ""
 
     open operator fun String.unaryPlus() {
-        description += this
+        description += this.trimIndent()
     }
 
     protected open val unionList = mutableListOf<TypeDefinition>()

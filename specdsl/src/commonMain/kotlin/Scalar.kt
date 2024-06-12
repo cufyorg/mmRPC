@@ -36,7 +36,7 @@ open class ScalarDefinitionBuilder {
     open var description = ""
 
     open operator fun String.unaryPlus() {
-        description += this
+        description += this.trimIndent()
     }
 
     open fun build(): ScalarDefinition {

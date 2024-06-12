@@ -37,7 +37,7 @@ open class ProtocolDefinitionBuilder {
     open var description = ""
 
     open operator fun String.unaryPlus() {
-        description += this
+        description += this.trimIndent()
     }
 
     protected open val routines = mutableListOf<RoutineDefinition>()

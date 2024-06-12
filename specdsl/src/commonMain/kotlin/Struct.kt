@@ -63,7 +63,7 @@ open class StructDefinitionBuilder : StructBuilder() {
     open var description = ""
 
     open operator fun String.unaryPlus() {
-        description += this
+        description += this.trimIndent()
     }
 
     protected open var fields = mutableListOf<PropDefinition>()

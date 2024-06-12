@@ -53,7 +53,7 @@ open class TypeInterDefinitionBuilder : TypeInterBuilder() {
     open var description = ""
 
     open operator fun String.unaryPlus() {
-        description += this
+        description += this.trimIndent()
     }
 
     protected open val interList = mutableListOf<TypeDefinition>()

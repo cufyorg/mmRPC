@@ -40,7 +40,7 @@ abstract class PropBuilder {
     abstract var description: String
 
     operator fun String.unaryPlus() {
-        description += this
+        description += this.trimIndent()
     }
 
     abstract fun build(): Prop

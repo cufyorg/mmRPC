@@ -54,7 +54,7 @@ open class ConstDefinitionBuilder : ConstBuilder() {
     open var description = ""
 
     open operator fun String.unaryPlus() {
-        description += this
+        description += this.trimIndent()
     }
 
     override fun build(): ConstDefinition {
