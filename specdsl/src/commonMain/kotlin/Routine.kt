@@ -20,6 +20,7 @@ package org.cufy.specdsl
 sealed interface Routine : Element {
     val name: String
     val description: String
+    val decorators: List<DecoratorDefinition>
     val endpoints: List<Endpoint>
     val fault: FaultDefinitionUnion
     val inputProps: Props
@@ -43,6 +44,7 @@ abstract class RoutineBuilder {
         description += this.trimIndent()
     }
 
+    abstract operator fun DecoratorDefinition.unaryPlus()
     abstract operator fun Endpoint.unaryPlus()
     abstract operator fun FaultDefinition.unaryPlus()
 
@@ -61,6 +63,7 @@ data class RoutineDefinition(
     override val name: String,
     override val namespace: Namespace,
     override val description: String,
+    override val decorators: List<DecoratorDefinition>,
     override val endpoints: List<EndpointDefinition>,
     override val fault: FaultDefinitionUnion,
     override val inputProps: PropsDefinition,
@@ -81,6 +84,7 @@ data class RoutineDefinition(
 data class AnonymousRoutine(
     override val name: String,
     override val description: String,
+    override val decorators: List<DecoratorDefinition>,
     override val endpoints: List<Endpoint>,
     override val fault: FaultDefinitionUnion,
     override val inputProps: Props,
@@ -92,6 +96,7 @@ data class AnonymousRoutine(
             name = this.name,
             namespace = namespace,
             description = this.description,
+            decorators = this.decorators,
             endpoints = this.endpoints.map {
                 when (it) {
                     is EndpointDefinition -> it
@@ -118,12 +123,17 @@ open class AnonymousRoutineBuilder : RoutineBuilder() {
     // language=markdown
     override var description = ""
 
+    protected open val decorators = mutableListOf<DecoratorDefinition>()
     protected open val endpoints = mutableListOf<Endpoint>()
     protected open val faultUnionList = mutableListOf<FaultDefinition>()
     protected open val inputPropsBuilder = AnonymousPropsBuilder()
         .also { it.name = "input" }
     protected open val outputPropsBuilder = AnonymousPropsBuilder()
         .also { it.name = "output" }
+
+    override fun DecoratorDefinition.unaryPlus() {
+        decorators += this
+    }
 
     override operator fun Endpoint.unaryPlus() {
         endpoints += this
@@ -152,6 +162,7 @@ open class AnonymousRoutineBuilder : RoutineBuilder() {
             inputProps = this.inputPropsBuilder.build(),
             outputProps = this.outputPropsBuilder.build(),
             endpoints = this.endpoints.toList(),
+            decorators = this.decorators,
             description = this.description,
         )
     }
