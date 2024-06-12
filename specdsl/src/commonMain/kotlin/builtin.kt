@@ -91,4 +91,19 @@ object builtin : Namespace() {
      * Namespace to be used for defining builtin props.
      */
     object prop : Namespace()
+
+    /**
+     * Namespace to be used for defining builtin decorators.
+     */
+    object decorator : Namespace()
+
+    /**
+     * Namespace to be used for defining builtin serialization objects.
+     */
+    object serial : Namespace()
+
+    /**
+     * Namespace to be used for defining builtin references.
+     */
+    object reference : Namespace()
 }
