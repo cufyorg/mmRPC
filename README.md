@@ -23,3 +23,10 @@ to define two paths instead of a single one with two methods. Thus, forcing cons
 - Q - When will you complete the docs?
 
 In a day called "Someday". You are free to remind me when it comes lsafer@gmail.com
+
+- Q - Future Compatibility 
+
+Future syntax compatibility is prioritized. Binary compatibility, currently, not at all.
+
+There will be reworks on builders, constructor, constructor-like functions and definition 
+hierarchy until a suitable and more consistent pattern is achieved.
