@@ -18,6 +18,7 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(kotlin("stdlib"))
+                implementation(libs.kotlin.serialization.core)
             }
         }
         commonTest {
