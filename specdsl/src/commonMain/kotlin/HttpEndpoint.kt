@@ -21,16 +21,12 @@ data class HttpSecurity(val name: String)
 
 data class HttpMethod(val name: String)
 
-data class HttpSecurityInter(val interList: List<HttpSecurity>)
-
-data class HttpMethodUnion(val unionList: List<HttpMethod>)
-
 ////////////////////////////////////////
 
 interface HttpEndpoint : Endpoint {
     val path: String?
-    val method: HttpMethodUnion
-    val security: HttpSecurityInter
+    val methodUnion: List<HttpMethod>
+    val securityInter: List<HttpSecurity>
 
     override fun collectChildren() =
         emptySequence<Element>()
@@ -60,8 +56,8 @@ data class HttpEndpointDefinition(
     override val name: String,
     override val namespace: Namespace,
     override val path: String?,
-    override val method: HttpMethodUnion,
-    override val security: HttpSecurityInter,
+    override val methodUnion: List<HttpMethod>,
+    override val securityInter: List<HttpSecurity>,
     override val description: String,
 ) : HttpEndpoint, EndpointDefinition {
     override val isInline = false
@@ -75,8 +71,8 @@ data class HttpEndpointDefinition(
 data class AnonymousHttpEndpoint(
     override val name: String,
     override val path: String?,
-    override val method: HttpMethodUnion,
-    override val security: HttpSecurityInter,
+    override val methodUnion: List<HttpMethod>,
+    override val securityInter: List<HttpSecurity>,
     override val description: String,
 ) : HttpEndpoint, AnonymousEndpoint {
     override fun createDefinition(namespace: Namespace): HttpEndpointDefinition {
@@ -84,8 +80,8 @@ data class AnonymousHttpEndpoint(
             name = this.name,
             namespace = namespace,
             path = this.path,
-            method = this.method,
-            security = this.security,
+            methodUnion = this.methodUnion,
+            securityInter = this.securityInter,
             description = this.description,
         )
     }
@@ -98,27 +94,23 @@ open class AnonymousHttpEndpointBuilder : HttpEndpointBuilder() {
     // language=markdown
     override var description = ""
 
-    protected open var methodUnionList = mutableSetOf<HttpMethod>()
-    protected open var securityInterList = mutableSetOf<HttpSecurity>()
+    protected open var methodUnion = mutableSetOf<HttpMethod>()
+    protected open var securityInter = mutableSetOf<HttpSecurity>()
 
     override operator fun HttpMethod.unaryPlus() {
-        methodUnionList.add(this)
+        methodUnion.add(this)
     }
 
     override operator fun HttpSecurity.unaryPlus() {
-        securityInterList.add(this)
+        securityInter.add(this)
     }
 
     override fun build(): AnonymousHttpEndpoint {
         return AnonymousHttpEndpoint(
             name = this.name,
             path = this.path,
-            method = HttpMethodUnion(
-                unionList = this.methodUnionList.toList()
-            ),
-            security = HttpSecurityInter(
-                interList = this.securityInterList.toList()
-            ),
+            methodUnion = this.methodUnion.toList(),
+            securityInter = this.securityInter.toList(),
             description = this.description,
         )
     }

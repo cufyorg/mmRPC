@@ -22,13 +22,14 @@ sealed interface Routine : Element {
     val description: String
     val decorators: List<DecoratorDefinition>
     val endpoints: List<Endpoint>
-    val fault: FaultDefinitionUnion
+    val faultUnion: List<FaultDefinition>
     val input: Struct
     val output: Struct
 
     override fun collectChildren() = sequence {
         yieldAll(endpoints.asSequence().flatMap { it.collect() })
-        yieldAll(fault.unionList.asSequence().flatMap { it.collect() })
+        yieldAll(faultUnion.asSequence().flatMap { it.collect() })
+
         yieldAll(input.collect())
         yieldAll(output.collect())
     }
@@ -65,7 +66,7 @@ data class RoutineDefinition(
     override val description: String,
     override val decorators: List<DecoratorDefinition>,
     override val endpoints: List<EndpointDefinition>,
-    override val fault: FaultDefinitionUnion,
+    override val faultUnion: List<FaultDefinition>,
     override val input: StructDefinition,
     override val output: StructDefinition,
 ) : Routine, ElementDefinition {
@@ -73,7 +74,7 @@ data class RoutineDefinition(
 
     override fun collectChildren() = sequence {
         yieldAll(endpoints.asSequence().flatMap { it.collect() })
-        yieldAll(fault.unionList.asSequence().flatMap { it.collect() })
+        yieldAll(faultUnion.asSequence().flatMap { it.collect() })
         yieldAll(input.collect())
         yieldAll(output.collect())
     }
@@ -86,7 +87,7 @@ data class AnonymousRoutine(
     override val description: String,
     override val decorators: List<DecoratorDefinition>,
     override val endpoints: List<Endpoint>,
-    override val fault: FaultDefinitionUnion,
+    override val faultUnion: List<FaultDefinition>,
     override val input: Struct,
     override val output: Struct,
 ) : Routine, AnonymousElement {
@@ -104,7 +105,7 @@ data class AnonymousRoutine(
                     else -> error("$it extends Endpoint but does not extend AnonymousEndpoint nor DefinedEndpoint")
                 }
             },
-            fault = this.fault,
+            faultUnion = this.faultUnion,
             input = when (this.input) {
                 is StructDefinition -> this.input
                 is AnonymousStruct -> this.input.createDefinition(asNamespace)
@@ -125,7 +126,7 @@ open class AnonymousRoutineBuilder : RoutineBuilder() {
 
     protected open val decorators = mutableListOf<DecoratorDefinition>()
     protected open val endpoints = mutableListOf<Endpoint>()
-    protected open val faultUnionList = mutableListOf<FaultDefinition>()
+    protected open val faultUnion = mutableListOf<FaultDefinition>()
     protected open val inputBuilder = AnonymousStructBuilder()
     protected open val outputBuilder = AnonymousStructBuilder()
 
@@ -138,7 +139,7 @@ open class AnonymousRoutineBuilder : RoutineBuilder() {
     }
 
     override operator fun FaultDefinition.unaryPlus() {
-        faultUnionList += this
+        faultUnion += this
     }
 
     @Marker3
@@ -154,9 +155,7 @@ open class AnonymousRoutineBuilder : RoutineBuilder() {
     override fun build(): AnonymousRoutine {
         return AnonymousRoutine(
             name = this.name,
-            fault = FaultDefinitionUnion(
-                unionList = this.faultUnionList.toList()
-            ),
+            faultUnion = this.faultUnion.toList(),
             input = this.inputBuilder.build(),
             output = this.outputBuilder.build(),
             endpoints = this.endpoints.toList(),

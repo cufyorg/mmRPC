@@ -17,10 +17,6 @@ package org.cufy.specdsl
 
 ////////////////////////////////////////
 
-data class FaultDefinitionUnion(val unionList: List<FaultDefinition>)
-
-////////////////////////////////////////
-
 data class FaultDefinition(
     override val name: String,
     override val namespace: Namespace,

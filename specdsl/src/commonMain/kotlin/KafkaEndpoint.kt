@@ -19,13 +19,11 @@ package org.cufy.specdsl
 
 data class KafkaSecurity(val name: String)
 
-data class KafkaSecurityInter(val interList: List<KafkaSecurity>)
-
 ////////////////////////////////////////
 
 interface KafkaEndpoint : Endpoint {
     val topic: String?
-    val security: KafkaSecurityInter
+    val securityInter: List<KafkaSecurity>
     val key: TypeTuple?
 
     override fun collectChildren() =
@@ -55,7 +53,7 @@ data class KafkaEndpointDefinition(
     override val name: String,
     override val namespace: Namespace,
     override val topic: String?,
-    override val security: KafkaSecurityInter,
+    override val securityInter: List<KafkaSecurity>,
     override val key: TypeTupleDefinition?,
     override val description: String,
 ) : KafkaEndpoint, EndpointDefinition {
@@ -70,7 +68,7 @@ data class KafkaEndpointDefinition(
 data class AnonymousKafkaEndpoint(
     override val name: String,
     override val topic: String?,
-    override val security: KafkaSecurityInter,
+    override val securityInter: List<KafkaSecurity>,
     override val key: TypeTuple?,
     override val description: String,
 ) : KafkaEndpoint, AnonymousEndpoint {
@@ -80,7 +78,7 @@ data class AnonymousKafkaEndpoint(
             name = this.name,
             namespace = namespace,
             topic = this.topic,
-            security = this.security,
+            securityInter = this.securityInter,
             key = when (val key = this.key) {
                 null -> null
                 is TypeTupleDefinition -> key
@@ -99,19 +97,17 @@ open class AnonymousKafkaEndpointBuilder : KafkaEndpointBuilder() {
     // language=markdown
     override var description = ""
 
-    protected open var securityInterList = mutableSetOf<KafkaSecurity>()
+    protected open var securityInter = mutableSetOf<KafkaSecurity>()
 
     override operator fun KafkaSecurity.unaryPlus() {
-        securityInterList.add(this)
+        securityInter.add(this)
     }
 
     override fun build(): AnonymousKafkaEndpoint {
         return AnonymousKafkaEndpoint(
             name = this.name,
             topic = this.topic,
-            security = KafkaSecurityInter(
-                interList = this.securityInterList.toList()
-            ),
+            securityInter = this.securityInter.toList(),
             key = this.key,
             description = this.description,
         )

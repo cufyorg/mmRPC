@@ -19,13 +19,11 @@ package org.cufy.specdsl
 
 data class IframeSecurity(val name: String)
 
-data class IframeSecurityInter(val interList: List<IframeSecurity>)
-
 ////////////////////////////////////////
 
 interface IframeEndpoint : Endpoint {
     val path: String?
-    val security: IframeSecurityInter
+    val securityInter: List<IframeSecurity>
 
     override fun collectChildren() =
         emptySequence<Element>()
@@ -53,7 +51,7 @@ data class IframeEndpointDefinition(
     override val name: String,
     override val namespace: Namespace,
     override val path: String?,
-    override val security: IframeSecurityInter,
+    override val securityInter: List<IframeSecurity>,
     override val description: String,
 ) : IframeEndpoint, EndpointDefinition {
     override val isInline = false
@@ -67,7 +65,7 @@ data class IframeEndpointDefinition(
 data class AnonymousIframeEndpoint(
     override val name: String,
     override val path: String?,
-    override val security: IframeSecurityInter,
+    override val securityInter: List<IframeSecurity>,
     override val description: String,
 ) : IframeEndpoint, AnonymousEndpoint {
     override fun createDefinition(namespace: Namespace): IframeEndpointDefinition {
@@ -75,7 +73,7 @@ data class AnonymousIframeEndpoint(
             name = this.name,
             namespace = namespace,
             path = this.path,
-            security = this.security,
+            securityInter = this.securityInter,
             description = this.description,
         )
     }
@@ -88,19 +86,17 @@ open class AnonymousIframeEndpointBuilder : IframeEndpointBuilder() {
     // language=markdown
     override var description = ""
 
-    protected open var securityInterList = mutableSetOf<IframeSecurity>()
+    protected open var securityInter = mutableSetOf<IframeSecurity>()
 
     override operator fun IframeSecurity.unaryPlus() {
-        securityInterList.add(this)
+        securityInter.add(this)
     }
 
     override fun build(): AnonymousIframeEndpoint {
         return AnonymousIframeEndpoint(
             name = this.name,
             path = this.path,
-            security = IframeSecurityInter(
-                interList = this.securityInterList.toList()
-            ),
+            securityInter = this.securityInter.toList(),
             description = this.description,
         )
     }

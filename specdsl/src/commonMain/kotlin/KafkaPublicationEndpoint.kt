@@ -19,13 +19,11 @@ package org.cufy.specdsl
 
 data class KafkaPublicationSecurity(val name: String)
 
-data class KafkaPublicationSecurityInter(val interList: List<KafkaPublicationSecurity>)
-
 ////////////////////////////////////////
 
 interface KafkaPublicationEndpoint : Endpoint {
     val topic: String?
-    val security: KafkaPublicationSecurityInter
+    val securityInter: List<KafkaPublicationSecurity>
     val key: TypeTuple?
 
     override fun collectChildren() =
@@ -55,7 +53,7 @@ data class KafkaPublicationEndpointDefinition(
     override val name: String,
     override val namespace: Namespace,
     override val topic: String?,
-    override val security: KafkaPublicationSecurityInter,
+    override val securityInter: List<KafkaPublicationSecurity>,
     override val key: TypeTupleDefinition?,
     override val description: String,
 ) : KafkaPublicationEndpoint, EndpointDefinition {
@@ -70,7 +68,7 @@ data class KafkaPublicationEndpointDefinition(
 data class AnonymousKafkaPublicationEndpoint(
     override val name: String,
     override val topic: String?,
-    override val security: KafkaPublicationSecurityInter,
+    override val securityInter: List<KafkaPublicationSecurity>,
     override val key: TypeTuple?,
     override val description: String,
 ) : KafkaPublicationEndpoint, AnonymousEndpoint {
@@ -80,7 +78,7 @@ data class AnonymousKafkaPublicationEndpoint(
             name = this.name,
             namespace = namespace,
             topic = this.topic,
-            security = this.security,
+            securityInter = this.securityInter,
             key = when (val key = this.key) {
                 null -> null
                 is TypeTupleDefinition -> key
@@ -99,19 +97,17 @@ open class AnonymousKafkaPublicationEndpointBuilder : KafkaPublicationEndpointBu
     // language=markdown
     override var description = ""
 
-    protected open var securityInterList = mutableSetOf<KafkaPublicationSecurity>()
+    protected open var securityInter = mutableSetOf<KafkaPublicationSecurity>()
 
     override operator fun KafkaPublicationSecurity.unaryPlus() {
-        securityInterList.add(this)
+        securityInter.add(this)
     }
 
     override fun build(): AnonymousKafkaPublicationEndpoint {
         return AnonymousKafkaPublicationEndpoint(
             name = this.name,
             topic = this.topic,
-            security = KafkaPublicationSecurityInter(
-                interList = this.securityInterList.toList()
-            ),
+            securityInter = this.securityInter.toList(),
             key = this.key,
             description = this.description,
         )
