@@ -23,14 +23,14 @@ sealed interface Routine : Element {
     val decorators: List<DecoratorDefinition>
     val endpoints: List<Endpoint>
     val fault: FaultDefinitionUnion
-    val inputProps: Props
-    val outputProps: Props
+    val input: Struct
+    val output: Struct
 
     override fun collectChildren() = sequence {
         yieldAll(endpoints.asSequence().flatMap { it.collect() })
         yieldAll(fault.unionList.asSequence().flatMap { it.collect() })
-        yieldAll(inputProps.collect())
-        yieldAll(outputProps.collect())
+        yieldAll(input.collect())
+        yieldAll(output.collect())
     }
 }
 
@@ -49,10 +49,10 @@ abstract class RoutineBuilder {
     abstract operator fun FaultDefinition.unaryPlus()
 
     @Marker3
-    abstract fun input(block: PropsBuilder.() -> Unit)
+    abstract fun input(block: StructBuilder.() -> Unit)
 
     @Marker3
-    abstract fun output(block: PropsBuilder.() -> Unit)
+    abstract fun output(block: StructBuilder.() -> Unit)
 
     abstract fun build(): Routine
 }
@@ -66,16 +66,16 @@ data class RoutineDefinition(
     override val decorators: List<DecoratorDefinition>,
     override val endpoints: List<EndpointDefinition>,
     override val fault: FaultDefinitionUnion,
-    override val inputProps: PropsDefinition,
-    override val outputProps: PropsDefinition,
+    override val input: StructDefinition,
+    override val output: StructDefinition,
 ) : Routine, ElementDefinition {
     override val isInline = false
 
     override fun collectChildren() = sequence {
         yieldAll(endpoints.asSequence().flatMap { it.collect() })
         yieldAll(fault.unionList.asSequence().flatMap { it.collect() })
-        yieldAll(inputProps.collect())
-        yieldAll(outputProps.collect())
+        yieldAll(input.collect())
+        yieldAll(output.collect())
     }
 }
 
@@ -87,8 +87,8 @@ data class AnonymousRoutine(
     override val decorators: List<DecoratorDefinition>,
     override val endpoints: List<Endpoint>,
     override val fault: FaultDefinitionUnion,
-    override val inputProps: Props,
-    override val outputProps: Props,
+    override val input: Struct,
+    override val output: Struct,
 ) : Routine, AnonymousElement {
     override fun createDefinition(namespace: Namespace): RoutineDefinition {
         val asNamespace = namespace + this.name
@@ -105,13 +105,13 @@ data class AnonymousRoutine(
                 }
             },
             fault = this.fault,
-            inputProps = when (this.inputProps) {
-                is PropsDefinition -> this.inputProps
-                is AnonymousProps -> this.inputProps.createDefinition(asNamespace)
+            input = when (this.input) {
+                is StructDefinition -> this.input
+                is AnonymousStruct -> this.input.createDefinition(asNamespace)
             },
-            outputProps = when (this.outputProps) {
-                is PropsDefinition -> this.outputProps
-                is AnonymousProps -> this.outputProps.createDefinition(asNamespace)
+            output = when (this.output) {
+                is StructDefinition -> this.output
+                is AnonymousStruct -> this.output.createDefinition(asNamespace)
             },
         )
     }
@@ -126,10 +126,8 @@ open class AnonymousRoutineBuilder : RoutineBuilder() {
     protected open val decorators = mutableListOf<DecoratorDefinition>()
     protected open val endpoints = mutableListOf<Endpoint>()
     protected open val faultUnionList = mutableListOf<FaultDefinition>()
-    protected open val inputPropsBuilder = AnonymousPropsBuilder()
-        .also { it.name = "input" }
-    protected open val outputPropsBuilder = AnonymousPropsBuilder()
-        .also { it.name = "output" }
+    protected open val inputBuilder = AnonymousStructBuilder()
+    protected open val outputBuilder = AnonymousStructBuilder()
 
     override fun DecoratorDefinition.unaryPlus() {
         decorators += this
@@ -144,13 +142,13 @@ open class AnonymousRoutineBuilder : RoutineBuilder() {
     }
 
     @Marker3
-    override fun input(block: PropsBuilder.() -> Unit) {
-        inputPropsBuilder.apply(block)
+    override fun input(block: StructBuilder.() -> Unit) {
+        inputBuilder.apply(block)
     }
 
     @Marker3
-    override fun output(block: PropsBuilder.() -> Unit) {
-        outputPropsBuilder.apply(block)
+    override fun output(block: StructBuilder.() -> Unit) {
+        outputBuilder.apply(block)
     }
 
     override fun build(): AnonymousRoutine {
@@ -159,8 +157,8 @@ open class AnonymousRoutineBuilder : RoutineBuilder() {
             fault = FaultDefinitionUnion(
                 unionList = this.faultUnionList.toList()
             ),
-            inputProps = this.inputPropsBuilder.build(),
-            outputProps = this.outputPropsBuilder.build(),
+            input = this.inputBuilder.build(),
+            output = this.outputBuilder.build(),
             endpoints = this.endpoints.toList(),
             decorators = this.decorators,
             description = this.description,

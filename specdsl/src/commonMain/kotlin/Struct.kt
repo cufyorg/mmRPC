@@ -151,6 +151,20 @@ data class AnonymousStruct(
     }
 }
 
+open class AnonymousStructBuilder : StructBuilder() {
+    protected open var fields = mutableListOf<Prop>()
+
+    override operator fun Prop.unaryPlus() {
+        fields += this
+    }
+
+    override fun build(): AnonymousStruct {
+        return AnonymousStruct(
+            fields = this.fields,
+        )
+    }
+}
+
 @Marker1
 fun struct(vararg fields: Prop) = AnonymousStruct(fields.asList())
 
