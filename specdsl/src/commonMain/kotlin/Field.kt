@@ -17,7 +17,7 @@ package org.cufy.specdsl
 
 ////////////////////////////////////////
 
-sealed interface Prop : Element {
+sealed interface Field : Element {
     val name: String
     val type: Type
     val default: Const?
@@ -30,7 +30,7 @@ sealed interface Prop : Element {
     }
 }
 
-abstract class PropBuilder {
+abstract class FieldBuilder {
     abstract var name: String
     abstract var type: Type
     abstract var default: Const?
@@ -43,19 +43,19 @@ abstract class PropBuilder {
         description += this.trimIndent()
     }
 
-    abstract fun build(): Prop
+    abstract fun build(): Field
 }
 
 ////////////////////////////////////////
 
-data class PropDefinition(
+data class FieldDefinition(
     override val name: String,
     override val namespace: Namespace,
     override val type: TypeDefinition,
     override val default: ConstDefinition?,
     override val isOptional: Boolean,
     override val description: String,
-) : Prop, ElementDefinition {
+) : Field, ElementDefinition {
     override val isInline = false
 
     override fun collectChildren() = sequence {
@@ -64,7 +64,7 @@ data class PropDefinition(
     }
 }
 
-open class PropDefinitionBuilder : PropBuilder() {
+open class FieldDefinitionBuilder : FieldBuilder() {
     open lateinit var namespace: Namespace
     override lateinit var name: String
     override lateinit var type: Type
@@ -75,9 +75,9 @@ open class PropDefinitionBuilder : PropBuilder() {
     // language=markdown
     override var description = ""
 
-    override fun build(): PropDefinition {
+    override fun build(): FieldDefinition {
         val asNamespace = this.namespace + this.name
-        return PropDefinition(
+        return FieldDefinition(
             name = this.name,
             namespace = this.namespace,
             type = when (val type = this.type) {
@@ -96,9 +96,9 @@ open class PropDefinitionBuilder : PropBuilder() {
 }
 
 @Marker1
-fun prop(type: Type, block: PropDefinitionBuilder.() -> Unit = {}): Unnamed<PropDefinition> {
+fun prop(type: Type, block: FieldDefinitionBuilder.() -> Unit = {}): Unnamed<FieldDefinition> {
     return Unnamed { namespace, name ->
-        PropDefinitionBuilder()
+        FieldDefinitionBuilder()
             .also { it.name = name }
             .also { it.namespace = namespace }
             .also { it.type = type }
@@ -109,16 +109,16 @@ fun prop(type: Type, block: PropDefinitionBuilder.() -> Unit = {}): Unnamed<Prop
 
 ////////////////////////////////////////
 
-data class AnonymousProp(
+data class AnonymousField(
     override val name: String,
     override val type: Type,
     override val default: Const?,
     override val isOptional: Boolean,
     override val description: String,
-) : Prop, AnonymousElement {
-    override fun createDefinition(namespace: Namespace): PropDefinition {
+) : Field, AnonymousElement {
+    override fun createDefinition(namespace: Namespace): FieldDefinition {
         val asNamespace = namespace + name
-        return PropDefinition(
+        return FieldDefinition(
             name = this.name,
             namespace = namespace,
             type = when (this.type) {
@@ -136,7 +136,7 @@ data class AnonymousProp(
     }
 }
 
-open class AnonymousPropBuilder : PropBuilder() {
+open class AnonymousFieldBuilder : FieldBuilder() {
     override lateinit var name: String
     override lateinit var type: Type
 
@@ -146,8 +146,8 @@ open class AnonymousPropBuilder : PropBuilder() {
     // language=markdown
     override var description = ""
 
-    override fun build(): AnonymousProp {
-        return AnonymousProp(
+    override fun build(): AnonymousField {
+        return AnonymousField(
             name = this.name,
             type = this.type,
             description = this.description,
@@ -164,8 +164,8 @@ fun prop(
     default: ConstDefinition? = null,
     isOptional: Boolean = false,
     description: String = "",
-): AnonymousProp {
-    return AnonymousProp(
+): AnonymousField {
+    return AnonymousField(
         name = name,
         type = type,
         default = default,

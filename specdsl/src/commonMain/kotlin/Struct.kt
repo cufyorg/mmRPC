@@ -20,17 +20,17 @@ import kotlin.reflect.KProperty
 ////////////////////////////////////////
 
 sealed interface Struct : Type {
-    val fields: List<Prop>
+    val fields: List<Field>
 
     override fun collectChildren() =
         sequence { yieldAll(fields.asSequence().flatMap { it.collect() }) }
 }
 
 abstract class StructBuilder {
-    abstract operator fun Prop.unaryPlus()
+    abstract operator fun Field.unaryPlus()
 
-    operator fun String.invoke(type: Type, block: AnonymousPropBuilder.() -> Unit = {}) {
-        +AnonymousPropBuilder()
+    operator fun String.invoke(type: Type, block: AnonymousFieldBuilder.() -> Unit = {}) {
+        +AnonymousFieldBuilder()
             .also { it.name = this }
             .also { it.type = type }
             .also(block)
@@ -47,7 +47,7 @@ data class StructDefinition(
     override val namespace: Namespace,
     override val isInline: Boolean,
     override val description: String,
-    override val fields: List<PropDefinition>,
+    override val fields: List<FieldDefinition>,
 ) : Struct, TypeDefinition {
     override fun collectChildren() =
         sequence { yieldAll(fields.asSequence().flatMap { it.collect() }) }
@@ -66,13 +66,13 @@ open class StructDefinitionBuilder : StructBuilder() {
         description += this.trimIndent()
     }
 
-    protected open var fields = mutableListOf<PropDefinition>()
-    protected open var anonymousFields = mutableListOf<AnonymousProp>()
+    protected open var fields = mutableListOf<FieldDefinition>()
+    protected open var anonymousFields = mutableListOf<AnonymousField>()
 
-    override operator fun Prop.unaryPlus() {
+    override operator fun Field.unaryPlus() {
         when (this) {
-            is PropDefinition -> fields += this
-            is AnonymousProp -> anonymousFields += this
+            is FieldDefinition -> fields += this
+            is AnonymousField -> anonymousFields += this
         }
     }
 
@@ -113,7 +113,7 @@ fun struct(block: StructDefinitionBuilder.() -> Unit = {}): Unnamed<Struct> {
 ////////////////////////////////////////
 
 data class AnonymousStruct(
-    override val fields: List<Prop>,
+    override val fields: List<Field>,
 ) : Struct, AnonymousType {
     override fun createDefinition(namespace: Namespace): StructDefinition {
         val name = "(anonymous{})"
@@ -125,8 +125,8 @@ data class AnonymousStruct(
             description = "",
             fields = this.fields.map {
                 when (it) {
-                    is PropDefinition -> it
-                    is AnonymousProp -> it.createDefinition(asNamespace)
+                    is FieldDefinition -> it
+                    is AnonymousField -> it.createDefinition(asNamespace)
                 }
             }
         )
@@ -142,8 +142,8 @@ data class AnonymousStruct(
                 description = "",
                 fields = this.fields.map {
                     when (it) {
-                        is PropDefinition -> it
-                        is AnonymousProp -> it.createDefinition(asNamespace)
+                        is FieldDefinition -> it
+                        is AnonymousField -> it.createDefinition(asNamespace)
                     }
                 }
             )
@@ -152,9 +152,9 @@ data class AnonymousStruct(
 }
 
 open class AnonymousStructBuilder : StructBuilder() {
-    protected open var fields = mutableListOf<Prop>()
+    protected open var fields = mutableListOf<Field>()
 
-    override operator fun Prop.unaryPlus() {
+    override operator fun Field.unaryPlus() {
         fields += this
     }
 
@@ -166,6 +166,6 @@ open class AnonymousStructBuilder : StructBuilder() {
 }
 
 @Marker1
-fun struct(vararg fields: Prop) = AnonymousStruct(fields.asList())
+fun struct(vararg fields: Field) = AnonymousStruct(fields.asList())
 
 ////////////////////////////////////////
