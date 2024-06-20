@@ -95,6 +95,7 @@ object builtin : Namespace() {
     /**
      * Namespace to be used for defining builtin decorators.
      */
+    @Deprecated("Use builtin.MyDecorator instead of builtin.decorator.MyDecorator")
     object decorator : Namespace()
 
     /**
@@ -105,5 +106,11 @@ object builtin : Namespace() {
     /**
      * Namespace to be used for defining builtin references.
      */
+    @Deprecated("builtin.reference was intended for token declarations. Thus, please use builtin.token")
     object reference : Namespace()
+
+    /**
+     * Namespace to be used for defining builtin token.
+     */
+    object token : Namespace()
 }
