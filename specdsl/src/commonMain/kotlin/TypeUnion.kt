@@ -15,78 +15,69 @@
  */
 package org.cufy.specdsl
 
-import kotlin.reflect.KProperty
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlin.jvm.JvmName
 
 ////////////////////////////////////////
 
-sealed interface TypeUnion : Type {
-    val unionList: List<Type>
-
-    override fun collectChildren() =
-        sequence { yieldAll(unionList.asSequence().flatMap { it.collect() }) }
+@Serializable
+@SerialName("union")
+data class UnionDefinition(
+    override val name: String = "(anonymous|)",
+    override val namespace: Namespace = Namespace.Toplevel,
+    @SerialName("is_inline")
+    override val isInline: Boolean = true,
+    override val description: String = "",
+    override val decorators: List<DecoratorDefinition> = emptyList(),
+    @SerialName("union_types")
+    val unionTypes: List<TypeDefinition>,
+) : TypeDefinition {
+    override fun collectChildren() = sequence {
+        yieldAll(decorators.asSequence().flatMap { it.collect() })
+        yieldAll(unionTypes.asSequence().flatMap { it.collect() })
+    }
 }
 
-abstract class TypeUnionBuilder {
-    abstract operator fun Type.unaryPlus()
+open class UnionDefinitionBuilder :
+    TypeDefinitionSetDomainContainer,
+    ElementDefinitionBuilder() {
+    override var name = "(anonymous|)"
 
-    abstract fun build(): TypeUnion
-}
+    protected open val unionTypesUnnamed = mutableListOf<Unnamed<TypeDefinition>>()
 
-////////////////////////////////////////
-
-data class TypeUnionDefinition(
-    override val name: String,
-    override val namespace: Namespace,
-    override val isInline: Boolean,
-    override val description: String,
-    override val unionList: List<TypeDefinition>,
-) : TypeUnion, TypeDefinition {
-    override fun collectChildren() =
-        sequence { yieldAll(unionList.asSequence().flatMap { it.collect() }) }
-}
-
-open class TypeUnionDefinitionBuilder : TypeUnionBuilder() {
-    open lateinit var name: String
-    open lateinit var namespace: Namespace
-
-    // language=markdown
-    open var description = ""
-
-    open operator fun String.unaryPlus() {
-        description += this.trimIndent()
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("unaryPlusUnnamedTypeDefinition")
+    override operator fun Unnamed<TypeDefinition>.unaryPlus() {
+        unionTypesUnnamed += this
     }
 
-    protected open val unionList = mutableListOf<TypeDefinition>()
-    protected open val anonymousUnionList = mutableListOf<AnonymousType>()
-
-    override operator fun Type.unaryPlus() {
-        when (this) {
-            is TypeDefinition -> unionList.add(this)
-            is AnonymousType -> anonymousUnionList.add(this)
-        }
-    }
-
-    override fun build(): TypeUnionDefinition {
-        val asNamespace = this.namespace + this.name
-        return TypeUnionDefinition(
+    override fun build(): UnionDefinition {
+        val asNamespace = this.namespace.value + this.name
+        return UnionDefinition(
             name = this.name,
-            namespace = this.namespace,
-            isInline = false,
+            namespace = this.namespace.value,
+            isInline = this.isInline,
             description = this.description,
-            unionList = this.unionList +
-                    this.anonymousUnionList.map {
-                        it.createDefinition(asNamespace)
-                    }
+            decorators = this.decoratorsUnnamed.map {
+                it.get(asNamespace)
+            },
+            unionTypes = this.unionTypesUnnamed.map {
+                it.get(asNamespace)
+            },
         )
     }
 }
 
 @Marker1
-fun union(block: TypeUnionDefinitionBuilder.() -> Unit = {}): Unnamed<TypeUnionDefinition> {
+fun union(
+    block: UnionDefinitionBuilder.() -> Unit = {},
+): Unnamed<UnionDefinition> {
     return Unnamed { namespace, name ->
-        TypeUnionDefinitionBuilder()
-            .also { it.name = name }
-            .also { it.namespace = namespace }
+        UnionDefinitionBuilder()
+            .also { it.name = name ?: return@also }
+            .also { it.namespace *= namespace }
+            .also { it.isInline = name == null }
             .apply(block)
             .build()
     }
@@ -94,46 +85,20 @@ fun union(block: TypeUnionDefinitionBuilder.() -> Unit = {}): Unnamed<TypeUnionD
 
 ////////////////////////////////////////
 
-data class AnonymousTypeUnion(
-    override val unionList: List<Type>
-) : TypeUnion, AnonymousType {
-    override fun createDefinition(namespace: Namespace): TypeUnionDefinition {
-        val name = "(anonymous|)"
-        val asNamespace = namespace + name
-        return TypeUnionDefinition(
-            name = name,
-            namespace = namespace,
-            description = "",
-            isInline = true,
-            unionList = this.unionList.map {
-                when (it) {
-                    is TypeDefinition -> it
-                    is AnonymousType -> it.createDefinition(asNamespace)
-                }
-            },
-        )
-    }
-
-    operator fun provideDelegate(t: Any?, p: KProperty<*>): Unnamed<TypeUnionDefinition> {
-        return Unnamed { namespace, name ->
-            val asNamespace = namespace + name
-            TypeUnionDefinition(
-                name = name,
-                namespace = namespace,
-                description = "",
-                isInline = false,
-                unionList = this.unionList.map {
-                    when (it) {
-                        is TypeDefinition -> it
-                        is AnonymousType -> it.createDefinition(asNamespace)
-                    }
-                },
-            )
-        }
-    }
+@Marker1
+fun union(
+    vararg types: TypeDefinition,
+    block: UnionDefinitionBuilder.() -> Unit = {},
+): Unnamed<UnionDefinition> {
+    return union { +types.asList(); block() }
 }
 
 @Marker1
-fun union(vararg unionList: Type) = AnonymousTypeUnion(unionList.asList())
+fun union(
+    vararg types: Unnamed<TypeDefinition>,
+    block: UnionDefinitionBuilder.() -> Unit = {},
+): Unnamed<UnionDefinition> {
+    return union { +types.asList(); block() }
+}
 
 ////////////////////////////////////////

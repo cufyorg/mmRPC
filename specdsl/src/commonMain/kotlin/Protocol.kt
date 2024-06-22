@@ -15,79 +15,93 @@
  */
 package org.cufy.specdsl
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlin.jvm.JvmName
+
 ////////////////////////////////////////
 
+@Serializable
+@SerialName("protocol")
 data class ProtocolDefinition(
-    override val name: String,
-    override val namespace: Namespace,
-    override val description: String,
-    val routines: List<RoutineDefinition>,
+    override val name: String = "(anonymous<protocol>)",
+    override val namespace: Namespace = Namespace.Toplevel,
+    @SerialName("is_inline")
+    override val isInline: Boolean = true,
+    override val description: String = "",
+    override val decorators: List<DecoratorDefinition> = emptyList(),
+    @SerialName("protocol_routines")
+    val protocolRoutines: List<RoutineDefinition> = emptyList(),
 ) : ElementDefinition {
-    override val isInline = false
-
-    override fun collectChildren() =
-        sequence { yieldAll(routines.asSequence().flatMap { it.collect() }) }
+    override fun collectChildren() = sequence {
+        yieldAll(decorators.asSequence().flatMap { it.collect() })
+        yieldAll(protocolRoutines.asSequence().flatMap { it.collect() })
+    }
 }
 
-open class ProtocolDefinitionBuilder {
-    open lateinit var name: String
-    open lateinit var namespace: Namespace
+open class ProtocolDefinitionBuilder :
+    RoutineDefinitionSetDomainContainer,
+    ElementDefinitionBuilder() {
+    override var name = "(anonymous<protocol>)"
 
-    // language=markdown
-    open var description = ""
+    protected open val protocolRoutinesUnnamed = mutableListOf<Unnamed<RoutineDefinition>>()
 
-    open operator fun String.unaryPlus() {
-        description += this.trimIndent()
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("unaryPlusUnnamedRoutineDefinition")
+    override operator fun Unnamed<RoutineDefinition>.unaryPlus() {
+        protocolRoutinesUnnamed += this
     }
 
-    protected open val routines = mutableListOf<RoutineDefinition>()
-    protected open val anonymousRoutines = mutableListOf<AnonymousRoutine>()
-
-    open operator fun Routine.unaryPlus() {
-        when (this) {
-            is RoutineDefinition -> routines += this
-            is AnonymousRoutine -> anonymousRoutines += this
-        }
-    }
-
-    open operator fun String.invoke(block: RoutineBuilder.() -> Unit) {
-        +AnonymousRoutineBuilder()
-            .also { it.name = this }
-            .apply(block)
-            .build()
-    }
-
-    open fun build(): ProtocolDefinition {
-        val asNamespace = this.namespace + this.name
+    override fun build(): ProtocolDefinition {
+        val asNamespace = this.namespace.value + this.name
         return ProtocolDefinition(
-            namespace = this.namespace,
+            namespace = this.namespace.value,
             name = this.name,
+            isInline = this.isInline,
             description = this.description,
-            routines = this.routines +
-                    this.anonymousRoutines.map {
-                        it.createDefinition(asNamespace)
-                    }
+            decorators = this.decoratorsUnnamed.map {
+                it.get(asNamespace)
+            },
+            protocolRoutines = this.protocolRoutinesUnnamed.map {
+                it.get(asNamespace)
+            }
         )
     }
 }
 
 @Marker1
-val protocol = UnnamedProvider { namespace, name ->
-    ProtocolDefinitionBuilder()
-        .also { it.name = name }
-        .also { it.namespace = namespace }
-        .build()
-}
-
-@Marker1
-fun protocol(block: ProtocolDefinitionBuilder.() -> Unit = {}): Unnamed<ProtocolDefinition> {
+fun protocol(
+    block: ProtocolDefinitionBuilder.() -> Unit = {}
+): Unnamed<ProtocolDefinition> {
     return Unnamed { namespace, name ->
         ProtocolDefinitionBuilder()
-            .also { it.name = name }
-            .also { it.namespace = namespace }
+            .also { it.name = name ?: return@also }
+            .also { it.namespace *= namespace }
+            .also { it.isInline = name == null }
             .apply(block)
             .build()
     }
+}
+
+////////////////////////////////////////
+
+@Marker1
+val protocol = protocol()
+
+@Marker1
+fun protocol(
+    vararg routines: RoutineDefinition,
+    block: ProtocolDefinitionBuilder.() -> Unit = {}
+): Unnamed<ProtocolDefinition> {
+    return protocol { +routines.asList(); block() }
+}
+
+@Marker1
+fun protocol(
+    vararg routines: Unnamed<RoutineDefinition>,
+    block: ProtocolDefinitionBuilder.() -> Unit = {}
+): Unnamed<ProtocolDefinition> {
+    return protocol { +routines.asList(); block() }
 }
 
 ////////////////////////////////////////

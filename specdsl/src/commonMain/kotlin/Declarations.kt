@@ -17,6 +17,67 @@ package org.cufy.specdsl
 
 import kotlin.reflect.KProperty
 
+////////////////////////////////////////
+
+abstract class NamespaceObject {
+    var namespace: Namespace
+        protected set
+
+    constructor() {
+        this.namespace = Namespace(inferSegment())
+    }
+
+    constructor(vararg segments: String) {
+        this.namespace = Namespace(*segments)
+    }
+
+    constructor(parent: NamespaceObject) {
+        this.namespace = parent.namespace + inferSegment()
+    }
+
+    constructor(parent: NamespaceObject, vararg segments: String) {
+        this.namespace = parent.namespace + segments.asList()
+    }
+
+    private fun inferSegment(): String {
+        return this::class.simpleName.orEmpty()
+    }
+}
+
+////////////////////////////////////////
+
+class Unnamed<out T>(private val block: (Namespace, String?) -> T) {
+    constructor(block: (Namespace) -> T) : this({ ns, _ -> block(ns) })
+    constructor(value: T) : this({ _, _ -> value })
+
+    fun get(namespace: Namespace, name: String) =
+        block(namespace, name)
+
+    fun get(namespace: Namespace) =
+        block(namespace, null)
+
+    fun get(obj: NamespaceObject, name: String) =
+        block(obj.namespace, name)
+
+    fun get(obj: NamespaceObject) =
+        block(obj.namespace, null)
+
+    private val values = mutableMapOf<Pair<Namespace, String?>, T>()
+
+    operator fun getValue(namespace: Namespace, property: KProperty<*>) =
+        values.getOrPut(namespace to property.name) {
+            block(namespace, property.name)
+        }
+
+    operator fun getValue(obj: NamespaceObject, property: KProperty<*>) =
+        values.getOrPut(obj.namespace to property.name) {
+            block(obj.namespace, property.name)
+        }
+
+    operator fun provideDelegate(thisRef: Any?, property: KProperty<*>) =
+        Unnamed { namespace, name -> block(namespace, name) }
+}
+
 @DslMarker
 annotation class Marker0
 
@@ -29,89 +90,4 @@ annotation class Marker2
 @DslMarker
 annotation class Marker3
 
-open class Namespace(vararg val segments: String) {
-    abstract inner class Namespace(vararg segments: String) :
-        org.cufy.specdsl.Namespace(*this.segments, *segments)
-
-    override fun hashCode() =
-        segments.contentHashCode()
-
-    override fun equals(other: Any?) =
-        other is Namespace && other.segments contentEquals segments
-
-    override fun toString() =
-        "Namespace($canonicalName)"
-
-    val canonicalName by lazy { segments.joinToString(".") }
-
-    operator fun plus(name: String) =
-        org.cufy.specdsl.Namespace(*segments, name)
-
-    operator fun plus(namespace: org.cufy.specdsl.Namespace) =
-        org.cufy.specdsl.Namespace(*segments, *namespace.segments)
-}
-
-class Unnamed<T>(val block: (Namespace, String) -> T) {
-    constructor(block: (Namespace) -> T) : this({ ns, _ -> block(ns) })
-
-    private val values = mutableMapOf<Pair<Namespace, String>, T>()
-
-    operator fun getValue(namespace: Namespace, property: KProperty<*>): T =
-        values.getOrPut(namespace to property.name) { block(namespace, property.name) }
-}
-
-class UnnamedProvider<T>(val block: (Namespace, String) -> T) {
-    constructor(block: (Namespace) -> T) : this({ ns, _ -> block(ns) })
-
-    operator fun provideDelegate(thisRef: Any?, property: KProperty<*>) =
-        Unnamed { namespace, name -> block(namespace, name) }
-}
-
-sealed interface Element {
-    fun collect(): Sequence<Element> =
-        sequenceOf(this) + collectChildren()
-
-    fun collectChildren(): Sequence<Element>
-}
-
-sealed interface AnonymousElement : Element {
-    fun createDefinition(namespace: Namespace): ElementDefinition
-}
-
-sealed interface ElementDefinition : Element {
-    val name: String
-    val namespace: Namespace
-    val description: String
-
-    val canonicalName: String
-        get() {
-            return if (namespace.segments.isEmpty()) name
-            else "${namespace.canonicalName}.$name"
-        }
-
-    val isInline: Boolean
-
-    override fun collect(): Sequence<ElementDefinition> =
-        sequenceOf(this) + collectChildren()
-
-    override fun collectChildren(): Sequence<ElementDefinition>
-}
-
-sealed interface Type : Element
-
-sealed interface AnonymousType : Type, AnonymousElement {
-    override fun createDefinition(namespace: Namespace): TypeDefinition
-}
-
-sealed interface TypeDefinition : Type, ElementDefinition
-
-interface Endpoint : Element {
-    val name: String
-    val description: String
-}
-
-interface AnonymousEndpoint : Endpoint, AnonymousElement {
-    override fun createDefinition(namespace: Namespace): EndpointDefinition
-}
-
-interface EndpointDefinition : Endpoint, ElementDefinition
+////////////////////////////////////////

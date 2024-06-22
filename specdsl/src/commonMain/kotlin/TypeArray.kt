@@ -15,68 +15,80 @@
  */
 package org.cufy.specdsl
 
-import kotlin.reflect.KProperty
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 ////////////////////////////////////////
 
-sealed interface TypeArray : Type {
-    val type: Type
-
-    override fun collectChildren() =
-        sequence { yieldAll(type.collect()) }
-}
-
-////////////////////////////////////////
-
-data class TypeArrayDefinition(
-    override val name: String,
-    override val namespace: Namespace,
-    override val type: TypeDefinition,
-    override val isInline: Boolean,
-    override val description: String,
-) : TypeArray, TypeDefinition {
-    override fun collectChildren() =
-        sequence { yieldAll(type.collect()) }
-}
-
-////////////////////////////////////////
-
-data class AnonymousTypeArray(
-    override val type: Type
-) : TypeArray, AnonymousType {
-    override fun createDefinition(namespace: Namespace): TypeArrayDefinition {
-        val name = "(anonymous[])"
-        val asNamespace = namespace + name
-        return TypeArrayDefinition(
-            name = name,
-            namespace = namespace,
-            type = when (this.type) {
-                is TypeDefinition -> this.type
-                is AnonymousType -> this.type.createDefinition(asNamespace)
-            },
-            isInline = true,
-            description = "",
-        )
+@Serializable
+@SerialName("array")
+data class ArrayDefinition(
+    override val name: String = "(anonymous[])",
+    override val namespace: Namespace = Namespace.Toplevel,
+    @SerialName("is_inline")
+    override val isInline: Boolean = true,
+    override val description: String = "",
+    override val decorators: List<DecoratorDefinition> = emptyList(),
+    @SerialName("array_type")
+    val arrayType: TypeDefinition,
+) : TypeDefinition {
+    override fun collectChildren() = sequence {
+        yieldAll(decorators.asSequence().flatMap { it.collect() })
+        yieldAll(arrayType.collect())
     }
+}
 
-    operator fun provideDelegate(a: Any?, p: KProperty<*>): Unnamed<TypeArrayDefinition> {
-        return Unnamed { namespace, name ->
-            val asNamespace = namespace + name
-            TypeArrayDefinition(
-                name = name,
-                namespace = namespace,
-                type = when (this.type) {
-                    is TypeDefinition -> this.type
-                    is AnonymousType -> this.type.createDefinition(asNamespace)
-                },
-                isInline = false,
-                description = "",
-            )
-        }
+open class ArrayDefinitionBuilder :
+    ElementDefinitionBuilder() {
+    override var name = "(anonymous[])"
+
+    open val type = DomainProperty<TypeDefinition>()
+
+    override fun build(): ArrayDefinition {
+        val asNamespace = this.namespace.value + this.name
+        return ArrayDefinition(
+            name = this.name,
+            namespace = this.namespace.value,
+            isInline = this.isInline,
+            description = this.description,
+            decorators = this.decoratorsUnnamed.map {
+                it.get(asNamespace)
+            },
+            arrayType = this.type.value.get(asNamespace),
+        )
     }
 }
 
 @Marker1
-fun array(type: Type) = AnonymousTypeArray(type)
+internal fun array(
+    block: ArrayDefinitionBuilder.() -> Unit = {}
+): Unnamed<ArrayDefinition> {
+    return Unnamed { namespace, name ->
+        ArrayDefinitionBuilder()
+            .also { it.name = name ?: return@also }
+            .also { it.namespace *= namespace }
+            .also { it.isInline = name == null }
+            .apply(block)
+            .build()
+    }
+}
+
+////////////////////////////////////////
+
+@Marker1
+fun array(
+    type: TypeDefinition,
+    block: ArrayDefinitionBuilder.() -> Unit = {},
+): Unnamed<ArrayDefinition> {
+    return array { this.type *= type; block() }
+}
+
+@Marker1
+fun array(
+    type: Unnamed<TypeDefinition>,
+    block: ArrayDefinitionBuilder.() -> Unit = {},
+): Unnamed<ArrayDefinition> {
+    return array { this.type *= type; block() }
+}
 
 ////////////////////////////////////////

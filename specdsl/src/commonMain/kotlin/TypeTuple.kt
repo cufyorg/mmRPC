@@ -15,75 +15,96 @@
  */
 package org.cufy.specdsl
 
-import kotlin.reflect.KProperty
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlin.jvm.JvmName
 
 ////////////////////////////////////////
 
-sealed interface TypeTuple : Type {
-    val tupleList: List<Type>
+@Serializable
+@SerialName("tuple")
+data class TupleDefinition(
+    override val name: String = "(anonymous())",
+    override val namespace: Namespace = Namespace.Toplevel,
+    @SerialName("is_inline")
+    override val isInline: Boolean = true,
+    override val description: String = "",
+    override val decorators: List<DecoratorDefinition> = emptyList(),
+    @SerialName("tuple_types")
+    val tupleTypes: List<TypeDefinition> = emptyList(),
+) : TypeDefinition {
+    companion object {
+        val Empty = TupleDefinition()
+    }
 
-    override fun collectChildren() =
-        sequence { yieldAll(tupleList.asSequence().flatMap { it.collect() }) }
+    override fun collectChildren() = sequence {
+        yieldAll(decorators.asSequence().flatMap { it.collect() })
+        yieldAll(tupleTypes.asSequence().flatMap { it.collect() })
+    }
 }
 
-////////////////////////////////////////
+open class TupleDefinitionBuilder :
+    TypeDefinitionSetDomainContainer,
+    ElementDefinitionBuilder() {
+    override var name = "(anonymous())"
 
-data class TypeTupleDefinition(
-    override val name: String,
-    override val namespace: Namespace,
-    override val isInline: Boolean,
-    override val description: String,
-    override val tupleList: List<TypeDefinition>,
-) : TypeTuple, TypeDefinition {
-    override fun collectChildren() =
-        sequence { yieldAll(tupleList.asSequence().flatMap { it.collect() }) }
-}
+    protected open val tupleTypesUnnamed = mutableListOf<Unnamed<TypeDefinition>>()
 
-////////////////////////////////////////
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("unaryPlusUnnamedTypeDefinition")
+    override operator fun Unnamed<TypeDefinition>.unaryPlus() {
+        tupleTypesUnnamed += this
+    }
 
-data class AnonymousTypeTuple(
-    override val tupleList: List<Type>
-) : TypeTuple, AnonymousType {
-    override fun createDefinition(namespace: Namespace): TypeTupleDefinition {
-        val name = "(anonymous())"
-        val asNamespace = namespace + name
-        return TypeTupleDefinition(
-            name = name,
-            namespace = namespace,
-            description = "",
-            isInline = true,
-            tupleList = this.tupleList.map {
-                when (it) {
-                    is TypeDefinition -> it
-                    is AnonymousType -> it.createDefinition(asNamespace)
-                }
+    override fun build(): TupleDefinition {
+        val asNamespace = this.namespace.value + this.name
+        return TupleDefinition(
+            name = this.name,
+            namespace = this.namespace.value,
+            isInline = this.isInline,
+            description = this.description,
+            decorators = this.decoratorsUnnamed.map {
+                it.get(asNamespace)
+            },
+            tupleTypes = this.tupleTypesUnnamed.map {
+                it.get(asNamespace)
             },
         )
     }
+}
 
-    operator fun provideDelegate(a: Any?, p: KProperty<*>): Unnamed<TypeTupleDefinition> {
-        return Unnamed { namespace, name ->
-            val asNamespace = namespace + name
-            TypeTupleDefinition(
-                name = name,
-                namespace = namespace,
-                description = "",
-                isInline = false,
-                tupleList = this.tupleList.map {
-                    when (it) {
-                        is TypeDefinition -> it
-                        is AnonymousType -> it.createDefinition(asNamespace)
-                    }
-                },
-            )
-        }
+@Marker1
+fun tuple(
+    block: TupleDefinitionBuilder.() -> Unit = {},
+): Unnamed<TupleDefinition> {
+    return Unnamed { namespace, name ->
+        TupleDefinitionBuilder()
+            .also { it.name = name ?: return@also }
+            .also { it.namespace *= namespace }
+            .also { it.isInline = name == null }
+            .build()
     }
 }
+
+////////////////////////////////////////
 
 @Marker1
 val tuple = tuple()
 
 @Marker1
-fun tuple(vararg tupleList: Type) = AnonymousTypeTuple(tupleList.asList())
+fun tuple(
+    vararg types: TypeDefinition,
+    block: TupleDefinitionBuilder.() -> Unit = {},
+): Unnamed<TupleDefinition> {
+    return tuple { +types.asList(); block() }
+}
+
+@Marker1
+fun tuple(
+    vararg types: Unnamed<TypeDefinition>,
+    block: TupleDefinitionBuilder.() -> Unit = {},
+): Unnamed<TupleDefinition> {
+    return tuple { +types.asList(); block() }
+}
 
 ////////////////////////////////////////

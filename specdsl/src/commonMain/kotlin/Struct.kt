@@ -15,96 +15,73 @@
  */
 package org.cufy.specdsl
 
-import kotlin.reflect.KProperty
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlin.jvm.JvmName
 
 ////////////////////////////////////////
 
-sealed interface Struct : Type {
-    val fields: List<Field>
-
-    override fun collectChildren() =
-        sequence { yieldAll(fields.asSequence().flatMap { it.collect() }) }
-}
-
-abstract class StructBuilder {
-    abstract operator fun Field.unaryPlus()
-
-    operator fun String.invoke(type: Type, block: AnonymousFieldBuilder.() -> Unit = {}) {
-        +AnonymousFieldBuilder()
-            .also { it.name = this }
-            .also { it.type = type }
-            .also(block)
-            .build()
-    }
-
-    abstract fun build(): Struct
-}
-
-////////////////////////////////////////
-
+@Serializable
+@SerialName("struct")
 data class StructDefinition(
-    override val name: String,
-    override val namespace: Namespace,
-    override val isInline: Boolean,
-    override val description: String,
-    override val fields: List<FieldDefinition>,
-) : Struct, TypeDefinition {
-    override fun collectChildren() =
-        sequence { yieldAll(fields.asSequence().flatMap { it.collect() }) }
-}
-
-////////////////////////////////////////
-
-open class StructDefinitionBuilder : StructBuilder() {
-    open lateinit var name: String
-    open lateinit var namespace: Namespace
-
-    // language=markdown
-    open var description = ""
-
-    open operator fun String.unaryPlus() {
-        description += this.trimIndent()
+    override val name: String = "(anonymous{})",
+    override val namespace: Namespace = Namespace.Toplevel,
+    @SerialName("is_inline")
+    override val isInline: Boolean = true,
+    override val description: String = "",
+    override val decorators: List<DecoratorDefinition> = emptyList(),
+    @SerialName("struct_fields")
+    val structFields: List<FieldDefinition> = emptyList(),
+) : TypeDefinition {
+    companion object {
+        val Empty = StructDefinition()
     }
 
-    protected open var fields = mutableListOf<FieldDefinition>()
-    protected open var anonymousFields = mutableListOf<AnonymousField>()
+    override fun collectChildren() = sequence {
+        yieldAll(decorators.asSequence().flatMap { it.collect() })
+        yieldAll(structFields.asSequence().flatMap { it.collect() })
+    }
+}
 
-    override operator fun Field.unaryPlus() {
-        when (this) {
-            is FieldDefinition -> fields += this
-            is AnonymousField -> anonymousFields += this
-        }
+open class StructDefinitionBuilder :
+    FieldDefinitionSetDomainContainer,
+    ElementDefinitionBuilder() {
+    override var name = "(anonymous{})"
+
+    protected open var structFieldsUnnamed = mutableListOf<Unnamed<FieldDefinition>>()
+
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("unaryPlusUnnamedFieldDefinition")
+    override operator fun Unnamed<FieldDefinition>.unaryPlus() {
+        structFieldsUnnamed += this
     }
 
     override fun build(): StructDefinition {
-        val asNamespace = this.namespace + this.name
+        val asNamespace = this.namespace.value + this.name
         return StructDefinition(
             name = this.name,
-            namespace = this.namespace,
-            isInline = false,
+            namespace = this.namespace.value,
+            isInline = this.isInline,
             description = this.description,
-            fields = this.fields +
-                    this.anonymousFields.map {
-                        it.createDefinition(asNamespace)
-                    }
+            decorators = this.decoratorsUnnamed.map {
+                it.get(asNamespace)
+            },
+            structFields = this.structFieldsUnnamed.map {
+                it.get(asNamespace)
+            },
         )
     }
 }
 
 @Marker1
-val struct = UnnamedProvider { namespace, name ->
-    StructDefinitionBuilder()
-        .also { it.name = name }
-        .also { it.namespace = namespace }
-        .build()
-}
-
-@Marker1
-fun struct(block: StructDefinitionBuilder.() -> Unit = {}): Unnamed<Struct> {
+fun struct(
+    block: StructDefinitionBuilder.() -> Unit = {}
+): Unnamed<StructDefinition> {
     return Unnamed { namespace, name ->
         StructDefinitionBuilder()
-            .also { it.name = name }
-            .also { it.namespace = namespace }
+            .also { it.name = name ?: return@also }
+            .also { it.namespace *= namespace }
+            .also { it.isInline = name == null }
             .apply(block)
             .build()
     }
@@ -112,60 +89,23 @@ fun struct(block: StructDefinitionBuilder.() -> Unit = {}): Unnamed<Struct> {
 
 ////////////////////////////////////////
 
-data class AnonymousStruct(
-    override val fields: List<Field>,
-) : Struct, AnonymousType {
-    override fun createDefinition(namespace: Namespace): StructDefinition {
-        val name = "(anonymous{})"
-        val asNamespace = namespace + name
-        return StructDefinition(
-            name = name,
-            namespace = namespace,
-            isInline = true,
-            description = "",
-            fields = this.fields.map {
-                when (it) {
-                    is FieldDefinition -> it
-                    is AnonymousField -> it.createDefinition(asNamespace)
-                }
-            }
-        )
-    }
+@Marker1
+val struct = struct()
 
-    operator fun provideDelegate(t: Any?, p: KProperty<*>): Unnamed<StructDefinition> {
-        return Unnamed { namespace, name ->
-            val asNamespace = namespace + name
-            StructDefinition(
-                name = name,
-                namespace = namespace,
-                isInline = false,
-                description = "",
-                fields = this.fields.map {
-                    when (it) {
-                        is FieldDefinition -> it
-                        is AnonymousField -> it.createDefinition(asNamespace)
-                    }
-                }
-            )
-        }
-    }
-}
-
-open class AnonymousStructBuilder : StructBuilder() {
-    protected open var fields = mutableListOf<Field>()
-
-    override operator fun Field.unaryPlus() {
-        fields += this
-    }
-
-    override fun build(): AnonymousStruct {
-        return AnonymousStruct(
-            fields = this.fields,
-        )
-    }
+@Marker1
+fun struct(
+    vararg fields: FieldDefinition,
+    block: StructDefinitionBuilder.() -> Unit = {}
+): Unnamed<StructDefinition> {
+    return struct { +fields.asList(); block() }
 }
 
 @Marker1
-fun struct(vararg fields: Field) = AnonymousStruct(fields.asList())
+fun struct(
+    vararg fields: Unnamed<FieldDefinition>,
+    block: StructDefinitionBuilder.() -> Unit = {}
+): Unnamed<StructDefinition> {
+    return struct { +fields.asList(); block() }
+}
 
 ////////////////////////////////////////

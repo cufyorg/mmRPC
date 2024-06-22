@@ -15,103 +15,113 @@
  */
 package org.cufy.specdsl
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlin.jvm.JvmInline
+
 ////////////////////////////////////////
 
-data class IframeSecurity(val name: String)
+@JvmInline
+@Serializable
+value class IframeSecurity(val name: String)
 
-////////////////////////////////////////
+@JvmInline
+@Serializable
+value class IframePath(val value: String)
 
-interface IframeEndpoint : Endpoint {
-    val path: String?
-    val securityInter: List<IframeSecurity>
-
-    override fun collectChildren() =
-        emptySequence<Element>()
+object Iframe {
+    val SameClient = IframeSecurity("SameClient")
 }
 
-abstract class IframeEndpointBuilder {
-    abstract var name: String
-    abstract var path: String?
+fun Namespace.toIframePath(): IframePath {
+    return IframePath(
+        value = segments.joinToString("/")
+    )
+}
 
-    // language=markdown
-    abstract var description: String
+////////////////////////////////////////
 
-    operator fun String.unaryPlus() {
-        description += this.trimIndent()
+@Serializable
+@SerialName("iframe_endpoint")
+data class IframeEndpointDefinition(
+    override val name: String = "(anonymous<iframe_endpoint>)",
+    override val namespace: Namespace = Namespace.Toplevel,
+    @SerialName("is_inline")
+    override val isInline: Boolean = true,
+    override val description: String = "",
+    override val decorators: List<DecoratorDefinition> = emptyList(),
+    @SerialName("endpoint_path")
+    val endpointPath: IframePath = namespace.toIframePath(),
+    @SerialName("endpoint_security_inter")
+    val endpointSecurityInter: List<IframeSecurity> = emptyList(),
+) : EndpointDefinition {
+    override fun collectChildren() = sequence {
+        yieldAll(decorators.asSequence().flatMap { it.collect() })
+    }
+}
+
+open class IframeEndpointDefinitionBuilder :
+    ElementDefinitionBuilder() {
+    override var name: String = "(anonymous<iframe_endpoint>)"
+
+    open var path: String? = null
+
+    protected open var endpointSecurityInter = mutableSetOf<IframeSecurity>()
+
+    open operator fun IframeSecurity.unaryPlus() {
+        endpointSecurityInter += this
     }
 
-    abstract operator fun IframeSecurity.unaryPlus()
-
-    abstract fun build(): IframeEndpoint
-}
-
-////////////////////////////////////////
-
-data class IframeEndpointDefinition(
-    override val name: String,
-    override val namespace: Namespace,
-    override val path: String?,
-    override val securityInter: List<IframeSecurity>,
-    override val description: String,
-) : IframeEndpoint, EndpointDefinition {
-    override val isInline = false
-
-    override fun collectChildren() =
-        emptySequence<ElementDefinition>()
-}
-
-////////////////////////////////////////
-
-data class AnonymousIframeEndpoint(
-    override val name: String,
-    override val path: String?,
-    override val securityInter: List<IframeSecurity>,
-    override val description: String,
-) : IframeEndpoint, AnonymousEndpoint {
-    override fun createDefinition(namespace: Namespace): IframeEndpointDefinition {
+    override fun build(): IframeEndpointDefinition {
+        val asNamespace = this.namespace.value + this.name
         return IframeEndpointDefinition(
             name = this.name,
-            namespace = namespace,
-            path = this.path,
-            securityInter = this.securityInter,
+            namespace = this.namespace.value,
+            isInline = this.isInline,
             description = this.description,
+            decorators = this.decoratorsUnnamed.map {
+                it.get(asNamespace)
+            },
+            endpointPath = this.path
+                ?.let { IframePath(it) }
+                ?: asNamespace.toIframePath(),
+            endpointSecurityInter = this.endpointSecurityInter.toList(),
         )
     }
 }
 
-open class AnonymousIframeEndpointBuilder : IframeEndpointBuilder() {
-    override var name: String = "iframe"
-    override var path: String? = null
-
-    // language=markdown
-    override var description = ""
-
-    protected open var securityInter = mutableSetOf<IframeSecurity>()
-
-    override operator fun IframeSecurity.unaryPlus() {
-        securityInter.add(this)
-    }
-
-    override fun build(): AnonymousIframeEndpoint {
-        return AnonymousIframeEndpoint(
-            name = this.name,
-            path = this.path,
-            securityInter = this.securityInter.toList(),
-            description = this.description,
-        )
+@Marker1
+fun endpointIframe(
+    block: IframeEndpointDefinitionBuilder.() -> Unit = {}
+): Unnamed<IframeEndpointDefinition> {
+    return Unnamed { namespace, name ->
+        IframeEndpointDefinitionBuilder()
+            .also { it.name = name ?: return@also }
+            .also { it.namespace *= namespace }
+            .also { it.isInline = name == null }
+            .apply(block)
+            .build()
     }
 }
 
 ////////////////////////////////////////
 
-@Marker2
-val RoutineBuilder.iframe get() = iframe()
+@Marker1
+val endpointIframe = endpointIframe()
+
+////////////////////////////////////////
 
 @Marker2
-fun RoutineBuilder.iframe(block: IframeEndpointBuilder.() -> Unit = {}) {
-    +AnonymousIframeEndpointBuilder()
-        .apply(block)
-        .build()
+val RoutineDefinitionBuilder.iframe: Unit
+    get() {
+        +endpointIframe
+    }
+
+@Marker2
+fun RoutineDefinitionBuilder.iframe(
+    block: IframeEndpointDefinitionBuilder.() -> Unit = {}
+) {
+    +endpointIframe { block() }
 }
 
 ////////////////////////////////////////

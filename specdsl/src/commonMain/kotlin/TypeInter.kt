@@ -15,78 +15,69 @@
  */
 package org.cufy.specdsl
 
-import kotlin.reflect.KProperty
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlin.jvm.JvmName
 
 ////////////////////////////////////////
 
-sealed interface TypeInter : Type {
-    val interList: List<Type>
-
-    override fun collectChildren() =
-        sequence { yieldAll(interList.asSequence().flatMap { it.collect() }) }
+@Serializable
+@SerialName("inter")
+data class InterDefinition(
+    override val name: String = "(anonymous&)",
+    override val namespace: Namespace = Namespace.Toplevel,
+    @SerialName("is_inline")
+    override val isInline: Boolean = true,
+    override val description: String = "",
+    override val decorators: List<DecoratorDefinition> = emptyList(),
+    @SerialName("inter_types")
+    val interTypes: List<TypeDefinition>,
+) : TypeDefinition {
+    override fun collectChildren() = sequence {
+        yieldAll(decorators.asSequence().flatMap { it.collect() })
+        yieldAll(interTypes.asSequence().flatMap { it.collect() })
+    }
 }
 
-abstract class TypeInterBuilder {
-    abstract operator fun Type.unaryPlus()
+open class InterDefinitionBuilder :
+    TypeDefinitionSetDomainContainer,
+    ElementDefinitionBuilder() {
+    override var name = "(anonymous&)"
 
-    abstract fun build(): TypeInter
-}
+    protected open val interTypesUnnamed = mutableListOf<Unnamed<TypeDefinition>>()
 
-////////////////////////////////////////
-
-data class TypeInterDefinition(
-    override val name: String,
-    override val namespace: Namespace,
-    override val isInline: Boolean,
-    override val description: String,
-    override val interList: List<TypeDefinition>,
-) : TypeInter, TypeDefinition {
-    override fun collectChildren() =
-        sequence { yieldAll(interList.asSequence().flatMap { it.collect() }) }
-}
-
-open class TypeInterDefinitionBuilder : TypeInterBuilder() {
-    open lateinit var name: String
-    open lateinit var namespace: Namespace
-
-    // language=markdown
-    open var description = ""
-
-    open operator fun String.unaryPlus() {
-        description += this.trimIndent()
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("unaryPlusUnnamedTypeDefinition")
+    override operator fun Unnamed<TypeDefinition>.unaryPlus() {
+        interTypesUnnamed += this
     }
 
-    protected open val interList = mutableListOf<TypeDefinition>()
-    protected open val anonymousInterList = mutableListOf<AnonymousType>()
-
-    override operator fun Type.unaryPlus() {
-        when (this) {
-            is TypeDefinition -> interList.add(this)
-            is AnonymousType -> anonymousInterList.add(this)
-        }
-    }
-
-    override fun build(): TypeInterDefinition {
-        val asNamespace = this.namespace + this.name
-        return TypeInterDefinition(
+    override fun build(): InterDefinition {
+        val asNamespace = this.namespace.value + this.name
+        return InterDefinition(
             name = this.name,
-            namespace = this.namespace,
-            isInline = false,
+            namespace = this.namespace.value,
+            isInline = this.isInline,
             description = this.description,
-            interList = this.interList +
-                    this.anonymousInterList.map {
-                        it.createDefinition(asNamespace)
-                    }
+            decorators = this.decoratorsUnnamed.map {
+                it.get(asNamespace)
+            },
+            interTypes = this.interTypesUnnamed.map {
+                it.get(asNamespace)
+            },
         )
     }
 }
 
 @Marker1
-fun inter(block: TypeInterDefinitionBuilder.() -> Unit = {}): Unnamed<TypeInterDefinition> {
+fun inter(
+    block: InterDefinitionBuilder.() -> Unit = {}
+): Unnamed<InterDefinition> {
     return Unnamed { namespace, name ->
-        TypeInterDefinitionBuilder()
-            .also { it.name = name }
-            .also { it.namespace = namespace }
+        InterDefinitionBuilder()
+            .also { it.name = name ?: return@also }
+            .also { it.namespace *= namespace }
+            .also { it.isInline = name == null }
             .apply(block)
             .build()
     }
@@ -94,46 +85,20 @@ fun inter(block: TypeInterDefinitionBuilder.() -> Unit = {}): Unnamed<TypeInterD
 
 ////////////////////////////////////////
 
-data class AnonymousTypeInter(
-    override val interList: List<Type>,
-) : TypeInter, AnonymousType {
-    override fun createDefinition(namespace: Namespace): TypeInterDefinition {
-        val name = "(anonymous&)"
-        val asNamespace = namespace + name
-        return TypeInterDefinition(
-            name = name,
-            namespace = namespace,
-            isInline = true,
-            description = "",
-            interList = this.interList.map {
-                when (it) {
-                    is TypeDefinition -> it
-                    is AnonymousType -> it.createDefinition(asNamespace)
-                }
-            },
-        )
-    }
-
-    operator fun provideDelegate(t: Any?, p: KProperty<*>): Unnamed<TypeInterDefinition> {
-        return Unnamed { namespace, name ->
-            val asNamespace = namespace + name
-            TypeInterDefinition(
-                name = name,
-                namespace = namespace,
-                isInline = false,
-                description = "",
-                interList = this.interList.map {
-                    when (it) {
-                        is TypeDefinition -> it
-                        is AnonymousType -> it.createDefinition(asNamespace)
-                    }
-                },
-            )
-        }
-    }
+@Marker1
+fun inter(
+    vararg types: TypeDefinition,
+    block: InterDefinitionBuilder.() -> Unit = {}
+): Unnamed<InterDefinition> {
+    return inter { +types.asList(); block() }
 }
 
 @Marker1
-fun inter(vararg interList: Type) = AnonymousTypeInter(interList.asList())
+fun inter(
+    vararg types: Unnamed<TypeDefinition>,
+    block: InterDefinitionBuilder.() -> Unit = {}
+): Unnamed<InterDefinition> {
+    return inter { +types.asList(); block() }
+}
 
 ////////////////////////////////////////

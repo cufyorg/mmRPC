@@ -15,118 +15,172 @@
  */
 package org.cufy.specdsl
 
-////////////////////////////////////////
-
-data class HttpSecurity(val name: String)
-
-data class HttpMethod(val name: String)
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlin.jvm.JvmInline
 
 ////////////////////////////////////////
 
-interface HttpEndpoint : Endpoint {
-    val path: String?
-    val methodUnion: List<HttpMethod>
-    val securityInter: List<HttpSecurity>
+@JvmInline
+@Serializable
+value class HttpSecurity(val name: String)
 
-    override fun collectChildren() =
-        emptySequence<Element>()
+@JvmInline
+@Serializable
+value class HttpMethod(val name: String)
+
+@JvmInline
+@Serializable
+value class HttpPath(val value: String)
+
+object Http {
+    val SameClient = HttpSecurity("SameClient")
+    val SameSubject = HttpSecurity("SameSubject")
+
+    /**
+     * Http GET method. This method is pure in nature and the
+     * go-to method for pure functions.
+     *
+     * - Parameters are passed in (www-url-encoded) request
+     *      url query with object values encoded in json.
+     * - Return value is passed in (json) response body.
+     */
+    val GET = HttpMethod("GET")
+
+    /**
+     * Http POST method. Versatile method and the fallback
+     * function if a method choice decision was not made.
+     *
+     * - Parameters are passed in (json) request body.
+     * - Return value is passed in (json) response body.
+     */
+    val POST = HttpMethod("POST")
+
+    /**
+     * Http PUT method. The choice for upsert operations.
+     *
+     * - Parameters are passed in (json) request body.
+     * - Return value is passed in (json) response body.
+     */
+    val PUT = HttpMethod("PUT")
+
+    /**
+     * Http PATCH method. Update an already existing entity.
+     *
+     * - Parameters are passed in (json) request body.
+     * - Return value is passed in (json) response body.
+     */
+    val PATCH = HttpMethod("PATCH")
+
+    /**
+     * Http DELETE method. Delete an entity.
+     *
+     * - Parameters are passed in (www-url-encoded) request
+     *      url query with object values encoded in json.
+     * - Return value is passed in (json) response body.
+     */
+    val DELETE = HttpMethod("DELETE")
 }
 
-abstract class HttpEndpointBuilder {
-    abstract var name: String
-    abstract var path: String?
+fun Namespace.toHttpPath(): HttpPath {
+    return HttpPath(
+        value = segments.joinToString("/")
+    )
+}
 
-    // language=markdown
-    abstract var description: String
+////////////////////////////////////////
 
-    operator fun String.unaryPlus() {
-        description += this.trimIndent()
+@Serializable
+@SerialName("http_endpoint")
+data class HttpEndpointDefinition(
+    override val name: String = "(anonymous<http_endpoint>)",
+    override val namespace: Namespace = Namespace.Toplevel,
+    @SerialName("is_inline")
+    override val isInline: Boolean = true,
+    override val description: String = "",
+    override val decorators: List<DecoratorDefinition> = emptyList(),
+    @SerialName("endpoint_path")
+    val endpointPath: HttpPath = namespace.toHttpPath(),
+    @SerialName("endpoint_method_union")
+    val endpointMethodUnion: List<HttpMethod> = listOf(
+        Http.POST,
+    ),
+    @SerialName("endpoint_security_inter")
+    val endpointSecurityInter: List<HttpSecurity> = emptyList(),
+) : EndpointDefinition {
+    override fun collectChildren() = sequence {
+        yieldAll(decorators.asSequence().flatMap { it.collect() })
+    }
+}
+
+open class HttpEndpointDefinitionBuilder :
+    ElementDefinitionBuilder() {
+    override var name = "(anonymous<http_endpoint>)"
+
+    open var path: String? = null
+
+    protected open var endpointMethodUnion = mutableSetOf<HttpMethod>()
+    protected open var endpointSecurityInter = mutableSetOf<HttpSecurity>()
+
+    open operator fun HttpMethod.unaryPlus() {
+        endpointMethodUnion += this
     }
 
-    abstract operator fun HttpMethod.unaryPlus()
+    open operator fun HttpSecurity.unaryPlus() {
+        endpointSecurityInter += this
+    }
 
-    abstract operator fun HttpSecurity.unaryPlus()
-
-    abstract fun build(): HttpEndpoint
-}
-
-////////////////////////////////////////
-
-data class HttpEndpointDefinition(
-    override val name: String,
-    override val namespace: Namespace,
-    override val path: String?,
-    override val methodUnion: List<HttpMethod>,
-    override val securityInter: List<HttpSecurity>,
-    override val description: String,
-) : HttpEndpoint, EndpointDefinition {
-    override val isInline = false
-
-    override fun collectChildren() =
-        emptySequence<ElementDefinition>()
-}
-
-////////////////////////////////////////
-
-data class AnonymousHttpEndpoint(
-    override val name: String,
-    override val path: String?,
-    override val methodUnion: List<HttpMethod>,
-    override val securityInter: List<HttpSecurity>,
-    override val description: String,
-) : HttpEndpoint, AnonymousEndpoint {
-    override fun createDefinition(namespace: Namespace): HttpEndpointDefinition {
+    override fun build(): HttpEndpointDefinition {
+        val asNamespace = this.namespace.value + this.name
         return HttpEndpointDefinition(
             name = this.name,
-            namespace = namespace,
-            path = this.path,
-            methodUnion = this.methodUnion,
-            securityInter = this.securityInter,
+            namespace = this.namespace.value,
+            isInline = this.isInline,
             description = this.description,
+            decorators = this.decoratorsUnnamed.map {
+                it.get(asNamespace)
+            },
+            endpointPath = this.path
+                ?.let { HttpPath(it) }
+                ?: asNamespace.toHttpPath(),
+            endpointMethodUnion = this.endpointMethodUnion.toList(),
+            endpointSecurityInter = this.endpointSecurityInter.toList(),
         )
     }
 }
 
-open class AnonymousHttpEndpointBuilder : HttpEndpointBuilder() {
-    override var name: String = "http"
-    override var path: String? = null
-
-    // language=markdown
-    override var description = ""
-
-    protected open var methodUnion = mutableSetOf<HttpMethod>()
-    protected open var securityInter = mutableSetOf<HttpSecurity>()
-
-    override operator fun HttpMethod.unaryPlus() {
-        methodUnion.add(this)
-    }
-
-    override operator fun HttpSecurity.unaryPlus() {
-        securityInter.add(this)
-    }
-
-    override fun build(): AnonymousHttpEndpoint {
-        return AnonymousHttpEndpoint(
-            name = this.name,
-            path = this.path,
-            methodUnion = this.methodUnion.toList(),
-            securityInter = this.securityInter.toList(),
-            description = this.description,
-        )
+@Marker1
+fun endpointHttp(
+    block: HttpEndpointDefinitionBuilder.() -> Unit = {}
+): Unnamed<HttpEndpointDefinition> {
+    return Unnamed { namespace, name ->
+        HttpEndpointDefinitionBuilder()
+            .also { it.name = name ?: return@also }
+            .also { it.namespace *= namespace }
+            .also { it.isInline = name == null }
+            .apply(block)
+            .build()
     }
 }
 
 ////////////////////////////////////////
 
-@Marker2
-val RoutineBuilder.http get() = http()
+@Marker1
+val endpointHttp = endpointHttp()
+
+////////////////////////////////////////
 
 @Marker2
-fun RoutineBuilder.http(block: HttpEndpointBuilder.() -> Unit = {}) {
-    +AnonymousHttpEndpointBuilder()
-        .apply { +Http.POST }
-        .apply(block)
-        .build()
+val RoutineDefinitionBuilder.http: Unit
+    get() {
+        +endpointHttp { +Http.POST }
+    }
+
+@Marker2
+fun RoutineDefinitionBuilder.http(
+    block: HttpEndpointDefinitionBuilder.() -> Unit = {}
+) {
+    +endpointHttp { +Http.POST; block() }
 }
 
 ////////////////////////////////////////

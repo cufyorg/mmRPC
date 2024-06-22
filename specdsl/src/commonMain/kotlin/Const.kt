@@ -15,109 +15,79 @@
  */
 package org.cufy.specdsl
 
-import kotlin.reflect.KProperty
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 ////////////////////////////////////////
 
-sealed interface Const : Type {
-    val value: String
-
-    override fun collectChildren() =
-        emptySequence<Element>()
-}
-
-abstract class ConstBuilder {
-    abstract var value: String
-
-    abstract fun build(): Const
-}
-
-////////////////////////////////////////
-
+@Serializable
+@SerialName("const")
 data class ConstDefinition(
-    override val name: String,
-    override val namespace: Namespace,
-    override val value: String,
-    override val isInline: Boolean,
-    override val description: String,
-) : Const, TypeDefinition {
-    override fun collectChildren() =
-        emptySequence<ElementDefinition>()
+    override val name: String = "(anonymous<const>)",
+    override val namespace: Namespace = Namespace.Toplevel,
+    @SerialName("is_inline")
+    override val isInline: Boolean = true,
+    override val description: String = "",
+    override val decorators: List<DecoratorDefinition> = emptyList(),
+    @SerialName("const_value")
+    val constValue: String,
+) : TypeDefinition {
+    override fun collectChildren() = sequence {
+        yieldAll(decorators.asSequence().flatMap { it.collect() })
+    }
 }
 
-open class ConstDefinitionBuilder : ConstBuilder() {
-    open lateinit var name: String
-    open lateinit var namespace: Namespace
-    override lateinit var value: String
+open class ConstDefinitionBuilder :
+    ElementDefinitionBuilder() {
+    override var name = "(anonymous<const>)"
 
-    // language=markdown
-    open var description = ""
-
-    open operator fun String.unaryPlus() {
-        description += this.trimIndent()
-    }
+    open lateinit var value: String
 
     override fun build(): ConstDefinition {
+        val asNamespace = this.namespace.value + this.name
         return ConstDefinition(
             name = this.name,
-            namespace = this.namespace,
-            value = this.value,
-            isInline = false,
+            namespace = this.namespace.value,
+            isInline = this.isInline,
             description = this.description,
+            decorators = this.decoratorsUnnamed.map {
+                it.get(asNamespace)
+            },
+            constValue = this.value,
         )
     }
 }
 
 @Marker1
-fun const(value: String, block: ConstDefinitionBuilder.() -> Unit = {}): Unnamed<ConstDefinition> {
+internal fun const(
+    block: ConstDefinitionBuilder.() -> Unit = {}
+): Unnamed<ConstDefinition> {
     return Unnamed { namespace, name ->
         ConstDefinitionBuilder()
-            .also { it.name = name }
-            .also { it.namespace = namespace }
-            .also { it.value = value }
+            .also { it.name = name ?: return@also }
+            .also { it.namespace *= namespace }
+            .also { it.isInline = name == null }
             .apply(block)
             .build()
     }
 }
 
-@Marker1
-fun stringConst(value: String, block: ConstDefinitionBuilder.() -> Unit = {}): Unnamed<ConstDefinition> {
-    return const("\"$value\"", block)
-}
-
 ////////////////////////////////////////
 
-data class AnonymousConst(
-    override val value: String,
-) : Const, AnonymousType {
-    override fun createDefinition(namespace: Namespace): ConstDefinition {
-        val name = this.value.uppercase()
-        return ConstDefinition(
-            name = name,
-            namespace = namespace,
-            value = this.value,
-            isInline = true,
-            description = "",
-        )
-    }
-
-    operator fun provideDelegate(t: Any?, p: KProperty<*>): Unnamed<ConstDefinition> {
-        return Unnamed { namespace, name ->
-            ConstDefinition(
-                name = name,
-                namespace = namespace,
-                value = this.value,
-                isInline = false,
-                description = "",
-            )
-        }
-    }
+@Marker1
+fun const(
+    value: String,
+    block: ConstDefinitionBuilder.() -> Unit = {}
+): Unnamed<ConstDefinition> {
+    return const { this.value = value; block() }
 }
 
 @Marker1
-fun const(value: String) = AnonymousConst(value)
-
-@Marker1
-fun stringConst(value: String) = const("\"$value\"")
+fun constString(
+    value: String,
+    block: ConstDefinitionBuilder.() -> Unit = {}
+): Unnamed<ConstDefinition> {
+    return const { this.value = "\"$value\""; block() }
+}
 
 ////////////////////////////////////////

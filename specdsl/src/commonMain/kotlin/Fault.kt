@@ -15,56 +15,61 @@
  */
 package org.cufy.specdsl
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
 ////////////////////////////////////////
 
+@Serializable
+@SerialName("fault")
 data class FaultDefinition(
-    override val name: String,
-    override val namespace: Namespace,
-    override val description: String,
+    override val name: String = "(anonymous<fault>)",
+    override val namespace: Namespace = Namespace.Toplevel,
+    @SerialName("is_inline")
+    override val isInline: Boolean = true,
+    override val description: String = "",
+    override val decorators: List<DecoratorDefinition> = emptyList(),
 ) : ElementDefinition {
-    override val isInline = false
-
-    override fun collectChildren() =
-        emptySequence<ElementDefinition>()
+    override fun collectChildren() = sequence {
+        yieldAll(decorators.asSequence().flatMap { it.collect() })
+    }
 }
 
-open class FaultDefinitionBuilder {
-    open lateinit var name: String
-    open lateinit var namespace: Namespace
+open class FaultDefinitionBuilder :
+    ElementDefinitionBuilder() {
+    override var name = "(anonymous<fault>)"
 
-    // language=markdown
-    open var description = ""
-
-    open operator fun String.unaryPlus() {
-        description += this.trimIndent()
-    }
-
-    open fun build(): FaultDefinition {
+    override fun build(): FaultDefinition {
+        val asNamespace = this.namespace.value + this.name
         return FaultDefinition(
             name = this.name,
-            namespace = this.namespace,
+            namespace = this.namespace.value,
+            isInline = this.isInline,
             description = this.description,
+            decorators = this.decoratorsUnnamed.map {
+                it.get(asNamespace)
+            },
         )
     }
 }
 
 @Marker1
-val fault = UnnamedProvider { namespace, name ->
-    FaultDefinitionBuilder()
-        .also { it.name = name }
-        .also { it.namespace = namespace }
-        .build()
-}
-
-@Marker1
-fun fault(block: FaultDefinitionBuilder.() -> Unit = {}): Unnamed<FaultDefinition> {
+fun fault(
+    block: FaultDefinitionBuilder.() -> Unit = {}
+): Unnamed<FaultDefinition> {
     return Unnamed { namespace, name ->
         FaultDefinitionBuilder()
-            .also { it.name = name }
-            .also { it.namespace = namespace }
+            .also { it.name = name ?: return@also }
+            .also { it.namespace *= namespace }
+            .also { it.isInline = name == null }
             .apply(block)
             .build()
     }
 }
+
+////////////////////////////////////////
+
+@Marker1
+val fault = fault()
 
 ////////////////////////////////////////

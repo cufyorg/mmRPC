@@ -15,56 +15,61 @@
  */
 package org.cufy.specdsl
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
 ////////////////////////////////////////
 
+@Serializable
+@SerialName("scalar")
 data class ScalarDefinition(
-    override val name: String,
-    override val namespace: Namespace,
-    override val description: String,
+    override val name: String = "(anonymous<scalar>)",
+    override val namespace: Namespace = Namespace.Toplevel,
+    @SerialName("is_inline")
+    override val isInline: Boolean = true,
+    override val description: String = "",
+    override val decorators: List<DecoratorDefinition> = emptyList(),
 ) : TypeDefinition {
-    override val isInline = false
-
-    override fun collectChildren() =
-        emptySequence<ElementDefinition>()
+    override fun collectChildren() = sequence {
+        yieldAll(decorators.asSequence().flatMap { it.collect() })
+    }
 }
 
-open class ScalarDefinitionBuilder {
-    open lateinit var name: String
-    open lateinit var namespace: Namespace
+open class ScalarDefinitionBuilder :
+    ElementDefinitionBuilder() {
+    override var name = "(anonymous<scalar>)"
 
-    // language=markdown
-    open var description = ""
-
-    open operator fun String.unaryPlus() {
-        description += this.trimIndent()
-    }
-
-    open fun build(): ScalarDefinition {
+    override fun build(): ScalarDefinition {
+        val asNamespace = this.namespace.value + this.name
         return ScalarDefinition(
             name = this.name,
-            namespace = this.namespace,
+            namespace = this.namespace.value,
+            isInline = this.isInline,
             description = this.description,
+            decorators = this.decoratorsUnnamed.map {
+                it.get(asNamespace)
+            },
         )
     }
 }
 
 @Marker1
-val scalar = UnnamedProvider { namespace, name ->
-    ScalarDefinitionBuilder()
-        .also { it.name = name }
-        .also { it.namespace = namespace }
-        .build()
-}
-
-@Marker1
-fun scalar(block: ScalarDefinitionBuilder.() -> Unit = {}): Unnamed<ScalarDefinition> {
+fun scalar(
+    block: ScalarDefinitionBuilder.() -> Unit = {}
+): Unnamed<ScalarDefinition> {
     return Unnamed { namespace, name ->
         ScalarDefinitionBuilder()
-            .also { it.name = name }
-            .also { it.namespace = namespace }
+            .also { it.name = name ?: return@also }
+            .also { it.namespace *= namespace }
+            .also { it.isInline = name == null }
             .also(block)
             .build()
     }
 }
+
+////////////////////////////////////////
+
+@Marker1
+val scalar = scalar()
 
 ////////////////////////////////////////

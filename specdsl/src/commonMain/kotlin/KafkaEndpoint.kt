@@ -15,114 +15,121 @@
  */
 package org.cufy.specdsl
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlin.jvm.JvmInline
+
 ////////////////////////////////////////
 
-data class KafkaSecurity(val name: String)
+@JvmInline
+@Serializable
+value class KafkaSecurity(val name: String)
 
-////////////////////////////////////////
+@JvmInline
+@Serializable
+value class KafkaTopic(val value: String)
 
-interface KafkaEndpoint : Endpoint {
-    val topic: String?
-    val securityInter: List<KafkaSecurity>
-    val key: TypeTuple?
-
-    override fun collectChildren() =
-        sequence { key?.let { yieldAll(it.collect()) } }
+object Kafka {
+    val KafkaACL = KafkaSecurity("KafkaACL")
+    val SameClient = KafkaSecurity("SameClient")
 }
 
-abstract class KafkaEndpointBuilder {
-    abstract var name: String
-    abstract var topic: String?
-    abstract var key: TypeTuple?
+fun Namespace.toKafkaTopic(): KafkaTopic {
+    return KafkaTopic(
+        value = canonicalName.replace(":", "-")
+    )
+}
 
-    // language=markdown
-    abstract var description: String
+////////////////////////////////////////
 
-    operator fun String.unaryPlus() {
-        description += this.trimIndent()
+@Serializable
+@SerialName("kafka_endpoint")
+data class KafkaEndpointDefinition(
+    override val name: String = "(anonymous<kafka_endpoint>)",
+    override val namespace: Namespace = Namespace.Toplevel,
+    @SerialName("is_inline")
+    override val isInline: Boolean = true,
+    override val description: String = "",
+    override val decorators: List<DecoratorDefinition> = emptyList(),
+    @SerialName("endpoint_topic")
+    val endpointTopic: KafkaTopic = namespace.toKafkaTopic(),
+    @SerialName("endpoint_security_inter")
+    val endpointSecurityInter: List<KafkaSecurity> = listOf(
+        Kafka.KafkaACL,
+    ),
+    @SerialName("endpoint_key")
+    val endpointKey: TupleDefinition? = null,
+) : EndpointDefinition {
+    override fun collectChildren() = sequence {
+        yieldAll(decorators.asSequence().flatMap { it.collect() })
+        endpointKey?.let { yieldAll(it.collect()) }
+    }
+}
+
+open class KafkaEndpointDefinitionBuilder :
+    ElementDefinitionBuilder() {
+    override var name = "(anonymous<kafka_endpoint>)"
+
+    open var topic: String? = null
+    open val key = OptionalDomainProperty<TupleDefinition>()
+
+    protected open var endpointSecurityInter = mutableSetOf<KafkaSecurity>()
+
+    open operator fun KafkaSecurity.unaryPlus() {
+        endpointSecurityInter += this
     }
 
-    abstract operator fun KafkaSecurity.unaryPlus()
-
-    abstract fun build(): KafkaEndpoint
-}
-
-////////////////////////////////////////
-
-data class KafkaEndpointDefinition(
-    override val name: String,
-    override val namespace: Namespace,
-    override val topic: String?,
-    override val securityInter: List<KafkaSecurity>,
-    override val key: TypeTupleDefinition?,
-    override val description: String,
-) : KafkaEndpoint, EndpointDefinition {
-    override val isInline = false
-
-    override fun collectChildren() =
-        sequence { key?.let { yieldAll(it.collect()) } }
-}
-
-////////////////////////////////////////
-
-data class AnonymousKafkaEndpoint(
-    override val name: String,
-    override val topic: String?,
-    override val securityInter: List<KafkaSecurity>,
-    override val key: TypeTuple?,
-    override val description: String,
-) : KafkaEndpoint, AnonymousEndpoint {
-    override fun createDefinition(namespace: Namespace): KafkaEndpointDefinition {
-        val asNamespace = namespace + this.name
+    override fun build(): KafkaEndpointDefinition {
+        val asNamespace = this.namespace.value + this.name
         return KafkaEndpointDefinition(
             name = this.name,
-            namespace = namespace,
-            topic = this.topic,
-            securityInter = this.securityInter,
-            key = when (val key = this.key) {
-                null -> null
-                is TypeTupleDefinition -> key
-                is AnonymousTypeTuple -> key.createDefinition(asNamespace)
+            namespace = this.namespace.value,
+            isInline = this.isInline,
+            description = this.description,
+            decorators = this.decoratorsUnnamed.map {
+                it.get(asNamespace)
             },
-            description = this.description,
+            endpointTopic = this.topic
+                ?.let { KafkaTopic(it) }
+                ?: asNamespace.toKafkaTopic(),
+            endpointSecurityInter = this.endpointSecurityInter.toList(),
+            endpointKey = this.key.value?.get(asNamespace),
         )
     }
 }
 
-open class AnonymousKafkaEndpointBuilder : KafkaEndpointBuilder() {
-    override var name: String = "kafka"
-    override var topic: String? = null
-    override var key: TypeTuple? = null
-
-    // language=markdown
-    override var description = ""
-
-    protected open var securityInter = mutableSetOf<KafkaSecurity>()
-
-    override operator fun KafkaSecurity.unaryPlus() {
-        securityInter.add(this)
-    }
-
-    override fun build(): AnonymousKafkaEndpoint {
-        return AnonymousKafkaEndpoint(
-            name = this.name,
-            topic = this.topic,
-            securityInter = this.securityInter.toList(),
-            key = this.key,
-            description = this.description,
-        )
+@Marker1
+fun endpointKafka(
+    block: KafkaEndpointDefinitionBuilder.() -> Unit = {}
+): Unnamed<KafkaEndpointDefinition> {
+    return Unnamed { namespace, name ->
+        KafkaEndpointDefinitionBuilder()
+            .also { it.name = name ?: return@also }
+            .also { it.namespace *= namespace }
+            .also { it.isInline = name == null }
+            .apply(block)
+            .build()
     }
 }
 
-@Marker2
-val RoutineBuilder.kafka get() = kafka()
+////////////////////////////////////////
+
+@Marker1
+val endpointKafka = endpointKafka()
+
+////////////////////////////////////////
 
 @Marker2
-fun RoutineBuilder.kafka(block: KafkaEndpointBuilder.() -> Unit = {}) {
-    +AnonymousKafkaEndpointBuilder()
-        .apply { +Kafka.KafkaACL }
-        .apply(block)
-        .build()
+val RoutineDefinitionBuilder.kafka: Unit
+    get() {
+        +endpointKafka { +Kafka.KafkaACL }
+    }
+
+@Marker2
+fun RoutineDefinitionBuilder.kafka(
+    block: KafkaEndpointDefinitionBuilder.() -> Unit = {}
+) {
+    +endpointKafka { +Kafka.KafkaACL; block() }
 }
 
 ////////////////////////////////////////

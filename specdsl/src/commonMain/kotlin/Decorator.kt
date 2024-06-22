@@ -15,56 +15,61 @@
  */
 package org.cufy.specdsl
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
 ////////////////////////////////////////
 
+@Serializable
+@SerialName("decorator")
 data class DecoratorDefinition(
-    override val name: String,
-    override val namespace: Namespace,
-    override val description: String,
+    override val name: String = "(anonymous@)",
+    override val namespace: Namespace = Namespace.Toplevel,
+    @SerialName("is_inline")
+    override val isInline: Boolean = true,
+    override val description: String = "",
+    override val decorators: List<DecoratorDefinition> = emptyList(),
 ) : ElementDefinition {
-    override val isInline = false
-
-    override fun collectChildren() =
-        emptySequence<ElementDefinition>()
+    override fun collectChildren() = sequence {
+        yieldAll(decorators.asSequence().flatMap { it.collect() })
+    }
 }
 
-open class DecoratorDefinitionBuilder {
-    open lateinit var name: String
-    open lateinit var namespace: Namespace
+open class DecoratorDefinitionBuilder :
+    ElementDefinitionBuilder() {
+    override var name = "(anonymous@)"
 
-    // language=markdown
-    open var description = ""
-
-    open operator fun String.unaryPlus() {
-        description += this.trimIndent()
-    }
-
-    open fun build(): DecoratorDefinition {
+    override fun build(): DecoratorDefinition {
+        val asNamespace = this.namespace.value + this.name
         return DecoratorDefinition(
             name = this.name,
-            namespace = this.namespace,
+            namespace = this.namespace.value,
+            isInline = this.isInline,
             description = this.description,
+            decorators = this.decoratorsUnnamed.map {
+                it.get(asNamespace)
+            },
         )
     }
 }
 
 @Marker1
-val decorator = UnnamedProvider { namespace, name ->
-    DecoratorDefinitionBuilder()
-        .also { it.name = name }
-        .also { it.namespace = namespace }
-        .build()
-}
-
-@Marker1
-fun decorator(block: DecoratorDefinitionBuilder.() -> Unit = {}): Unnamed<DecoratorDefinition> {
+fun decorator(
+    block: DecoratorDefinitionBuilder.() -> Unit = {}
+): Unnamed<DecoratorDefinition> {
     return Unnamed { namespace, name ->
         DecoratorDefinitionBuilder()
-            .also { it.name = name }
-            .also { it.namespace = namespace }
+            .also { it.name = name ?: return@also }
+            .also { it.namespace *= namespace }
+            .also { it.isInline = name == null }
             .apply(block)
             .build()
     }
 }
+
+////////////////////////////////////////
+
+@Marker1
+val decorator = decorator()
 
 ////////////////////////////////////////

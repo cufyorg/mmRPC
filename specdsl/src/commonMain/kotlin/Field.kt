@@ -15,93 +15,69 @@
  */
 package org.cufy.specdsl
 
-////////////////////////////////////////
-
-sealed interface Field : Element {
-    val name: String
-    val type: Type
-    val default: Const?
-    val isOptional: Boolean
-    val description: String
-
-    override fun collectChildren() = sequence {
-        yieldAll(type.collect())
-        default?.let { yieldAll(it.collect()) }
-    }
-}
-
-abstract class FieldBuilder {
-    abstract var name: String
-    abstract var type: Type
-    abstract var default: Const?
-    abstract var isOptional: Boolean
-
-    // language=markdown
-    abstract var description: String
-
-    operator fun String.unaryPlus() {
-        description += this.trimIndent()
-    }
-
-    abstract fun build(): Field
-}
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 ////////////////////////////////////////
 
+@Serializable
+@SerialName("field")
 data class FieldDefinition(
-    override val name: String,
-    override val namespace: Namespace,
-    override val type: TypeDefinition,
-    override val default: ConstDefinition?,
-    override val isOptional: Boolean,
-    override val description: String,
-) : Field, ElementDefinition {
-    override val isInline = false
-
+    override val name: String = "(anonymous<field>)",
+    override val namespace: Namespace = Namespace.Toplevel,
+    @SerialName("is_inline")
+    override val isInline: Boolean = true,
+    override val description: String = "",
+    override val decorators: List<DecoratorDefinition> = emptyList(),
+    @SerialName("field_type")
+    val fieldType: TypeDefinition,
+    @SerialName("field_is_optional")
+    val fieldIsOptional: Boolean = false,
+    @SerialName("field_default")
+    val fieldDefault: ConstDefinition? = null,
+) : ElementDefinition {
     override fun collectChildren() = sequence {
-        yieldAll(type.collect())
-        default?.let { yieldAll(it.collect()) }
+        yieldAll(decorators.asSequence().flatMap { it.collect() })
+        yieldAll(fieldType.collect())
+        fieldDefault?.let { yieldAll(it.collect()) }
     }
 }
 
-open class FieldDefinitionBuilder : FieldBuilder() {
-    open lateinit var namespace: Namespace
-    override lateinit var name: String
-    override lateinit var type: Type
+open class FieldDefinitionBuilder :
+    ElementDefinitionBuilder() {
+    override var name = "(anonymous<field>)"
 
-    override var default: Const? = null
-    override var isOptional = false
+    open var isOptional = false
 
-    // language=markdown
-    override var description = ""
+    open val type = DomainProperty<TypeDefinition>()
+    open val default = OptionalDomainProperty<ConstDefinition>()
 
     override fun build(): FieldDefinition {
-        val asNamespace = this.namespace + this.name
+        val asNamespace = this.namespace.value + this.name
         return FieldDefinition(
             name = this.name,
-            namespace = this.namespace,
-            type = when (val type = this.type) {
-                is TypeDefinition -> type
-                is AnonymousType -> type.createDefinition(asNamespace)
-            },
+            namespace = this.namespace.value,
+            isInline = this.isInline,
             description = this.description,
-            default = when (val default = this.default) {
-                null -> null
-                is ConstDefinition -> default
-                is AnonymousConst -> default.createDefinition(asNamespace)
+            decorators = this.decoratorsUnnamed.map {
+                it.get(asNamespace)
             },
-            isOptional = this.isOptional,
+            fieldIsOptional = this.isOptional,
+            fieldType = this.type.value.get(asNamespace),
+            fieldDefault = this.default.value?.get(asNamespace),
         )
     }
 }
 
 @Marker1
-fun prop(type: Type, block: FieldDefinitionBuilder.() -> Unit = {}): Unnamed<FieldDefinition> {
+internal fun prop(
+    block: FieldDefinitionBuilder.() -> Unit = {},
+): Unnamed<FieldDefinition> {
     return Unnamed { namespace, name ->
         FieldDefinitionBuilder()
-            .also { it.name = name }
-            .also { it.namespace = namespace }
-            .also { it.type = type }
+            .also { it.name = name ?: return@also }
+            .also { it.namespace *= namespace }
+            .also { it.isInline = name == null }
             .apply(block)
             .build()
     }
@@ -109,69 +85,20 @@ fun prop(type: Type, block: FieldDefinitionBuilder.() -> Unit = {}): Unnamed<Fie
 
 ////////////////////////////////////////
 
-data class AnonymousField(
-    override val name: String,
-    override val type: Type,
-    override val default: Const?,
-    override val isOptional: Boolean,
-    override val description: String,
-) : Field, AnonymousElement {
-    override fun createDefinition(namespace: Namespace): FieldDefinition {
-        val asNamespace = namespace + name
-        return FieldDefinition(
-            name = this.name,
-            namespace = namespace,
-            type = when (this.type) {
-                is TypeDefinition -> this.type
-                is AnonymousType -> this.type.createDefinition(asNamespace)
-            },
-            default = when (this.default) {
-                null -> null
-                is ConstDefinition -> this.default
-                is AnonymousConst -> this.default.createDefinition(asNamespace)
-            },
-            isOptional = this.isOptional,
-            description = this.description,
-        )
-    }
-}
-
-open class AnonymousFieldBuilder : FieldBuilder() {
-    override lateinit var name: String
-    override lateinit var type: Type
-
-    override var default: Const? = null
-    override var isOptional = false
-
-    // language=markdown
-    override var description = ""
-
-    override fun build(): AnonymousField {
-        return AnonymousField(
-            name = this.name,
-            type = this.type,
-            description = this.description,
-            default = this.default,
-            isOptional = this.isOptional,
-        )
-    }
+@Marker1
+fun prop(
+    type: TypeDefinition,
+    block: FieldDefinitionBuilder.() -> Unit = {},
+): Unnamed<FieldDefinition> {
+    return prop { this.type *= type; block() }
 }
 
 @Marker1
 fun prop(
-    name: String,
-    type: Type,
-    default: ConstDefinition? = null,
-    isOptional: Boolean = false,
-    description: String = "",
-): AnonymousField {
-    return AnonymousField(
-        name = name,
-        type = type,
-        default = default,
-        isOptional = isOptional,
-        description = description,
-    )
+    type: Unnamed<TypeDefinition>,
+    block: FieldDefinitionBuilder.() -> Unit = {},
+): Unnamed<FieldDefinition> {
+    return prop { this.type *= type; block() }
 }
 
 ////////////////////////////////////////
