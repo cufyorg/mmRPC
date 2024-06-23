@@ -82,6 +82,7 @@ fun tuple(
             .also { it.name = name ?: return@also }
             .also { it.namespace *= namespace }
             .also { it.isInline = name == null }
+            .apply(block)
             .build()
     }
 }
