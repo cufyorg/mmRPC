@@ -23,6 +23,17 @@ import kotlin.jvm.JvmInline
 @Serializable
 value class SpecSheet(val elements: List<ElementDefinition>) {
     constructor(vararg elements: ElementDefinition) : this(elements.asList())
+
+    fun collectChildren() = elements.asSequence().flatMap { it.collect() }
+
+    operator fun plus(element: ElementDefinition) =
+        SpecSheet(this.elements + element)
+
+    operator fun plus(elements: Iterable<ElementDefinition>) =
+        SpecSheet(this.elements + elements)
+
+    operator fun plus(sheet: SpecSheet) =
+        SpecSheet(this.elements + sheet.elements)
 }
 
 @JvmInline
