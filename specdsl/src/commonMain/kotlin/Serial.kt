@@ -46,6 +46,13 @@ value class Namespace(val segments: List<String>) {
 
     operator fun plus(namespace: Namespace) =
         Namespace(segments = this.segments + namespace.segments)
+
+    operator fun contains(namespace: Namespace): Boolean {
+        if (this.segments.size > namespace.segments.size)
+            return false
+
+        return this.segments == namespace.segments.subList(0, this.segments.size)
+    }
 }
 
 @Serializable
