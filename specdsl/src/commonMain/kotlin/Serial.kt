@@ -36,6 +36,7 @@ value class Namespace(val segments: List<String>) {
 
     override fun toString() = "Namespace($canonicalName)"
 
+    val parent get() = Namespace(segments.dropLast(1))
     val canonicalName get() = this.segments.joinToString(".")
 
     operator fun plus(segment: String) =
@@ -47,6 +48,7 @@ value class Namespace(val segments: List<String>) {
     operator fun plus(namespace: Namespace) =
         Namespace(segments = this.segments + namespace.segments)
 
+    fun take(n: Int) = Namespace(segments.take(n))
 
     operator fun contains(namespace: Namespace): Boolean {
         if (this.segments.size > namespace.segments.size)
