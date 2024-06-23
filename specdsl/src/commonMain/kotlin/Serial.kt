@@ -18,6 +18,7 @@ package org.cufy.specdsl
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmInline
+import kotlin.math.min
 
 @JvmInline
 @Serializable
@@ -38,12 +39,21 @@ value class SpecSheet(val elements: List<ElementDefinition>) {
 
 @JvmInline
 @Serializable
-value class Namespace(val segments: List<String>) {
+value class Namespace(val segments: List<String>) : Comparable<Namespace> {
     companion object {
         val Toplevel = Namespace()
     }
 
     constructor(vararg segments: String) : this(segments.asList())
+
+    override fun compareTo(other: Namespace): Int {
+        repeat(min(this.segments.size, other.segments.size)) { i ->
+            val r = segments[i].compareTo(other.segments[i])
+            if (r != 0) return r
+        }
+
+        return this.segments.size - other.segments.size
+    }
 
     override fun toString() = "Namespace($canonicalName)"
 
