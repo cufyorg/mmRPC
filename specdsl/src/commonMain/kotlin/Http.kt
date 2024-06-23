@@ -142,7 +142,7 @@ open class HttpEndpointDefinitionBuilder :
             },
             endpointPath = this.path
                 ?.let { HttpPath(it) }
-                ?: asNamespace.toHttpPath(),
+                ?: this.namespace.value.toHttpPath(),
             endpointMethodUnion = this.endpointMethodUnion.toList(),
             endpointSecurityInter = this.endpointSecurityInter.toList(),
         )

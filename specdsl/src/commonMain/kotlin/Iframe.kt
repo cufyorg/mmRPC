@@ -84,7 +84,7 @@ open class IframeEndpointDefinitionBuilder :
             },
             endpointPath = this.path
                 ?.let { IframePath(it) }
-                ?: asNamespace.toIframePath(),
+                ?: this.namespace.value.toIframePath(),
             endpointSecurityInter = this.endpointSecurityInter.toList(),
         )
     }
