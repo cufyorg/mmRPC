@@ -38,7 +38,7 @@ data class RoutineDefinition(
     val routineInput: StructDefinition = StructDefinition.Empty,
     @SerialName("routine_output")
     val routineOutput: StructDefinition = StructDefinition.Empty,
-) : ElementDefinition {
+) : ElementDefinition() {
     companion object {
         const val ANONYMOUS_NAME = "(anonymous<routine>)"
     }

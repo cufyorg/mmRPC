@@ -30,7 +30,7 @@ data class FaultDefinition(
     override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<Metadata> = emptyList(),
-) : ElementDefinition {
+) : ElementDefinition() {
     companion object {
         const val ANONYMOUS_NAME = "(anonymous<fault>)"
     }

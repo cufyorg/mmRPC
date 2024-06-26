@@ -59,7 +59,7 @@ data class KafkaEndpointDefinition(
     ),
     @SerialName("endpoint_key")
     val endpointKey: TupleDefinition? = null,
-) : EndpointDefinition {
+) : EndpointDefinition() {
     companion object {
         const val ANONYMOUS_NAME = "(anonymous<kafka_endpoint>)"
     }

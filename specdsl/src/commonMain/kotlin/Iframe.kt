@@ -54,7 +54,7 @@ data class IframeEndpointDefinition(
     val endpointPath: IframePath = namespace.toIframePath(),
     @SerialName("endpoint_security_inter")
     val endpointSecurityInter: List<IframeSecurity> = emptyList(),
-) : EndpointDefinition {
+) : EndpointDefinition() {
     companion object {
         const val ANONYMOUS_NAME = "(anonymous<iframe_endpoint>)"
     }

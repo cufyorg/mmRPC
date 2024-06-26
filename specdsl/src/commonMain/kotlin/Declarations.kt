@@ -23,28 +23,28 @@ import kotlin.reflect.KProperty
 ////////////////////////////////////////
 
 @Serializable
-sealed interface ElementDefinition {
-    val name: String
-    val namespace: Namespace
+sealed class ElementDefinition {
+    abstract val name: String
+    abstract val namespace: Namespace
 
     @SerialName("is_inline")
-    val isInline: Boolean
-    val description: String
-    val metadata: List<Metadata>
+    abstract val isInline: Boolean
+    abstract val description: String
+    abstract val metadata: List<Metadata>
 
-    val canonicalName get() = CanonicalName(namespace, name)
-    val isAnonymous get() = namespace.isAnonymous || Namespace.isAnonymousSegment(name)
+    val canonicalName by lazy { CanonicalName(namespace, name) }
+    val isAnonymous by lazy { namespace.isAnonymous || Namespace.isAnonymousSegment(name) }
 
     fun collect() = sequenceOf(this) + collectChildren()
 
-    fun collectChildren(): Sequence<ElementDefinition>
+    abstract fun collectChildren(): Sequence<ElementDefinition>
 }
 
 @Serializable
-sealed interface TypeDefinition : ElementDefinition
+sealed class TypeDefinition : ElementDefinition()
 
 @Serializable
-sealed interface EndpointDefinition : ElementDefinition
+sealed class EndpointDefinition : ElementDefinition()
 
 ////////////////////////////////////////
 

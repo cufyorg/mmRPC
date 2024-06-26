@@ -30,7 +30,7 @@ data class MetadataDefinition(
     override val metadata: List<Metadata> = emptyList(),
     @SerialName("metadata_parameters")
     val metadataParameters: List<MetadataParameterDefinition> = emptyList(),
-) : ElementDefinition {
+) : ElementDefinition() {
     companion object {
         const val ANONYMOUS_NAME = "(anonymous@)"
     }

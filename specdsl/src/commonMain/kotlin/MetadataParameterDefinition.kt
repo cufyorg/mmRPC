@@ -20,7 +20,7 @@ data class MetadataParameterDefinition(
     val parameterIsOptional: Boolean = false,
     @SerialName("parameter_default")
     val parameterDefault: ConstDefinition? = null,
-) : ElementDefinition {
+) : ElementDefinition() {
     companion object {
         const val ANONYMOUS_NAME = "(anonymous<metadata-parameter>)"
     }

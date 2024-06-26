@@ -107,7 +107,7 @@ data class HttpEndpointDefinition(
     ),
     @SerialName("endpoint_security_inter")
     val endpointSecurityInter: List<HttpSecurity> = emptyList(),
-) : EndpointDefinition {
+) : EndpointDefinition() {
     companion object {
         const val ANONYMOUS_NAME = "(anonymous<http_endpoint>)"
     }

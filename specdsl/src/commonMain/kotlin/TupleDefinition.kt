@@ -32,7 +32,7 @@ data class TupleDefinition(
     override val metadata: List<Metadata> = emptyList(),
     @SerialName("tuple_types")
     val tupleTypes: List<TypeDefinition> = emptyList(),
-) : TypeDefinition {
+) : TypeDefinition() {
     companion object {
         val Empty = TupleDefinition()
         const val ANONYMOUS_NAME = "(anonymous())"

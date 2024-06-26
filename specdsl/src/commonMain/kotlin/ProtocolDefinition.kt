@@ -32,7 +32,7 @@ data class ProtocolDefinition(
     override val metadata: List<Metadata> = emptyList(),
     @SerialName("protocol_routines")
     val protocolRoutines: List<RoutineDefinition> = emptyList(),
-) : ElementDefinition {
+) : ElementDefinition() {
     companion object {
         const val ANONYMOUS_NAME = "(anonymous<protocol>)"
     }

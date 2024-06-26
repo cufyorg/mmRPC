@@ -31,7 +31,7 @@ data class ArrayDefinition(
     override val metadata: List<Metadata> = emptyList(),
     @SerialName("array_type")
     val arrayType: TypeDefinition,
-) : TypeDefinition {
+) : TypeDefinition() {
     companion object {
         const val ANONYMOUS_NAME = "(anonymous[])"
     }

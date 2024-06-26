@@ -32,7 +32,7 @@ data class StructDefinition(
     override val metadata: List<Metadata> = emptyList(),
     @SerialName("struct_fields")
     val structFields: List<FieldDefinition> = emptyList(),
-) : TypeDefinition {
+) : TypeDefinition() {
     companion object {
         const val ANONYMOUS_NAME = "(anonymous{})"
         val Empty = StructDefinition()

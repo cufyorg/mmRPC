@@ -35,7 +35,7 @@ data class FieldDefinition(
     val fieldIsOptional: Boolean = false,
     @SerialName("field_default")
     val fieldDefault: ConstDefinition? = null,
-) : ElementDefinition {
+) : ElementDefinition() {
     companion object {
         const val ANONYMOUS_NAME = "(anonymous<field>)"
     }

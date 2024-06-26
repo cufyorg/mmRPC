@@ -32,7 +32,7 @@ data class UnionDefinition(
     override val metadata: List<Metadata> = emptyList(),
     @SerialName("union_types")
     val unionTypes: List<TypeDefinition>,
-) : TypeDefinition {
+) : TypeDefinition() {
     companion object {
         const val ANONYMOUS_NAME = "(anonymous|)"
     }

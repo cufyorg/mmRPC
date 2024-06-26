@@ -32,7 +32,7 @@ data class InterDefinition(
     override val metadata: List<Metadata> = emptyList(),
     @SerialName("inter_types")
     val interTypes: List<TypeDefinition>,
-) : TypeDefinition {
+) : TypeDefinition() {
     companion object {
         const val ANONYMOUS_NAME = "(anonymous&)"
     }

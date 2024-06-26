@@ -33,7 +33,7 @@ data class ConstDefinition(
     val constType: ScalarDefinition,
     @SerialName("const_value")
     val constValue: String,
-) : TypeDefinition {
+) : TypeDefinition() {
     companion object {
         const val ANONYMOUS_NAME = "(anonymous<const>)"
     }
