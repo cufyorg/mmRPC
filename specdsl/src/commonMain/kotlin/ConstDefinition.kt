@@ -29,11 +29,14 @@ data class ConstDefinition(
     override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<Metadata> = emptyList(),
+    @SerialName("const_type")
+    val constType: ScalarDefinition,
     @SerialName("const_value")
     val constValue: String,
 ) : TypeDefinition {
     override fun collectChildren() = sequence {
         yieldAll(metadata.asSequence().flatMap { it.collect() })
+        yieldAll(constType.collect())
     }
 }
 
@@ -41,6 +44,7 @@ open class ConstDefinitionBuilder :
     ElementDefinitionBuilder() {
     override var name = "(anonymous<const>)"
 
+    open val type = DomainProperty<ScalarDefinition>()
     open lateinit var value: String
 
     override fun build(): ConstDefinition {
@@ -51,6 +55,7 @@ open class ConstDefinitionBuilder :
             isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.toList(),
+            constType = this.type.value.get(asNamespace),
             constValue = this.value,
         )
     }
@@ -75,17 +80,53 @@ internal fun const(
 @Marker1
 fun const(
     value: String,
+    type: ScalarDefinition = builtin.String,
     block: ConstDefinitionBuilder.() -> Unit = {}
 ): Unnamed<ConstDefinition> {
-    return const { this.value = value; block() }
+    return const {
+        this.type *= type
+        this.value = value
+        block()
+    }
+}
+
+@Marker1
+fun const(
+    value: String,
+    type: Unnamed<ScalarDefinition>,
+    block: ConstDefinitionBuilder.() -> Unit = {}
+): Unnamed<ConstDefinition> {
+    return const {
+        this.type *= type
+        this.value = value
+        block()
+    }
 }
 
 @Marker1
 fun constString(
     value: String,
+    type: ScalarDefinition = builtin.String,
     block: ConstDefinitionBuilder.() -> Unit = {}
 ): Unnamed<ConstDefinition> {
-    return const { this.value = "\"$value\""; block() }
+    return const {
+        this.type *= type
+        this.value = "\"$value\""
+        block()
+    }
+}
+
+@Marker1
+fun constString(
+    value: String,
+    type: Unnamed<ScalarDefinition>,
+    block: ConstDefinitionBuilder.() -> Unit = {}
+): Unnamed<ConstDefinition> {
+    return const {
+        this.type *= type
+        this.value = "\"$value\""
+        block()
+    }
 }
 
 ////////////////////////////////////////

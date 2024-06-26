@@ -20,6 +20,17 @@ package org.cufy.specdsl
  */
 @Suppress("ClassName")
 object builtin : NamespaceObject() {
+    val Nothing by scalar { description = "builtin nothing (the type of null)" }
+    val NULL by const("null", Nothing) { description = "builtin null" }
+    val String by scalar { description = "builtin string" }
+    val Boolean by scalar { description = "builtin boolean" }
+    val TRUE by const("true", Boolean) { description = "builtin true" }
+    val FALSE by const("false", Boolean) { description = "builtin false" }
+    val Int32 by scalar { description = "builtin 32bit int" }
+    val UInt32 by scalar { description = "builtin unsigned 32bit int" }
+    val Int64 by scalar { description = "builtin 64bit int" }
+    val UInt64 by scalar { description = "builtin unsigned 64bit int" }
+
     /**
      * Namespace to be used for defining builtin faults.
      */
