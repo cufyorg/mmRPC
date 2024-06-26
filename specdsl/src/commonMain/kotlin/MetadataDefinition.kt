@@ -28,6 +28,8 @@ data class MetadataDefinition(
     override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<Metadata> = emptyList(),
+    @SerialName("metadata_is_native")
+    val metadataIsNative: Boolean = false,
     @SerialName("metadata_parameters")
     val metadataParameters: List<MetadataParameterDefinition> = emptyList(),
 ) : ElementDefinition() {
@@ -46,6 +48,8 @@ open class MetadataDefinitionBuilder :
     ElementDefinitionBuilder() {
     override var name = MetadataDefinition.ANONYMOUS_NAME
 
+    open var isNative = false
+
     protected open var metadataParametersUnnamed = mutableListOf<Unnamed<MetadataParameterDefinition>>()
 
     @Suppress("INAPPLICABLE_JVM_NAME")
@@ -62,6 +66,7 @@ open class MetadataDefinitionBuilder :
             isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.toList(),
+            metadataIsNative = this.isNative,
             metadataParameters = this.metadataParametersUnnamed
                 .map { it.get(asNamespace) },
         )
@@ -88,6 +93,9 @@ fun metadata(
 val metadata = metadata()
 
 @Marker1
+val nativeMetadata = nativeMetadata()
+
+@Marker1
 fun metadata(
     vararg parameters: MetadataParameterDefinition,
     block: MetadataDefinitionBuilder.() -> Unit = {}
@@ -101,6 +109,29 @@ fun metadata(
     block: MetadataDefinitionBuilder.() -> Unit = {}
 ): Unnamed<MetadataDefinition> {
     return metadata { +parameters.asList(); block() }
+}
+
+@Marker1
+fun nativeMetadata(
+    block: MetadataDefinitionBuilder.() -> Unit = {}
+): Unnamed<MetadataDefinition> {
+    return metadata { isNative = true; block() }
+}
+
+@Marker1
+fun nativeMetadata(
+    vararg parameters: MetadataParameterDefinition,
+    block: MetadataDefinitionBuilder.() -> Unit = {}
+): Unnamed<MetadataDefinition> {
+    return nativeMetadata { +parameters.asList(); block() }
+}
+
+@Marker1
+fun nativeMetadata(
+    vararg parameters: Unnamed<MetadataParameterDefinition>,
+    block: MetadataDefinitionBuilder.() -> Unit = {}
+): Unnamed<MetadataDefinition> {
+    return nativeMetadata { +parameters.asList(); block() }
 }
 
 ////////////////////////////////////////

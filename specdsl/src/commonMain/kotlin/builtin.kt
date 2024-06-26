@@ -33,6 +33,9 @@ object builtin : NamespaceObject() {
     val Float32 by nativeScalar { description = "builtin 32bit float" }
     val Float64 by nativeScalar { description = "builtin 64bit float" }
 
+    val Deprecated__message by metadata_param { +"The deprecation message" }
+    val Deprecated by nativeMetadata(Deprecated__message)
+
     /**
      * Namespace to be used for defining builtin faults.
      */

@@ -13,6 +13,8 @@ data class CompactMetadataDefinition(
     override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<CompactMetadata> = emptyList(),
+    @SerialName("metadata_is_native")
+    val metadataIsNative: Boolean = false,
     @SerialName("metadata_parameters.ref")
     val metadataParameters: List<CanonicalName> = emptyList(),
 ) : CompactElementDefinition
@@ -25,6 +27,7 @@ fun MetadataDefinition.toCompact(): CompactMetadataDefinition {
         description = this.description,
         metadata = this.metadata
             .map { it.toCompact() },
+        metadataIsNative = this.metadataIsNative,
         metadataParameters = this.metadataParameters
             .map { it.canonicalName }
     )
@@ -42,6 +45,7 @@ fun CompactMetadataDefinition.inflate(
             metadata = this.metadata.map {
                 it.inflate(onLookup)() ?: return@it null
             },
+            metadataIsNative = this.metadataIsNative,
             metadataParameters = this.metadataParameters.map {
                 val item = onLookup(it) ?: return@it null
                 require(item is MetadataParameterDefinition) {
