@@ -84,7 +84,7 @@ object Http {
 
 fun Namespace.toHttpPath(): HttpPath {
     return HttpPath(
-        value = segments.joinToString("/")
+        value = "/" + segments.joinToString("/")
     )
 }
 

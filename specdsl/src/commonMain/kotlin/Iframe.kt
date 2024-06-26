@@ -35,7 +35,7 @@ object Iframe {
 
 fun Namespace.toIframePath(): IframePath {
     return IframePath(
-        value = segments.joinToString("/")
+        value = "/" + segments.joinToString("/")
     )
 }
 
