@@ -28,8 +28,12 @@ class Namespace : Comparable<Namespace> {
     companion object {
         val Toplevel = Namespace()
 
+        internal fun create0(segments: List<String>): Namespace {
+            return Namespace().also { it.segments = segments }
+        }
+
         fun fromCanonical(canonicalName: String): Namespace {
-            return Namespace(segmentsChecked = canonicalName.split('.'))
+            return create0(canonicalName.split('.'))
         }
     }
 
@@ -46,6 +50,8 @@ class Namespace : Comparable<Namespace> {
     var segments: List<String> = emptyList()
         private set
 
+    constructor()
+
     constructor(vararg segments: String) {
         require(segments.none { it.contains('.') }) {
             "Namespace segments should not contain '.'"
@@ -58,10 +64,6 @@ class Namespace : Comparable<Namespace> {
             "Namespace segments should not contain '.'"
         }
         this.segments = segments
-    }
-
-    private constructor(segmentsChecked: List<String>, unit: Unit = Unit) {
-        this.segments = segmentsChecked
     }
 
     override fun equals(other: Any?) =
@@ -97,38 +99,38 @@ class Namespace : Comparable<Namespace> {
         require(!segment.contains('.')) {
             "Namespace should not contain '.'"
         }
-        return Namespace(segmentsChecked = this.segments + segment)
+        return create0(this.segments + segment)
     }
 
     operator fun plus(segments: Iterable<String>): Namespace {
         require(segments.none { it.contains('.') }) {
             "Namespace should not contain '.'"
         }
-        return Namespace(segmentsChecked = this.segments + segments)
+        return create0(this.segments + segments)
     }
 
     operator fun plus(namespace: Namespace): Namespace {
-        return Namespace(segmentsChecked = this.segments + namespace.segments)
+        return create0(this.segments + namespace.segments)
     }
 
     fun take(n: Int): Namespace {
         require(n >= 0) { "Requested element count $n is less than zero." }
         if (n == 0) return Toplevel
         if (n >= this.segments.size) return this
-        return Namespace(segmentsChecked = this.segments.subList(0, n))
+        return create0(this.segments.subList(0, n))
     }
 
     fun dropLast(n: Int): Namespace {
         require(n >= 0) { "Requested element count $n is less than zero." }
         if (n == 0) return this
         if (n >= this.segments.size) return Toplevel
-        return Namespace(segmentsChecked = this.segments.subList(0, this.segments.size - n))
+        return create0(this.segments.subList(0, this.segments.size - n))
     }
 
     fun collect(): Sequence<Namespace> {
         return sequence {
             repeat(segments.size) { i ->
-                yield(Namespace(segmentsChecked = segments.subList(0, i + 1)))
+                yield(create0(segments.subList(0, i + 1)))
             }
         }
     }
