@@ -29,6 +29,8 @@ data class ScalarDefinition(
     override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<Metadata> = emptyList(),
+    @SerialName("scalar_is_native")
+    val scalarIsNative: Boolean,
 ) : TypeDefinition() {
     companion object {
         const val ANONYMOUS_NAME = "(anonymous<scalar>)"
@@ -78,7 +80,7 @@ fun scalar(
 val scalar = scalar()
 
 @Marker1
-val typealiasScalar = scalar { isNative = true }
+val nativeScalar = scalar { isNative = true }
 
 @Marker1
 fun nativeScalar(

@@ -16,6 +16,8 @@ data class CompactScalarDefinition(
     override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<CompactMetadata> = emptyList(),
+    @SerialName("scalar_is_native")
+    val scalarIsNative: Boolean,
 ) : CompactElementDefinition
 
 fun ScalarDefinition.toCompact(): CompactScalarDefinition {
@@ -26,6 +28,7 @@ fun ScalarDefinition.toCompact(): CompactScalarDefinition {
         description = this.description,
         metadata = this.metadata
             .map { it.toCompact() },
+        scalarIsNative = this.scalarIsNative,
     )
 }
 
@@ -41,6 +44,7 @@ fun CompactScalarDefinition.inflate(
             metadata = this.metadata.map {
                 it.inflate(onLookup)() ?: return@it null
             },
+            scalarIsNative = this.scalarIsNative,
         )
     }
 }
