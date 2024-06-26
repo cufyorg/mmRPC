@@ -30,7 +30,7 @@ data class ScalarDefinition(
     override val description: String = "",
     override val metadata: List<Metadata> = emptyList(),
     @SerialName("scalar_is_native")
-    val scalarIsNative: Boolean,
+    val scalarIsNative: Boolean = false,
 ) : TypeDefinition() {
     companion object {
         const val ANONYMOUS_NAME = "(anonymous<scalar>)"

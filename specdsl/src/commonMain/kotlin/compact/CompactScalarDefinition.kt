@@ -17,7 +17,7 @@ data class CompactScalarDefinition(
     override val description: String = "",
     override val metadata: List<CompactMetadata> = emptyList(),
     @SerialName("scalar_is_native")
-    val scalarIsNative: Boolean,
+    val scalarIsNative: Boolean = false,
 ) : CompactElementDefinition
 
 fun ScalarDefinition.toCompact(): CompactScalarDefinition {

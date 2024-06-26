@@ -20,18 +20,18 @@ package org.cufy.specdsl
  */
 @Suppress("ClassName")
 object builtin : NamespaceObject() {
-    val Nothing by nativeScalar { description = "builtin nothing (the type of null)" }
-    val NULL by const("null", Nothing) { description = "builtin null" }
-    val String by nativeScalar { description = "builtin string" }
-    val Boolean by nativeScalar { description = "builtin boolean" }
-    val TRUE by const("true", Boolean) { description = "builtin true" }
-    val FALSE by const("false", Boolean) { description = "builtin false" }
-    val Int32 by nativeScalar { description = "builtin 32bit int" }
-    val UInt32 by nativeScalar { description = "builtin unsigned 32bit int" }
-    val Int64 by nativeScalar { description = "builtin 64bit int" }
-    val UInt64 by nativeScalar { description = "builtin unsigned 64bit int" }
-    val Float32 by nativeScalar { description = "builtin 32bit float" }
-    val Float64 by nativeScalar { description = "builtin 64bit float" }
+    val Nothing by nativeScalar { +"builtin nothing (the type of null)" }
+    val NULL by const("null", Nothing) { +"builtin null" }
+    val String by nativeScalar { +"builtin string" }
+    val Boolean by nativeScalar { +"builtin boolean" }
+    val TRUE by const("true", Boolean) { +"builtin true" }
+    val FALSE by const("false", Boolean) { +"builtin false" }
+    val Int32 by nativeScalar { +"builtin 32bit int" }
+    val UInt32 by nativeScalar { +"builtin unsigned 32bit int" }
+    val Int64 by nativeScalar { +"builtin 64bit int" }
+    val UInt64 by nativeScalar { +"builtin unsigned 64bit int" }
+    val Float32 by nativeScalar { +"builtin 32bit float" }
+    val Float64 by nativeScalar { +"builtin 64bit float" }
 
     val Deprecated__message by metadata_param { +"The deprecation message" }
     val Deprecated by nativeMetadata(Deprecated__message)
