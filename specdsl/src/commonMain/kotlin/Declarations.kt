@@ -116,18 +116,27 @@ class Unnamed<out T>(private val block: (Namespace, String?) -> T) {
 
     private val values = mutableMapOf<Pair<Namespace, String?>, T>()
 
-    operator fun getValue(namespace: Namespace, property: KProperty<*>) =
-        values.getOrPut(namespace to property.name) {
-            block(namespace, property.name)
+    operator fun getValue(namespace: Namespace, property: KProperty<*>): T {
+        return values.getOrPut(namespace to property.name) {
+            val splits = property.name.split("__")
+            val ns = namespace + splits.dropLast(1)
+            val n = splits.last()
+            block(ns, n)
         }
+    }
 
-    operator fun getValue(obj: NamespaceObject, property: KProperty<*>) =
-        values.getOrPut(obj.namespace to property.name) {
-            block(obj.namespace, property.name)
+    operator fun getValue(obj: NamespaceObject, property: KProperty<*>): T {
+        return values.getOrPut(obj.namespace to property.name) {
+            val splits = property.name.split("__")
+            val ns = obj.namespace + splits.dropLast(1)
+            val n = splits.last()
+            block(ns, n)
         }
+    }
 
-    operator fun provideDelegate(thisRef: Any?, property: KProperty<*>) =
-        Unnamed { namespace, name -> block(namespace, name) }
+    operator fun provideDelegate(thisRef: Any?, property: KProperty<*>): Unnamed<T> {
+        return Unnamed { namespace, name -> block(namespace, name) }
+    }
 }
 
 @DslMarker
