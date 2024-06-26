@@ -37,48 +37,6 @@ value class SpecSheet(val elements: List<ElementDefinition>) {
         SpecSheet(this.elements + sheet.elements)
 }
 
-@JvmInline
-@Serializable
-value class Namespace(val segments: List<String>) : Comparable<Namespace> {
-    companion object {
-        val Toplevel = Namespace()
-    }
-
-    constructor(vararg segments: String) : this(segments.asList())
-
-    override fun compareTo(other: Namespace): Int {
-        repeat(min(this.segments.size, other.segments.size)) { i ->
-            val r = segments[i].compareTo(other.segments[i])
-            if (r != 0) return r
-        }
-
-        return this.segments.size - other.segments.size
-    }
-
-    override fun toString() = "Namespace($canonicalName)"
-
-    val parent get() = Namespace(segments.dropLast(1))
-    val canonicalName get() = this.segments.joinToString(".")
-
-    operator fun plus(segment: String) =
-        Namespace(segments = this.segments + segment)
-
-    operator fun plus(segments: Iterable<String>) =
-        Namespace(segments = this.segments + segments)
-
-    operator fun plus(namespace: Namespace) =
-        Namespace(segments = this.segments + namespace.segments)
-
-    fun take(n: Int) = Namespace(segments.take(n))
-
-    operator fun contains(namespace: Namespace): Boolean {
-        if (this.segments.size > namespace.segments.size)
-            return false
-
-        return this.segments == namespace.segments.subList(0, this.segments.size)
-    }
-}
-
 @Serializable
 sealed interface ElementDefinition {
     val name: String
