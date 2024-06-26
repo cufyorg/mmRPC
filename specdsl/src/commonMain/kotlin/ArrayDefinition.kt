@@ -23,7 +23,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 @SerialName("array")
 data class ArrayDefinition(
-    override val name: String = "(anonymous[])",
+    override val name: String = ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
     @SerialName("is_inline")
     override val isInline: Boolean = true,
@@ -32,6 +32,10 @@ data class ArrayDefinition(
     @SerialName("array_type")
     val arrayType: TypeDefinition,
 ) : TypeDefinition {
+    companion object {
+        const val ANONYMOUS_NAME = "(anonymous[])"
+    }
+
     override fun collectChildren() = sequence {
         yieldAll(metadata.asSequence().flatMap { it.collect() })
         yieldAll(arrayType.collect())
@@ -40,7 +44,7 @@ data class ArrayDefinition(
 
 open class ArrayDefinitionBuilder :
     ElementDefinitionBuilder() {
-    override var name = "(anonymous[])"
+    override var name = ArrayDefinition.ANONYMOUS_NAME
 
     open val type = DomainProperty<TypeDefinition>()
 

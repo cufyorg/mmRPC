@@ -36,7 +36,7 @@ object Kafka {
 
 fun Namespace.toKafkaTopic(): KafkaTopic {
     return KafkaTopic(
-        value = canonicalName.replace(":", "-")
+        value = canonicalName.value.replace(":", "-")
     )
 }
 
@@ -45,7 +45,7 @@ fun Namespace.toKafkaTopic(): KafkaTopic {
 @Serializable
 @SerialName("kafka_endpoint")
 data class KafkaEndpointDefinition(
-    override val name: String = "(anonymous<kafka_endpoint>)",
+    override val name: String = ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
     @SerialName("is_inline")
     override val isInline: Boolean = true,
@@ -60,6 +60,10 @@ data class KafkaEndpointDefinition(
     @SerialName("endpoint_key")
     val endpointKey: TupleDefinition? = null,
 ) : EndpointDefinition {
+    companion object {
+        const val ANONYMOUS_NAME = "(anonymous<kafka_endpoint>)"
+    }
+
     override fun collectChildren() = sequence {
         yieldAll(metadata.asSequence().flatMap { it.collect() })
         endpointKey?.let { yieldAll(it.collect()) }
@@ -68,7 +72,7 @@ data class KafkaEndpointDefinition(
 
 open class KafkaEndpointDefinitionBuilder :
     ElementDefinitionBuilder() {
-    override var name = "(anonymous<kafka_endpoint>)"
+    override var name = KafkaEndpointDefinition.ANONYMOUS_NAME
 
     open var topic: String? = null
     open val key = OptionalDomainProperty<TupleDefinition>()

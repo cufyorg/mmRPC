@@ -251,7 +251,7 @@ interface MetadataParameterDefinitionSetDomainContainer {
 
 @Marker0
 abstract class ElementDefinitionBuilder {
-    open var name: String = "(anonymous)"
+    abstract var name: String
     open val namespace = NamespaceDomainProperty()
     open var isInline = true
     open var description = ""

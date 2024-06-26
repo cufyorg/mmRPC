@@ -24,7 +24,7 @@ import kotlin.jvm.JvmName
 @Serializable
 @SerialName("union")
 data class UnionDefinition(
-    override val name: String = "(anonymous|)",
+    override val name: String = ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
     @SerialName("is_inline")
     override val isInline: Boolean = true,
@@ -33,6 +33,10 @@ data class UnionDefinition(
     @SerialName("union_types")
     val unionTypes: List<TypeDefinition>,
 ) : TypeDefinition {
+    companion object {
+        const val ANONYMOUS_NAME = "(anonymous|)"
+    }
+
     override fun collectChildren() = sequence {
         yieldAll(metadata.asSequence().flatMap { it.collect() })
         yieldAll(unionTypes.asSequence().flatMap { it.collect() })
@@ -42,7 +46,7 @@ data class UnionDefinition(
 open class UnionDefinitionBuilder :
     TypeDefinitionSetDomainContainer,
     ElementDefinitionBuilder() {
-    override var name = "(anonymous|)"
+    override var name = UnionDefinition.ANONYMOUS_NAME
 
     protected open val unionTypesUnnamed = mutableListOf<Unnamed<TypeDefinition>>()
 

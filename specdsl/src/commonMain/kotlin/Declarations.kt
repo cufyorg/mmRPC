@@ -17,6 +17,7 @@ package org.cufy.specdsl
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlin.jvm.JvmInline
 import kotlin.reflect.KProperty
 
 ////////////////////////////////////////
@@ -31,13 +32,8 @@ sealed interface ElementDefinition {
     val description: String
     val metadata: List<Metadata>
 
-    val canonicalName: String
-        get() {
-            return if (namespace.segments.isEmpty()) name
-            else "${namespace.canonicalName}.$name"
-        }
-
-    val isAnonymous get() = namespace.isAnonymous || name.startsWith("(anonymous") && name.endsWith(")")
+    val canonicalName get() = CanonicalName(namespace, name)
+    val isAnonymous get() = namespace.isAnonymous || Namespace.isAnonymousSegment(name)
 
     fun collect() = sequenceOf(this) + collectChildren()
 
@@ -49,6 +45,29 @@ sealed interface TypeDefinition : ElementDefinition
 
 @Serializable
 sealed interface EndpointDefinition : ElementDefinition
+
+////////////////////////////////////////
+
+@JvmInline
+@Serializable
+value class CanonicalName(val value: String) {
+    val asNamespace get() = Namespace(this)
+}
+
+fun CanonicalName(namespace: Namespace): CanonicalName {
+    return CanonicalName(namespace.segments.joinToString("."))
+}
+
+fun CanonicalName(namespace: Namespace, name: String): CanonicalName {
+    return CanonicalName(buildString {
+        for (segment in namespace.segments) {
+            append(segment)
+            append(".")
+        }
+
+        append(name)
+    })
+}
 
 ////////////////////////////////////////
 

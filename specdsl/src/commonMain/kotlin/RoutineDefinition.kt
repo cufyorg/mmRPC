@@ -24,7 +24,7 @@ import kotlin.jvm.JvmName
 @Serializable
 @SerialName("routine")
 data class RoutineDefinition(
-    override val name: String = "(anonymous<routine>)",
+    override val name: String = ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
     @SerialName("is_inline")
     override val isInline: Boolean = true,
@@ -39,6 +39,10 @@ data class RoutineDefinition(
     @SerialName("routine_output")
     val routineOutput: StructDefinition = StructDefinition.Empty,
 ) : ElementDefinition {
+    companion object {
+        const val ANONYMOUS_NAME = "(anonymous<routine>)"
+    }
+
     override fun collectChildren() = sequence {
         yieldAll(metadata.asSequence().flatMap { it.collect() })
         yieldAll(routineEndpoints.asSequence().flatMap { it.collect() })
@@ -52,7 +56,7 @@ open class RoutineDefinitionBuilder :
     EndpointDefinitionSetDomainContainer,
     FaultDefinitionSetDomainContainer,
     ElementDefinitionBuilder() {
-    override var name = "(anonymous<routine>)"
+    override var name = RoutineDefinition.ANONYMOUS_NAME
 
     protected open val routineEndpointsUnnamed = mutableListOf<Unnamed<EndpointDefinition>>()
     protected open val routineFaultUnionUnnamed = mutableListOf<Unnamed<FaultDefinition>>()

@@ -24,7 +24,7 @@ import kotlin.jvm.JvmName
 @Serializable
 @SerialName("struct")
 data class StructDefinition(
-    override val name: String = "(anonymous{})",
+    override val name: String = ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
     @SerialName("is_inline")
     override val isInline: Boolean = true,
@@ -34,6 +34,7 @@ data class StructDefinition(
     val structFields: List<FieldDefinition> = emptyList(),
 ) : TypeDefinition {
     companion object {
+        const val ANONYMOUS_NAME = "(anonymous{})"
         val Empty = StructDefinition()
     }
 
@@ -46,7 +47,7 @@ data class StructDefinition(
 open class StructDefinitionBuilder :
     FieldDefinitionSetDomainContainer,
     ElementDefinitionBuilder() {
-    override var name = "(anonymous{})"
+    override var name = StructDefinition.ANONYMOUS_NAME
 
     protected open var structFieldsUnnamed = mutableListOf<Unnamed<FieldDefinition>>()
 

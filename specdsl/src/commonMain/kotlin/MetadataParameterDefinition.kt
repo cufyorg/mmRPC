@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 @SerialName("metadata-parameter")
 data class MetadataParameterDefinition(
-    override val name: String = "(anonymous<metadata-parameter>)",
+    override val name: String = ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
     @SerialName("is_inline")
     override val isInline: Boolean = true,
@@ -21,6 +21,10 @@ data class MetadataParameterDefinition(
     @SerialName("parameter_default")
     val parameterDefault: ConstDefinition? = null,
 ) : ElementDefinition {
+    companion object {
+        const val ANONYMOUS_NAME = "(anonymous<metadata-parameter>)"
+    }
+
     override fun collectChildren() = sequence {
         yieldAll(metadata.asSequence().flatMap { it.collect() })
         yieldAll(parameterType.collect())
@@ -30,7 +34,7 @@ data class MetadataParameterDefinition(
 
 open class MetadataParameterDefinitionBuilder :
     ElementDefinitionBuilder() {
-    override var name = "(anonymous<metadata-parameter>)"
+    override var name = MetadataParameterDefinition.ANONYMOUS_NAME
 
     open var isOptional = false
 

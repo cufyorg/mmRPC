@@ -22,7 +22,7 @@ import kotlin.jvm.JvmName
 @Serializable
 @SerialName("metadata")
 data class MetadataDefinition(
-    override val name: String = "(anonymous@)",
+    override val name: String = ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
     @SerialName("is_inline")
     override val isInline: Boolean = true,
@@ -31,6 +31,10 @@ data class MetadataDefinition(
     @SerialName("metadata_parameters")
     val metadataParameters: List<MetadataParameterDefinition> = emptyList(),
 ) : ElementDefinition {
+    companion object {
+        const val ANONYMOUS_NAME = "(anonymous@)"
+    }
+
     override fun collectChildren() = sequence {
         yieldAll(metadata.asSequence().flatMap { it.collect() })
         yieldAll(metadataParameters.asSequence().flatMap { it.collect() })
@@ -40,7 +44,7 @@ data class MetadataDefinition(
 open class MetadataDefinitionBuilder :
     MetadataParameterDefinitionSetDomainContainer,
     ElementDefinitionBuilder() {
-    override var name = "(anonymous@)"
+    override var name = MetadataDefinition.ANONYMOUS_NAME
 
     protected open var metadataParametersUnnamed = mutableListOf<Unnamed<MetadataParameterDefinition>>()
 

@@ -24,7 +24,7 @@ import kotlin.jvm.JvmName
 @Serializable
 @SerialName("protocol")
 data class ProtocolDefinition(
-    override val name: String = "(anonymous<protocol>)",
+    override val name: String = ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
     @SerialName("is_inline")
     override val isInline: Boolean = true,
@@ -33,6 +33,10 @@ data class ProtocolDefinition(
     @SerialName("protocol_routines")
     val protocolRoutines: List<RoutineDefinition> = emptyList(),
 ) : ElementDefinition {
+    companion object {
+        const val ANONYMOUS_NAME = "(anonymous<protocol>)"
+    }
+
     override fun collectChildren() = sequence {
         yieldAll(metadata.asSequence().flatMap { it.collect() })
         yieldAll(protocolRoutines.asSequence().flatMap { it.collect() })
@@ -42,7 +46,7 @@ data class ProtocolDefinition(
 open class ProtocolDefinitionBuilder :
     RoutineDefinitionSetDomainContainer,
     ElementDefinitionBuilder() {
-    override var name = "(anonymous<protocol>)"
+    override var name = ProtocolDefinition.ANONYMOUS_NAME
 
     protected open val protocolRoutinesUnnamed = mutableListOf<Unnamed<RoutineDefinition>>()
 

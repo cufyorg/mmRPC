@@ -93,7 +93,7 @@ fun Namespace.toHttpPath(): HttpPath {
 @Serializable
 @SerialName("http_endpoint")
 data class HttpEndpointDefinition(
-    override val name: String = "(anonymous<http_endpoint>)",
+    override val name: String = ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
     @SerialName("is_inline")
     override val isInline: Boolean = true,
@@ -108,6 +108,10 @@ data class HttpEndpointDefinition(
     @SerialName("endpoint_security_inter")
     val endpointSecurityInter: List<HttpSecurity> = emptyList(),
 ) : EndpointDefinition {
+    companion object {
+        const val ANONYMOUS_NAME = "(anonymous<http_endpoint>)"
+    }
+
     override fun collectChildren() = sequence {
         yieldAll(metadata.asSequence().flatMap { it.collect() })
     }
@@ -115,7 +119,7 @@ data class HttpEndpointDefinition(
 
 open class HttpEndpointDefinitionBuilder :
     ElementDefinitionBuilder() {
-    override var name = "(anonymous<http_endpoint>)"
+    override var name = HttpEndpointDefinition.ANONYMOUS_NAME
 
     open var path: String? = null
 

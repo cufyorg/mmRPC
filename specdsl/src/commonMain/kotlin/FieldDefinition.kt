@@ -23,7 +23,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 @SerialName("field")
 data class FieldDefinition(
-    override val name: String = "(anonymous<field>)",
+    override val name: String = ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
     @SerialName("is_inline")
     override val isInline: Boolean = true,
@@ -36,6 +36,10 @@ data class FieldDefinition(
     @SerialName("field_default")
     val fieldDefault: ConstDefinition? = null,
 ) : ElementDefinition {
+    companion object {
+        const val ANONYMOUS_NAME = "(anonymous<field>)"
+    }
+
     override fun collectChildren() = sequence {
         yieldAll(metadata.asSequence().flatMap { it.collect() })
         yieldAll(fieldType.collect())
@@ -45,7 +49,7 @@ data class FieldDefinition(
 
 open class FieldDefinitionBuilder :
     ElementDefinitionBuilder() {
-    override var name = "(anonymous<field>)"
+    override var name = FieldDefinition.ANONYMOUS_NAME
 
     open var isOptional = false
 

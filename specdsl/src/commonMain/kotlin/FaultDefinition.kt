@@ -17,19 +17,24 @@ package org.cufy.specdsl
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.cufy.specdsl.ConstDefinition.Companion.ANONYMOUS_NAME
 
 ////////////////////////////////////////
 
 @Serializable
 @SerialName("fault")
 data class FaultDefinition(
-    override val name: String = "(anonymous<fault>)",
+    override val name: String = ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
     @SerialName("is_inline")
     override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<Metadata> = emptyList(),
 ) : ElementDefinition {
+    companion object {
+        const val ANONYMOUS_NAME = "(anonymous<fault>)"
+    }
+
     override fun collectChildren() = sequence {
         yieldAll(metadata.asSequence().flatMap { it.collect() })
     }
@@ -37,7 +42,7 @@ data class FaultDefinition(
 
 open class FaultDefinitionBuilder :
     ElementDefinitionBuilder() {
-    override var name = "(anonymous<fault>)"
+    override var name = FaultDefinition.ANONYMOUS_NAME
 
     override fun build(): FaultDefinition {
         val asNamespace = this.namespace.value + this.name

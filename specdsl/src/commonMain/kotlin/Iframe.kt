@@ -44,7 +44,7 @@ fun Namespace.toIframePath(): IframePath {
 @Serializable
 @SerialName("iframe_endpoint")
 data class IframeEndpointDefinition(
-    override val name: String = "(anonymous<iframe_endpoint>)",
+    override val name: String = ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
     @SerialName("is_inline")
     override val isInline: Boolean = true,
@@ -55,6 +55,10 @@ data class IframeEndpointDefinition(
     @SerialName("endpoint_security_inter")
     val endpointSecurityInter: List<IframeSecurity> = emptyList(),
 ) : EndpointDefinition {
+    companion object {
+        const val ANONYMOUS_NAME = "(anonymous<iframe_endpoint>)"
+    }
+
     override fun collectChildren() = sequence {
         yieldAll(metadata.asSequence().flatMap { it.collect() })
     }
@@ -62,7 +66,7 @@ data class IframeEndpointDefinition(
 
 open class IframeEndpointDefinitionBuilder :
     ElementDefinitionBuilder() {
-    override var name: String = "(anonymous<iframe_endpoint>)"
+    override var name = IframeEndpointDefinition.ANONYMOUS_NAME
 
     open var path: String? = null
 

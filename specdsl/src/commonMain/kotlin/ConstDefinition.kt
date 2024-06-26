@@ -23,7 +23,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 @SerialName("const")
 data class ConstDefinition(
-    override val name: String = "(anonymous<const>)",
+    override val name: String = ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
     @SerialName("is_inline")
     override val isInline: Boolean = true,
@@ -34,6 +34,10 @@ data class ConstDefinition(
     @SerialName("const_value")
     val constValue: String,
 ) : TypeDefinition {
+    companion object {
+        const val ANONYMOUS_NAME = "(anonymous<const>)"
+    }
+
     override fun collectChildren() = sequence {
         yieldAll(metadata.asSequence().flatMap { it.collect() })
         yieldAll(constType.collect())
@@ -42,7 +46,7 @@ data class ConstDefinition(
 
 open class ConstDefinitionBuilder :
     ElementDefinitionBuilder() {
-    override var name = "(anonymous<const>)"
+    override var name = ConstDefinition.ANONYMOUS_NAME
 
     open val type = DomainProperty<ScalarDefinition>()
     open lateinit var value: String

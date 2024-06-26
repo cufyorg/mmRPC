@@ -28,12 +28,13 @@ class Namespace : Comparable<Namespace> {
     companion object {
         val Toplevel = Namespace()
 
-        internal fun create0(segments: List<String>): Namespace {
-            return Namespace().also { it.segments = segments }
+        fun isAnonymousSegment(segment: String): Boolean {
+            return segment.startsWith("(anonymous") &&
+                    segment.endsWith(")")
         }
 
-        fun fromCanonical(canonicalName: String): Namespace {
-            return create0(canonicalName.split('.'))
+        internal fun create0(segments: List<String>): Namespace {
+            return Namespace().also { it.segments = segments }
         }
     }
 
@@ -41,10 +42,10 @@ class Namespace : Comparable<Namespace> {
         override val descriptor = PrimitiveSerialDescriptor("Namespace", PrimitiveKind.STRING)
 
         override fun serialize(encoder: Encoder, value: Namespace) =
-            encoder.encodeString(value.canonicalName)
+            encoder.encodeString(value.segments.joinToString("."))
 
         override fun deserialize(decoder: Decoder): Namespace =
-            fromCanonical(decoder.decodeString())
+            create0(decoder.decodeString().split("."))
     }
 
     var segments: List<String> = emptyList()
@@ -64,6 +65,10 @@ class Namespace : Comparable<Namespace> {
             "Namespace segments should not contain '.'"
         }
         this.segments = segments
+    }
+
+    constructor(canonicalName: CanonicalName) {
+        this.segments = canonicalName.value.split(".")
     }
 
     override fun equals(other: Any?) =
@@ -89,11 +94,11 @@ class Namespace : Comparable<Namespace> {
 
     inline val name get() = this.nameOrNull ?: ""
     inline val nameOrNull get() = this.segments.lastOrNull()
-    val canonicalName by lazy { this.segments.joinToString(".") }
+    val canonicalName by lazy { CanonicalName(this) }
 
     val isToplevel get() = this.segments.isEmpty()
     val isOnToplevel get() = this.segments.size == 1
-    val isAnonymous by lazy { this.segments.any { it.startsWith("(anonymous") && it.endsWith(")") } }
+    val isAnonymous by lazy { this.segments.any { isAnonymousSegment(it) } }
 
     operator fun plus(segment: String): Namespace {
         require(!segment.contains('.')) {

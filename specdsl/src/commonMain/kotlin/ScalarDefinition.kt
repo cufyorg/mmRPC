@@ -23,13 +23,17 @@ import kotlinx.serialization.Serializable
 @Serializable
 @SerialName("scalar")
 data class ScalarDefinition(
-    override val name: String = "(anonymous<scalar>)",
+    override val name: String = ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
     @SerialName("is_inline")
     override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<Metadata> = emptyList(),
 ) : TypeDefinition {
+    companion object {
+        const val ANONYMOUS_NAME = "(anonymous<scalar>)"
+    }
+
     override fun collectChildren() = sequence {
         yieldAll(metadata.asSequence().flatMap { it.collect() })
     }
@@ -37,7 +41,7 @@ data class ScalarDefinition(
 
 open class ScalarDefinitionBuilder :
     ElementDefinitionBuilder() {
-    override var name = "(anonymous<scalar>)"
+    override var name = ScalarDefinition.ANONYMOUS_NAME
 
     override fun build(): ScalarDefinition {
         val asNamespace = this.namespace.value + this.name

@@ -24,7 +24,7 @@ import kotlin.jvm.JvmName
 @Serializable
 @SerialName("inter")
 data class InterDefinition(
-    override val name: String = "(anonymous&)",
+    override val name: String = ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
     @SerialName("is_inline")
     override val isInline: Boolean = true,
@@ -33,6 +33,10 @@ data class InterDefinition(
     @SerialName("inter_types")
     val interTypes: List<TypeDefinition>,
 ) : TypeDefinition {
+    companion object {
+        const val ANONYMOUS_NAME = "(anonymous&)"
+    }
+
     override fun collectChildren() = sequence {
         yieldAll(metadata.asSequence().flatMap { it.collect() })
         yieldAll(interTypes.asSequence().flatMap { it.collect() })
@@ -42,7 +46,7 @@ data class InterDefinition(
 open class InterDefinitionBuilder :
     TypeDefinitionSetDomainContainer,
     ElementDefinitionBuilder() {
-    override var name = "(anonymous&)"
+    override var name = InterDefinition.ANONYMOUS_NAME
 
     protected open val interTypesUnnamed = mutableListOf<Unnamed<TypeDefinition>>()
 

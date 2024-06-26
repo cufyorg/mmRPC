@@ -24,7 +24,7 @@ import kotlin.jvm.JvmName
 @Serializable
 @SerialName("tuple")
 data class TupleDefinition(
-    override val name: String = "(anonymous())",
+    override val name: String = ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
     @SerialName("is_inline")
     override val isInline: Boolean = true,
@@ -35,6 +35,7 @@ data class TupleDefinition(
 ) : TypeDefinition {
     companion object {
         val Empty = TupleDefinition()
+        const val ANONYMOUS_NAME = "(anonymous())"
     }
 
     override fun collectChildren() = sequence {
@@ -46,7 +47,7 @@ data class TupleDefinition(
 open class TupleDefinitionBuilder :
     TypeDefinitionSetDomainContainer,
     ElementDefinitionBuilder() {
-    override var name = "(anonymous())"
+    override var name = TupleDefinition.ANONYMOUS_NAME
 
     protected open val tupleTypesUnnamed = mutableListOf<Unnamed<TypeDefinition>>()
 
