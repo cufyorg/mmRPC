@@ -17,48 +17,59 @@ package org.cufy.specdsl
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-
-////////////////////////////////////////
+import kotlin.jvm.JvmName
 
 @Serializable
-@SerialName("decorator")
-data class DecoratorDefinition(
+@SerialName("metadata")
+data class MetadataDefinition(
     override val name: String = "(anonymous@)",
     override val namespace: Namespace = Namespace.Toplevel,
     @SerialName("is_inline")
     override val isInline: Boolean = true,
     override val description: String = "",
-    override val decorators: List<DecoratorDefinition> = emptyList(),
+    override val metadata: List<Metadata> = emptyList(),
+    @SerialName("metadata_parameters")
+    val metadataParameters: List<MetadataParameterDefinition> = emptyList(),
 ) : ElementDefinition {
     override fun collectChildren() = sequence {
-        yieldAll(decorators.asSequence().flatMap { it.collect() })
+        yieldAll(metadata.asSequence().flatMap { it.collect() })
+        yieldAll(metadataParameters.asSequence().flatMap { it.collect() })
     }
 }
 
-open class DecoratorDefinitionBuilder :
+open class MetadataDefinitionBuilder :
+    MetadataParameterDefinitionSetDomainContainer,
     ElementDefinitionBuilder() {
     override var name = "(anonymous@)"
 
-    override fun build(): DecoratorDefinition {
+    protected open var metadataParametersUnnamed = mutableListOf<Unnamed<MetadataParameterDefinition>>()
+
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("unaryPlusUnnamedMetadataParameterDefinition")
+    override operator fun Unnamed<MetadataParameterDefinition>.unaryPlus() {
+        metadataParametersUnnamed += this
+    }
+
+    override fun build(): MetadataDefinition {
         val asNamespace = this.namespace.value + this.name
-        return DecoratorDefinition(
+        return MetadataDefinition(
             name = this.name,
             namespace = this.namespace.value,
             isInline = this.isInline,
             description = this.description,
-            decorators = this.decoratorsUnnamed.map {
-                it.get(asNamespace)
-            },
+            metadata = this.metadata.toList(),
+            metadataParameters = this.metadataParametersUnnamed
+                .map { it.get(asNamespace) },
         )
     }
 }
 
 @Marker1
-fun decorator(
-    block: DecoratorDefinitionBuilder.() -> Unit = {}
-): Unnamed<DecoratorDefinition> {
+fun metadata(
+    block: MetadataDefinitionBuilder.() -> Unit = {}
+): Unnamed<MetadataDefinition> {
     return Unnamed { namespace, name ->
-        DecoratorDefinitionBuilder()
+        MetadataDefinitionBuilder()
             .also { it.name = name ?: return@also }
             .also { it.namespace *= namespace }
             .also { it.isInline = name == null }
@@ -70,6 +81,22 @@ fun decorator(
 ////////////////////////////////////////
 
 @Marker1
-val decorator = decorator()
+val metadata = metadata()
+
+@Marker1
+fun metadata(
+    vararg parameters: MetadataParameterDefinition,
+    block: MetadataDefinitionBuilder.() -> Unit = {}
+): Unnamed<MetadataDefinition> {
+    return metadata { +parameters.asList(); block() }
+}
+
+@Marker1
+fun metadata(
+    vararg parameters: Unnamed<MetadataParameterDefinition>,
+    block: MetadataDefinitionBuilder.() -> Unit = {}
+): Unnamed<MetadataDefinition> {
+    return metadata { +parameters.asList(); block() }
+}
 
 ////////////////////////////////////////

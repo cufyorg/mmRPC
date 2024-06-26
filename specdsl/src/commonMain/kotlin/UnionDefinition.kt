@@ -29,12 +29,12 @@ data class UnionDefinition(
     @SerialName("is_inline")
     override val isInline: Boolean = true,
     override val description: String = "",
-    override val decorators: List<DecoratorDefinition> = emptyList(),
+    override val metadata: List<Metadata> = emptyList(),
     @SerialName("union_types")
     val unionTypes: List<TypeDefinition>,
 ) : TypeDefinition {
     override fun collectChildren() = sequence {
-        yieldAll(decorators.asSequence().flatMap { it.collect() })
+        yieldAll(metadata.asSequence().flatMap { it.collect() })
         yieldAll(unionTypes.asSequence().flatMap { it.collect() })
     }
 }
@@ -59,9 +59,7 @@ open class UnionDefinitionBuilder :
             namespace = this.namespace.value,
             isInline = this.isInline,
             description = this.description,
-            decorators = this.decoratorsUnnamed.map {
-                it.get(asNamespace)
-            },
+            metadata = this.metadata.toList(),
             unionTypes = this.unionTypesUnnamed.map {
                 it.get(asNamespace)
             },

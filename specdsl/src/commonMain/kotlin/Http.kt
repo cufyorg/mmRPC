@@ -98,7 +98,7 @@ data class HttpEndpointDefinition(
     @SerialName("is_inline")
     override val isInline: Boolean = true,
     override val description: String = "",
-    override val decorators: List<DecoratorDefinition> = emptyList(),
+    override val metadata: List<Metadata> = emptyList(),
     @SerialName("endpoint_path")
     val endpointPath: HttpPath = namespace.toHttpPath(),
     @SerialName("endpoint_method_union")
@@ -109,7 +109,7 @@ data class HttpEndpointDefinition(
     val endpointSecurityInter: List<HttpSecurity> = emptyList(),
 ) : EndpointDefinition {
     override fun collectChildren() = sequence {
-        yieldAll(decorators.asSequence().flatMap { it.collect() })
+        yieldAll(metadata.asSequence().flatMap { it.collect() })
     }
 }
 
@@ -137,9 +137,7 @@ open class HttpEndpointDefinitionBuilder :
             namespace = this.namespace.value,
             isInline = this.isInline,
             description = this.description,
-            decorators = this.decoratorsUnnamed.map {
-                it.get(asNamespace)
-            },
+            metadata = this.metadata.toList(),
             endpointPath = this.path
                 ?.let { HttpPath(it) }
                 ?: this.namespace.value.toHttpPath(),

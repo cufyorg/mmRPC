@@ -56,27 +56,6 @@ open class NamespaceDomainProperty {
 }
 
 @Marker0
-interface DecoratorDefinitionSetDomainContainer {
-    @JvmName("unaryPlusUnnamedDecoratorDefinition")
-    operator fun Unnamed<DecoratorDefinition>.unaryPlus()
-
-    @JvmName("unaryPlusIterableUnnamedDecoratorDefinition")
-    operator fun Iterable<Unnamed<DecoratorDefinition>>.unaryPlus() {
-        for (it in this) +it
-    }
-
-    @JvmName("unaryPlusDecoratorDefinition")
-    operator fun DecoratorDefinition.unaryPlus() {
-        +Unnamed(this)
-    }
-
-    @JvmName("unaryPlusIterableDecorationDefinition")
-    operator fun Iterable<DecoratorDefinition>.unaryPlus() {
-        for (it in this) +Unnamed(it)
-    }
-}
-
-@Marker0
 interface EndpointDefinitionSetDomainContainer {
     @JvmName("unaryPlusUnnamedEndpointDefinition")
     operator fun Unnamed<EndpointDefinition>.unaryPlus()
@@ -222,23 +201,83 @@ interface FieldDefinitionSetDomainContainer {
 }
 
 @Marker0
-abstract class ElementDefinitionBuilder :
-    DecoratorDefinitionSetDomainContainer {
+interface MetadataParameterDefinitionSetDomainContainer {
+    @JvmName("unaryPlusUnnamedMetadataParameterDefinition")
+    operator fun Unnamed<MetadataParameterDefinition>.unaryPlus()
+
+    @JvmName("unaryPlusIterableUnnamedMetadataParameterDefinition")
+    operator fun Iterable<Unnamed<MetadataParameterDefinition>>.unaryPlus() {
+        for (it in this) +it
+    }
+
+    @JvmName("unaryPlusMetadataParameterDefinition")
+    operator fun MetadataParameterDefinition.unaryPlus() {
+        +Unnamed(this)
+    }
+
+    @JvmName("unaryPlusIterableMetadataParameterDefinition")
+    operator fun Iterable<MetadataParameterDefinition>.unaryPlus() {
+        for (it in this) +Unnamed(it)
+    }
+
+    operator fun String.invoke(
+        type: ScalarDefinition,
+        block: MetadataParameterDefinitionBuilder.() -> Unit = {},
+    ) {
+        +Unnamed { namespace, _ ->
+            MetadataParameterDefinitionBuilder()
+                .also { it.name = this }
+                .also { it.namespace *= namespace }
+                .also { it.type *= type }
+                .apply(block)
+                .build()
+        }
+    }
+
+    operator fun String.invoke(
+        type: Unnamed<ScalarDefinition>,
+        block: MetadataParameterDefinitionBuilder.() -> Unit = {},
+    ) {
+        +Unnamed { namespace, _ ->
+            MetadataParameterDefinitionBuilder()
+                .also { it.name = this }
+                .also { it.namespace *= namespace }
+                .also { it.type *= type }
+                .apply(block)
+                .build()
+        }
+    }
+}
+
+@Marker0
+abstract class ElementDefinitionBuilder {
     open var name: String = "(anonymous)"
     open val namespace = NamespaceDomainProperty()
     open var isInline = true
     open var description = ""
 
-    protected open val decoratorsUnnamed = mutableListOf<Unnamed<DecoratorDefinition>>()
+    protected open val metadata = mutableListOf<Metadata>()
 
     open operator fun String.unaryPlus() {
         description += this.trimIndent()
     }
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
-    @JvmName("unaryPlusUnnamedDecoratorDefinition")
-    override operator fun Unnamed<DecoratorDefinition>.unaryPlus() {
-        decoratorsUnnamed += this
+    @JvmName("unaryPlusMetadata")
+    operator fun Metadata.unaryPlus() {
+        metadata += this
+    }
+
+    @JvmName("unaryPlusIterableMetadata")
+    operator fun Iterable<Metadata>.unaryPlus() {
+        metadata += this
+    }
+
+    @JvmName("unaryPlusMetadataDefinition")
+    operator fun MetadataDefinition.unaryPlus() {
+        val classThis = this@ElementDefinitionBuilder
+        classThis.metadata += MetadataBuilder()
+            .also { it.definition = this }
+            .build()
     }
 
     abstract fun build(): ElementDefinition

@@ -26,7 +26,7 @@ sealed interface ElementDefinition {
     @SerialName("is_inline")
     val isInline: Boolean
     val description: String
-    val decorators: List<DecoratorDefinition>
+    val metadata: List<Metadata>
 
     val canonicalName: String
         get() {

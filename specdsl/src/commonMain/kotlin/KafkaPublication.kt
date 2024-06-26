@@ -49,7 +49,7 @@ data class KafkaPublicationEndpointDefinition(
     @SerialName("is_inline")
     override val isInline: Boolean = true,
     override val description: String = "",
-    override val decorators: List<DecoratorDefinition> = emptyList(),
+    override val metadata: List<Metadata> = emptyList(),
     @SerialName("endpoint_topic")
     val endpointTopic: KafkaPublicationTopic = namespace.toKafkaPublicationTopic(),
     @SerialName("endpoint_security_inter")
@@ -60,7 +60,7 @@ data class KafkaPublicationEndpointDefinition(
     val endpointKey: TupleDefinition? = null,
 ) : EndpointDefinition {
     override fun collectChildren() = sequence {
-        yieldAll(decorators.asSequence().flatMap { it.collect() })
+        yieldAll(metadata.asSequence().flatMap { it.collect() })
         endpointKey?.let { yieldAll(it.collect()) }
     }
 }
@@ -85,9 +85,7 @@ open class KafkaPublicationEndpointDefinitionBuilder :
             namespace = this.namespace.value,
             isInline = this.isInline,
             description = this.description,
-            decorators = this.decoratorsUnnamed.map {
-                it.get(asNamespace)
-            },
+            metadata = this.metadata.toList(),
             endpointTopic = this.topic
                 ?.let { KafkaPublicationTopic(it) }
                 ?: this.namespace.value.toKafkaPublicationTopic(),

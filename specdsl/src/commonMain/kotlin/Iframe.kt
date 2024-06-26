@@ -49,14 +49,14 @@ data class IframeEndpointDefinition(
     @SerialName("is_inline")
     override val isInline: Boolean = true,
     override val description: String = "",
-    override val decorators: List<DecoratorDefinition> = emptyList(),
+    override val metadata: List<Metadata> = emptyList(),
     @SerialName("endpoint_path")
     val endpointPath: IframePath = namespace.toIframePath(),
     @SerialName("endpoint_security_inter")
     val endpointSecurityInter: List<IframeSecurity> = emptyList(),
 ) : EndpointDefinition {
     override fun collectChildren() = sequence {
-        yieldAll(decorators.asSequence().flatMap { it.collect() })
+        yieldAll(metadata.asSequence().flatMap { it.collect() })
     }
 }
 
@@ -79,9 +79,7 @@ open class IframeEndpointDefinitionBuilder :
             namespace = this.namespace.value,
             isInline = this.isInline,
             description = this.description,
-            decorators = this.decoratorsUnnamed.map {
-                it.get(asNamespace)
-            },
+            metadata = this.metadata.toList(),
             endpointPath = this.path
                 ?.let { IframePath(it) }
                 ?: this.namespace.value.toIframePath(),

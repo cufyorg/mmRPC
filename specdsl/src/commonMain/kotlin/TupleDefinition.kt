@@ -29,7 +29,7 @@ data class TupleDefinition(
     @SerialName("is_inline")
     override val isInline: Boolean = true,
     override val description: String = "",
-    override val decorators: List<DecoratorDefinition> = emptyList(),
+    override val metadata: List<Metadata> = emptyList(),
     @SerialName("tuple_types")
     val tupleTypes: List<TypeDefinition> = emptyList(),
 ) : TypeDefinition {
@@ -38,7 +38,7 @@ data class TupleDefinition(
     }
 
     override fun collectChildren() = sequence {
-        yieldAll(decorators.asSequence().flatMap { it.collect() })
+        yieldAll(metadata.asSequence().flatMap { it.collect() })
         yieldAll(tupleTypes.asSequence().flatMap { it.collect() })
     }
 }
@@ -63,9 +63,7 @@ open class TupleDefinitionBuilder :
             namespace = this.namespace.value,
             isInline = this.isInline,
             description = this.description,
-            decorators = this.decoratorsUnnamed.map {
-                it.get(asNamespace)
-            },
+            metadata = this.metadata.toList(),
             tupleTypes = this.tupleTypesUnnamed.map {
                 it.get(asNamespace)
             },
