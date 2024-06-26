@@ -15,7 +15,40 @@
  */
 package org.cufy.specdsl
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import kotlin.reflect.KProperty
+
+////////////////////////////////////////
+
+@Serializable
+sealed interface ElementDefinition {
+    val name: String
+    val namespace: Namespace
+
+    @SerialName("is_inline")
+    val isInline: Boolean
+    val description: String
+    val metadata: List<Metadata>
+
+    val canonicalName: String
+        get() {
+            return if (namespace.segments.isEmpty()) name
+            else "${namespace.canonicalName}.$name"
+        }
+
+    val isAnonymous get() = namespace.isAnonymous || name.startsWith("(anonymous") && name.endsWith(")")
+
+    fun collect() = sequenceOf(this) + collectChildren()
+
+    fun collectChildren(): Sequence<ElementDefinition>
+}
+
+@Serializable
+sealed interface TypeDefinition : ElementDefinition
+
+@Serializable
+sealed interface EndpointDefinition : ElementDefinition
 
 ////////////////////////////////////////
 
