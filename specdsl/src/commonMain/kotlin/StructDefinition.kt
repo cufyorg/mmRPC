@@ -65,8 +65,8 @@ open class StructDefinitionBuilder :
             isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.toList(),
-            structFields = this.structFieldsUnnamed.map {
-                it.get(asNamespace)
+            structFields = this.structFieldsUnnamed.mapIndexed { i, it ->
+                it.get(asNamespace, name = "field$i")
             },
         )
     }

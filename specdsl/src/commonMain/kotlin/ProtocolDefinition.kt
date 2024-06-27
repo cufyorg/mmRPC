@@ -64,8 +64,8 @@ open class ProtocolDefinitionBuilder :
             isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.toList(),
-            protocolRoutines = this.protocolRoutinesUnnamed.map {
-                it.get(asNamespace)
+            protocolRoutines = this.protocolRoutinesUnnamed.mapIndexed { i, it ->
+                it.get(asNamespace, name = "routine$i")
             }
         )
     }

@@ -65,8 +65,8 @@ open class FieldDefinitionBuilder :
             description = this.description,
             metadata = this.metadata.toList(),
             fieldIsOptional = this.isOptional,
-            fieldType = this.type.value.get(asNamespace),
-            fieldDefault = this.default.value?.get(asNamespace),
+            fieldType = this.type.value.get(asNamespace, name = "type"),
+            fieldDefault = this.default.value?.get(asNamespace, name = "default"),
         )
     }
 }

@@ -64,8 +64,8 @@ open class UnionDefinitionBuilder :
             isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.toList(),
-            unionTypes = this.unionTypesUnnamed.map {
-                it.get(asNamespace)
+            unionTypes = this.unionTypesUnnamed.mapIndexed { i, it ->
+                it.get(asNamespace, name = "type$i")
             },
         )
     }

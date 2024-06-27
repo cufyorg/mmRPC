@@ -94,7 +94,7 @@ open class KafkaPublicationEndpointDefinitionBuilder :
                 ?.let { KafkaPublicationTopic(it) }
                 ?: this.namespace.value.toKafkaPublicationTopic(),
             endpointSecurityInter = this.endpointSecurityInter.toList(),
-            endpointKey = this.key.value?.get(asNamespace),
+            endpointKey = this.key.value?.get(asNamespace, name = "key"),
         )
     }
 }

@@ -64,8 +64,8 @@ open class InterDefinitionBuilder :
             isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.toList(),
-            interTypes = this.interTypesUnnamed.map {
-                it.get(asNamespace)
+            interTypes = this.interTypesUnnamed.mapIndexed { i, it ->
+                it.get(asNamespace, name = "type$i")
             },
         )
     }

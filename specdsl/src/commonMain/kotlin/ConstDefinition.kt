@@ -59,7 +59,7 @@ open class ConstDefinitionBuilder :
             isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.toList(),
-            constType = this.type.value.get(asNamespace),
+            constType = this.type.value.get(asNamespace, name = "type"),
             constValue = this.value,
         )
     }

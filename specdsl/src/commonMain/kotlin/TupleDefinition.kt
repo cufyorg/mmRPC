@@ -65,8 +65,8 @@ open class TupleDefinitionBuilder :
             isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.toList(),
-            tupleTypes = this.tupleTypesUnnamed.map {
-                it.get(asNamespace)
+            tupleTypes = this.tupleTypesUnnamed.mapIndexed { i, it ->
+                it.get(asNamespace, name = "type$i")
             },
         )
     }

@@ -67,8 +67,9 @@ open class MetadataDefinitionBuilder :
             description = this.description,
             metadata = this.metadata.toList(),
             metadataIsNative = this.isNative,
-            metadataParameters = this.metadataParametersUnnamed
-                .map { it.get(asNamespace) },
+            metadataParameters = this.metadataParametersUnnamed.mapIndexed { i, it ->
+                it.get(asNamespace, name = "parameter$i")
+            },
         )
     }
 }

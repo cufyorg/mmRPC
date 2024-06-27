@@ -94,11 +94,11 @@ open class RoutineDefinitionBuilder :
             isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.toList(),
-            routineEndpoints = this.routineEndpointsUnnamed.map {
-                it.get(asNamespace)
+            routineEndpoints = this.routineEndpointsUnnamed.mapIndexed { i, it ->
+                it.get(asNamespace, name = "endpoint$i")
             },
-            routineFaultUnion = this.routineFaultUnionUnnamed.map {
-                it.get(asNamespace)
+            routineFaultUnion = this.routineFaultUnionUnnamed.mapIndexed { i, it ->
+                it.get(asNamespace, name = "fault$i")
             },
             routineInput = this.routineInputBlocks.let { blocks ->
                 StructDefinitionBuilder()

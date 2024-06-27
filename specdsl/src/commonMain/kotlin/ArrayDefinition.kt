@@ -56,7 +56,7 @@ open class ArrayDefinitionBuilder :
             isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.toList(),
-            arrayType = this.type.value.get(asNamespace),
+            arrayType = this.type.value.get(asNamespace, name = "type"),
         )
     }
 }

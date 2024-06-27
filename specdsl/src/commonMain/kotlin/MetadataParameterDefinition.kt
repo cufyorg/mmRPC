@@ -50,8 +50,8 @@ open class MetadataParameterDefinitionBuilder :
             description = this.description,
             metadata = this.metadata.toList(),
             parameterIsOptional = this.isOptional,
-            parameterType = this.type.value.get(asNamespace),
-            parameterDefault = this.default.value?.get(asNamespace),
+            parameterType = this.type.value.get(asNamespace, name = "type"),
+            parameterDefault = this.default.value?.get(asNamespace, name = "default"),
         )
     }
 }
