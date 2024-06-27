@@ -16,8 +16,6 @@ data class MetadataParameterDefinition(
     override val metadata: List<Metadata> = emptyList(),
     @SerialName("parameter_type")
     val parameterType: ScalarDefinition,
-    @SerialName("parameter_is_optional")
-    val parameterIsOptional: Boolean = false,
     @SerialName("parameter_default")
     val parameterDefault: ConstDefinition? = null,
 ) : ElementDefinition() {
@@ -49,7 +47,6 @@ open class MetadataParameterDefinitionBuilder :
             isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.toList(),
-            parameterIsOptional = this.isOptional,
             parameterType = this.type.value.get(asNamespace, name = "type"),
             parameterDefault = this.default.value?.get(asNamespace, name = "default"),
         )

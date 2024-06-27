@@ -15,8 +15,6 @@ data class CompactMetadataParameterDefinition(
     override val metadata: List<CompactMetadata> = emptyList(),
     @SerialName("parameter_type.ref")
     val parameterType: CanonicalName,
-    @SerialName("parameter_is_optional")
-    val parameterIsOptional: Boolean = false,
     @SerialName("parameter_default.ref")
     val parameterDefault: CanonicalName? = null,
 ) : CompactElementDefinition
@@ -30,7 +28,6 @@ fun MetadataParameterDefinition.toCompact(): CompactMetadataParameterDefinition 
         metadata = this.metadata
             .map { it.toCompact() },
         parameterType = this.parameterType.canonicalName,
-        parameterIsOptional = this.parameterIsOptional,
         parameterDefault = this.parameterDefault?.canonicalName,
     )
 }
@@ -54,7 +51,6 @@ fun CompactMetadataParameterDefinition.inflate(
                 }
                 item
             },
-            parameterIsOptional = this.parameterIsOptional,
             parameterDefault = this.parameterDefault?.let {
                 val item = onLookup(it) ?: return@it null
                 require(item is ConstDefinition) {

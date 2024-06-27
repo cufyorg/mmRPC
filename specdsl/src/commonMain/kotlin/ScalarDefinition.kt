@@ -29,8 +29,6 @@ data class ScalarDefinition(
     override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<Metadata> = emptyList(),
-    @SerialName("scalar_is_native")
-    val scalarIsNative: Boolean = false,
 ) : TypeDefinition() {
     companion object {
         const val ANONYMOUS_NAME = "(anonymous<scalar>)"
@@ -45,8 +43,6 @@ open class ScalarDefinitionBuilder :
     ElementDefinitionBuilder() {
     override var name = ScalarDefinition.ANONYMOUS_NAME
 
-    open var isNative = false
-
     override fun build(): ScalarDefinition {
         val asNamespace = this.namespace.value + this.name
         return ScalarDefinition(
@@ -55,7 +51,6 @@ open class ScalarDefinitionBuilder :
             isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.toList(),
-            scalarIsNative = this.isNative,
         )
     }
 }
@@ -78,15 +73,5 @@ fun scalar(
 
 @Marker1
 val scalar = scalar()
-
-@Marker1
-val nativeScalar = scalar { isNative = true }
-
-@Marker1
-fun nativeScalar(
-    block: ScalarDefinitionBuilder.() -> Unit = {}
-): Unnamed<ScalarDefinition> {
-    return scalar { isNative = true; block() }
-}
 
 ////////////////////////////////////////

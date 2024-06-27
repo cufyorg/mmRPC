@@ -15,8 +15,6 @@ data class CompactFieldDefinition(
     override val metadata: List<CompactMetadata> = emptyList(),
     @SerialName("field_type.ref")
     val fieldType: CanonicalName,
-    @SerialName("field_is_optional")
-    val fieldIsOptional: Boolean = false,
     @SerialName("field_default.ref")
     val fieldDefault: CanonicalName? = null,
 ) : CompactElementDefinition
@@ -30,7 +28,6 @@ fun FieldDefinition.toCompact(): CompactFieldDefinition {
         metadata = this.metadata
             .map { it.toCompact() },
         fieldType = this.fieldType.canonicalName,
-        fieldIsOptional = this.fieldIsOptional,
         fieldDefault = this.fieldDefault?.canonicalName,
     )
 }
@@ -54,7 +51,6 @@ fun CompactFieldDefinition.inflate(
                 }
                 item
             },
-            fieldIsOptional = this.fieldIsOptional,
             fieldDefault = this.fieldDefault?.let {
                 val item = onLookup(it) ?: return@it null
                 require(item is ConstDefinition) {

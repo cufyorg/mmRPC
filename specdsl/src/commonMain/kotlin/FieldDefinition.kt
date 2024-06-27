@@ -31,8 +31,6 @@ data class FieldDefinition(
     override val metadata: List<Metadata> = emptyList(),
     @SerialName("field_type")
     val fieldType: TypeDefinition,
-    @SerialName("field_is_optional")
-    val fieldIsOptional: Boolean = false,
     @SerialName("field_default")
     val fieldDefault: ConstDefinition? = null,
 ) : ElementDefinition() {
@@ -51,8 +49,6 @@ open class FieldDefinitionBuilder :
     ElementDefinitionBuilder() {
     override var name = FieldDefinition.ANONYMOUS_NAME
 
-    open var isOptional = false
-
     open val type = DomainProperty<TypeDefinition>()
     open val default = OptionalDomainProperty<ConstDefinition>()
 
@@ -64,7 +60,6 @@ open class FieldDefinitionBuilder :
             isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.toList(),
-            fieldIsOptional = this.isOptional,
             fieldType = this.type.value.get(asNamespace, name = "type"),
             fieldDefault = this.default.value?.get(asNamespace, name = "default"),
         )
