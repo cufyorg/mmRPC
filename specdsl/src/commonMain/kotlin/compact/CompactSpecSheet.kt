@@ -8,7 +8,7 @@ import kotlin.jvm.JvmInline
 
 @JvmInline
 @Serializable
-value class CompactSpecSheet(val elements: Set<CompactElementDefinition>) {
+value class CompactSpecSheet(val elements: Set<CompactElementDefinition> = emptySet()) {
     operator fun plus(element: CompactElementDefinition) =
         CompactSpecSheet(this.elements + element)
 
@@ -29,22 +29,28 @@ fun SpecSheet.toCompact(): CompactSpecSheet {
 
 fun CompactSpecSheet.inflate(): SpecSheet {
     val inflated = mutableMapOf<CanonicalName, () -> ElementDefinition?>()
+    val requested = mutableListOf<CanonicalName>()
 
     for (element in this.elements) {
         inflated[element.canonicalName] = element.inflate {
+            requested += it
             inflated[it]?.invoke()
         }
     }
 
     val output = inflated.mapValues { it.value() }
-    val failed = output.asSequence().filter { it.value == null }.toList()
+    val failed = buildList {
+        addAll(requested.filter { it !in output })
+        addAll(output.asSequence().filter { it.value == null }.map { it.key }.toList())
+    }
 
     if (failed.isNotEmpty()) {
         error(buildString {
             append("Inflation failed: failed to inflate the following definitions: ")
-            for ((canonicalName) in failed) {
+            for (canonicalName in failed) {
                 appendLine()
-                append(canonicalName)
+                append("- ")
+                append(canonicalName.value)
             }
         })
     }
