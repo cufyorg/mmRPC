@@ -46,8 +46,8 @@ fun CompactMetadataParameterDefinition.inflate(
             },
             parameterType = this.parameterType.let {
                 val item = onLookup(it) ?: return@it null
-                require(item is ScalarDefinition) {
-                    "parameter_type.ref must point to a ScalarDefinition"
+                require(item is TypeDefinition) {
+                    "parameter_type.ref must point to a TypeDefinition"
                 }
                 item
             },

@@ -46,8 +46,8 @@ fun CompactConstDefinition.inflate(
             },
             constType = this.constType.let {
                 val item = onLookup(it) ?: return@it null
-                require(item is ScalarDefinition) {
-                    "const_type.ref must point to a ScalarDefinition"
+                require(item is TypeDefinition) {
+                    "const_type.ref must point to a TypeDefinition"
                 }
                 item
             },

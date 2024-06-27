@@ -221,7 +221,7 @@ interface MetadataParameterDefinitionSetDomainContainer {
     }
 
     operator fun String.invoke(
-        type: ScalarDefinition,
+        type: TypeDefinition,
         block: MetadataParameterDefinitionBuilder.() -> Unit = {},
     ) {
         +Unnamed { namespace, _ ->
@@ -235,7 +235,7 @@ interface MetadataParameterDefinitionSetDomainContainer {
     }
 
     operator fun String.invoke(
-        type: Unnamed<ScalarDefinition>,
+        type: Unnamed<TypeDefinition>,
         block: MetadataParameterDefinitionBuilder.() -> Unit = {},
     ) {
         +Unnamed { namespace, _ ->

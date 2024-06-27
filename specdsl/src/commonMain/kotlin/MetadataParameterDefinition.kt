@@ -15,7 +15,7 @@ data class MetadataParameterDefinition(
     override val description: String = "",
     override val metadata: List<Metadata> = emptyList(),
     @SerialName("parameter_type")
-    val parameterType: ScalarDefinition,
+    val parameterType: TypeDefinition,
     @SerialName("parameter_default")
     val parameterDefault: ConstDefinition? = null,
 ) : ElementDefinition() {
@@ -34,9 +34,7 @@ open class MetadataParameterDefinitionBuilder :
     ElementDefinitionBuilder() {
     override var name = MetadataParameterDefinition.ANONYMOUS_NAME
 
-    open var isOptional = false
-
-    open val type = DomainProperty<ScalarDefinition>()
+    open val type = DomainProperty<TypeDefinition>()
     open val default = OptionalDomainProperty<ConstDefinition>()
 
     override fun build(): MetadataParameterDefinition {
@@ -73,7 +71,7 @@ internal fun metadata_param(
 @Marker1
 @Suppress("FunctionName")
 fun metadata_param(
-    type: ScalarDefinition,
+    type: TypeDefinition,
     block: MetadataParameterDefinitionBuilder.() -> Unit = {},
 ): Unnamed<MetadataParameterDefinition> {
     return metadata_param { this.type *= type; block() }
@@ -82,7 +80,7 @@ fun metadata_param(
 @Marker1
 @Suppress("FunctionName")
 fun metadata_param(
-    type: Unnamed<ScalarDefinition>,
+    type: Unnamed<TypeDefinition>,
     block: MetadataParameterDefinitionBuilder.() -> Unit = {},
 ): Unnamed<MetadataParameterDefinition> {
     return metadata_param { this.type *= type; block() }

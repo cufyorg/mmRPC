@@ -30,7 +30,7 @@ data class ConstDefinition(
     override val description: String = "",
     override val metadata: List<Metadata> = emptyList(),
     @SerialName("const_type")
-    val constType: ScalarDefinition,
+    val constType: TypeDefinition,
     @SerialName("const_value")
     val constValue: String,
 ) : TypeDefinition() {
@@ -48,7 +48,7 @@ open class ConstDefinitionBuilder :
     ElementDefinitionBuilder() {
     override var name = ConstDefinition.ANONYMOUS_NAME
 
-    open val type = DomainProperty<ScalarDefinition>()
+    open val type = DomainProperty<TypeDefinition>()
     open lateinit var value: String
 
     override fun build(): ConstDefinition {
@@ -84,7 +84,7 @@ internal fun const(
 @Marker1
 fun const(
     value: String,
-    type: ScalarDefinition = builtin.String,
+    type: TypeDefinition = builtin.String,
     block: ConstDefinitionBuilder.() -> Unit = {}
 ): Unnamed<ConstDefinition> {
     return const {
@@ -97,7 +97,7 @@ fun const(
 @Marker1
 fun const(
     value: String,
-    type: Unnamed<ScalarDefinition>,
+    type: Unnamed<TypeDefinition>,
     block: ConstDefinitionBuilder.() -> Unit = {}
 ): Unnamed<ConstDefinition> {
     return const {
@@ -110,7 +110,7 @@ fun const(
 @Marker1
 fun constString(
     value: String,
-    type: ScalarDefinition = builtin.String,
+    type: TypeDefinition = builtin.String,
     block: ConstDefinitionBuilder.() -> Unit = {}
 ): Unnamed<ConstDefinition> {
     return const {
@@ -123,7 +123,7 @@ fun constString(
 @Marker1
 fun constString(
     value: String,
-    type: Unnamed<ScalarDefinition>,
+    type: Unnamed<TypeDefinition>,
     block: ConstDefinitionBuilder.() -> Unit = {}
 ): Unnamed<ConstDefinition> {
     return const {
