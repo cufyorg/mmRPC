@@ -1,3 +1,5 @@
+@file:Suppress("PackageDirectoryMismatch")
+
 package org.cufy.specdsl.compact
 
 import kotlinx.serialization.SerialName
@@ -5,26 +7,26 @@ import kotlinx.serialization.Serializable
 import org.cufy.specdsl.*
 
 @Serializable
-@SerialName("kafka_endpoint")
-data class CompactKafkaEndpointDefinition(
-    override val name: String = KafkaEndpointDefinition.ANONYMOUS_NAME,
+@SerialName("kafka_publication_endpoint")
+data class CompactKafkaPublicationEndpointDefinition(
+    override val name: String = KafkaPublicationEndpointDefinition.ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
     @SerialName("is_inline")
     override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<CompactMetadata> = emptyList(),
     @SerialName("endpoint_topic")
-    val endpointTopic: KafkaTopic = namespace.toKafkaTopic(),
+    val endpointTopic: KafkaPublicationTopic = namespace.toKafkaPublicationTopic(),
     @SerialName("endpoint_security_inter")
-    val endpointSecurityInter: List<KafkaSecurity> = listOf(
-        Kafka.KafkaACL,
+    val endpointSecurityInter: List<KafkaPublicationSecurity> = listOf(
+        KafkaPublication.KafkaACL,
     ),
     @SerialName("endpoint_key.ref")
     val endpointKey: CanonicalName? = null,
 ) : CompactElementDefinition
 
-fun KafkaEndpointDefinition.toCompact(): CompactKafkaEndpointDefinition {
-    return CompactKafkaEndpointDefinition(
+fun KafkaPublicationEndpointDefinition.toCompact(): CompactKafkaPublicationEndpointDefinition {
+    return CompactKafkaPublicationEndpointDefinition(
         name = this.name,
         namespace = this.namespace,
         isInline = this.isInline,
@@ -37,11 +39,11 @@ fun KafkaEndpointDefinition.toCompact(): CompactKafkaEndpointDefinition {
     )
 }
 
-fun CompactKafkaEndpointDefinition.inflate(
+fun CompactKafkaPublicationEndpointDefinition.inflate(
     onLookup: (CanonicalName) -> ElementDefinition?
-): () -> KafkaEndpointDefinition? {
+): () -> KafkaPublicationEndpointDefinition? {
     return it@{
-        KafkaEndpointDefinition(
+        KafkaPublicationEndpointDefinition(
             name = this.name,
             namespace = this.namespace,
             isInline = this.isInline,

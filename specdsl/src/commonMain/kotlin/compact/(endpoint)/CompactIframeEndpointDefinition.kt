@@ -1,3 +1,5 @@
+@file:Suppress("PackageDirectoryMismatch")
+
 package org.cufy.specdsl.compact
 
 import kotlinx.serialization.SerialName
@@ -5,26 +7,22 @@ import kotlinx.serialization.Serializable
 import org.cufy.specdsl.*
 
 @Serializable
-@SerialName("http_endpoint")
-data class CompactHttpEndpointDefinition(
-    override val name: String = HttpEndpointDefinition.ANONYMOUS_NAME,
+@SerialName("iframe_endpoint")
+data class CompactIframeEndpointDefinition(
+    override val name: String = IframeEndpointDefinition.ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
     @SerialName("is_inline")
     override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<CompactMetadata> = emptyList(),
     @SerialName("endpoint_path")
-    val endpointPath: HttpPath = namespace.toHttpPath(),
-    @SerialName("endpoint_method_union")
-    val endpointMethodUnion: List<HttpMethod> = listOf(
-        Http.POST,
-    ),
+    val endpointPath: IframePath = namespace.toIframePath(),
     @SerialName("endpoint_security_inter")
-    val endpointSecurityInter: List<HttpSecurity> = emptyList(),
+    val endpointSecurityInter: List<IframeSecurity> = emptyList(),
 ) : CompactElementDefinition
 
-fun HttpEndpointDefinition.toCompact(): CompactHttpEndpointDefinition {
-    return CompactHttpEndpointDefinition(
+fun IframeEndpointDefinition.toCompact(): CompactIframeEndpointDefinition {
+    return CompactIframeEndpointDefinition(
         name = this.name,
         namespace = this.namespace,
         isInline = this.isInline,
@@ -32,16 +30,15 @@ fun HttpEndpointDefinition.toCompact(): CompactHttpEndpointDefinition {
         metadata = this.metadata
             .map { it.toCompact() },
         endpointPath = this.endpointPath,
-        endpointMethodUnion = this.endpointMethodUnion,
         endpointSecurityInter = this.endpointSecurityInter,
     )
 }
 
-fun CompactHttpEndpointDefinition.inflate(
+fun CompactIframeEndpointDefinition.inflate(
     onLookup: (CanonicalName) -> ElementDefinition?
-): () -> HttpEndpointDefinition? {
+): () -> IframeEndpointDefinition? {
     return it@{
-        HttpEndpointDefinition(
+        IframeEndpointDefinition(
             name = this.name,
             namespace = this.namespace,
             isInline = this.isInline,
@@ -50,7 +47,6 @@ fun CompactHttpEndpointDefinition.inflate(
                 it.inflate(onLookup)() ?: return@it null
             },
             endpointPath = this.endpointPath,
-            endpointMethodUnion = this.endpointMethodUnion,
             endpointSecurityInter = this.endpointSecurityInter,
         )
     }

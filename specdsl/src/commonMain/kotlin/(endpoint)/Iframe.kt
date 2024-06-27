@@ -13,6 +13,8 @@
  *	See the License for the specific language governing permissions and
  *	limitations under the License.
  */
+@file:Suppress("PackageDirectoryMismatch")
+
 package org.cufy.specdsl
 
 import kotlinx.serialization.SerialName
@@ -23,89 +25,81 @@ import kotlin.jvm.JvmInline
 
 @JvmInline
 @Serializable
-value class KafkaSecurity(val name: String)
+value class IframeSecurity(val name: String)
 
 @JvmInline
 @Serializable
-value class KafkaTopic(val value: String)
+value class IframePath(val value: String)
 
-object Kafka {
-    val KafkaACL = KafkaSecurity("KafkaACL")
-    val SameClient = KafkaSecurity("SameClient")
+object Iframe {
+    val SameClient = IframeSecurity("SameClient")
 }
 
-fun Namespace.toKafkaTopic(): KafkaTopic {
-    return KafkaTopic(
-        value = canonicalName.value.replace(":", "-")
+fun Namespace.toIframePath(): IframePath {
+    return IframePath(
+        value = "/" + segments.joinToString("/")
     )
 }
 
 ////////////////////////////////////////
 
 @Serializable
-@SerialName("kafka_endpoint")
-data class KafkaEndpointDefinition(
+@SerialName("iframe_endpoint")
+data class IframeEndpointDefinition(
     override val name: String = ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
     @SerialName("is_inline")
     override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<Metadata> = emptyList(),
-    @SerialName("endpoint_topic")
-    val endpointTopic: KafkaTopic = namespace.toKafkaTopic(),
+    @SerialName("endpoint_path")
+    val endpointPath: IframePath = namespace.toIframePath(),
     @SerialName("endpoint_security_inter")
-    val endpointSecurityInter: List<KafkaSecurity> = listOf(
-        Kafka.KafkaACL,
-    ),
-    @SerialName("endpoint_key")
-    val endpointKey: TupleDefinition? = null,
+    val endpointSecurityInter: List<IframeSecurity> = emptyList(),
 ) : EndpointDefinition() {
     companion object {
-        const val ANONYMOUS_NAME = "(anonymous<kafka_endpoint>)"
+        const val ANONYMOUS_NAME = "(anonymous<iframe_endpoint>)"
     }
 
     override fun collectChildren() = sequence {
         yieldAll(metadata.asSequence().flatMap { it.collect() })
-        endpointKey?.let { yieldAll(it.collect()) }
     }
 }
 
-open class KafkaEndpointDefinitionBuilder :
+open class IframeEndpointDefinitionBuilder :
     ElementDefinitionBuilder() {
-    override var name = KafkaEndpointDefinition.ANONYMOUS_NAME
+    override var name = IframeEndpointDefinition.ANONYMOUS_NAME
 
-    open var topic: String? = null
-    open val key = OptionalDomainProperty<TupleDefinition>()
+    open var path: String? = null
 
-    protected open var endpointSecurityInter = mutableSetOf<KafkaSecurity>()
+    protected open var endpointSecurityInter = mutableSetOf<IframeSecurity>()
 
-    open operator fun KafkaSecurity.unaryPlus() {
+    open operator fun IframeSecurity.unaryPlus() {
         endpointSecurityInter += this
     }
 
-    override fun build(): KafkaEndpointDefinition {
+    override fun build(): IframeEndpointDefinition {
         val asNamespace = this.namespace.value + this.name
-        return KafkaEndpointDefinition(
+        return IframeEndpointDefinition(
             name = this.name,
             namespace = this.namespace.value,
             isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.toList(),
-            endpointTopic = this.topic
-                ?.let { KafkaTopic(it) }
-                ?: this.namespace.value.toKafkaTopic(),
+            endpointPath = this.path
+                ?.let { IframePath(it) }
+                ?: this.namespace.value.toIframePath(),
             endpointSecurityInter = this.endpointSecurityInter.toList(),
-            endpointKey = this.key.value?.get(asNamespace, name = "key"),
         )
     }
 }
 
 @Marker1
-fun endpointKafka(
-    block: KafkaEndpointDefinitionBuilder.() -> Unit = {}
-): Unnamed<KafkaEndpointDefinition> {
+fun endpointIframe(
+    block: IframeEndpointDefinitionBuilder.() -> Unit = {}
+): Unnamed<IframeEndpointDefinition> {
     return Unnamed { namespace, name ->
-        KafkaEndpointDefinitionBuilder()
+        IframeEndpointDefinitionBuilder()
             .also { it.name = name ?: return@also }
             .also { it.namespace *= namespace }
             .also { it.isInline = name == null }
@@ -117,21 +111,21 @@ fun endpointKafka(
 ////////////////////////////////////////
 
 @Marker1
-val endpointKafka = endpointKafka()
+val endpointIframe = endpointIframe()
 
 ////////////////////////////////////////
 
 @Marker2
-val RoutineDefinitionBuilder.kafka: Unit
+val RoutineDefinitionBuilder.iframe: Unit
     get() {
-        +endpointKafka { name = "kafka"; +Kafka.KafkaACL }
+        +endpointIframe { name = "iframe" }
     }
 
 @Marker2
-fun RoutineDefinitionBuilder.kafka(
-    block: KafkaEndpointDefinitionBuilder.() -> Unit = {}
+fun RoutineDefinitionBuilder.iframe(
+    block: IframeEndpointDefinitionBuilder.() -> Unit = {}
 ) {
-    +endpointKafka { name = "kafka"; +Kafka.KafkaACL; block() }
+    +endpointIframe { name = "iframe"; block() }
 }
 
 ////////////////////////////////////////
