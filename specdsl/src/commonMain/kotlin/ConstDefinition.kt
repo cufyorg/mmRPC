@@ -115,7 +115,7 @@ fun constString(
 ): Unnamed<ConstDefinition> {
     return const {
         this.type *= type
-        this.value = "\"$value\""
+        this.value = string(value)
         block()
     }
 }
@@ -128,7 +128,7 @@ fun constString(
 ): Unnamed<ConstDefinition> {
     return const {
         this.type *= type
-        this.value = "\"$value\""
+        this.value = string(value)
         block()
     }
 }

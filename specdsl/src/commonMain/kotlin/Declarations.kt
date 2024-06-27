@@ -22,6 +22,11 @@ import kotlin.reflect.KProperty
 
 ////////////////////////////////////////
 
+@Marker1
+fun string(name: String) = "\"$name\""
+
+////////////////////////////////////////
+
 @Serializable
 sealed class ElementDefinition {
     abstract val name: String
