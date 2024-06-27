@@ -7,7 +7,7 @@ import org.cufy.specdsl.*
 @Serializable
 @SerialName("http_endpoint")
 data class CompactHttpEndpointDefinition(
-    override val name: String = "(anonymous<http_endpoint>)",
+    override val name: String = HttpEndpointDefinition.ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
     @SerialName("is_inline")
     override val isInline: Boolean = true,

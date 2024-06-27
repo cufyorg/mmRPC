@@ -7,7 +7,7 @@ import org.cufy.specdsl.*
 @Serializable
 @SerialName("union")
 data class CompactUnionDefinition(
-    override val name: String = "(anonymous|)",
+    override val name: String = UnionDefinition.ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
     @SerialName("is_inline")
     override val isInline: Boolean = true,

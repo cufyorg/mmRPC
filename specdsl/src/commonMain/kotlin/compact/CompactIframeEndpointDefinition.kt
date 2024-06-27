@@ -7,7 +7,7 @@ import org.cufy.specdsl.*
 @Serializable
 @SerialName("iframe_endpoint")
 data class CompactIframeEndpointDefinition(
-    override val name: String = "(anonymous<iframe_endpoint>)",
+    override val name: String = IframeEndpointDefinition.ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
     @SerialName("is_inline")
     override val isInline: Boolean = true,

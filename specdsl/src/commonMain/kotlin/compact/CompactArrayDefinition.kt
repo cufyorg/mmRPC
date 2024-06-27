@@ -7,7 +7,7 @@ import org.cufy.specdsl.*
 @Serializable
 @SerialName("array")
 data class CompactArrayDefinition(
-    override val name: String = "(anonymous[])",
+    override val name: String = ArrayDefinition.ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
     @SerialName("is_inline")
     override val isInline: Boolean = true,

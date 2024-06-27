@@ -10,7 +10,7 @@ import org.cufy.specdsl.Namespace
 @Serializable
 @SerialName("fault")
 data class CompactFaultDefinition(
-    override val name: String = "(anonymous<fault>)",
+    override val name: String = FaultDefinition.ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
     @SerialName("is_inline")
     override val isInline: Boolean = true,

@@ -94,3 +94,13 @@ fun array(
 }
 
 ////////////////////////////////////////
+
+@Marker1
+val TypeDefinition.array: Unnamed<ArrayDefinition>
+    get() = array(this)
+
+@Marker1
+val Unnamed<TypeDefinition>.array: Unnamed<ArrayDefinition>
+    get() = array(this)
+
+////////////////////////////////////////

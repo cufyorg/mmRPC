@@ -7,7 +7,7 @@ import org.cufy.specdsl.*
 @Serializable
 @SerialName("protocol")
 data class CompactProtocolDefinition(
-    override val name: String = "(anonymous<protocol>)",
+    override val name: String = ProtocolDefinition.ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
     @SerialName("is_inline")
     override val isInline: Boolean = true,

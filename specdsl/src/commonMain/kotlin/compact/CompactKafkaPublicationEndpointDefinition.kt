@@ -7,7 +7,7 @@ import org.cufy.specdsl.*
 @Serializable
 @SerialName("kafka_publication_endpoint")
 data class CompactKafkaPublicationEndpointDefinition(
-    override val name: String = "(anonymous<kafka_publication_endpoint>)",
+    override val name: String = KafkaPublicationEndpointDefinition.ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
     @SerialName("is_inline")
     override val isInline: Boolean = true,

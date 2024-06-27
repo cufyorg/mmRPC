@@ -7,7 +7,7 @@ import org.cufy.specdsl.*
 @Serializable
 @SerialName("metadata")
 data class CompactMetadataDefinition(
-    override val name: String = "(anonymous@)",
+    override val name: String = MetadataDefinition.ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
     @SerialName("is_inline")
     override val isInline: Boolean = true,

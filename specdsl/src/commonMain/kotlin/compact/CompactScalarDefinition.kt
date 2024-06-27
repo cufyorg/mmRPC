@@ -10,7 +10,7 @@ import org.cufy.specdsl.ScalarDefinition
 @Serializable
 @SerialName("scalar")
 data class CompactScalarDefinition(
-    override val name: String = "(anonymous<scalar>)",
+    override val name: String = ScalarDefinition.ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
     @SerialName("is_inline")
     override val isInline: Boolean = true,
