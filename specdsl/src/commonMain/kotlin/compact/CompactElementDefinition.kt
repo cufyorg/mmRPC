@@ -31,6 +31,7 @@ fun ElementDefinition.toCompact(): CompactElementDefinition {
         is KafkaPublicationEndpointDefinition -> toCompact()
         is MetadataDefinition -> toCompact()
         is MetadataParameterDefinition -> toCompact()
+        is OptionalDefinition -> toCompact()
         is ProtocolDefinition -> toCompact()
         is RoutineDefinition -> toCompact()
         is ScalarDefinition -> toCompact()
@@ -55,7 +56,7 @@ fun CompactElementDefinition.inflate(
         is CompactKafkaPublicationEndpointDefinition -> inflate(onLookup)
         is CompactMetadataDefinition -> inflate(onLookup)
         is CompactMetadataParameterDefinition -> inflate(onLookup)
-
+        is CompactOptionalDefinition -> inflate(onLookup)
         is CompactProtocolDefinition -> inflate(onLookup)
         is CompactRoutineDefinition -> inflate(onLookup)
         is CompactScalarDefinition -> inflate(onLookup)
