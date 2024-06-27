@@ -116,14 +116,14 @@ val endpointIframe = endpointIframe()
 @Marker2
 val RoutineDefinitionBuilder.iframe: Unit
     get() {
-        +endpointIframe
+        +endpointIframe { name = "iframe" }
     }
 
 @Marker2
 fun RoutineDefinitionBuilder.iframe(
     block: IframeEndpointDefinitionBuilder.() -> Unit = {}
 ) {
-    +endpointIframe { block() }
+    +endpointIframe { name = "iframe"; block() }
 }
 
 ////////////////////////////////////////

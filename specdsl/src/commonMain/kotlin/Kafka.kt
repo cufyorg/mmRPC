@@ -124,14 +124,14 @@ val endpointKafka = endpointKafka()
 @Marker2
 val RoutineDefinitionBuilder.kafka: Unit
     get() {
-        +endpointKafka { +Kafka.KafkaACL }
+        +endpointKafka { name = "kafka"; +Kafka.KafkaACL }
     }
 
 @Marker2
 fun RoutineDefinitionBuilder.kafka(
     block: KafkaEndpointDefinitionBuilder.() -> Unit = {}
 ) {
-    +endpointKafka { +Kafka.KafkaACL; block() }
+    +endpointKafka { name = "kafka"; +Kafka.KafkaACL; block() }
 }
 
 ////////////////////////////////////////

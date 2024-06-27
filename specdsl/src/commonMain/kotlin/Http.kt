@@ -175,14 +175,14 @@ val endpointHttp = endpointHttp()
 @Marker2
 val RoutineDefinitionBuilder.http: Unit
     get() {
-        +endpointHttp { +Http.POST }
+        +endpointHttp { name = "http"; +Http.POST }
     }
 
 @Marker2
 fun RoutineDefinitionBuilder.http(
     block: HttpEndpointDefinitionBuilder.() -> Unit = {}
 ) {
-    +endpointHttp { +Http.POST; block() }
+    +endpointHttp { name = "http"; +Http.POST; block() }
 }
 
 ////////////////////////////////////////

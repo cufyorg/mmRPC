@@ -123,14 +123,14 @@ val endpointKafkaPublication = endpointKafkaPublication()
 @Marker2
 val RoutineDefinitionBuilder.kafkaPublication: Unit
     get() {
-        +endpointKafkaPublication { +KafkaPublication.KafkaACL }
+        +endpointKafkaPublication { name = "kafkaPublication"; +KafkaPublication.KafkaACL }
     }
 
 @Marker2
 fun RoutineDefinitionBuilder.kafkaPublication(
     block: KafkaPublicationEndpointDefinitionBuilder.() -> Unit = {}
 ) {
-    +endpointKafkaPublication { +KafkaPublication.KafkaACL; block() }
+    +endpointKafkaPublication { name = "kafkaPublication"; +KafkaPublication.KafkaACL; block() }
 }
 
 ////////////////////////////////////////
