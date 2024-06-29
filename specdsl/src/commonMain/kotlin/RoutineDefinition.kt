@@ -102,14 +102,14 @@ open class RoutineDefinitionBuilder :
             },
             routineInput = this.routineInputBlocks.let { blocks ->
                 StructDefinitionBuilder()
-                    .also { it.name = "input" }
+                    .also { it.name = "Input" }
                     .also { it.namespace *= asNamespace }
                     .apply { for (it in blocks) it() }
                     .build()
             },
             routineOutput = this.routineOutputBlocks.let { blocks ->
                 StructDefinitionBuilder()
-                    .also { it.name = "output" }
+                    .also { it.name = "Output" }
                     .also { it.namespace *= asNamespace }
                     .apply { for (it in blocks) it() }
                     .build()
