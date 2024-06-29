@@ -32,7 +32,7 @@ data class ConstDefinition(
     @SerialName("const_type")
     val constType: TypeDefinition,
     @SerialName("const_value")
-    val constValue: String,
+    val constValue: Literal,
 ) : TypeDefinition() {
     companion object {
         const val ANONYMOUS_NAME = "(anonymous<const>)"
@@ -49,7 +49,7 @@ open class ConstDefinitionBuilder :
     override var name = ConstDefinition.ANONYMOUS_NAME
 
     open val type = DomainProperty<TypeDefinition>()
-    open lateinit var value: String
+    open lateinit var value: Literal
 
     override fun build(): ConstDefinition {
         val asNamespace = this.namespace.value + this.name
@@ -83,8 +83,8 @@ internal fun const(
 
 @Marker1
 fun const(
-    value: String,
-    type: TypeDefinition = builtin.String,
+    type: TypeDefinition,
+    value: Literal = null.literal,
     block: ConstDefinitionBuilder.() -> Unit = {}
 ): Unnamed<ConstDefinition> {
     return const {
@@ -96,8 +96,8 @@ fun const(
 
 @Marker1
 fun const(
-    value: String,
     type: Unnamed<TypeDefinition>,
+    value: Literal = null.literal,
     block: ConstDefinitionBuilder.() -> Unit = {}
 ): Unnamed<ConstDefinition> {
     return const {
@@ -107,28 +107,77 @@ fun const(
     }
 }
 
+////////////////////////////////////////
+
 @Marker1
-fun constString(
-    value: String,
-    type: TypeDefinition = builtin.String,
+fun const(
+    value: NullLiteral,
     block: ConstDefinitionBuilder.() -> Unit = {}
 ): Unnamed<ConstDefinition> {
     return const {
-        this.type *= type
-        this.value = string(value)
+        this.type *= builtin.Any.optional
+        this.value = value
         block()
     }
 }
 
 @Marker1
-fun constString(
-    value: String,
-    type: Unnamed<TypeDefinition>,
+fun const(
+    value: BooleanLiteral,
     block: ConstDefinitionBuilder.() -> Unit = {}
 ): Unnamed<ConstDefinition> {
     return const {
-        this.type *= type
-        this.value = string(value)
+        this.type *= builtin.Boolean
+        this.value = value
+        block()
+    }
+}
+
+@Marker1
+fun const(
+    value: IntLiteral,
+    block: ConstDefinitionBuilder.() -> Unit = {}
+): Unnamed<ConstDefinition> {
+    return const {
+        this.type *= builtin.Int64
+        this.value = value
+        block()
+    }
+}
+
+@Marker1
+fun const(
+    value: FloatLiteral,
+    block: ConstDefinitionBuilder.() -> Unit = {}
+): Unnamed<ConstDefinition> {
+    return const {
+        this.type *= builtin.Float64
+        this.value = value
+        block()
+    }
+}
+
+@Marker1
+fun const(
+    value: StringLiteral,
+    block: ConstDefinitionBuilder.() -> Unit = {}
+): Unnamed<ConstDefinition> {
+    return const {
+        this.type *= builtin.String
+        this.value = value
+        block()
+    }
+}
+
+@Marker1
+fun const(
+    value: TupleLiteral,
+    block: ConstDefinitionBuilder.() -> Unit = {}
+): Unnamed<ConstDefinition> {
+    return const {
+        this.type *= tuple {
+        }
+        this.value = value
         block()
     }
 }

@@ -2,16 +2,13 @@ package org.cufy.specdsl.compact
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.cufy.specdsl.CanonicalName
-import org.cufy.specdsl.ElementDefinition
-import org.cufy.specdsl.MetadataParameter
-import org.cufy.specdsl.MetadataParameterDefinition
+import org.cufy.specdsl.*
 
 @Serializable
 data class CompactMetadataParameter(
     @SerialName("definition.ref")
     val definition: CanonicalName,
-    val value: String,
+    val value: Literal,
 )
 
 fun MetadataParameter.toCompact(): CompactMetadataParameter {

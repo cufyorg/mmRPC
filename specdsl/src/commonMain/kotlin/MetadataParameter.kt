@@ -22,7 +22,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class MetadataParameter(
     val definition: MetadataParameterDefinition,
-    val value: String,
+    val value: Literal,
 ) {
     fun collect() = sequence {
         yieldAll(definition.collect())
@@ -31,7 +31,7 @@ data class MetadataParameter(
 
 open class MetadataParameterBuilder {
     lateinit var definition: MetadataParameterDefinition
-    lateinit var value: String
+    lateinit var value: Literal
 
     fun build(): MetadataParameter {
         return MetadataParameter(
@@ -44,7 +44,7 @@ open class MetadataParameterBuilder {
 ////////////////////////////////////////
 
 operator fun MetadataParameterDefinition.invoke(
-    value: String,
+    value: Literal,
     block: MetadataParameterBuilder.() -> Unit = {}
 ): MetadataParameter {
     return MetadataParameterBuilder()

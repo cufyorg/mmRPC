@@ -16,7 +16,7 @@ data class CompactConstDefinition(
     @SerialName("const_type.ref")
     val constType: CanonicalName,
     @SerialName("const_value")
-    val constValue: String,
+    val constValue: Literal,
 ) : CompactElementDefinition
 
 fun ConstDefinition.toCompact(): CompactConstDefinition {

@@ -21,11 +21,11 @@ package org.cufy.specdsl
 @Suppress("ClassName")
 object builtin : NamespaceObject() {
     val Any by scalar { +"Everything extends Any" }
-    val NULL by const("null", Any.optional) { +"builtin null" }
+    val NULL by const(null.literal) { +"builtin null" }
     val String by scalar { +"builtin string" }
     val Boolean by scalar { +"builtin boolean" }
-    val TRUE by const("true", Boolean) { +"builtin true" }
-    val FALSE by const("false", Boolean) { +"builtin false" }
+    val TRUE by const(true.literal) { +"builtin true" }
+    val FALSE by const(false.literal) { +"builtin false" }
     val Int32 by scalar { +"builtin 32bit int" }
     val UInt32 by scalar { +"builtin unsigned 32bit int" }
     val Int64 by scalar { +"builtin 64bit int" }
