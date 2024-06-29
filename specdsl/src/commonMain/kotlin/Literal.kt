@@ -17,6 +17,7 @@ package org.cufy.specdsl
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlin.jvm.JvmName
 
 @Serializable
 sealed interface Literal {
@@ -30,6 +31,7 @@ data object NullLiteral : Literal {
 }
 
 @Marker1
+@get:JvmName("literalOrNull")
 val Nothing?.literal get() = NullLiteral
 
 @Serializable
@@ -42,6 +44,7 @@ data class BooleanLiteral(val value: Boolean) : Literal {
 val Boolean.literal get() = BooleanLiteral(this)
 
 @Marker1
+@get:JvmName("literalOrNull")
 val Boolean?.literal get() = this?.literal ?: null.literal
 
 @Serializable
@@ -54,12 +57,14 @@ data class IntLiteral(val value: Long) : Literal {
 val Int.literal get() = IntLiteral(toLong())
 
 @Marker1
+@get:JvmName("literalOrNull")
 val Int?.literal get() = this?.literal ?: null.literal
 
 @Marker1
 val Long.literal get() = IntLiteral(this)
 
 @Marker1
+@get:JvmName("literalOrNull")
 val Long?.literal get() = this?.literal ?: null.literal
 
 @Serializable
@@ -72,12 +77,14 @@ data class FloatLiteral(val value: Double) : Literal {
 val Float.literal get() = FloatLiteral(toDouble())
 
 @Marker1
+@get:JvmName("literalOrNull")
 val Float?.literal get() = this?.literal ?: null.literal
 
 @Marker1
 val Double.literal get() = FloatLiteral(this)
 
 @Marker1
+@get:JvmName("literalOrNull")
 val Double?.literal get() = this?.literal ?: null.literal
 
 @Serializable
@@ -90,6 +97,7 @@ data class StringLiteral(val value: String) : Literal {
 val String.literal get() = StringLiteral(this)
 
 @Marker1
+@get:JvmName("literalOrNull")
 val String?.literal get() = this?.literal ?: null.literal
 
 @Serializable
