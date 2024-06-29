@@ -100,9 +100,13 @@ class Namespace : Comparable<Namespace> {
     val isOnToplevel get() = this.segments.size == 1
     val isAnonymous by lazy { this.segments.any { isAnonymousSegment(it) } }
 
+    val asSimpleIdentifier by lazy {
+        name.replace(':', '_')
+    }
     val asIdentifier by lazy {
         segments.joinToString("_") {
             it.replaceFirstChar { it.uppercase() }
+                .replace(':', '_')
         }
     }
 
