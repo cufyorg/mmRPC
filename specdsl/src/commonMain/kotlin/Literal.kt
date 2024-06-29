@@ -19,18 +19,24 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed interface Literal
+sealed interface Literal {
+    fun contentToString(): String
+}
 
 @Serializable
 @SerialName("null")
-data object NullLiteral : Literal
+data object NullLiteral : Literal {
+    override fun contentToString() = "null"
+}
 
 @Marker1
 val Nothing?.literal get() = NullLiteral
 
 @Serializable
 @SerialName("boolean")
-data class BooleanLiteral(val value: Boolean) : Literal
+data class BooleanLiteral(val value: Boolean) : Literal {
+    override fun contentToString() = value.toString()
+}
 
 @Marker1
 val Boolean.literal get() = BooleanLiteral(this)
@@ -40,7 +46,9 @@ val Boolean?.literal get() = this?.literal ?: null.literal
 
 @Serializable
 @SerialName("int")
-data class IntLiteral(val value: Long) : Literal
+data class IntLiteral(val value: Long) : Literal {
+    override fun contentToString() = value.toString()
+}
 
 @Marker1
 val Int.literal get() = IntLiteral(toLong())
@@ -56,7 +64,9 @@ val Long?.literal get() = this?.literal ?: null.literal
 
 @Serializable
 @SerialName("float")
-data class FloatLiteral(val value: Double) : Literal
+data class FloatLiteral(val value: Double) : Literal {
+    override fun contentToString() = value.toString()
+}
 
 @Marker1
 val Float.literal get() = FloatLiteral(toDouble())
@@ -72,7 +82,9 @@ val Double?.literal get() = this?.literal ?: null.literal
 
 @Serializable
 @SerialName("string")
-data class StringLiteral(val value: String) : Literal
+data class StringLiteral(val value: String) : Literal {
+    override fun contentToString() = "\"$value\""
+}
 
 @Marker1
 val String.literal get() = StringLiteral(this)
@@ -82,7 +94,9 @@ val String?.literal get() = this?.literal ?: null.literal
 
 @Serializable
 @SerialName("tuple")
-data class TupleLiteral(val value: List<Literal>) : Literal
+data class TupleLiteral(val value: List<Literal>) : Literal {
+    override fun contentToString() = value.joinToString(", ", "[", "]") { it.contentToString() }
+}
 
 @Marker1
 fun literal(vararg value: Literal) =
