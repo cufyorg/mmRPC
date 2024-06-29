@@ -36,6 +36,9 @@ object builtin : NamespaceObject() {
     val Deprecated__message by metadata_param(String) { +"The deprecation message" }
     val Deprecated by metadata(Deprecated__message)
 
+    val Experimental__message by metadata_param(String)
+    val Experimental by metadata(Deprecated__message)
+
     /**
      * Namespace to be used for defining builtin faults.
      */
