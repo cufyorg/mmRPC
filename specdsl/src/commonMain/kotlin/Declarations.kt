@@ -50,8 +50,11 @@ sealed class EndpointDefinition : ElementDefinition()
 
 @JvmInline
 @Serializable
-value class CanonicalName(val value: String) {
+value class CanonicalName(val value: String) : Comparable<CanonicalName> {
     val asNamespace get() = Namespace(this)
+
+    override fun compareTo(other: CanonicalName) =
+        value.compareTo(other.value)
 }
 
 fun CanonicalName(namespace: Namespace): CanonicalName {
