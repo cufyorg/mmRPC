@@ -100,6 +100,12 @@ class Namespace : Comparable<Namespace> {
     val isOnToplevel get() = this.segments.size == 1
     val isAnonymous by lazy { this.segments.any { isAnonymousSegment(it) } }
 
+    val asIdentifier by lazy {
+        segments.joinToString("_") {
+            it.replaceFirstChar { it.uppercase() }
+        }
+    }
+
     operator fun plus(segment: String): Namespace {
         require(!segment.contains('.')) {
             "Namespace should not contain '.'"
