@@ -1,7 +1,14 @@
 [versions]
 kotlin = "2.0.0"
+kotlinpoet = "1.17.0"
+
+[plugins]
+gradle-plugin-publish = { id = "com.gradle.plugin-publish", version = "1.2.1" }
 
 [libraries]
 kotlin-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version = "1.6.3" }
 kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.6.3" }
+kotlin-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.8.1" }
 kotlin-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.6.0" }
+
+kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
