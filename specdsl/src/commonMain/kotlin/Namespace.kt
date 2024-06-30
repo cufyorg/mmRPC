@@ -78,7 +78,7 @@ class Namespace : Comparable<Namespace> {
         this.segments.hashCode()
 
     override fun toString() =
-        "Namespace(${this.canonicalName})"
+        "Namespace(${this.canonicalName.value})"
 
     override fun compareTo(other: Namespace): Int {
         repeat(min(this.segments.size, other.segments.size)) { i ->
