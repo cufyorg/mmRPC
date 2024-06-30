@@ -70,11 +70,11 @@ open class FieldDefinitionBuilder :
 internal fun prop(
     block: FieldDefinitionBuilder.() -> Unit = {},
 ): Unnamed<FieldDefinition> {
-    return Unnamed { namespace, name ->
+    return Unnamed { namespace, name, isInline ->
         FieldDefinitionBuilder()
             .also { it.name = name ?: return@also }
             .also { it.namespace *= namespace }
-            .also { it.isInline = name == null }
+            .also { it.isInline = isInline }
             .apply(block)
             .build()
     }

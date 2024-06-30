@@ -73,11 +73,11 @@ open class MetadataDefinitionBuilder :
 fun metadata(
     block: MetadataDefinitionBuilder.() -> Unit = {}
 ): Unnamed<MetadataDefinition> {
-    return Unnamed { namespace, name ->
+    return Unnamed { namespace, name, isInline ->
         MetadataDefinitionBuilder()
             .also { it.name = name ?: return@also }
             .also { it.namespace *= namespace }
-            .also { it.isInline = name == null }
+            .also { it.isInline = isInline }
             .apply(block)
             .build()
     }

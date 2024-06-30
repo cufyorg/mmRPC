@@ -75,11 +75,11 @@ open class InterDefinitionBuilder :
 fun inter(
     block: InterDefinitionBuilder.() -> Unit = {}
 ): Unnamed<InterDefinition> {
-    return Unnamed { namespace, name ->
+    return Unnamed { namespace, name, isInline ->
         InterDefinitionBuilder()
             .also { it.name = name ?: return@also }
             .also { it.namespace *= namespace }
-            .also { it.isInline = name == null }
+            .also { it.isInline = isInline }
             .apply(block)
             .build()
     }

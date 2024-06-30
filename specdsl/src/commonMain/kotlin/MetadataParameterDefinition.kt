@@ -56,11 +56,11 @@ open class MetadataParameterDefinitionBuilder :
 internal fun metadata_param(
     block: MetadataParameterDefinitionBuilder.() -> Unit = {},
 ): Unnamed<MetadataParameterDefinition> {
-    return Unnamed { namespace, name ->
+    return Unnamed { namespace, name, isInline ->
         MetadataParameterDefinitionBuilder()
             .also { it.name = name ?: return@also }
             .also { it.namespace *= namespace }
-            .also { it.isInline = name == null }
+            .also { it.isInline = isInline }
             .apply(block)
             .build()
     }

@@ -75,11 +75,11 @@ open class ProtocolDefinitionBuilder :
 fun protocol(
     block: ProtocolDefinitionBuilder.() -> Unit = {}
 ): Unnamed<ProtocolDefinition> {
-    return Unnamed { namespace, name ->
+    return Unnamed { namespace, name, isInline ->
         ProtocolDefinitionBuilder()
             .also { it.name = name ?: return@also }
             .also { it.namespace *= namespace }
-            .also { it.isInline = name == null }
+            .also { it.isInline = isInline }
             .apply(block)
             .build()
     }

@@ -157,11 +157,11 @@ open class HttpEndpointDefinitionBuilder :
 fun endpointHttp(
     block: HttpEndpointDefinitionBuilder.() -> Unit = {}
 ): Unnamed<HttpEndpointDefinition> {
-    return Unnamed { namespace, name ->
+    return Unnamed { namespace, name, isInline ->
         HttpEndpointDefinitionBuilder()
             .also { it.name = name ?: return@also }
             .also { it.namespace *= namespace }
-            .also { it.isInline = name == null }
+            .also { it.isInline = isInline }
             .apply(block)
             .build()
     }

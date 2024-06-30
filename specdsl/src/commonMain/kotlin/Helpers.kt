@@ -141,7 +141,7 @@ interface RoutineDefinitionSetDomainContainer {
     operator fun String.invoke(
         block: RoutineDefinitionBuilder.() -> Unit
     ) {
-        +Unnamed { namespace, _ ->
+        +Unnamed { namespace, _, _ ->
             RoutineDefinitionBuilder()
                 .also { it.name = this }
                 .also { it.namespace *= namespace }
@@ -175,7 +175,7 @@ interface FieldDefinitionSetDomainContainer {
         type: TypeDefinition,
         block: FieldDefinitionBuilder.() -> Unit = {},
     ) {
-        +Unnamed { namespace, _ ->
+        +Unnamed { namespace, _, _ ->
             FieldDefinitionBuilder()
                 .also { it.name = this }
                 .also { it.namespace *= namespace }
@@ -189,7 +189,7 @@ interface FieldDefinitionSetDomainContainer {
         type: Unnamed<TypeDefinition>,
         block: FieldDefinitionBuilder.() -> Unit = {},
     ) {
-        +Unnamed { namespace, _ ->
+        +Unnamed { namespace, _, _ ->
             FieldDefinitionBuilder()
                 .also { it.name = this }
                 .also { it.namespace *= namespace }
@@ -224,7 +224,7 @@ interface MetadataParameterDefinitionSetDomainContainer {
         type: TypeDefinition,
         block: MetadataParameterDefinitionBuilder.() -> Unit = {},
     ) {
-        +Unnamed { namespace, _ ->
+        +Unnamed { namespace, _, _ ->
             MetadataParameterDefinitionBuilder()
                 .also { it.name = this }
                 .also { it.namespace *= namespace }
@@ -238,7 +238,7 @@ interface MetadataParameterDefinitionSetDomainContainer {
         type: Unnamed<TypeDefinition>,
         block: MetadataParameterDefinitionBuilder.() -> Unit = {},
     ) {
-        +Unnamed { namespace, _ ->
+        +Unnamed { namespace, _, _ ->
             MetadataParameterDefinitionBuilder()
                 .also { it.name = this }
                 .also { it.namespace *= namespace }

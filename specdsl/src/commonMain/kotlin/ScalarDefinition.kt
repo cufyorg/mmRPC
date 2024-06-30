@@ -59,11 +59,11 @@ open class ScalarDefinitionBuilder :
 fun scalar(
     block: ScalarDefinitionBuilder.() -> Unit = {}
 ): Unnamed<ScalarDefinition> {
-    return Unnamed { namespace, name ->
+    return Unnamed { namespace, name, isInline ->
         ScalarDefinitionBuilder()
             .also { it.name = name ?: return@also }
             .also { it.namespace *= namespace }
-            .also { it.isInline = name == null }
+            .also { it.isInline = isInline }
             .also(block)
             .build()
     }

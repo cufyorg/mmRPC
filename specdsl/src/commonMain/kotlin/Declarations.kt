@@ -101,21 +101,25 @@ abstract class NamespaceObject {
 
 ////////////////////////////////////////
 
-class Unnamed<out T>(private val block: (Namespace, String?) -> T) {
-    constructor(block: (Namespace) -> T) : this({ ns, _ -> block(ns) })
-    constructor(value: T) : this({ _, _ -> value })
+fun interface UnnamedBlock<out T> {
+    operator fun invoke(ns: Namespace, name: String?, isInline: Boolean): T
+}
 
-    fun get(namespace: Namespace, name: String) =
-        block(namespace, name)
+class Unnamed<out T>(private val block: UnnamedBlock<T>) {
+    constructor(block: (Namespace) -> T) : this({ ns, _, _ -> block(ns) })
+    constructor(value: T) : this({ _, _, _ -> value })
 
-    fun get(namespace: Namespace) =
-        block(namespace, null)
+    fun get(namespace: Namespace, isInline: Boolean = true) =
+        block(namespace, name = null, isInline = isInline)
 
-    fun get(obj: NamespaceObject, name: String) =
-        block(obj.namespace, name)
+    fun get(namespace: Namespace, name: String, isInline: Boolean = true) =
+        block(namespace, name, isInline = isInline)
 
-    fun get(obj: NamespaceObject) =
-        block(obj.namespace, null)
+    fun get(obj: NamespaceObject, isInline: Boolean = true) =
+        block(obj.namespace, name = null, isInline = isInline)
+
+    fun get(obj: NamespaceObject, name: String, isInline: Boolean = true) =
+        block(obj.namespace, name, isInline = isInline)
 
     private val values = mutableMapOf<Pair<Namespace, String?>, T>()
 
@@ -124,7 +128,7 @@ class Unnamed<out T>(private val block: (Namespace, String?) -> T) {
             val splits = property.name.split("__")
             val ns = namespace + splits.dropLast(1)
             val n = splits.last()
-            block(ns, n)
+            block(ns, n, isInline = false)
         }
     }
 
@@ -133,12 +137,12 @@ class Unnamed<out T>(private val block: (Namespace, String?) -> T) {
             val splits = property.name.split("__")
             val ns = obj.namespace + splits.dropLast(1)
             val n = splits.last()
-            block(ns, n)
+            block(ns, n, isInline = false)
         }
     }
 
     operator fun provideDelegate(thisRef: Any?, property: KProperty<*>): Unnamed<T> {
-        return Unnamed { namespace, name -> block(namespace, name) }
+        return Unnamed { namespace, name, isInline -> block(namespace, name, isInline) }
     }
 }
 

@@ -76,11 +76,11 @@ open class TupleDefinitionBuilder :
 fun tuple(
     block: TupleDefinitionBuilder.() -> Unit = {},
 ): Unnamed<TupleDefinition> {
-    return Unnamed { namespace, name ->
+    return Unnamed { namespace, name, isInline ->
         TupleDefinitionBuilder()
             .also { it.name = name ?: return@also }
             .also { it.namespace *= namespace }
-            .also { it.isInline = name == null }
+            .also { it.isInline = isInline }
             .apply(block)
             .build()
     }

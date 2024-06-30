@@ -106,11 +106,11 @@ open class KafkaEndpointDefinitionBuilder :
 fun endpointKafka(
     block: KafkaEndpointDefinitionBuilder.() -> Unit = {}
 ): Unnamed<KafkaEndpointDefinition> {
-    return Unnamed { namespace, name ->
+    return Unnamed { namespace, name, isInline ->
         KafkaEndpointDefinitionBuilder()
             .also { it.name = name ?: return@also }
             .also { it.namespace *= namespace }
-            .also { it.isInline = name == null }
+            .also { it.isInline = isInline }
             .apply(block)
             .build()
     }

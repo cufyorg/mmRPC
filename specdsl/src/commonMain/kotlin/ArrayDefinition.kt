@@ -65,11 +65,11 @@ open class ArrayDefinitionBuilder :
 internal fun array(
     block: ArrayDefinitionBuilder.() -> Unit = {}
 ): Unnamed<ArrayDefinition> {
-    return Unnamed { namespace, name ->
+    return Unnamed { namespace, name, isInline ->
         ArrayDefinitionBuilder()
             .also { it.name = name ?: return@also }
             .also { it.namespace *= namespace }
-            .also { it.isInline = name == null }
+            .also { it.isInline = isInline }
             .apply(block)
             .build()
     }
