@@ -32,6 +32,11 @@ value class IframeSecurity(val name: String)
 value class IframePath(val value: String)
 
 object Iframe {
+    /**
+     * The client is considered authenticated with itself
+     * as the subject when the iframe's parent page was
+     * confirmed to be one of the domains of the client.
+     */
     val SameClient = IframeSecurity("SameClient")
 }
 

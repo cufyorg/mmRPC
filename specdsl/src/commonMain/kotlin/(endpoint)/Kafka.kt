@@ -32,7 +32,21 @@ value class KafkaSecurity(val name: String)
 value class KafkaTopic(val value: String)
 
 object Kafka {
+    /**
+     * The client is considered authenticated with no
+     * subject when it can produce to the topic.
+     *
+     * > This is the set by default for all kafka endpoints.
+     */
     val KafkaACL = KafkaSecurity("KafkaACL")
+
+    /**
+     * The client is considered authenticated with itself
+     * as the subject when it can produce to the topic
+     * prefix with its client id:
+     *
+     * `<client_id>.<topic_name>`
+     */
     val SameClient = KafkaSecurity("SameClient")
 }
 
@@ -59,6 +73,17 @@ data class KafkaEndpointDefinition(
     val endpointSecurityInter: List<KafkaSecurity> = listOf(
         Kafka.KafkaACL,
     ),
+    /**
+     * How to calculate the record key.
+     *
+     * The key is calculated by taking the `md5` hash of
+     * the result of concatenating the string representation
+     * of each value in the key tuple.
+     *
+     * This is considered a suggestion and implementations can
+     * use other means for calculating the record key other that
+     * the specified.
+     */
     @SerialName("endpoint_key")
     val endpointKey: TupleDefinition? = null,
 ) : EndpointDefinition() {

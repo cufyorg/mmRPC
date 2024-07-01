@@ -36,7 +36,24 @@ value class HttpMethod(val name: String)
 value class HttpPath(val value: String)
 
 object Http {
+    /**
+     * The client is considered authenticated with itself
+     * as the subject when it provides an access token
+     * using [RFC6750](https://datatracker.ietf.org/doc/html/rfc6750)
+     * with either its client id in the `client_id` claim
+     * and the `iss` claim is a trusted subject identity
+     * provider or its client id in the `sub` claim and
+     * the `iss` is a trusted client identity provider.
+     */
     val SameClient = HttpSecurity("SameClient")
+
+    /**
+     * The client is considered authenticated with some
+     * subject in some issuer when it provides an access token
+     * using [RFC6750](https://datatracker.ietf.org/doc/html/rfc6750)
+     * with the subject matching the `sub` claim and the
+     * subject issuer matching the `iss` claim.
+     */
     val SameSubject = HttpSecurity("SameSubject")
 
     /**
