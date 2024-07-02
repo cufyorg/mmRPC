@@ -10,7 +10,6 @@ fun GenGroup.createKDocReference(element: ElementDefinition): String {
 
     val identifier = when (element) {
         is ConstDefinition -> element.asReferenceName
-        is FaultDefinition -> element.asReferenceName
         is FieldDefinition -> element.asReferenceName
 
         is MetadataDefinition -> {
@@ -27,6 +26,7 @@ fun GenGroup.createKDocReference(element: ElementDefinition): String {
             element.asClassName
         }
 
+        is FaultDefinition -> element.asClassName
         is StructDefinition -> element.asClassName
         is UnionDefinition -> element.asClassName
         is InterDefinition -> element.asClassName

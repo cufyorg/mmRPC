@@ -7,9 +7,6 @@ import org.cufy.specdsl.*
 val ConstDefinition.asReferenceName: String
     get() = name
 
-val FaultDefinition.asReferenceName: String
-    get() = name
-
 val FieldDefinition.asReferenceName: String
     get() = name.trainCase()
 
@@ -27,6 +24,9 @@ val Namespace.asClassName: String
     get() = segments.joinToString("_") {
         it.replace(':', '_')
     }
+
+val FaultDefinition.asClassName: String
+    get() = name
 
 val MetadataDefinition.asClassName: String
     get() = name

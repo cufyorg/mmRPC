@@ -39,6 +39,8 @@ open class GenContext(
 
     val failures = mutableListOf<GenException>()
 
+    val toplevelBlocks = mutableListOf<FileSpec.Builder.() -> Unit>()
+
     val objectBlocks = namespaceSet.associateWith {
         mutableListOf<TypeSpec.Builder.() -> Unit>()
     }
@@ -75,6 +77,11 @@ abstract class GenGroup {
         )
 
         throw GenException(failure)
+    }
+
+    @Marker0
+    fun onToplevel(block: FileSpec.Builder.() -> Unit) {
+        ctx.toplevelBlocks += block
     }
 
     @Marker0

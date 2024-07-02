@@ -21,13 +21,6 @@ fun GenGroup.referenceOf(element: ConstDefinition): CodeBlock {
 }
 
 @Marker0
-fun GenGroup.referenceOf(element: FaultDefinition): CodeBlock {
-    debugRejectAnonymous(TAG, element)
-
-    return CodeBlock.of("%L.%L", element.namespace.asClassName, element.asReferenceName)
-}
-
-@Marker0
 fun GenGroup.referenceOf(element: FieldDefinition): CodeBlock {
     debugRejectAnonymous(TAG, element)
 

@@ -37,5 +37,13 @@ fun generateFileSpecSet(ctx: GenContext): List<FileSpec> {
 
             add(fileSpec)
         }
+
+        val toplevelBlocks = ctx.toplevelBlocks
+
+        val toplevelSpec = FileSpec.builder(ctx.pkg, "toplevel")
+            .apply { toplevelBlocks.forEach { it() } }
+            .build()
+
+        add(toplevelSpec)
     }
 }

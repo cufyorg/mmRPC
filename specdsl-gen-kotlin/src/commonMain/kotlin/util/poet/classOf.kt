@@ -15,8 +15,6 @@ returns the globally accessible class of some element.
 
 private const val TAG = "classOf"
 
-// ========== { MetadataDefinition }
-
 @Marker0
 fun GenGroup.classOf(namespace: Namespace): ClassName {
     return ClassName(ctx.pkg, namespace.asClassName)
@@ -32,7 +30,12 @@ fun GenGroup.classOf(element: MetadataDefinition): ClassName {
     return ClassName(ctx.pkg, element.namespace.asClassName, element.asClassName)
 }
 
-// ========== { TypeDefinition }
+@Marker0
+fun GenGroup.classOf(element: FaultDefinition): ClassName {
+    debugRejectAnonymous(TAG, element)
+
+    return ClassName(ctx.pkg, element.namespace.asClassName, element.asClassName)
+}
 
 @Marker0
 fun GenGroup.classOf(element: TypeDefinition): TypeName {
