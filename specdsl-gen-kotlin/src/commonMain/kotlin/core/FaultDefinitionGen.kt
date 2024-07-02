@@ -11,7 +11,7 @@ import org.cufy.specdsl.gen.kotlin.util.poet.createOptionalSerialNameAnnotationS
 import org.cufy.specdsl.gen.kotlin.util.poet.createOptionalSerializableAnnotationSet
 
 class FaultDefinitionGen(override val ctx: GenContext) : GenGroup() {
-    private val classOfCommonInterface = ClassName(ctx.pkg, "Fault")
+    private val classOfFaultInterface = ClassName(ctx.pkg, "Fault")
 
     fun generateClasses() {
         generateFaultInterface()
@@ -44,7 +44,7 @@ class FaultDefinitionGen(override val ctx: GenContext) : GenGroup() {
                 .build()
 
             val typeSpec = TypeSpec
-                .interfaceBuilder(classOfCommonInterface)
+                .interfaceBuilder(classOfFaultInterface)
                 .addAnnotations(createOptionalSerializableAnnotationSet())
                 .addModifiers(KModifier.SEALED)
                 .addProperty(typePropertySpec)
@@ -103,7 +103,7 @@ class FaultDefinitionGen(override val ctx: GenContext) : GenGroup() {
                 .addAnnotations(createAnnotationSet(element.metadata))
                 .addAnnotations(createOptionalSerializableAnnotationSet())
                 .addAnnotations(createOptionalSerialNameAnnotationSet(element.canonicalName.value))
-                .addSuperinterface(classOfCommonInterface)
+                .addSuperinterface(classOfFaultInterface)
                 .addModifiers(KModifier.DATA)
                 .addProperty(serialNameConstantSpec)
                 .addProperty(typePropertySpec)
