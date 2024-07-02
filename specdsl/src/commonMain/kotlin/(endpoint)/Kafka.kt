@@ -78,7 +78,7 @@ data class KafkaEndpointDefinition(
      *
      * The key is calculated by taking the `md5` hash of
      * the result of concatenating the string representation
-     * of each value in the key tuple.
+     * of each value in the key tuple with `;` as the separator.
      *
      * This is considered a suggestion and implementations can
      * use other means for calculating the record key other that
