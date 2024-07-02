@@ -60,9 +60,28 @@ object Http {
      * Http GET method. This method is pure in nature and the
      * go-to method for pure functions.
      *
-     * - Parameters are passed in (www-url-encoded) request
-     *      url query with object values encoded in json.
-     * - Return value is passed in (json) response body.
+     * ### Input
+     *
+     * Parameters are passed in (www-url-encoded) request
+     * url query with object values encoded in json.
+     *
+     * ### Output
+     *
+     * Return value is passed in (json) response body
+     * with a success status code.
+     *
+     * ### Failure
+     *
+     * If an error is to be returned, an error object composed
+     * of the fault canonical name and an optional error message
+     * is passed in (json) response body with an error status code:
+     *
+     * ```json
+     * {
+     *      "type": <fault-canonical-name>,
+     *      "message": <optional-error-message>
+     * }
+     * ```
      */
     val GET = HttpMethod("GET")
 
@@ -70,33 +89,109 @@ object Http {
      * Http POST method. Versatile method and the fallback
      * function if a method choice decision was not made.
      *
-     * - Parameters are passed in (json) request body.
-     * - Return value is passed in (json) response body.
+     * ### Input
+     *
+     * Parameters are passed in (json) request body.
+     *
+     * ### Output
+     *
+     * Return value is passed in (json) response body
+     * with a success status code.
+     *
+     * ### Failure
+     *
+     * If an error is to be returned, an error object composed
+     * of the fault canonical name and an optional error message
+     * is passed in (json) response body with an error status code:
+     *
+     * ```json
+     * {
+     *      "type": <fault-canonical-name>,
+     *      "message": <optional-error-message>
+     * }
+     * ```
      */
     val POST = HttpMethod("POST")
 
     /**
      * Http PUT method. The choice for upsert operations.
      *
-     * - Parameters are passed in (json) request body.
-     * - Return value is passed in (json) response body.
+     * ### Input
+     *
+     * Parameters are passed in (json) request body.
+     *
+     * ### Output
+     *
+     * Return value is passed in (json) response body
+     * with a success status code.
+     *
+     * ### Failure
+     *
+     * If an error is to be returned, an error object composed
+     * of the fault canonical name and an optional error message
+     * is passed in (json) response body with an error status code:
+     *
+     * ```json
+     * {
+     *      "type": <fault-canonical-name>,
+     *      "message": <optional-error-message>
+     * }
+     * ```
      */
     val PUT = HttpMethod("PUT")
 
     /**
      * Http PATCH method. Update an already existing entity.
      *
-     * - Parameters are passed in (json) request body.
-     * - Return value is passed in (json) response body.
+     * ### Input
+     *
+     * Parameters are passed in (json) request body.
+     *
+     * ### Output
+     *
+     * Return value is passed in (json) response body
+     * with a success status code.
+     *
+     * ### Failure
+     *
+     * If an error is to be returned, an error object composed
+     * of the fault canonical name and an optional error message
+     * is passed in (json) response body with an error status code:
+     *
+     * ```json
+     * {
+     *      "type": <fault-canonical-name>,
+     *      "message": <optional-error-message>
+     * }
+     * ```
      */
     val PATCH = HttpMethod("PATCH")
 
     /**
      * Http DELETE method. Delete an entity.
      *
-     * - Parameters are passed in (www-url-encoded) request
-     *      url query with object values encoded in json.
-     * - Return value is passed in (json) response body.
+     * ### Input
+     *
+     * Parameters are passed in (www-url-encoded) request
+     * url query with object values encoded in json.
+     *
+     * ### Output
+     *
+     * Return value is passed in (json) response body
+     * with a success status code.
+     *
+     * ### Failure
+     *
+     * If an error is to be returned, an error object composed
+     * of the fault canonical name and an optional error message
+     * is passed in (json) response body with an error status code:
+     *
+     * ```json
+     * {
+     *      "type": <fault-canonical-name>,
+     *      "message": <optional-error-message>
+     * }
+     * ```
      */
     val DELETE = HttpMethod("DELETE")
 }
