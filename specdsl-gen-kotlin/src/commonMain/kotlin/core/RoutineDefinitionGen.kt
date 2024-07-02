@@ -1,11 +1,13 @@
 package org.cufy.specdsl.gen.kotlin.core
 
 import com.squareup.kotlinpoet.*
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.plusParameter
 import org.cufy.specdsl.RoutineDefinition
 import org.cufy.specdsl.gen.kotlin.GenContext
 import org.cufy.specdsl.gen.kotlin.GenGroup
 import org.cufy.specdsl.gen.kotlin.util.asClassName
 import org.cufy.specdsl.gen.kotlin.util.createKDoc
+import org.cufy.specdsl.gen.kotlin.util.poet.classOf
 import org.cufy.specdsl.gen.kotlin.util.poet.createAnnotationSet
 import org.cufy.specdsl.gen.kotlin.util.poet.createOptionalSerialNameAnnotationSet
 import org.cufy.specdsl.gen.kotlin.util.poet.createOptionalSerializableAnnotationSet
@@ -48,6 +50,8 @@ data class RoutineDefinitionGen(override val ctx: GenContext) : GenGroup() {
                 .addAnnotations(createOptionalSerializableAnnotationSet())
                 .addModifiers(KModifier.SEALED)
                 .addProperty(typePropertySpec)
+                .addTypeVariable(TypeVariableName("I", ANY))
+                .addTypeVariable(TypeVariableName("O", ANY))
                 .build()
 
             addType(typeSpec)
@@ -97,13 +101,17 @@ data class RoutineDefinitionGen(override val ctx: GenContext) : GenGroup() {
                 .initializer("%S", element.canonicalName.value)
                 .build()
 
+            val classOfRoutineInterfaceWithParameters = classOfRoutineInterface
+                .plusParameter(classOf(element.asNamespace).nestedClass("Input"))
+                .plusParameter(classOf(element.asNamespace).nestedClass("Output"))
+
             val typeSpec = TypeSpec
                 .objectBuilder(element.asClassName)
                 .addKdoc(createKDoc(element))
                 .addAnnotations(createAnnotationSet(element.metadata))
                 .addAnnotations(createOptionalSerializableAnnotationSet())
                 .addAnnotations(createOptionalSerialNameAnnotationSet(element.canonicalName.value))
-                .addSuperinterface(classOfRoutineInterface)
+                .addSuperinterface(classOfRoutineInterfaceWithParameters)
                 .addModifiers(KModifier.DATA)
                 .addProperty(serialNameConstantSpec)
                 .addProperty(typePropertySpec)
