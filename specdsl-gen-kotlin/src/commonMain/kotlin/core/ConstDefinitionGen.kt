@@ -3,9 +3,12 @@ package org.cufy.specdsl.gen.kotlin.core
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.PropertySpec
 import org.cufy.specdsl.ConstDefinition
+import org.cufy.specdsl.ScalarDefinition
+import org.cufy.specdsl.TupleLiteral
 import org.cufy.specdsl.gen.kotlin.GenContext
 import org.cufy.specdsl.gen.kotlin.GenGroup
-import org.cufy.specdsl.gen.kotlin.util.*
+import org.cufy.specdsl.gen.kotlin.util.asReferenceName
+import org.cufy.specdsl.gen.kotlin.util.createKDoc
 import org.cufy.specdsl.gen.kotlin.util.poet.createAnnotationSet
 import org.cufy.specdsl.gen.kotlin.util.poet.createLiteral
 import org.cufy.specdsl.gen.kotlin.util.poet.typeOf
@@ -47,12 +50,22 @@ class ConstDefinitionGen(override val ctx: GenContext) : GenGroup() {
      * ```
      */
     private fun generateLiteralConstant(element: ConstDefinition) {
+        val isCompileTimeConstant = when {
+            element.constType !is ScalarDefinition -> false
+            element.constType.canonicalName !in ctx.nativeElements -> false
+            element.constValue is TupleLiteral -> false
+            else -> true
+        }
+
         onObject(element.namespace) {
             val propertySpec = PropertySpec
                 .builder(element.asReferenceName, typeOf(element))
                 .addKdoc(createKDoc(element))
                 .addAnnotations(createAnnotationSet(element.metadata))
-                .addModifiers(KModifier.CONST)
+                .apply {
+                    if (isCompileTimeConstant)
+                        addModifiers(KModifier.CONST)
+                }
                 .initializer(createLiteral(element))
                 .build()
 
