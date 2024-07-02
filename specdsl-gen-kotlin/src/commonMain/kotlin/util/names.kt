@@ -28,6 +28,9 @@ val Namespace.asClassName: String
 val FaultDefinition.asClassName: String
     get() = name
 
+val RoutineDefinition.asClassName: String
+    get() = name
+
 val MetadataDefinition.asClassName: String
     get() = name
 

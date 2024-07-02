@@ -16,6 +16,9 @@ fun runGenGroups(ctx: GenContext) {
     FaultDefinitionGen(ctx).run {
         generateClasses()
     }
+    RoutineDefinitionGen(ctx).run {
+        generateClasses()
+    }
     FieldDefinitionGen(ctx).run {
         generateConstants()
     }
