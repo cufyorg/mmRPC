@@ -29,7 +29,7 @@ val FaultDefinition.asClassName: String
     get() = name
 
 val RoutineDefinition.asClassName: String
-    get() = name
+    get() = name.replace(":", "_")
 
 val MetadataDefinition.asClassName: String
     get() = name
