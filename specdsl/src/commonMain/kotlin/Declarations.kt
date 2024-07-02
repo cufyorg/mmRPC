@@ -35,6 +35,8 @@ sealed class ElementDefinition {
     val canonicalName by lazy { CanonicalName(namespace, name) }
     val isAnonymous by lazy { namespace.isAnonymous || Namespace.isAnonymousSegment(name) }
 
+    val asNamespace by lazy { namespace + name }
+
     fun collect() = sequenceOf(this) + collectChildren()
 
     abstract fun collectChildren(): Sequence<ElementDefinition>
