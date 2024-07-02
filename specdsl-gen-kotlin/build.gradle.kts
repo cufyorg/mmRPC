@@ -12,7 +12,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation(project(":specdsl"))
+                implementation(project(":specdsl-definition"))
 
                 implementation(kotlin("stdlib"))
                 implementation(libs.kotlin.serialization.core)
