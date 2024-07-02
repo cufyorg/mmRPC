@@ -29,7 +29,7 @@ data class TupleDefinition(
     @SerialName("is_inline")
     override val isInline: Boolean = true,
     override val description: String = "",
-    override val metadata: List<Metadata> = emptyList(),
+    override val metadata: List<MetadataDefinitionUsage> = emptyList(),
     @SerialName("tuple_types")
     val tupleTypes: List<TypeDefinition> = emptyList(),
 ) : TypeDefinition() {

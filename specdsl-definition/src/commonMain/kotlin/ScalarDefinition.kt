@@ -28,7 +28,7 @@ data class ScalarDefinition(
     @SerialName("is_inline")
     override val isInline: Boolean = true,
     override val description: String = "",
-    override val metadata: List<Metadata> = emptyList(),
+    override val metadata: List<MetadataDefinitionUsage> = emptyList(),
 ) : TypeDefinition() {
     companion object {
         const val ANONYMOUS_NAME = "(anonymous<scalar>)"

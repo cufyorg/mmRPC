@@ -17,7 +17,6 @@ package org.cufy.specdsl
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.cufy.specdsl.ConstDefinition.Companion.ANONYMOUS_NAME
 
 ////////////////////////////////////////
 
@@ -29,7 +28,7 @@ data class FaultDefinition(
     @SerialName("is_inline")
     override val isInline: Boolean = true,
     override val description: String = "",
-    override val metadata: List<Metadata> = emptyList(),
+    override val metadata: List<MetadataDefinitionUsage> = emptyList(),
 ) : ElementDefinition() {
     companion object {
         const val ANONYMOUS_NAME = "(anonymous<fault>)"

@@ -29,7 +29,7 @@ data class RoutineDefinition(
     @SerialName("is_inline")
     override val isInline: Boolean = true,
     override val description: String = "",
-    override val metadata: List<Metadata> = emptyList(),
+    override val metadata: List<MetadataDefinitionUsage> = emptyList(),
     @SerialName("routine_endpoints")
     val routineEndpoints: List<EndpointDefinition> = emptyList(),
     @SerialName("routine_fault_union")

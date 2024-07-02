@@ -12,7 +12,7 @@ data class CompactRoutineDefinition(
     @SerialName("is_inline")
     override val isInline: Boolean = true,
     override val description: String = "",
-    override val metadata: List<CompactMetadata> = emptyList(),
+    override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
     @SerialName("routine_endpoints.ref")
     val routineEndpoints: List<CanonicalName> = emptyList(),
     @SerialName("routine_fault_union.ref")

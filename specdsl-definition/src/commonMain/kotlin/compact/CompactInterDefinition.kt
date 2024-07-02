@@ -12,7 +12,7 @@ data class CompactInterDefinition(
     @SerialName("is_inline")
     override val isInline: Boolean = true,
     override val description: String = "",
-    override val metadata: List<CompactMetadata> = emptyList(),
+    override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
     @SerialName("inter_types.ref")
     val interTypes: List<CanonicalName>,
 ) : CompactElementDefinition

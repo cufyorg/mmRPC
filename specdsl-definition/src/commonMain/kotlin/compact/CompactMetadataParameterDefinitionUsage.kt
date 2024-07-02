@@ -5,24 +5,24 @@ import kotlinx.serialization.Serializable
 import org.cufy.specdsl.*
 
 @Serializable
-data class CompactMetadataParameter(
+data class CompactMetadataParameterDefinitionUsage(
     @SerialName("definition.ref")
     val definition: CanonicalName,
     val value: Literal,
 )
 
-fun MetadataParameter.toCompact(): CompactMetadataParameter {
-    return CompactMetadataParameter(
+fun MetadataParameterDefinitionUsage.toCompact(): CompactMetadataParameterDefinitionUsage {
+    return CompactMetadataParameterDefinitionUsage(
         definition = this.definition.canonicalName,
         value = this.value,
     )
 }
 
-fun CompactMetadataParameter.inflate(
+fun CompactMetadataParameterDefinitionUsage.inflate(
     onLookup: (CanonicalName) -> ElementDefinition?
-): () -> MetadataParameter? {
+): () -> MetadataParameterDefinitionUsage? {
     return it@{
-        MetadataParameter(
+        MetadataParameterDefinitionUsage(
             definition = this.definition.let {
                 val item = onLookup(it) ?: return@it null
                 require(item is MetadataParameterDefinition) {

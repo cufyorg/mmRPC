@@ -30,7 +30,7 @@ sealed class ElementDefinition {
     @SerialName("is_inline")
     abstract val isInline: Boolean
     abstract val description: String
-    abstract val metadata: List<Metadata>
+    abstract val metadata: List<MetadataDefinitionUsage>
 
     val canonicalName by lazy { CanonicalName(namespace, name) }
     val isAnonymous by lazy { namespace.isAnonymous || Namespace.isAnonymousSegment(name) }

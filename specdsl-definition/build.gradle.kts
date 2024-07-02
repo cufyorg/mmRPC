@@ -17,6 +17,8 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
+                implementation(project(":specdsl-core"))
+
                 implementation(kotlin("stdlib"))
                 implementation(libs.kotlin.serialization.core)
             }

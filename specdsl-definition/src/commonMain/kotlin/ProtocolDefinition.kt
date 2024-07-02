@@ -29,7 +29,7 @@ data class ProtocolDefinition(
     @SerialName("is_inline")
     override val isInline: Boolean = true,
     override val description: String = "",
-    override val metadata: List<Metadata> = emptyList(),
+    override val metadata: List<MetadataDefinitionUsage> = emptyList(),
     @SerialName("protocol_routines")
     val protocolRoutines: List<RoutineDefinition> = emptyList(),
 ) : ElementDefinition() {

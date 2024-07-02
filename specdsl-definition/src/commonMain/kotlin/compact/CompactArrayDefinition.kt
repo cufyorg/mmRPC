@@ -12,7 +12,7 @@ data class CompactArrayDefinition(
     @SerialName("is_inline")
     override val isInline: Boolean = true,
     override val description: String = "",
-    override val metadata: List<CompactMetadata> = emptyList(),
+    override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
     @SerialName("array_type.ref")
     val arrayType: CanonicalName,
 ) : CompactElementDefinition

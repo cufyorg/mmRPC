@@ -20,7 +20,7 @@ import kotlinx.serialization.Serializable
 ////////////////////////////////////////
 
 @Serializable
-data class MetadataParameter(
+data class MetadataParameterDefinitionUsage(
     val definition: MetadataParameterDefinition,
     val value: Literal,
 ) {
@@ -29,12 +29,12 @@ data class MetadataParameter(
     }
 }
 
-open class MetadataParameterBuilder {
+open class MetadataParameterDefinitionUsageBuilder {
     lateinit var definition: MetadataParameterDefinition
     lateinit var value: Literal
 
-    fun build(): MetadataParameter {
-        return MetadataParameter(
+    fun build(): MetadataParameterDefinitionUsage {
+        return MetadataParameterDefinitionUsage(
             definition = this.definition,
             value = this.value,
         )
@@ -45,9 +45,9 @@ open class MetadataParameterBuilder {
 
 operator fun MetadataParameterDefinition.invoke(
     value: Literal,
-    block: MetadataParameterBuilder.() -> Unit = {}
-): MetadataParameter {
-    return MetadataParameterBuilder()
+    block: MetadataParameterDefinitionUsageBuilder.() -> Unit = {}
+): MetadataParameterDefinitionUsage {
+    return MetadataParameterDefinitionUsageBuilder()
         .also { it.definition = this }
         .also { it.value = value }
         .apply(block)

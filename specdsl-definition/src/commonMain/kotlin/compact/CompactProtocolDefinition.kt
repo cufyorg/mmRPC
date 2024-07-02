@@ -12,7 +12,7 @@ data class CompactProtocolDefinition(
     @SerialName("is_inline")
     override val isInline: Boolean = true,
     override val description: String = "",
-    override val metadata: List<CompactMetadata> = emptyList(),
+    override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
     @SerialName("protocol_routines.ref")
     val protocolRoutines: List<CanonicalName> = emptyList(),
 ) : CompactElementDefinition

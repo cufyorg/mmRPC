@@ -12,7 +12,7 @@ data class CompactTupleDefinition(
     @SerialName("is_inline")
     override val isInline: Boolean = true,
     override val description: String = "",
-    override val metadata: List<CompactMetadata> = emptyList(),
+    override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
     @SerialName("tuple_types.ref")
     val tupleTypes: List<CanonicalName> = emptyList(),
 ) : CompactElementDefinition

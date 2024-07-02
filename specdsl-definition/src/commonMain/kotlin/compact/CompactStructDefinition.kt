@@ -12,7 +12,7 @@ data class CompactStructDefinition(
     @SerialName("is_inline")
     override val isInline: Boolean = true,
     override val description: String = "",
-    override val metadata: List<CompactMetadata> = emptyList(),
+    override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
     @SerialName("struct_fields.ref")
     val structFields: List<CanonicalName> = emptyList(),
 ) : CompactElementDefinition

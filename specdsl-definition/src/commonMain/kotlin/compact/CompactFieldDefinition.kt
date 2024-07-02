@@ -12,7 +12,7 @@ data class CompactFieldDefinition(
     @SerialName("is_inline")
     override val isInline: Boolean = true,
     override val description: String = "",
-    override val metadata: List<CompactMetadata> = emptyList(),
+    override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
     @SerialName("field_type.ref")
     val fieldType: CanonicalName,
     @SerialName("field_default.ref")

@@ -21,9 +21,9 @@ import kotlin.jvm.JvmName
 ////////////////////////////////////////
 
 @Serializable
-data class Metadata(
+data class MetadataDefinitionUsage(
     val definition: MetadataDefinition,
-    val parameters: List<MetadataParameter>,
+    val parameters: List<MetadataParameterDefinitionUsage>,
 ) {
     fun collect() = sequence {
         yieldAll(definition.collect())
@@ -31,23 +31,23 @@ data class Metadata(
     }
 }
 
-open class MetadataBuilder {
+open class MetadataDefinitionUsageBuilder {
     lateinit var definition: MetadataDefinition
 
-    protected open val parameters = mutableListOf<MetadataParameter>()
+    protected open val parameters = mutableListOf<MetadataParameterDefinitionUsage>()
 
     @JvmName("unaryPlusMetadataParameter")
-    operator fun MetadataParameter.unaryPlus() {
+    operator fun MetadataParameterDefinitionUsage.unaryPlus() {
         parameters += this
     }
 
     @JvmName("unaryPlusIterableMetadataParameter")
-    operator fun Iterable<MetadataParameter>.unaryPlus() {
+    operator fun Iterable<MetadataParameterDefinitionUsage>.unaryPlus() {
         parameters += this
     }
 
-    fun build(): Metadata {
-        return Metadata(
+    fun build(): MetadataDefinitionUsage {
+        return MetadataDefinitionUsage(
             definition = this.definition,
             parameters = this.parameters.toList(),
         )
@@ -57,9 +57,9 @@ open class MetadataBuilder {
 ////////////////////////////////////////
 
 operator fun MetadataDefinition.invoke(
-    block: MetadataBuilder.() -> Unit = {}
-): Metadata {
-    return MetadataBuilder()
+    block: MetadataDefinitionUsageBuilder.() -> Unit = {}
+): MetadataDefinitionUsage {
+    return MetadataDefinitionUsageBuilder()
         .also { it.definition = this }
         .apply(block)
         .build()

@@ -256,26 +256,26 @@ abstract class ElementDefinitionBuilder {
     open var isInline = true
     open var description = ""
 
-    protected open val metadata = mutableListOf<Metadata>()
+    protected open val metadata = mutableListOf<MetadataDefinitionUsage>()
 
     open operator fun String.unaryPlus() {
         description += this.trimIndent()
     }
 
     @JvmName("unaryPlusMetadata")
-    operator fun Metadata.unaryPlus() {
+    operator fun MetadataDefinitionUsage.unaryPlus() {
         metadata += this
     }
 
     @JvmName("unaryPlusIterableMetadata")
-    operator fun Iterable<Metadata>.unaryPlus() {
+    operator fun Iterable<MetadataDefinitionUsage>.unaryPlus() {
         metadata += this
     }
 
     @JvmName("unaryPlusMetadataDefinition")
     operator fun MetadataDefinition.unaryPlus() {
         val classThis = this@ElementDefinitionBuilder
-        classThis.metadata += MetadataBuilder()
+        classThis.metadata += MetadataDefinitionUsageBuilder()
             .also { it.definition = this }
             .build()
     }

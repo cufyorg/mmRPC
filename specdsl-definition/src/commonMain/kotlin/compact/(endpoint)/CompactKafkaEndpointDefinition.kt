@@ -14,7 +14,7 @@ data class CompactKafkaEndpointDefinition(
     @SerialName("is_inline")
     override val isInline: Boolean = true,
     override val description: String = "",
-    override val metadata: List<CompactMetadata> = emptyList(),
+    override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
     @SerialName("endpoint_topic")
     val endpointTopic: KafkaTopic = namespace.toKafkaTopic(),
     @SerialName("endpoint_security_inter")

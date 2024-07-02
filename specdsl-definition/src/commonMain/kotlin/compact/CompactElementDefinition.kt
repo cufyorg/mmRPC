@@ -12,7 +12,7 @@ sealed interface CompactElementDefinition {
     @SerialName("is_inline")
     val isInline: Boolean
     val description: String
-    val metadata: List<CompactMetadata>
+    val metadata: List<CompactMetadataDefinitionUsage>
 
     val canonicalName get() = CanonicalName(namespace, name)
     val isAnonymous get() = namespace.isAnonymous || Namespace.isAnonymousSegment(name)

@@ -29,7 +29,7 @@ data class InterDefinition(
     @SerialName("is_inline")
     override val isInline: Boolean = true,
     override val description: String = "",
-    override val metadata: List<Metadata> = emptyList(),
+    override val metadata: List<MetadataDefinitionUsage> = emptyList(),
     @SerialName("inter_types")
     val interTypes: List<TypeDefinition>,
 ) : TypeDefinition() {
