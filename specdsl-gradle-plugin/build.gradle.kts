@@ -20,6 +20,7 @@ gradlePlugin {
 }
 
 dependencies {
+    implementation(project(":specdsl-core"))
     implementation(project(":specdsl-definition"))
     implementation(project(":specdsl-gen-kotlin"))
 

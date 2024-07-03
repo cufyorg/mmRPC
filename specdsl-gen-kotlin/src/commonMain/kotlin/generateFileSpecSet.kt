@@ -13,13 +13,8 @@ fun generateFileSpecSet(ctx: GenContext): List<FileSpec> {
             val fileBlocks = ctx.fileBlocks[ns].orEmpty()
             val fileOptionalBlocks = ctx.fileOptionalBlocks[ns].orEmpty()
 
-            if (objectBlocks.isEmpty() && fileBlocks.isEmpty()) {
-                // Ignore the namespace if it and all of its children are not used
-                val cond0 = ctx.objectBlocks.none { it.key in ns && it.value.isNotEmpty() }
-                val cond1 = ctx.fileBlocks.none { it.key in ns && it.value.isNotEmpty() }
-
-                if (cond0 && cond1) continue
-            }
+            if (objectBlocks.isEmpty() && fileBlocks.isEmpty())
+                continue
 
             val nsClass = ClassName(ctx.pkg, ns.asClassName)
 
@@ -40,10 +35,12 @@ fun generateFileSpecSet(ctx: GenContext): List<FileSpec> {
 
         val toplevelBlocks = ctx.toplevelBlocks
 
-        val toplevelSpec = FileSpec.builder(ctx.pkg, "toplevel")
-            .apply { toplevelBlocks.forEach { it() } }
-            .build()
+        if (toplevelBlocks.isNotEmpty()) {
+            val toplevelSpec = FileSpec.builder(ctx.pkg, "toplevel")
+                .apply { toplevelBlocks.forEach { it() } }
+                .build()
 
-        add(toplevelSpec)
+            add(toplevelSpec)
+        }
     }
 }

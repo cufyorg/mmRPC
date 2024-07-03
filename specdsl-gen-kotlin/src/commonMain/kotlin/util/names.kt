@@ -2,21 +2,37 @@ package org.cufy.specdsl.gen.kotlin.util
 
 import org.cufy.specdsl.*
 
-// asReferenceName
+//
 
-val ConstDefinition.asReferenceName: String
-    get() = name
+inline val FaultDefinition.fStaticInfo get() = "INFO"
+inline val FieldDefinition.fStaticInfo get() = "INFO"
+inline val MetadataDefinition.fStaticInfo get() = "INFO"
+inline val ProtocolDefinition.fStaticInfo get() = "INFO"
+inline val RoutineDefinition.fStaticInfo get() = "INFO"
 
-val FieldDefinition.asReferenceName: String
-    get() = name.trainCase()
+//
 
-val Namespace.asReferenceName: String
-    get() = name.replace(':', '_')
+inline val HttpEndpointDefinition.fStaticInfo get() = "INFO"
+inline val IframeEndpointDefinition.fStaticInfo get() = "INFO"
+inline val KafkaEndpointDefinition.fStaticInfo get() = "INFO"
+inline val KafkaPublicationEndpointDefinition.fStaticInfo get() = "INFO"
 
-val Namespace.asQualifiedReferenceName: String
-    get() = segments.joinToString(".") {
-        it.replace(':', '_')
-    }
+//
+
+inline val ConstDefinition.fStaticInfo get() = "INFO"
+inline val ScalarDefinition.fStaticInfo get() = "INFO"
+inline val StructDefinition.fStaticInfo get() = "INFO"
+inline val UnionDefinition.fStaticInfo get() = "INFO"
+
+//
+
+inline val ConstDefinition.fStaticValue get() = "VALUE"
+inline val FieldDefinition.fStaticName get() = "NAME"
+
+inline val HttpEndpointDefinition.fStaticPath get() = "PATH"
+inline val IframeEndpointDefinition.fStaticPath get() = "PATH"
+inline val KafkaEndpointDefinition.fStaticTopic get() = "TOPIC"
+inline val KafkaPublicationEndpointDefinition.fStaticTopic get() = "TOPIC"
 
 // asClassName
 
@@ -25,26 +41,26 @@ val Namespace.asClassName: String
         it.replace(':', '_')
     }
 
-val FaultDefinition.asClassName: String
-    get() = name
+//
 
-val RoutineDefinition.asClassName: String
-    get() = name.replace(":", "_")
+inline val FaultDefinition.asClassName get() = name
+inline val FieldDefinition.asClassName get() = name
+inline val MetadataDefinition.asClassName get() = name
+inline val ProtocolDefinition.asClassName get() = name
+inline val RoutineDefinition.asClassName get() = name.replace(":", "_")
 
-val MetadataDefinition.asClassName: String
-    get() = name
+//
 
-val ScalarDefinition.asClassName: String
-    get() = name
+inline val HttpEndpointDefinition.asClassName get() = name
+inline val IframeEndpointDefinition.asClassName get() = name
+inline val KafkaEndpointDefinition.asClassName get() = name
+inline val KafkaPublicationEndpointDefinition.asClassName get() = name
 
-val StructDefinition.asClassName: String
-    get() = name
+//
 
-val UnionDefinition.asClassName: String
-    get() = name
+inline val ConstDefinition.asClassName get() = name
+inline val ScalarDefinition.asClassName get() = name
+inline val StructDefinition.asClassName get() = name
+inline val UnionDefinition.asClassName get() = name
 
-val InterDefinition.asClassName: String
-    get() = name
-
-val TupleDefinition.asClassName: String
-    get() = name
+//

@@ -1,103 +1,97 @@
 package org.cufy.specdsl.gen.kotlin.core
 
-import com.squareup.kotlinpoet.FunSpec
-import com.squareup.kotlinpoet.ParameterSpec
-import com.squareup.kotlinpoet.PropertySpec
-import com.squareup.kotlinpoet.TypeSpec
+import com.squareup.kotlinpoet.*
 import org.cufy.specdsl.MetadataDefinition
+import org.cufy.specdsl.MetadataInfo
 import org.cufy.specdsl.gen.kotlin.GenContext
 import org.cufy.specdsl.gen.kotlin.GenGroup
-import org.cufy.specdsl.gen.kotlin.util.*
-import org.cufy.specdsl.gen.kotlin.util.poet.createAnnotationSet
-import org.cufy.specdsl.gen.kotlin.util.poet.createLiteralInlinedOrReference
-import org.cufy.specdsl.gen.kotlin.util.poet.typeOf
+import org.cufy.specdsl.gen.kotlin.util.MetadataStrategy
+import org.cufy.specdsl.gen.kotlin.util.asClassName
+import org.cufy.specdsl.gen.kotlin.util.calculateStrategy
+import org.cufy.specdsl.gen.kotlin.util.fStaticInfo
+import org.cufy.specdsl.gen.kotlin.util.poet.*
 
 class MetadataDefinitionGen(override val ctx: GenContext) : GenGroup() {
-    fun generateClasses() {
+    override fun apply() {
         for (element in ctx.specSheet.collectChildren()) {
             if (element !is MetadataDefinition) continue
             if (element.isAnonymous) continue
-            if (element.canonicalName in ctx.nativeElements) continue
 
             failGenBoundary {
-                generateAnnotationClass(element)
+                onObject(element.namespace) {
+                    when (calculateStrategy(element)) {
+                        MetadataStrategy.DATA_OBJECT
+                        -> addType(createDataObject(element))
+
+                        MetadataStrategy.ANNOTATION_CLASS
+                        -> addType(createAnnotationClass(element))
+                    }
+                }
             }
         }
     }
 
-    /**
-     * Generate annotation classes for metadata definitions.
-     *
-     * ### Skip for:
-     *
-     * - anonymous elements
-     * - native elements
-     *
-     * ### Example:
-     *
-     * ```
-     * val custom.example.Something__message by metadata_parameter(builtin.String)
-     * val custom.example.Something by metadata {
-     *     +custom.example.Something__message
-     * }
-     * ```
-     *
-     * ### Produces:
-     *
-     * ```
-     * // classes["builtin.String"] = "kotlin.String"
-     * // nativeElements += "builtin.String"
-     *
-     * object custom_example {
-     *      // ...
-     *
-     *      annotation class Something(val message: kotlin.String)
-     * }
-     * ```
-     */
-    private fun generateAnnotationClass(element: MetadataDefinition) {
-        onObject(element.namespace) {
-            val typePrimaryConstructorSpec = FunSpec
-                .constructorBuilder()
-                .apply {
-                    for (it in element.metadataParameters) {
-                        val default = it.parameterDefault
-                        val parameterSpec = when {
-                            default == null -> ParameterSpec
-                                .builder(it.name, typeOf(it.parameterType))
-                                .build()
+    private fun createAnnotationClass(element: MetadataDefinition): TypeSpec {
+        val companionObjectSpec = TypeSpec
+            .companionObjectBuilder()
+            .addProperty(createStaticInfoProperty(element))
+            .build()
 
-                            else -> ParameterSpec
-                                .builder(it.name, typeOf(it.parameterType))
-                                .defaultValue(createLiteralInlinedOrReference(default))
-                                .build()
-                        }
-
-                        addParameter(parameterSpec)
-                    }
-                }
-                .build()
-
-            val typeSpec = TypeSpec
-                .annotationBuilder(element.asClassName)
-                .addKdoc(createKDoc(element))
-                .addAnnotations(createAnnotationSet(element.metadata))
-                .primaryConstructor(typePrimaryConstructorSpec)
-                .apply {
-                    for (it in element.metadataParameters) {
-                        val propertySpec = PropertySpec
+        val primaryConstructorSpec = FunSpec
+            .constructorBuilder()
+            .apply {
+                for (it in element.metadataParameters) {
+                    val parameterSpec = when (val default = it.parameterDefault) {
+                        null -> ParameterSpec
                             .builder(it.name, typeOf(it.parameterType))
-                            .addKdoc(createKDoc(it))
-                            .addAnnotations(createAnnotationSet(it.metadata))
-                            .initializer(it.name)
                             .build()
 
-                        addProperty(propertySpec)
+                        else -> ParameterSpec
+                            .builder(it.name, typeOf(it.parameterType))
+                            .defaultValue(createLiteralInlinedOrRefOfValue(default))
+                            .build()
                     }
-                }
-                .build()
 
-            addType(typeSpec)
-        }
+                    addParameter(parameterSpec)
+                }
+            }
+            .build()
+
+        return TypeSpec
+            .annotationBuilder(element.asClassName)
+            .addType(companionObjectSpec)
+            .addKdoc("@see %L", createKDocReference(element))
+            .addAnnotations(createAnnotationSet(element.metadata))
+            .primaryConstructor(primaryConstructorSpec)
+            .apply {
+                for (it in element.metadataParameters) {
+                    val propertySpec = PropertySpec
+                        .builder(it.name, typeOf(it.parameterType))
+                        .addKdoc("@see %L", createKDocReference(it))
+                        .addAnnotations(createAnnotationSet(it.metadata))
+                        .initializer(it.name)
+                        .build()
+
+                    addProperty(propertySpec)
+                }
+            }
+            .build()
+    }
+
+    private fun createDataObject(element: MetadataDefinition): TypeSpec {
+        return TypeSpec
+            .objectBuilder(element.asClassName)
+            .addProperty(createStaticInfoProperty(element))
+            .addModifiers(KModifier.DATA)
+            .addKdoc(createKDoc(element))
+            .addAnnotations(createAnnotationSet(element.metadata))
+            .build()
+    }
+
+    private fun createStaticInfoProperty(element: MetadataDefinition): PropertySpec {
+        return PropertySpec
+            .builder(element.fStaticInfo, MetadataInfo::class)
+            .initializer("\n%L", createInfo(element))
+            .build()
     }
 }

@@ -10,46 +10,20 @@ import org.cufy.specdsl.gen.kotlin.core.endpoint.KafkaPublicationGen
 fun runGenGroups(ctx: GenContext) {
     /* =============== core =============== */
 
-    ConstDefinitionGen(ctx).run {
-        generateConstants()
-    }
-    FaultDefinitionGen(ctx).run {
-        generateClasses()
-    }
-    RoutineDefinitionGen(ctx).run {
-        generateClasses()
-    }
-    FieldDefinitionGen(ctx).run {
-        generateConstants()
-    }
-    MetadataDefinitionGen(ctx).run {
-        generateClasses()
-    }
-    NamespaceGen(ctx).run {
-        generateAccessors()
-    }
-    ScalarDefinitionGen(ctx).run {
-        generateClasses()
-    }
-    StructDefinitionGen(ctx).run {
-        generateClasses()
-    }
-    UnionDefinitionGen(ctx).run {
-        generateClasses()
-    }
+    ConstDefinitionGen(ctx).apply()
+    FaultDefinitionGen(ctx).apply()
+    ProtocolDefinitionGen(ctx).apply()
+    RoutineDefinitionGen(ctx).apply()
+    FieldDefinitionGen(ctx).apply()
+    MetadataDefinitionGen(ctx).apply()
+    ScalarDefinitionGen(ctx).apply()
+    StructDefinitionGen(ctx).apply()
+    UnionDefinitionGen(ctx).apply()
 
     /* =============== core.endpoint =============== */
 
-    HttpGen(ctx).run {
-        generateConstants()
-    }
-    IframeGen(ctx).run {
-        generateConstants()
-    }
-    KafkaGen(ctx).run {
-        generateConstants()
-    }
-    KafkaPublicationGen(ctx).run {
-        generateConstants()
-    }
+    HttpGen(ctx).apply()
+    IframeGen(ctx).apply()
+    KafkaGen(ctx).apply()
+    KafkaPublicationGen(ctx).apply()
 }

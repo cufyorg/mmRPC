@@ -34,7 +34,7 @@ open class GenContext(
 ) {
     val namespaceSet = specSheet.collectChildren()
         .filterNot { it.isAnonymous }
-        .flatMap { it.namespace.collect() }
+        .flatMap { it.asNamespace.collect() }
         .toSet()
 
     val failures = mutableListOf<GenException>()
@@ -57,6 +57,8 @@ open class GenContext(
 
 abstract class GenGroup {
     abstract val ctx: GenContext
+
+    abstract fun apply()
 
     @Marker0
     inline fun failGenBoundary(block: () -> Unit) {

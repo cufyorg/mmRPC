@@ -1,6 +1,7 @@
 package org.cufy.specdsl.gen.kotlin.util.poet
 
 import com.squareup.kotlinpoet.CodeBlock
+import com.squareup.kotlinpoet.joinToCode
 import org.cufy.specdsl.*
 import org.cufy.specdsl.gen.kotlin.GenGroup
 
@@ -31,20 +32,8 @@ private fun GenGroup.createLiteralInlined(element: ArrayDefinition, value: Liter
     if (value !is TupleLiteral)
         failGen(TAG, element) { "illegal value: $value" }
 
-    val format = buildString {
-        append("arrayOf(")
-        repeat(value.value.size) { i ->
-            if (i != 0) append(", ")
-            append("%L")
-        }
-        append(")")
-    }
-
-    val args = Array(value.value.size) { i ->
-        createLiteralInlined(element.arrayType, value.value[i])
-    }
-
-    return CodeBlock.of(format, *args)
+    val items = value.value.joinToCode { createLiteral(element.arrayType, it) }
+    return CodeBlock.of("arrayOf(%L)", items)
 }
 
 private fun GenGroup.createLiteralInlined(element: ScalarDefinition, value: Literal): CodeBlock {

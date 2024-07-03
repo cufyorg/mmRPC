@@ -2,179 +2,122 @@ package org.cufy.specdsl.gen.kotlin.core
 
 import com.squareup.kotlinpoet.*
 import org.cufy.specdsl.StructDefinition
+import org.cufy.specdsl.StructInfo
+import org.cufy.specdsl.StructObject
 import org.cufy.specdsl.gen.kotlin.GenContext
 import org.cufy.specdsl.gen.kotlin.GenGroup
 import org.cufy.specdsl.gen.kotlin.util.StructStrategy
 import org.cufy.specdsl.gen.kotlin.util.asClassName
-import org.cufy.specdsl.gen.kotlin.util.calculateStructStrategy
-import org.cufy.specdsl.gen.kotlin.util.createKDoc
+import org.cufy.specdsl.gen.kotlin.util.calculateStrategy
+import org.cufy.specdsl.gen.kotlin.util.fStaticInfo
 import org.cufy.specdsl.gen.kotlin.util.poet.*
 
 class StructDefinitionGen(override val ctx: GenContext) : GenGroup() {
-    fun generateClasses() {
+    override fun apply() {
         for (element in ctx.specSheet.collectChildren()) {
             if (element !is StructDefinition) continue
             if (element.isAnonymous) continue
 
             failGenBoundary {
-                when (calculateStructStrategy(element)) {
-                    StructStrategy.DATA_OBJECT -> generateDataObject(element)
-                    StructStrategy.DATA_CLASS -> generateDataClass(element)
+                onObject(element.namespace) {
+                    when (calculateStrategy(element)) {
+                        StructStrategy.DATA_CLASS
+                        -> addType(createDataClass(element))
+
+                        StructStrategy.DATA_OBJECT
+                        -> addType(createDataObject(element))
+                    }
                 }
             }
         }
     }
 
-    /**
-     * Generate data objects for struct definitions.
-     *
-     * ### Skip for:
-     *
-     * - anonymous elements
-     * - elements with fields
-     *
-     * ### Example:
-     *
-     * ```
-     * val custom.example.Something by struct
-     * ```
-     *
-     * Produces:
-     *
-     * ```
-     * object custom_example {
-     *      // ...
-     *
-     *      @Serializable
-     *      @SerialName("custom.example.Something")
-     *      data object Something {
-     *          const val SERIAL_NAME = "custom.example.Something"
-     *      }
-     * }
-     * ```
-     */
-    private fun generateDataObject(element: StructDefinition) {
-        onObject(element.namespace) {
-            val serialNameConstantSpec = PropertySpec
-                .builder("SERIAL_NAME", STRING)
-                .addModifiers(KModifier.CONST)
-                .initializer("%S", element.canonicalName.value)
-                .build()
+    private fun createDataClass(element: StructDefinition): TypeSpec {
+        val companionObjectSpec = TypeSpec
+            .companionObjectBuilder()
+            .addProperty(createStaticInfoProperty(element))
+            .build()
 
-            val typeSpec = TypeSpec
-                .objectBuilder(element.asClassName)
-                .addKdoc(createKDoc(element))
-                .addAnnotations(createAnnotationSet(element.metadata))
-                .addAnnotations(createOptionalSerializableAnnotationSet())
-                .addAnnotations(createOptionalSerialNameAnnotationSet(element.canonicalName.value))
-                .addModifiers(KModifier.DATA)
-                .addSuperinterfaces(calculateUnionInterfaces(element))
-                .addProperty(serialNameConstantSpec)
-                .build()
+        val primaryConstructorSpec = FunSpec
+            .constructorBuilder()
+            .apply {
+                for (it in element.structFields) {
+                    val parameterSpec = when (val default = it.fieldDefault) {
+                        null -> ParameterSpec
+                            .builder(it.name, typeOf(it.fieldType))
+                            .build()
 
-            addType(typeSpec)
-        }
+                        else -> ParameterSpec
+                            .builder(it.name, typeOf(it.fieldType))
+                            .defaultValue(createLiteralInlinedOrRefOfValue(default))
+                            .build()
+                    }
+
+                    addParameter(parameterSpec)
+                }
+            }
+            .build()
+
+        return TypeSpec
+            .classBuilder(element.asClassName)
+            .addModifiers(KModifier.DATA)
+            .addType(companionObjectSpec)
+            .overrideObject(element)
+            .addKdoc("@see %L", createKDocReference(element))
+            .addAnnotations(createAnnotationSet(element.metadata))
+            .addAnnotations(createOptionalSerializableAnnotationSet())
+            .addAnnotations(createOptionalSerialNameAnnotationSet(element.canonicalName.value))
+            .addSuperinterfaces(calculateUnionInterfaces(element))
+            .primaryConstructor(primaryConstructorSpec)
+            .apply {
+                for (it in element.structFields) {
+                    val propertySpec = PropertySpec
+                        .builder(it.name, typeOf(it.fieldType))
+                        .addKdoc("@see %L", createKDocReference(it))
+                        .addAnnotations(createAnnotationSet(it.metadata))
+                        // fixme nameOrReferenceOf to account for anonymous fields
+                        .addAnnotations(createOptionalSerialNameAnnotationSet(refOfName(it)))
+                        .initializer("%L", it.name)
+                        .build()
+
+                    addProperty(propertySpec)
+                }
+            }
+            .build()
     }
 
-    /**
-     * Generate data classes for struct definitions.
-     *
-     * ### Skip for:
-     *
-     * - anonymous elements
-     * - elements with no fields
-     *
-     * ### Example:
-     *
-     * ```
-     * val custom.example.Something by struct {
-     *      "id"(builtin.String)
-     *      "timestamp"(builtin.Int64)
-     * }
-     * ```
-     *
-     * Produces:
-     *
-     * ```
-     * // classes["builtin.String"] = "kotlin.String"
-     * // classes["builtin.Int64"] = "kotlin.Long"
-     *
-     * object custom_example {
-     *      // ...
-     *
-     *      @Serializable
-     *      @SerialName("custom.example.Something")
-     *      data class Something(
-     *          @SerialName("message")
-     *          val message: kotlin.String,
-     *          @SerialName("timestamp")
-     *          val timestamp: kotlin.Long,
-     *      ) {
-     *          companion object {
-     *              const val SERIAL_NAME = "custom.example.Something"
-     *          }
-     *      }
-     * }
-     * ```
-     */
-    private fun generateDataClass(element: StructDefinition) {
-        onObject(element.namespace) {
-            val serialNameConstantSpec = PropertySpec
-                .builder("SERIAL_NAME", STRING)
-                .addModifiers(KModifier.CONST)
-                .initializer("%S", element.canonicalName.value)
-                .build()
+    private fun createDataObject(element: StructDefinition): TypeSpec {
+        return TypeSpec
+            .objectBuilder(element.asClassName)
+            .addModifiers(KModifier.DATA)
+            .addProperty(createStaticInfoProperty(element))
+            .overrideObject(element)
+            .addKdoc("@see %L", createKDocReference(element))
+            .addAnnotations(createAnnotationSet(element.metadata))
+            .addAnnotations(createOptionalSerializableAnnotationSet())
+            .addAnnotations(createOptionalSerialNameAnnotationSet(element.canonicalName.value))
+            .addSuperinterfaces(calculateUnionInterfaces(element))
+            .build()
+    }
 
-            val companionObjectSpec = TypeSpec
-                .companionObjectBuilder()
-                .addProperty(serialNameConstantSpec)
-                .build()
+    private fun TypeSpec.Builder.overrideObject(element: StructDefinition): TypeSpec.Builder {
+        val overrideObjectClass = StructObject::class.asClassName()
 
-            val typePrimaryConstructorSpec = FunSpec
-                .constructorBuilder()
-                .apply {
-                    for (field in element.structFields) {
-                        val parameterSpec = ParameterSpec
-                            .builder(field.name, typeOf(field.fieldType))
-                            .apply {
-                                field.fieldDefault?.let { fieldDefault ->
-                                    defaultValue(createLiteralOrReference(fieldDefault))
-                                }
-                            }
-                            .build()
+        val infoPropertySpec = PropertySpec
+            .builder("info", StructInfo::class)
+            .addModifiers(KModifier.OVERRIDE)
+            .initializer("%L", element.fStaticInfo)
+            .build()
 
-                        addParameter(parameterSpec)
-                    }
-                }
-                .build()
+        return this
+            .superclass(overrideObjectClass)
+            .addProperty(infoPropertySpec)
+    }
 
-            val typeSpec = TypeSpec
-                .classBuilder(element.asClassName)
-                .addKdoc(createKDoc(element))
-                .addAnnotations(createAnnotationSet(element.metadata))
-                .addAnnotations(createOptionalSerializableAnnotationSet())
-                .addAnnotations(createOptionalSerialNameAnnotationSet(element.canonicalName.value))
-                .addModifiers(KModifier.DATA)
-                .addSuperinterfaces(calculateUnionInterfaces(element))
-                .primaryConstructor(typePrimaryConstructorSpec)
-                .addType(companionObjectSpec)
-                .apply {
-                    for (field in element.structFields) {
-                        val propertySpec = PropertySpec
-                            .builder(field.name, typeOf(field.fieldType))
-                            .addKdoc(createKDoc(field))
-                            .addAnnotations(createAnnotationSet(field.metadata))
-                            // fixme nameOrReferenceOf to account for anonymous fields
-                            .addAnnotations(createOptionalSerialNameAnnotationSet(referenceOf(field)))
-                            .initializer("%L", field.name)
-                            .build()
-
-                        addProperty(propertySpec)
-                    }
-                }
-                .build()
-
-            addType(typeSpec)
-        }
+    private fun createStaticInfoProperty(element: StructDefinition): PropertySpec {
+        return PropertySpec
+            .builder(element.fStaticInfo, StructInfo::class)
+            .initializer("\n%L", createInfo(element))
+            .build()
     }
 }

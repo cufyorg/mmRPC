@@ -6,12 +6,12 @@ import org.cufy.specdsl.Marker0
 import org.cufy.specdsl.gen.kotlin.GenGroup
 
 @Marker0
-fun GenGroup.createLiteralOrReference(element: ConstDefinition): CodeBlock {
+fun GenGroup.createLiteralOrRefOfValue(element: ConstDefinition): CodeBlock {
     if (element.isAnonymous)
         return createLiteral(element)
 
     if (element.canonicalName in ctx.nativeElements)
         return createLiteral(element)
 
-    return referenceOf(element)
+    return refOfValue(element)
 }

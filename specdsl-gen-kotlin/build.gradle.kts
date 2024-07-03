@@ -12,6 +12,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
+                implementation(project(":specdsl-core"))
                 implementation(project(":specdsl-definition"))
 
                 implementation(kotlin("stdlib"))

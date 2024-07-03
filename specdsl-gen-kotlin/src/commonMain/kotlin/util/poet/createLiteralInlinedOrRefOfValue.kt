@@ -7,7 +7,7 @@ import org.cufy.specdsl.ScalarDefinition
 import org.cufy.specdsl.gen.kotlin.GenGroup
 
 @Marker0
-fun GenGroup.createLiteralInlinedOrReference(element: ConstDefinition): CodeBlock {
+fun GenGroup.createLiteralInlinedOrRefOfValue(element: ConstDefinition): CodeBlock {
     if (element.isAnonymous)
         return createLiteralInlined(element)
 
@@ -20,5 +20,5 @@ fun GenGroup.createLiteralInlinedOrReference(element: ConstDefinition): CodeBloc
     if (element.constType.canonicalName !in ctx.nativeElements)
         return createLiteralInlined(element)
 
-    return referenceOf(element)
+    return refOfValue(element)
 }

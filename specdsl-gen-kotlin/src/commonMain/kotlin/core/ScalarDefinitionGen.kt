@@ -1,97 +1,86 @@
 package org.cufy.specdsl.gen.kotlin.core
 
-import com.squareup.kotlinpoet.*
+import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.PropertySpec
+import com.squareup.kotlinpoet.TypeSpec
 import org.cufy.specdsl.ScalarDefinition
+import org.cufy.specdsl.ScalarInfo
 import org.cufy.specdsl.gen.kotlin.GenContext
 import org.cufy.specdsl.gen.kotlin.GenGroup
+import org.cufy.specdsl.gen.kotlin.util.ScalarStrategy
 import org.cufy.specdsl.gen.kotlin.util.asClassName
-import org.cufy.specdsl.gen.kotlin.util.createKDoc
+import org.cufy.specdsl.gen.kotlin.util.calculateStrategy
+import org.cufy.specdsl.gen.kotlin.util.fStaticInfo
 import org.cufy.specdsl.gen.kotlin.util.poet.*
 
 class ScalarDefinitionGen(override val ctx: GenContext) : GenGroup() {
-    fun generateClasses() {
+    override fun apply() {
         for (element in ctx.specSheet.collectChildren()) {
             if (element !is ScalarDefinition) continue
             if (element.isAnonymous) continue
-            if (element.canonicalName in ctx.nativeElements) continue
 
             failGenBoundary {
-                generateValueClass(element)
+                onObject(element.namespace) {
+                    when (calculateStrategy(element)) {
+                        ScalarStrategy.DATA_OBJECT
+                        -> addType(createDataObject(element))
+
+                        ScalarStrategy.VALUE_CLASS
+                        -> addType(createValueClass(element))
+                    }
+                }
             }
         }
     }
 
-    /**
-     * Generate value classes for scalar definitions.
-     *
-     * ### Skip for:
-     *
-     * - anonymous elements
-     * - native elements
-     *
-     * ### Example:
-     *
-     * ```
-     * val custom.example.Something by scalar
-     * ```
-     *
-     * Produces:
-     *
-     * ```
-     * // classes["custom.example.Something"] = "kotlin.String"
-     *
-     * object custom_example {
-     *      // ...
-     *
-     *      @JvmInline
-     *      @Serializable
-     *      @SerialName("custom.example.Something")
-     *      value class Something(val value: kotlin.String) {
-     *          companion object {
-     *              const val SERIAL_NAME = "custom.example.Something"
-     *          }
-     *      }
-     * }
-     * ```
-     */
-    private fun generateValueClass(element: ScalarDefinition) {
-        onObject(element.namespace) {
-            val serialNameConstantSpec = PropertySpec
-                .builder("SERIAL_NAME", STRING)
-                .addModifiers(KModifier.CONST)
-                .initializer("%S", element.canonicalName.value)
-                .build()
+    private fun createValueClass(element: ScalarDefinition): TypeSpec {
+        val companionObjectSpec = TypeSpec
+            .companionObjectBuilder()
+            .addProperty(createStaticInfoProperty(element))
+            .build()
 
-            val companionObjectSpec = TypeSpec
-                .companionObjectBuilder()
-                .addProperty(serialNameConstantSpec)
-                .build()
+        val primaryConstructorSpec = FunSpec
+            .constructorBuilder()
+            .addParameter("value", nativeClassOf(element))
+            .build()
 
-            val typePrimaryConstructorSpec = FunSpec
-                .constructorBuilder()
-                .addParameter("value", nativeClassOf(element))
-                .build()
+        val valuePropertySpec = PropertySpec
+            .builder("value", nativeClassOf(element))
+            .initializer("value")
+            .build()
 
-            val typeValuePropertySpec = PropertySpec
-                .builder("value", nativeClassOf(element))
-                .initializer("value")
-                .build()
+        return TypeSpec
+            .classBuilder(element.asClassName)
+            .addModifiers(KModifier.VALUE)
+            .addAnnotation(JvmInline::class)
+            .addType(companionObjectSpec)
+            .addKdoc("@see %L", createKDocReference(element))
+            .addAnnotations(createAnnotationSet(element.metadata))
+            .addAnnotations(createOptionalSerializableAnnotationSet())
+            .addAnnotations(createOptionalSerialNameAnnotationSet(element.canonicalName.value))
+            .addSuperinterfaces(calculateUnionInterfaces(element))
+            .primaryConstructor(primaryConstructorSpec)
+            .addProperty(valuePropertySpec)
+            .build()
+    }
 
-            val typeSpec = TypeSpec
-                .classBuilder(element.asClassName)
-                .addKdoc(createKDoc(element))
-                .addAnnotations(createAnnotationSet(element.metadata))
-                .addAnnotations(createOptionalSerializableAnnotationSet())
-                .addAnnotations(createOptionalSerialNameAnnotationSet(element.canonicalName.value))
-                .addAnnotation(JvmInline::class)
-                .addModifiers(KModifier.VALUE)
-                .addSuperinterfaces(calculateUnionInterfaces(element))
-                .primaryConstructor(typePrimaryConstructorSpec)
-                .addProperty(typeValuePropertySpec)
-                .addType(companionObjectSpec)
-                .build()
+    private fun createDataObject(element: ScalarDefinition): TypeSpec {
+        return TypeSpec
+            .objectBuilder(element.asClassName)
+            .addModifiers(KModifier.DATA)
+            .addProperty(createStaticInfoProperty(element))
+            .addKdoc(createKDoc(element))
+            .addAnnotations(createAnnotationSet(element.metadata))
+            .addAnnotations(createOptionalSerializableAnnotationSet())
+            .addAnnotations(createOptionalSerialNameAnnotationSet(element.canonicalName.value))
+            .build()
+    }
 
-            addType(typeSpec)
-        }
+    private fun createStaticInfoProperty(element: ScalarDefinition): PropertySpec {
+        return PropertySpec
+            .builder(element.fStaticInfo, ScalarInfo::class)
+            .initializer("\n%L", createInfo(element))
+            .build()
     }
 }
