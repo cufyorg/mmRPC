@@ -103,6 +103,8 @@ val String?.literal get() = this?.literal ?: null.literal
 @Serializable
 @SerialName("tuple")
 data class TupleLiteral(val value: List<Literal>) : Literal {
+    constructor(vararg value: Literal) : this(value.asList())
+
     override fun contentToString() = value.joinToString(", ", "[", "]") { it.contentToString() }
 }
 

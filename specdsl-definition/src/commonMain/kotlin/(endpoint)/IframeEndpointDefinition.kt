@@ -19,32 +19,6 @@ package org.cufy.specdsl
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlin.jvm.JvmInline
-
-////////////////////////////////////////
-
-@JvmInline
-@Serializable
-value class IframeSecurity(val name: String)
-
-@JvmInline
-@Serializable
-value class IframePath(val value: String)
-
-object Iframe {
-    /**
-     * The client is considered authenticated with itself
-     * as the subject when the iframe's parent page was
-     * confirmed to be one of the domains of the client.
-     */
-    val SameClient = IframeSecurity("SameClient")
-}
-
-fun Namespace.toIframePath(): IframePath {
-    return IframePath(
-        value = "/" + segments.joinToString("/")
-    )
-}
 
 ////////////////////////////////////////
 

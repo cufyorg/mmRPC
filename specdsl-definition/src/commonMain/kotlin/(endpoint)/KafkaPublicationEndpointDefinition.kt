@@ -19,33 +19,6 @@ package org.cufy.specdsl
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlin.jvm.JvmInline
-
-////////////////////////////////////////
-
-@JvmInline
-@Serializable
-value class KafkaPublicationSecurity(val name: String)
-
-@JvmInline
-@Serializable
-value class KafkaPublicationTopic(val value: String)
-
-object KafkaPublication {
-    /**
-     * The client is considered authenticated with no
-     * subject when it can consume the topic.
-     *
-     * > This is the set by default for all kafka publication endpoints.
-     */
-    val KafkaACL = KafkaPublicationSecurity("KafkaACL")
-}
-
-fun Namespace.toKafkaPublicationTopic(): KafkaPublicationTopic {
-    return KafkaPublicationTopic(
-        value = canonicalName.value.replace(":", "-")
-    )
-}
 
 ////////////////////////////////////////
 

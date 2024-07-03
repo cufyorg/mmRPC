@@ -18,6 +18,83 @@
 package org.cufy.specdsl
 
 import kotlin.jvm.JvmName
+import kotlin.reflect.KProperty
+
+////////////////////////////////////////
+
+abstract class NamespaceObject {
+    var namespace: Namespace
+        protected set
+
+    constructor() {
+        this.namespace = Namespace(inferSegment())
+    }
+
+    constructor(vararg segments: String) {
+        this.namespace = Namespace(*segments)
+    }
+
+    constructor(parent: NamespaceObject) {
+        this.namespace = parent.namespace + inferSegment()
+    }
+
+    constructor(parent: NamespaceObject, vararg segments: String) {
+        this.namespace = parent.namespace + segments.asList()
+    }
+
+    private fun inferSegment(): String {
+        return this::class.simpleName.orEmpty()
+    }
+}
+
+////////////////////////////////////////
+
+fun interface UnnamedBlock<out T> {
+    operator fun invoke(ns: Namespace, name: String?, isInline: Boolean): T
+}
+
+class Unnamed<out T>(private val block: UnnamedBlock<T>) {
+    constructor(block: (Namespace) -> T) : this({ ns, _, _ -> block(ns) })
+    constructor(value: T) : this({ _, _, _ -> value })
+
+    fun get(namespace: Namespace, isInline: Boolean = true) =
+        block(namespace, name = null, isInline = isInline)
+
+    fun get(namespace: Namespace, name: String, isInline: Boolean = true) =
+        block(namespace, name, isInline = isInline)
+
+    fun get(obj: NamespaceObject, isInline: Boolean = true) =
+        block(obj.namespace, name = null, isInline = isInline)
+
+    fun get(obj: NamespaceObject, name: String, isInline: Boolean = true) =
+        block(obj.namespace, name, isInline = isInline)
+
+    private val values = mutableMapOf<Pair<Namespace, String?>, T>()
+
+    operator fun getValue(namespace: Namespace, property: KProperty<*>): T {
+        return values.getOrPut(namespace to property.name) {
+            val splits = property.name.split("__")
+            val ns = namespace + splits.dropLast(1)
+            val n = splits.last()
+            block(ns, n, isInline = false)
+        }
+    }
+
+    operator fun getValue(obj: NamespaceObject, property: KProperty<*>): T {
+        return values.getOrPut(obj.namespace to property.name) {
+            val splits = property.name.split("__")
+            val ns = obj.namespace + splits.dropLast(1)
+            val n = splits.last()
+            block(ns, n, isInline = false)
+        }
+    }
+
+    operator fun provideDelegate(thisRef: Any?, property: KProperty<*>): Unnamed<T> {
+        return Unnamed { namespace, name, isInline -> block(namespace, name, isInline) }
+    }
+}
+
+////////////////////////////////////////
 
 open class DomainProperty<T> {
     lateinit var value: Unnamed<T>
@@ -54,6 +131,8 @@ open class NamespaceDomainProperty {
         this.value = value.namespace
     }
 }
+
+////////////////////////////////////////
 
 @Marker0
 interface EndpointDefinitionSetDomainContainer {
@@ -249,6 +328,8 @@ interface MetadataParameterDefinitionSetDomainContainer {
     }
 }
 
+////////////////////////////////////////
+
 @Marker0
 abstract class ElementDefinitionBuilder {
     abstract var name: String
@@ -282,3 +363,5 @@ abstract class ElementDefinitionBuilder {
 
     abstract fun build(): ElementDefinition
 }
+
+////////////////////////////////////////
