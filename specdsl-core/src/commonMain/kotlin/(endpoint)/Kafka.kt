@@ -30,8 +30,24 @@ value class KafkaSecurity(val name: String)
 @Serializable
 value class KafkaTopic(val value: String)
 
+/**
+ * Kafka endpoints are kafka topics that are designed
+ * to be produced to by **any privileged endpoint client**
+ * and consumed by **only the endpoint's server**.
+ *
+ * Keys and values are always serialized as `String`.
+ *
+ * When message header `Content-Type` is set to `application/json`,
+ * the values are encoded as **JSON Objects**.
+ *
+ * When message header `Content-Type` is set to `application/jwt`,
+ * the values are encoded as **JWS Compact Serialization**.
+ */
 object Kafka {
     /**
+     * Requires the client to have permission to write to
+     * the endpoint's topic.
+     *
      * The client is considered authenticated with no
      * subject when it can produce to the topic.
      *
@@ -40,13 +56,20 @@ object Kafka {
     val KafkaACL = KafkaSecurity("KafkaACL")
 
     /**
-     * The client is considered authenticated with itself
-     * as the subject when it can produce to the topic
-     * prefix with its client id:
+     * Requires confirmation of the identity of a client.
      *
-     * `<client_id>.<topic_name>`
+     * ### JWS MESSAGES
+     *
+     * The client is considered authenticated with itself
+     * as the subject when it provides the message as the
+     * payload in a jwt signed by a trusted key of the client.
+     * The jwt should include the header `kid` which should be
+     * the id of either a previously agreed upon key of the
+     * client or a key in a previously agreed upon keyset uri.
      */
     val SameClient = KafkaSecurity("SameClient")
+
+    // Planned to add Confidential with JWE
 }
 
 fun Namespace.toKafkaTopic(): KafkaTopic {

@@ -30,11 +30,22 @@ value class IframeSecurity(val name: String)
 @Serializable
 value class IframePath(val value: String)
 
+/**
+ * Iframe endpoints are HTML pages that are designed to be
+ * hosted by the endpoint's server and embedded in any page
+ * of a privileged client.
+ *
+ * Communication between iframe
+ */
 object Iframe {
     /**
+     * Requires confirmation of the identity of a client.
+     *
+     * ### USING `document.referrer`
+     *
      * The client is considered authenticated with itself
-     * as the subject when the iframe's parent page was
-     * confirmed to be one of the domains of the client.
+     * as the subject when the iframe successfully identifies
+     * its domain in the iframe's `document.referrer`.
      */
     val SameClient = IframeSecurity("SameClient")
 }
