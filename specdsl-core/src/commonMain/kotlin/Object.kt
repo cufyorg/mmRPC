@@ -41,7 +41,7 @@ abstract class ProtocolObject : ElementObject() {
     abstract override val info: ProtocolInfo
 }
 
-abstract class RoutineObject<I : StructObject, O : StructObject> : ElementObject() {
+abstract class RoutineObject<I, O> : ElementObject() {
     abstract override val info: RoutineInfo
 }
 
