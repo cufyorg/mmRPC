@@ -10,7 +10,7 @@ import org.cufy.mmrpc.gen.kotlin.GenGroup
 /**
  * Returns the assignable type of some element.
  */
-@Marker0
+@Marker3
 fun GenGroup.typeOf(element: TypeDefinition): TypeName {
     if (element is ConstDefinition)
         return typeOf(element.constType)

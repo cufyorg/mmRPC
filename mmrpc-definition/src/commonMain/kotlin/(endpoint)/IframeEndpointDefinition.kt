@@ -73,7 +73,7 @@ open class IframeEndpointDefinitionBuilder :
     }
 }
 
-@Marker1
+@Marker2
 fun endpointIframe(
     block: IframeEndpointDefinitionBuilder.() -> Unit = {}
 ): Unnamed<IframeEndpointDefinition> {
@@ -89,18 +89,18 @@ fun endpointIframe(
 
 ////////////////////////////////////////
 
-@Marker1
+@Marker2
 val endpointIframe = endpointIframe()
 
 ////////////////////////////////////////
 
-@Marker2
+@Marker1
 val RoutineDefinitionBuilder.iframe: Unit
     get() {
         +endpointIframe { name = "iframe" }
     }
 
-@Marker2
+@Marker1
 fun RoutineDefinitionBuilder.iframe(
     block: IframeEndpointDefinitionBuilder.() -> Unit = {}
 ) {

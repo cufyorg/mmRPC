@@ -7,7 +7,7 @@ import org.cufy.mmrpc.gen.kotlin.util.*
 
 private const val TAG = "refOf"
 
-@Marker0
+@Marker3
 fun GenGroup.refOfValue(element: ConstDefinition): CodeBlock {
     debugRejectAnonymous(TAG, element)
     debugRejectNative(TAG, element)
@@ -15,14 +15,14 @@ fun GenGroup.refOfValue(element: ConstDefinition): CodeBlock {
     return CodeBlock.of("%T.%L.%L", classOf(element.namespace), element.asClassName, element.fStaticValue)
 }
 
-@Marker0
+@Marker3
 fun GenGroup.refOfName(element: FieldDefinition): CodeBlock {
     debugRejectAnonymous(TAG, element)
 
     return CodeBlock.of("%T.%L.%L", classOf(element.namespace), element.asClassName, element.fStaticName)
 }
 
-@Marker0
+@Marker3
 fun GenGroup.refOfInfo(element: ElementDefinition): CodeBlock {
     debugRejectAnonymous(TAG, element)
 
@@ -75,7 +75,7 @@ fun GenGroup.refOfInfo(element: ElementDefinition): CodeBlock {
     }
 }
 
-@Marker0
+@Marker3
 fun GenGroup.refOfInfoOrCreateInfo(element: ElementDefinition): CodeBlock {
     if (element.isAnonymous)
         return createInfo(element)

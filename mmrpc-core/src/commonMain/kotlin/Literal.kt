@@ -30,7 +30,7 @@ data object NullLiteral : Literal {
     override fun contentToString() = "null"
 }
 
-@Marker1
+@Marker2
 @get:JvmName("literalOrNull")
 val Nothing?.literal get() = NullLiteral
 
@@ -40,10 +40,10 @@ data class BooleanLiteral(val value: Boolean) : Literal {
     override fun contentToString() = value.toString()
 }
 
-@Marker1
+@Marker2
 val Boolean.literal get() = BooleanLiteral(this)
 
-@Marker1
+@Marker2
 @get:JvmName("literalOrNull")
 val Boolean?.literal get() = this?.literal ?: null.literal
 
@@ -53,17 +53,17 @@ data class IntLiteral(val value: Long) : Literal {
     override fun contentToString() = value.toString()
 }
 
-@Marker1
+@Marker2
 val Int.literal get() = IntLiteral(toLong())
 
-@Marker1
+@Marker2
 @get:JvmName("literalOrNull")
 val Int?.literal get() = this?.literal ?: null.literal
 
-@Marker1
+@Marker2
 val Long.literal get() = IntLiteral(this)
 
-@Marker1
+@Marker2
 @get:JvmName("literalOrNull")
 val Long?.literal get() = this?.literal ?: null.literal
 
@@ -73,17 +73,17 @@ data class FloatLiteral(val value: Double) : Literal {
     override fun contentToString() = value.toString()
 }
 
-@Marker1
+@Marker2
 val Float.literal get() = FloatLiteral(toDouble())
 
-@Marker1
+@Marker2
 @get:JvmName("literalOrNull")
 val Float?.literal get() = this?.literal ?: null.literal
 
-@Marker1
+@Marker2
 val Double.literal get() = FloatLiteral(this)
 
-@Marker1
+@Marker2
 @get:JvmName("literalOrNull")
 val Double?.literal get() = this?.literal ?: null.literal
 
@@ -93,10 +93,10 @@ data class StringLiteral(val value: String) : Literal {
     override fun contentToString() = "\"$value\""
 }
 
-@Marker1
+@Marker2
 val String.literal get() = StringLiteral(this)
 
-@Marker1
+@Marker2
 @get:JvmName("literalOrNull")
 val String?.literal get() = this?.literal ?: null.literal
 
@@ -108,6 +108,6 @@ data class TupleLiteral(val value: List<Literal>) : Literal {
     override fun contentToString() = value.joinToString(", ", "[", "]") { it.contentToString() }
 }
 
-@Marker1
+@Marker2
 fun literal(vararg value: Literal) =
     TupleLiteral(value.asList())

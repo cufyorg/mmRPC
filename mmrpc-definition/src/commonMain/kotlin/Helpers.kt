@@ -134,7 +134,7 @@ open class NamespaceDomainProperty {
 
 ////////////////////////////////////////
 
-@Marker0
+@Marker3
 interface EndpointDefinitionSetDomainContainer {
     @JvmName("unaryPlusUnnamedEndpointDefinition")
     operator fun Unnamed<EndpointDefinition>.unaryPlus()
@@ -155,7 +155,7 @@ interface EndpointDefinitionSetDomainContainer {
     }
 }
 
-@Marker0
+@Marker3
 interface FaultDefinitionSetDomainContainer {
     @JvmName("unaryPlusUnnamedFaultDefinition")
     operator fun Unnamed<FaultDefinition>.unaryPlus()
@@ -176,7 +176,7 @@ interface FaultDefinitionSetDomainContainer {
     }
 }
 
-@Marker0
+@Marker3
 interface TypeDefinitionSetDomainContainer {
     @JvmName("unaryPlusUnnamedTypeDefinition")
     operator fun Unnamed<TypeDefinition>.unaryPlus()
@@ -197,7 +197,7 @@ interface TypeDefinitionSetDomainContainer {
     }
 }
 
-@Marker0
+@Marker3
 interface RoutineDefinitionSetDomainContainer {
     @JvmName("unaryPlusUnnamedRoutineDefinition")
     operator fun Unnamed<RoutineDefinition>.unaryPlus()
@@ -230,7 +230,7 @@ interface RoutineDefinitionSetDomainContainer {
     }
 }
 
-@Marker0
+@Marker3
 interface FieldDefinitionSetDomainContainer {
     @JvmName("unaryPlusUnnamedFieldDefinition")
     operator fun Unnamed<FieldDefinition>.unaryPlus()
@@ -279,7 +279,7 @@ interface FieldDefinitionSetDomainContainer {
     }
 }
 
-@Marker0
+@Marker3
 interface MetadataParameterDefinitionSetDomainContainer {
     @JvmName("unaryPlusUnnamedMetadataParameterDefinition")
     operator fun Unnamed<MetadataParameterDefinition>.unaryPlus()
@@ -330,7 +330,7 @@ interface MetadataParameterDefinitionSetDomainContainer {
 
 ////////////////////////////////////////
 
-@Marker0
+@Marker3
 abstract class ElementDefinitionBuilder {
     abstract var name: String
     open val namespace = NamespaceDomainProperty()

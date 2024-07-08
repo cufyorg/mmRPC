@@ -71,7 +71,7 @@ open class ProtocolDefinitionBuilder :
     }
 }
 
-@Marker1
+@Marker2
 fun protocol(
     block: ProtocolDefinitionBuilder.() -> Unit = {}
 ): Unnamed<ProtocolDefinition> {
@@ -87,10 +87,10 @@ fun protocol(
 
 ////////////////////////////////////////
 
-@Marker1
+@Marker2
 val protocol = protocol()
 
-@Marker1
+@Marker2
 fun protocol(
     vararg routines: RoutineDefinition,
     block: ProtocolDefinitionBuilder.() -> Unit = {}
@@ -98,7 +98,7 @@ fun protocol(
     return protocol { +routines.asList(); block() }
 }
 
-@Marker1
+@Marker2
 fun protocol(
     vararg routines: Unnamed<RoutineDefinition>,
     block: ProtocolDefinitionBuilder.() -> Unit = {}

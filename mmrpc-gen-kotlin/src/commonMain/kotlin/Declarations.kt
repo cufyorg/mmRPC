@@ -60,7 +60,7 @@ abstract class GenGroup {
 
     abstract fun apply()
 
-    @Marker0
+    @Marker3
     inline fun failGenBoundary(block: () -> Unit) {
         try {
             block()
@@ -69,7 +69,7 @@ abstract class GenGroup {
         }
     }
 
-    @Marker0
+    @Marker3
     fun failGen(tag: String, definition: ElementDefinition, message: () -> String): Nothing {
         val failure = GenFailure(
             group = this::class.simpleName.orEmpty(),
@@ -81,33 +81,33 @@ abstract class GenGroup {
         throw GenException(failure)
     }
 
-    @Marker0
+    @Marker3
     fun onToplevel(block: FileSpec.Builder.() -> Unit) {
         ctx.toplevelBlocks += block
     }
 
-    @Marker0
+    @Marker3
     fun onObject(ns: Namespace, block: TypeSpec.Builder.() -> Unit) {
         val list = ctx.objectBlocks[ns]
         list ?: error("$TAG: namespace not defined on initialization: ${ns.canonicalName.value}")
         list += block
     }
 
-    @Marker0
+    @Marker3
     fun onObjectOptional(ns: Namespace, block: TypeSpec.Builder.() -> Unit) {
         val list = ctx.objectOptionalBlocks[ns]
         list ?: error("$TAG: namespace not defined on initialization: ${ns.canonicalName.value}")
         list += block
     }
 
-    @Marker0
+    @Marker3
     fun onFile(ns: Namespace, block: FileSpec.Builder.() -> Unit) {
         val list = ctx.fileBlocks[ns]
         list ?: error("$TAG: namespace not defined on initialization: ${ns.canonicalName.value}")
         list += block
     }
 
-    @Marker0
+    @Marker3
     fun onFileOptional(ns: Namespace, block: FileSpec.Builder.() -> Unit) {
         val list = ctx.fileOptionalBlocks[ns]
         list ?: error("$TAG: namespace not defined on initialization: ${ns.canonicalName.value}")

@@ -4,7 +4,7 @@ import com.squareup.kotlinpoet.CodeBlock
 import org.cufy.mmrpc.*
 import org.cufy.mmrpc.gen.kotlin.GenGroup
 
-@Marker0
+@Marker3
 fun GenGroup.createInfoUsage(element: MetadataDefinitionUsage): CodeBlock {
     return createCall(
         function = CodeBlock.of("%T", MetadataInfoUsage::class),
@@ -16,7 +16,7 @@ fun GenGroup.createInfoUsage(element: MetadataDefinitionUsage): CodeBlock {
     )
 }
 
-@Marker0
+@Marker3
 fun GenGroup.createInfoUsage(element: MetadataParameterDefinitionUsage): CodeBlock {
     return createCall(
         function = CodeBlock.of("%T", MetadataParameterInfoUsage::class),

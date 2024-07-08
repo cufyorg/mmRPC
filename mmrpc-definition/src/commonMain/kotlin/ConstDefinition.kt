@@ -65,7 +65,7 @@ open class ConstDefinitionBuilder :
     }
 }
 
-@Marker1
+@Marker2
 internal fun const(
     block: ConstDefinitionBuilder.() -> Unit = {}
 ): Unnamed<ConstDefinition> {
@@ -81,7 +81,7 @@ internal fun const(
 
 ////////////////////////////////////////
 
-@Marker1
+@Marker2
 fun const(
     type: TypeDefinition,
     value: Literal = null.literal,
@@ -94,7 +94,7 @@ fun const(
     }
 }
 
-@Marker1
+@Marker2
 fun const(
     type: Unnamed<TypeDefinition>,
     value: Literal = null.literal,
@@ -109,7 +109,7 @@ fun const(
 
 ////////////////////////////////////////
 
-@Marker1
+@Marker2
 fun const(
     value: NullLiteral,
     block: ConstDefinitionBuilder.() -> Unit = {}
@@ -121,7 +121,7 @@ fun const(
     }
 }
 
-@Marker1
+@Marker2
 fun const(
     value: BooleanLiteral,
     block: ConstDefinitionBuilder.() -> Unit = {}
@@ -133,7 +133,7 @@ fun const(
     }
 }
 
-@Marker1
+@Marker2
 fun const(
     value: IntLiteral,
     block: ConstDefinitionBuilder.() -> Unit = {}
@@ -145,7 +145,7 @@ fun const(
     }
 }
 
-@Marker1
+@Marker2
 fun const(
     value: FloatLiteral,
     block: ConstDefinitionBuilder.() -> Unit = {}
@@ -157,7 +157,7 @@ fun const(
     }
 }
 
-@Marker1
+@Marker2
 fun const(
     value: StringLiteral,
     block: ConstDefinitionBuilder.() -> Unit = {}
@@ -169,7 +169,7 @@ fun const(
     }
 }
 
-@Marker1
+@Marker2
 fun const(
     value: TupleLiteral,
     block: ConstDefinitionBuilder.() -> Unit = {}

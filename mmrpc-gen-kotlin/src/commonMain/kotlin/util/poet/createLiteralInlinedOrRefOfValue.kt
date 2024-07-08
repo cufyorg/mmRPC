@@ -2,11 +2,11 @@ package org.cufy.mmrpc.gen.kotlin.util.poet
 
 import com.squareup.kotlinpoet.CodeBlock
 import org.cufy.mmrpc.ConstDefinition
-import org.cufy.mmrpc.Marker0
+import org.cufy.mmrpc.Marker3
 import org.cufy.mmrpc.ScalarDefinition
 import org.cufy.mmrpc.gen.kotlin.GenGroup
 
-@Marker0
+@Marker3
 fun GenGroup.createLiteralInlinedOrRefOfValue(element: ConstDefinition): CodeBlock {
     if (element.isAnonymous)
         return createLiteralInlined(element)

@@ -72,7 +72,7 @@ open class TupleDefinitionBuilder :
     }
 }
 
-@Marker1
+@Marker2
 fun tuple(
     block: TupleDefinitionBuilder.() -> Unit = {},
 ): Unnamed<TupleDefinition> {
@@ -88,10 +88,10 @@ fun tuple(
 
 ////////////////////////////////////////
 
-@Marker1
+@Marker2
 val tuple = tuple()
 
-@Marker1
+@Marker2
 fun tuple(
     vararg types: TypeDefinition,
     block: TupleDefinitionBuilder.() -> Unit = {},
@@ -99,7 +99,7 @@ fun tuple(
     return tuple { +types.asList(); block() }
 }
 
-@Marker1
+@Marker2
 fun tuple(
     vararg types: Unnamed<TypeDefinition>,
     block: TupleDefinitionBuilder.() -> Unit = {},

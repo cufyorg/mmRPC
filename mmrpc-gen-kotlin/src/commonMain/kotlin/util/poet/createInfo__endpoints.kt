@@ -4,7 +4,7 @@ import com.squareup.kotlinpoet.CodeBlock
 import org.cufy.mmrpc.*
 import org.cufy.mmrpc.gen.kotlin.GenGroup
 
-@Marker0
+@Marker3
 fun GenGroup.createInfo(element: HttpEndpointDefinition): CodeBlock {
     return createCall(
         function = CodeBlock.of("%T", HttpEndpointInfo::class),
@@ -32,7 +32,7 @@ fun GenGroup.createInfo(element: HttpEndpointDefinition): CodeBlock {
     )
 }
 
-@Marker0
+@Marker3
 fun GenGroup.createInfo(element: IframeEndpointDefinition): CodeBlock {
     return createCall(
         function = CodeBlock.of("%T", IframeEndpointInfo::class),
@@ -54,7 +54,7 @@ fun GenGroup.createInfo(element: IframeEndpointDefinition): CodeBlock {
     )
 }
 
-@Marker0
+@Marker3
 fun GenGroup.createInfo(element: KafkaEndpointDefinition): CodeBlock {
     return createCall(
         function = CodeBlock.of("%T", KafkaEndpointInfo::class),
@@ -80,7 +80,7 @@ fun GenGroup.createInfo(element: KafkaEndpointDefinition): CodeBlock {
     )
 }
 
-@Marker0
+@Marker3
 fun GenGroup.createInfo(element: KafkaPublicationEndpointDefinition): CodeBlock {
     return createCall(
         function = CodeBlock.of("%T", KafkaPublicationEndpointInfo::class),

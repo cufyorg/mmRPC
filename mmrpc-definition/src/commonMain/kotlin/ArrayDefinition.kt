@@ -61,7 +61,7 @@ open class ArrayDefinitionBuilder :
     }
 }
 
-@Marker1
+@Marker2
 internal fun array(
     block: ArrayDefinitionBuilder.() -> Unit = {}
 ): Unnamed<ArrayDefinition> {
@@ -77,7 +77,7 @@ internal fun array(
 
 ////////////////////////////////////////
 
-@Marker1
+@Marker2
 fun array(
     type: TypeDefinition,
     block: ArrayDefinitionBuilder.() -> Unit = {},
@@ -85,7 +85,7 @@ fun array(
     return array { this.type *= type; block() }
 }
 
-@Marker1
+@Marker2
 fun array(
     type: Unnamed<TypeDefinition>,
     block: ArrayDefinitionBuilder.() -> Unit = {},
@@ -95,11 +95,11 @@ fun array(
 
 ////////////////////////////////////////
 
-@Marker1
+@Marker2
 val TypeDefinition.array: Unnamed<ArrayDefinition>
     get() = array(this)
 
-@Marker1
+@Marker2
 val Unnamed<TypeDefinition>.array: Unnamed<ArrayDefinition>
     get() = array(this)
 

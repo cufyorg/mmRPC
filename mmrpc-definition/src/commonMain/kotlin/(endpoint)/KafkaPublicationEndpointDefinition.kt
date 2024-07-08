@@ -91,7 +91,7 @@ open class KafkaPublicationEndpointDefinitionBuilder :
     }
 }
 
-@Marker1
+@Marker2
 fun endpointKafkaPublication(
     block: KafkaPublicationEndpointDefinitionBuilder.() -> Unit = {}
 ): Unnamed<KafkaPublicationEndpointDefinition> {
@@ -107,18 +107,18 @@ fun endpointKafkaPublication(
 
 ////////////////////////////////////////
 
-@Marker1
+@Marker2
 val endpointKafkaPublication = endpointKafkaPublication()
 
 ////////////////////////////////////////
 
-@Marker2
+@Marker1
 val RoutineDefinitionBuilder.kafkaPublication: Unit
     get() {
         +endpointKafkaPublication { name = "kafkaPublication"; +KafkaPublication.KafkaACL }
     }
 
-@Marker2
+@Marker1
 fun RoutineDefinitionBuilder.kafkaPublication(
     block: KafkaPublicationEndpointDefinitionBuilder.() -> Unit = {}
 ) {

@@ -51,7 +51,7 @@ open class MetadataParameterDefinitionBuilder :
     }
 }
 
-@Marker1
+@Marker2
 @Suppress("FunctionName")
 internal fun metadata_param(
     block: MetadataParameterDefinitionBuilder.() -> Unit = {},
@@ -68,7 +68,7 @@ internal fun metadata_param(
 
 ////////////////////////////////////////
 
-@Marker1
+@Marker2
 @Suppress("FunctionName")
 fun metadata_param(
     type: TypeDefinition,
@@ -77,7 +77,7 @@ fun metadata_param(
     return metadata_param { this.type *= type; block() }
 }
 
-@Marker1
+@Marker2
 @Suppress("FunctionName")
 fun metadata_param(
     type: Unnamed<TypeDefinition>,

@@ -71,7 +71,7 @@ open class InterDefinitionBuilder :
     }
 }
 
-@Marker1
+@Marker2
 fun inter(
     block: InterDefinitionBuilder.() -> Unit = {}
 ): Unnamed<InterDefinition> {
@@ -87,7 +87,7 @@ fun inter(
 
 ////////////////////////////////////////
 
-@Marker1
+@Marker2
 fun inter(
     vararg types: TypeDefinition,
     block: InterDefinitionBuilder.() -> Unit = {}
@@ -95,7 +95,7 @@ fun inter(
     return inter { +types.asList(); block() }
 }
 
-@Marker1
+@Marker2
 fun inter(
     vararg types: Unnamed<TypeDefinition>,
     block: InterDefinitionBuilder.() -> Unit = {}

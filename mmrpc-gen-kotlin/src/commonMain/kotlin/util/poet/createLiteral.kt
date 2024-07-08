@@ -12,7 +12,7 @@ private const val TAG = "createLiteral"
  * returns the representation of the given [value]
  * in the given type [element].
  */
-@Marker0
+@Marker3
 fun GenGroup.createLiteral(element: ConstDefinition): CodeBlock {
     return createLiteral(element.constType, element.constValue)
 }
@@ -22,7 +22,7 @@ fun GenGroup.createLiteral(element: ConstDefinition): CodeBlock {
  * returns the representation of the given [value]
  * in the given type [element].
  */
-@Marker0
+@Marker3
 fun GenGroup.createLiteral(element: TypeDefinition, value: Literal): CodeBlock {
     return when (element) {
         is ConstDefinition -> createLiteral(element.constType, value)

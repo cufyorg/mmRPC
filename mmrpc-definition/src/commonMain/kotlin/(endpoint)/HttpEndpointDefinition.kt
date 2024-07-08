@@ -83,7 +83,7 @@ open class HttpEndpointDefinitionBuilder :
     }
 }
 
-@Marker1
+@Marker2
 fun endpointHttp(
     block: HttpEndpointDefinitionBuilder.() -> Unit = {}
 ): Unnamed<HttpEndpointDefinition> {
@@ -99,18 +99,18 @@ fun endpointHttp(
 
 ////////////////////////////////////////
 
-@Marker1
+@Marker2
 val endpointHttp = endpointHttp()
 
 ////////////////////////////////////////
 
-@Marker2
+@Marker1
 val RoutineDefinitionBuilder.http: Unit
     get() {
         +endpointHttp { name = "http"; +Http.POST }
     }
 
-@Marker2
+@Marker1
 fun RoutineDefinitionBuilder.http(
     block: HttpEndpointDefinitionBuilder.() -> Unit = {}
 ) {

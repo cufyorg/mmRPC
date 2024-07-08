@@ -66,7 +66,7 @@ open class FieldDefinitionBuilder :
     }
 }
 
-@Marker1
+@Marker2
 internal fun prop(
     block: FieldDefinitionBuilder.() -> Unit = {},
 ): Unnamed<FieldDefinition> {
@@ -82,7 +82,7 @@ internal fun prop(
 
 ////////////////////////////////////////
 
-@Marker1
+@Marker2
 fun prop(
     type: TypeDefinition,
     block: FieldDefinitionBuilder.() -> Unit = {},
@@ -90,7 +90,7 @@ fun prop(
     return prop { this.type *= type; block() }
 }
 
-@Marker1
+@Marker2
 fun prop(
     type: Unnamed<TypeDefinition>,
     block: FieldDefinitionBuilder.() -> Unit = {},

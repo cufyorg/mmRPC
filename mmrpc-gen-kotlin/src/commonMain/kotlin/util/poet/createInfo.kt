@@ -4,7 +4,7 @@ import com.squareup.kotlinpoet.CodeBlock
 import org.cufy.mmrpc.*
 import org.cufy.mmrpc.gen.kotlin.GenGroup
 
-@Marker0
+@Marker3
 fun GenGroup.createInfo(element: ElementDefinition): CodeBlock {
     return when (element) {
         is FaultDefinition -> createInfo(element)

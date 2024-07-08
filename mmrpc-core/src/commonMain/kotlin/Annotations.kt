@@ -15,14 +15,14 @@
  */
 package org.cufy.mmrpc
 
-@DslMarker
+@DslMarker // style3
 annotation class Marker0
 
-@DslMarker
+@DslMarker // style2
 annotation class Marker1
 
-@DslMarker
+@DslMarker // style1
 annotation class Marker2
 
-@DslMarker
+@DslMarker // style4
 annotation class Marker3

@@ -71,7 +71,7 @@ open class UnionDefinitionBuilder :
     }
 }
 
-@Marker1
+@Marker2
 fun union(
     block: UnionDefinitionBuilder.() -> Unit = {},
 ): Unnamed<UnionDefinition> {
@@ -87,7 +87,7 @@ fun union(
 
 ////////////////////////////////////////
 
-@Marker1
+@Marker2
 fun union(
     vararg types: TypeDefinition,
     block: UnionDefinitionBuilder.() -> Unit = {},
@@ -95,7 +95,7 @@ fun union(
     return union { +types.asList(); block() }
 }
 
-@Marker1
+@Marker2
 fun union(
     vararg types: Unnamed<TypeDefinition>,
     block: UnionDefinitionBuilder.() -> Unit = {},

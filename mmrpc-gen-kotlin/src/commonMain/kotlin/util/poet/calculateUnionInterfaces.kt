@@ -10,34 +10,34 @@ import org.cufy.mmrpc.gen.kotlin.util.debugRejectNative
 
 private const val TAG = "calculateUnionInterfaces"
 
-@Marker0
+@Marker3
 fun GenGroup.calculateUnionInterfaces(element: ScalarDefinition): Set<ClassName> {
     debugRejectNative(TAG, element)
 
     return calculateUnionInterfaces0(element)
 }
 
-@Marker0
+@Marker3
 fun GenGroup.calculateUnionInterfaces(element: StructDefinition): Set<ClassName> {
     return calculateUnionInterfaces0(element)
 }
 
-@Marker0
+@Marker3
 fun GenGroup.calculateUnionInterfaces(element: TupleDefinition): Set<ClassName> {
     return calculateUnionInterfaces0(element)
 }
 
-@Marker0
+@Marker3
 fun GenGroup.calculateUnionInterfaces(element: UnionDefinition): Set<ClassName> {
     return calculateUnionInterfaces0(element)
 }
 
-@Marker0
+@Marker3
 fun GenGroup.calculateUnionInterfaces(element: InterDefinition): Set<ClassName> {
     return calculateUnionInterfaces0(element)
 }
 
-@Marker0
+@Marker3
 private fun GenGroup.calculateUnionInterfaces0(element: TypeDefinition): Set<ClassName> {
     debugRejectAnonymous(TAG, element)
 

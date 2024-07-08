@@ -7,12 +7,12 @@ import org.cufy.mmrpc.gen.kotlin.GenGroup
 
 private const val TAG = "createLiteralInlined"
 
-@Marker0
+@Marker3
 fun GenGroup.createLiteralInlined(element: ConstDefinition): CodeBlock {
     return createLiteralInlined(element.constType, element.constValue)
 }
 
-@Marker0
+@Marker3
 fun GenGroup.createLiteralInlined(element: TypeDefinition, value: Literal): CodeBlock {
     return when (element) {
         is ConstDefinition -> createLiteralInlined(element.constType, value)

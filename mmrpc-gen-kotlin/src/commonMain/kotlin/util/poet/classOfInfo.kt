@@ -5,7 +5,7 @@ import com.squareup.kotlinpoet.asClassName
 import org.cufy.mmrpc.*
 import org.cufy.mmrpc.gen.kotlin.GenGroup
 
-@Marker0
+@Marker3
 fun GenGroup.classOfInfo(element: ElementDefinition): ClassName {
     return when (element) {
         is FaultDefinition -> FaultInfo::class.asClassName()

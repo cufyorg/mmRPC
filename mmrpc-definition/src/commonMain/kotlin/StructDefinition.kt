@@ -72,7 +72,7 @@ open class StructDefinitionBuilder :
     }
 }
 
-@Marker1
+@Marker2
 fun struct(
     block: StructDefinitionBuilder.() -> Unit = {}
 ): Unnamed<StructDefinition> {
@@ -88,10 +88,10 @@ fun struct(
 
 ////////////////////////////////////////
 
-@Marker1
+@Marker2
 val struct = struct()
 
-@Marker1
+@Marker2
 fun struct(
     vararg fields: FieldDefinition,
     block: StructDefinitionBuilder.() -> Unit = {}
@@ -99,7 +99,7 @@ fun struct(
     return struct { +fields.asList(); block() }
 }
 
-@Marker1
+@Marker2
 fun struct(
     vararg fields: Unnamed<FieldDefinition>,
     block: StructDefinitionBuilder.() -> Unit = {}

@@ -55,7 +55,7 @@ open class ScalarDefinitionBuilder :
     }
 }
 
-@Marker1
+@Marker2
 fun scalar(
     block: ScalarDefinitionBuilder.() -> Unit = {}
 ): Unnamed<ScalarDefinition> {
@@ -71,7 +71,7 @@ fun scalar(
 
 ////////////////////////////////////////
 
-@Marker1
+@Marker2
 val scalar = scalar()
 
 ////////////////////////////////////////

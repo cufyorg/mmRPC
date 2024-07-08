@@ -69,7 +69,7 @@ open class MetadataDefinitionBuilder :
     }
 }
 
-@Marker1
+@Marker2
 fun metadata(
     block: MetadataDefinitionBuilder.() -> Unit = {}
 ): Unnamed<MetadataDefinition> {
@@ -85,10 +85,10 @@ fun metadata(
 
 ////////////////////////////////////////
 
-@Marker1
+@Marker2
 val metadata = metadata()
 
-@Marker1
+@Marker2
 fun metadata(
     vararg parameters: MetadataParameterDefinition,
     block: MetadataDefinitionBuilder.() -> Unit = {}
@@ -96,7 +96,7 @@ fun metadata(
     return metadata { +parameters.asList(); block() }
 }
 
-@Marker1
+@Marker2
 fun metadata(
     vararg parameters: Unnamed<MetadataParameterDefinition>,
     block: MetadataDefinitionBuilder.() -> Unit = {}

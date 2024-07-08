@@ -1,11 +1,11 @@
 package org.cufy.mmrpc.gen.kotlin.util.poet
 
 import com.squareup.kotlinpoet.AnnotationSpec
-import org.cufy.mmrpc.Marker0
+import org.cufy.mmrpc.Marker3
 import org.cufy.mmrpc.MetadataDefinitionUsage
 import org.cufy.mmrpc.gen.kotlin.GenGroup
 
-@Marker0
+@Marker3
 fun GenGroup.createAnnotationSet(metadata: List<MetadataDefinitionUsage>): List<AnnotationSpec> {
     return buildList {
         for (it in metadata) {

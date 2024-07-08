@@ -14,12 +14,12 @@ returns the globally accessible class of some element.
 
 private const val TAG = "classOf"
 
-@Marker0
+@Marker3
 fun GenGroup.classOf(namespace: Namespace): ClassName {
     return ClassName(ctx.pkg, namespace.asClassName)
 }
 
-@Marker0
+@Marker3
 fun GenGroup.classOf(element: MetadataDefinition): ClassName {
     debugRejectAnonymous(TAG, element)
 
@@ -29,7 +29,7 @@ fun GenGroup.classOf(element: MetadataDefinition): ClassName {
     return ClassName(ctx.pkg, element.namespace.asClassName, element.asClassName)
 }
 
-@Marker0
+@Marker3
 fun GenGroup.classOf(element: ScalarDefinition): ClassName {
     debugRejectAnonymous(TAG, element)
 
@@ -39,14 +39,14 @@ fun GenGroup.classOf(element: ScalarDefinition): ClassName {
     return ClassName(ctx.pkg, element.namespace.asClassName, element.asClassName)
 }
 
-@Marker0
+@Marker3
 fun GenGroup.classOf(element: UnionDefinition): ClassName {
     debugRejectAnonymous(TAG, element)
 
     return ClassName(ctx.pkg, element.namespace.asClassName, element.asClassName)
 }
 
-@Marker0
+@Marker3
 fun GenGroup.classOf(element: StructDefinition): ClassName {
     debugRejectAnonymous(TAG, element)
 

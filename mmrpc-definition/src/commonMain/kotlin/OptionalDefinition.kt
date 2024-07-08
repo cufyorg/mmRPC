@@ -61,7 +61,7 @@ open class OptionalDefinitionBuilder :
     }
 }
 
-@Marker1
+@Marker2
 internal fun optional(
     block: OptionalDefinitionBuilder.() -> Unit = {}
 ): Unnamed<OptionalDefinition> {
@@ -77,7 +77,7 @@ internal fun optional(
 
 ////////////////////////////////////////
 
-@Marker1
+@Marker2
 fun optional(
     type: TypeDefinition,
     block: OptionalDefinitionBuilder.() -> Unit = {},
@@ -85,7 +85,7 @@ fun optional(
     return optional { this.type *= type; block() }
 }
 
-@Marker1
+@Marker2
 fun optional(
     type: Unnamed<TypeDefinition>,
     block: OptionalDefinitionBuilder.() -> Unit = {},
@@ -95,11 +95,11 @@ fun optional(
 
 ////////////////////////////////////////
 
-@Marker1
+@Marker2
 val TypeDefinition.optional: Unnamed<OptionalDefinition>
     get() = optional(this)
 
-@Marker1
+@Marker2
 val Unnamed<TypeDefinition>.optional: Unnamed<OptionalDefinition>
     get() = optional(this)
 

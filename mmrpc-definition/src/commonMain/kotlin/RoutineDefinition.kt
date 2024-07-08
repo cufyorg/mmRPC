@@ -76,12 +76,12 @@ open class RoutineDefinitionBuilder :
         routineFaultUnionUnnamed += this
     }
 
-    @Marker3
+    @Marker0
     open fun input(block: StructDefinitionBuilder.() -> Unit) {
         routineInputBlocks += block
     }
 
-    @Marker3
+    @Marker0
     open fun output(block: StructDefinitionBuilder.() -> Unit) {
         routineOutputBlocks += block
     }

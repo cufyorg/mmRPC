@@ -12,7 +12,7 @@ enum class ScalarStrategy {
     VALUE_CLASS,
 }
 
-@Marker0
+@Marker3
 fun GenGroup.calculateStrategy(element: ScalarDefinition): ScalarStrategy {
     debugRejectAnonymous(TAG, element)
 
@@ -29,7 +29,7 @@ enum class MetadataStrategy {
     ANNOTATION_CLASS,
 }
 
-@Marker0
+@Marker3
 fun GenGroup.calculateStrategy(element: MetadataDefinition): MetadataStrategy {
     debugRejectAnonymous(TAG, element)
 
@@ -46,7 +46,7 @@ enum class StructStrategy {
     DATA_CLASS,
 }
 
-@Marker0
+@Marker3
 fun GenGroup.calculateStrategy(element: StructDefinition): StructStrategy {
     debugRejectAnonymous(TAG, element)
 
@@ -65,7 +65,7 @@ enum class UnionStrategy {
     SEALED_CLASS,
 }
 
-@Marker0
+@Marker3
 fun GenGroup.calculateStrategy(element: UnionDefinition): UnionStrategy {
     debugRejectAnonymous(TAG, element)
 

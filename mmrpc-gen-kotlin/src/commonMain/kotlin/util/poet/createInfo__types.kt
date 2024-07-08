@@ -4,7 +4,7 @@ import com.squareup.kotlinpoet.CodeBlock
 import org.cufy.mmrpc.*
 import org.cufy.mmrpc.gen.kotlin.GenGroup
 
-@Marker0
+@Marker3
 fun GenGroup.createInfo(element: ArrayDefinition): CodeBlock {
     return createCall(
         function = CodeBlock.of("%T", ArrayInfo::class),
@@ -18,7 +18,7 @@ fun GenGroup.createInfo(element: ArrayDefinition): CodeBlock {
     )
 }
 
-@Marker0
+@Marker3
 fun GenGroup.createInfo(element: ConstDefinition): CodeBlock {
     return createCall(
         function = CodeBlock.of("%T", ConstInfo::class),
@@ -33,7 +33,7 @@ fun GenGroup.createInfo(element: ConstDefinition): CodeBlock {
     )
 }
 
-@Marker0
+@Marker3
 fun GenGroup.createInfo(element: InterDefinition): CodeBlock {
     return createCall(
         function = CodeBlock.of("%T", InterInfo::class),
@@ -50,7 +50,7 @@ fun GenGroup.createInfo(element: InterDefinition): CodeBlock {
     )
 }
 
-@Marker0
+@Marker3
 fun GenGroup.createInfo(element: OptionalDefinition): CodeBlock {
     return createCall(
         function = CodeBlock.of("%T", OptionalInfo::class),
@@ -64,7 +64,7 @@ fun GenGroup.createInfo(element: OptionalDefinition): CodeBlock {
     )
 }
 
-@Marker0
+@Marker3
 fun GenGroup.createInfo(element: ScalarDefinition): CodeBlock {
     return createCall(
         function = CodeBlock.of("%T", ScalarInfo::class),
@@ -77,7 +77,7 @@ fun GenGroup.createInfo(element: ScalarDefinition): CodeBlock {
     )
 }
 
-@Marker0
+@Marker3
 fun GenGroup.createInfo(element: StructDefinition): CodeBlock {
     return createCall(
         function = CodeBlock.of("%T", StructInfo::class),
@@ -94,7 +94,7 @@ fun GenGroup.createInfo(element: StructDefinition): CodeBlock {
     )
 }
 
-@Marker0
+@Marker3
 fun GenGroup.createInfo(element: TupleDefinition): CodeBlock {
     return createCall(
         function = CodeBlock.of("%T", TupleInfo::class),
@@ -111,7 +111,7 @@ fun GenGroup.createInfo(element: TupleDefinition): CodeBlock {
     )
 }
 
-@Marker0
+@Marker3
 fun GenGroup.createInfo(element: UnionDefinition): CodeBlock {
     return createCall(
         function = CodeBlock.of("%T", UnionInfo::class),

@@ -91,7 +91,7 @@ open class KafkaEndpointDefinitionBuilder :
     }
 }
 
-@Marker1
+@Marker2
 fun endpointKafka(
     block: KafkaEndpointDefinitionBuilder.() -> Unit = {}
 ): Unnamed<KafkaEndpointDefinition> {
@@ -107,18 +107,18 @@ fun endpointKafka(
 
 ////////////////////////////////////////
 
-@Marker1
+@Marker2
 val endpointKafka = endpointKafka()
 
 ////////////////////////////////////////
 
-@Marker2
+@Marker1
 val RoutineDefinitionBuilder.kafka: Unit
     get() {
         +endpointKafka { name = "kafka"; +Kafka.KafkaACL }
     }
 
-@Marker2
+@Marker1
 fun RoutineDefinitionBuilder.kafka(
     block: KafkaEndpointDefinitionBuilder.() -> Unit = {}
 ) {

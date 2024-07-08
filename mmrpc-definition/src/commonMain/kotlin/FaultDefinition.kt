@@ -55,7 +55,7 @@ open class FaultDefinitionBuilder :
     }
 }
 
-@Marker1
+@Marker2
 fun fault(
     block: FaultDefinitionBuilder.() -> Unit = {}
 ): Unnamed<FaultDefinition> {
@@ -71,7 +71,7 @@ fun fault(
 
 ////////////////////////////////////////
 
-@Marker1
+@Marker2
 val fault = fault()
 
 ////////////////////////////////////////

@@ -4,7 +4,7 @@ import com.squareup.kotlinpoet.CodeBlock
 import org.cufy.mmrpc.*
 import org.cufy.mmrpc.gen.kotlin.GenGroup
 
-@Marker0
+@Marker3
 fun GenGroup.createInfo(element: FaultDefinition): CodeBlock {
     return createCall(
         function = CodeBlock.of("%T", FaultInfo::class),
@@ -17,7 +17,7 @@ fun GenGroup.createInfo(element: FaultDefinition): CodeBlock {
     )
 }
 
-@Marker0
+@Marker3
 fun GenGroup.createInfo(element: FieldDefinition): CodeBlock {
     return createCall(
         function = CodeBlock.of("%T", FieldInfo::class),
@@ -35,7 +35,7 @@ fun GenGroup.createInfo(element: FieldDefinition): CodeBlock {
     )
 }
 
-@Marker0
+@Marker3
 fun GenGroup.createInfo(element: MetadataDefinition): CodeBlock {
     return createCall(
         function = CodeBlock.of("%T", MetadataInfo::class),
@@ -52,7 +52,7 @@ fun GenGroup.createInfo(element: MetadataDefinition): CodeBlock {
     )
 }
 
-@Marker0
+@Marker3
 fun GenGroup.createInfo(element: MetadataParameterDefinition): CodeBlock {
     return createCall(
         function = CodeBlock.of("%T", MetadataParameterInfo::class),
@@ -70,7 +70,7 @@ fun GenGroup.createInfo(element: MetadataParameterDefinition): CodeBlock {
     )
 }
 
-@Marker0
+@Marker3
 fun GenGroup.createInfo(element: ProtocolDefinition): CodeBlock {
     return createCall(
         function = CodeBlock.of("%T", ProtocolInfo::class),
@@ -87,7 +87,7 @@ fun GenGroup.createInfo(element: ProtocolDefinition): CodeBlock {
     )
 }
 
-@Marker0
+@Marker3
 fun GenGroup.createInfo(element: RoutineDefinition): CodeBlock {
     return createCall(
         function = CodeBlock.of("%T", RoutineInfo::class),
