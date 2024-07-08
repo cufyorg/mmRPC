@@ -11,7 +11,7 @@ tasks.wrapper {
 }
 
 subprojects {
-    group = "org.cufy.specdsl"
+    group = "org.cufy.mmrpc"
 
     repositories {
         mavenCentral()
