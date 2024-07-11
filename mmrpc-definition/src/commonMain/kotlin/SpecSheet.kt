@@ -93,7 +93,7 @@ class SpecSheet {
     operator fun minus(specSheet: SpecSheet) =
         create0(this.elements - specSheet.elements)
 
-    fun collectChildren() = elements
+    fun collectChildren() = elements.asSequence()
 
     operator fun contains(element: ElementDefinition): Boolean {
         return element in this.elements
