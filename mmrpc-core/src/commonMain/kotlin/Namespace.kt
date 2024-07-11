@@ -141,9 +141,17 @@ class Namespace : Comparable<Namespace> {
     }
 
     operator fun contains(namespace: Namespace): Boolean {
+        if (namespace.segments.isEmpty())
+            return false
+
         if (this.segments.size > namespace.segments.size)
             return false
 
-        return this.segments == namespace.segments.subList(0, this.segments.size)
+        repeat(this.segments.size) {
+            if (this.segments[it] != namespace.segments[it])
+                return false
+        }
+
+        return true
     }
 }
