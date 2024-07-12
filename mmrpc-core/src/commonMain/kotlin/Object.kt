@@ -13,30 +13,34 @@
  *	See the License for the specific language governing permissions and
  *	limitations under the License.
  */
+@file:Suppress("PropertyName")
+
 package org.cufy.mmrpc
 
+//
+
 interface ElementObject {
-    val info: ElementInfo
+    val __info__: ElementInfo
 }
 
 interface TypeObject : ElementObject {
-    override val info: TypeInfo
+    override val __info__: TypeInfo
 }
 
 interface EndpointObject : ElementObject {
-    override val info: EndpointInfo
+    override val __info__: EndpointInfo
 }
 
 // Elements
 
 interface ConstObject<T> : ElementObject {
-    override val info: ConstInfo
+    override val __info__: ConstInfo
 
     val value: T
 }
 
 interface FaultObject : ElementObject {
-    override val info: FaultInfo
+    override val __info__: FaultInfo
 }
 
 interface FieldObject : ElementObject {
@@ -44,21 +48,21 @@ interface FieldObject : ElementObject {
 }
 
 interface ProtocolObject : ElementObject {
-    override val info: ProtocolInfo
+    override val __info__: ProtocolInfo
 }
 
 interface RoutineObject<I, O> : ElementObject {
-    override val info: RoutineInfo
+    override val __info__: RoutineInfo
 }
 
 // Endpoints
 
 interface HttpEndpointObject : EndpointObject {
-    override val info: HttpEndpointInfo
+    override val __info__: HttpEndpointInfo
 }
 
 interface IframeEndpointObject : EndpointObject {
-    override val info: IframeEndpointInfo
+    override val __info__: IframeEndpointInfo
 }
 
 interface KafkaEndpointObject : EndpointObject {
@@ -72,7 +76,7 @@ interface KafkaPublicationEndpointObject : EndpointObject {
 // Types
 
 interface EnumObject<T> : TypeObject {
-    override val info: EnumInfo
+    override val __info__: EnumInfo
 
     val value: T
 }
