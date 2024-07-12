@@ -31,6 +31,10 @@ abstract class EndpointObject : ElementObject() {
 
 abstract class FaultObject : ElementObject() {
     abstract override val info: FaultInfo
+interface ConstObject<T> : ElementObject {
+    override val info: ConstInfo
+
+    val value: T
 }
 
 abstract class FieldObject : ElementObject() {
@@ -65,10 +69,10 @@ abstract class KafkaPublicationEndpointObject : EndpointObject() {
 
 // Types
 
-abstract class ConstObject<T> : TypeObject() {
-    abstract override val info: ConstInfo
+interface EnumObject<T> : TypeObject {
+    override val info: EnumInfo
 
-    abstract val value: T
+    val value: T
 }
 
 abstract class StructObject : TypeObject() {

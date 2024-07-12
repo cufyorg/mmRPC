@@ -22,6 +22,7 @@ fun ElementDefinition.toCompact(): CompactElementDefinition {
     return when (this) {
         is ArrayDefinition -> toCompact()
         is ConstDefinition -> toCompact()
+        is EnumDefinition -> toCompact()
         is FaultDefinition -> toCompact()
         is FieldDefinition -> toCompact()
         is HttpEndpointDefinition -> toCompact()
@@ -47,6 +48,7 @@ fun CompactElementDefinition.inflate(
     return when (this) {
         is CompactArrayDefinition -> inflate(onLookup)
         is CompactConstDefinition -> inflate(onLookup)
+        is CompactEnumDefinition -> inflate(onLookup)
         is CompactFaultDefinition -> inflate(onLookup)
         is CompactFieldDefinition -> inflate(onLookup)
         is CompactHttpEndpointDefinition -> inflate(onLookup)

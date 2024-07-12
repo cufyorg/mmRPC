@@ -198,6 +198,48 @@ interface TypeDefinitionSetDomainContainer {
 }
 
 @Marker3
+interface StructDefinitionSetDomainContainer {
+    @JvmName("unaryPlusUnnamedStructDefinition")
+    operator fun Unnamed<StructDefinition>.unaryPlus()
+
+    @JvmName("unaryPlusIterableUnnamedStructDefinition")
+    operator fun Iterable<Unnamed<StructDefinition>>.unaryPlus() {
+        for (it in this) +it
+    }
+
+    @JvmName("unaryPlusStructDefinition")
+    operator fun StructDefinition.unaryPlus() {
+        +Unnamed(this)
+    }
+
+    @JvmName("unaryPlusIterableStructDefinition")
+    operator fun Iterable<StructDefinition>.unaryPlus() {
+        for (it in this) +Unnamed(it)
+    }
+}
+
+@Marker3
+interface ConstDefinitionSetDomainContainer {
+    @JvmName("unaryPlusUnnamedConstDefinition")
+    operator fun Unnamed<ConstDefinition>.unaryPlus()
+
+    @JvmName("unaryPlusIterableUnnamedConstDefinition")
+    operator fun Iterable<Unnamed<ConstDefinition>>.unaryPlus() {
+        for (it in this) +it
+    }
+
+    @JvmName("unaryPlusConstDefinition")
+    operator fun ConstDefinition.unaryPlus() {
+        +Unnamed(this)
+    }
+
+    @JvmName("unaryPlusIterableConstDefinition")
+    operator fun Iterable<ConstDefinition>.unaryPlus() {
+        for (it in this) +Unnamed(it)
+    }
+}
+
+@Marker3
 interface RoutineDefinitionSetDomainContainer {
     @JvmName("unaryPlusUnnamedRoutineDefinition")
     operator fun Unnamed<RoutineDefinition>.unaryPlus()

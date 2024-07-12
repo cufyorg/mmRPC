@@ -54,6 +54,18 @@ data class MetadataParameterInfoUsage(
 // elements
 
 @Serializable
+@SerialName("const")
+data class ConstInfo(
+    override val name: String,
+    override val namespace: Namespace,
+    override val metadata: List<MetadataInfoUsage>,
+    @SerialName("const_type")
+    val type: TypeInfo,
+    @SerialName("const_value")
+    val value: Literal,
+) : ElementInfo()
+
+@Serializable
 @SerialName("fault")
 data class FaultInfo(
     override val name: String,
@@ -190,15 +202,15 @@ data class ArrayInfo(
 ) : TypeInfo()
 
 @Serializable
-@SerialName("const")
-data class ConstInfo(
+@SerialName("enum")
+data class EnumInfo(
     override val name: String,
     override val namespace: Namespace,
     override val metadata: List<MetadataInfoUsage>,
-    @SerialName("const_type")
+    @SerialName("enum_type")
     val type: TypeInfo,
-    @SerialName("const_value")
-    val value: Literal,
+    @SerialName("enum_entries")
+    val entries: List<ConstInfo>,
 ) : TypeInfo()
 
 @Serializable
