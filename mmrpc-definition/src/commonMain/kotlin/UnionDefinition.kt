@@ -31,7 +31,7 @@ data class UnionDefinition(
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
     @SerialName("union_types")
-    val unionTypes: List<TypeDefinition>,
+    val unionTypes: List<StructDefinition>,
 ) : TypeDefinition() {
     companion object {
         const val ANONYMOUS_NAME = "(anonymous|)"
@@ -44,15 +44,15 @@ data class UnionDefinition(
 }
 
 open class UnionDefinitionBuilder :
-    TypeDefinitionSetDomainContainer,
+    StructDefinitionSetDomainContainer,
     ElementDefinitionBuilder() {
     override var name = UnionDefinition.ANONYMOUS_NAME
 
-    protected open val unionTypesUnnamed = mutableListOf<Unnamed<TypeDefinition>>()
+    protected open val unionTypesUnnamed = mutableListOf<Unnamed<StructDefinition>>()
 
     @Suppress("INAPPLICABLE_JVM_NAME")
-    @JvmName("unaryPlusUnnamedTypeDefinition")
-    override operator fun Unnamed<TypeDefinition>.unaryPlus() {
+    @JvmName("unaryPlusUnnamedStructDefinition")
+    override operator fun Unnamed<StructDefinition>.unaryPlus() {
         unionTypesUnnamed += this
     }
 
@@ -89,7 +89,7 @@ fun union(
 
 @Marker2
 fun union(
-    vararg types: TypeDefinition,
+    vararg types: StructDefinition,
     block: UnionDefinitionBuilder.() -> Unit = {},
 ): Unnamed<UnionDefinition> {
     return union { +types.asList(); block() }
@@ -97,7 +97,7 @@ fun union(
 
 @Marker2
 fun union(
-    vararg types: Unnamed<TypeDefinition>,
+    vararg types: Unnamed<StructDefinition>,
     block: UnionDefinitionBuilder.() -> Unit = {},
 ): Unnamed<UnionDefinition> {
     return union { +types.asList(); block() }

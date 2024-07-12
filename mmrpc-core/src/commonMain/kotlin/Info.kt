@@ -220,7 +220,7 @@ data class InterInfo(
     override val namespace: Namespace,
     override val metadata: List<MetadataInfoUsage>,
     @SerialName("inter_types")
-    val types: List<TypeInfo>,
+    val types: List<StructInfo>,
 ) : TypeInfo()
 
 @Serializable
@@ -268,5 +268,5 @@ data class UnionInfo(
     override val namespace: Namespace,
     override val metadata: List<MetadataInfoUsage>,
     @SerialName("union_types")
-    val types: List<TypeInfo>,
+    val types: List<StructInfo>,
 ) : TypeInfo()

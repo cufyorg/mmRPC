@@ -31,7 +31,7 @@ data class InterDefinition(
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
     @SerialName("inter_types")
-    val interTypes: List<TypeDefinition>,
+    val interTypes: List<StructDefinition>,
 ) : TypeDefinition() {
     companion object {
         const val ANONYMOUS_NAME = "(anonymous&)"
@@ -44,15 +44,15 @@ data class InterDefinition(
 }
 
 open class InterDefinitionBuilder :
-    TypeDefinitionSetDomainContainer,
+    StructDefinitionSetDomainContainer,
     ElementDefinitionBuilder() {
     override var name = InterDefinition.ANONYMOUS_NAME
 
-    protected open val interTypesUnnamed = mutableListOf<Unnamed<TypeDefinition>>()
+    protected open val interTypesUnnamed = mutableListOf<Unnamed<StructDefinition>>()
 
     @Suppress("INAPPLICABLE_JVM_NAME")
-    @JvmName("unaryPlusUnnamedTypeDefinition")
-    override operator fun Unnamed<TypeDefinition>.unaryPlus() {
+    @JvmName("unaryPlusUnnamedStructDefinition")
+    override operator fun Unnamed<StructDefinition>.unaryPlus() {
         interTypesUnnamed += this
     }
 
@@ -89,7 +89,7 @@ fun inter(
 
 @Marker2
 fun inter(
-    vararg types: TypeDefinition,
+    vararg types: StructDefinition,
     block: InterDefinitionBuilder.() -> Unit = {}
 ): Unnamed<InterDefinition> {
     return inter { +types.asList(); block() }
@@ -97,7 +97,7 @@ fun inter(
 
 @Marker2
 fun inter(
-    vararg types: Unnamed<TypeDefinition>,
+    vararg types: Unnamed<StructDefinition>,
     block: InterDefinitionBuilder.() -> Unit = {}
 ): Unnamed<InterDefinition> {
     return inter { +types.asList(); block() }

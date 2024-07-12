@@ -44,8 +44,8 @@ fun CompactUnionDefinition.inflate(
             },
             unionTypes = this.unionTypes.map {
                 val item = onLookup(it) ?: return@it null
-                require(item is TypeDefinition) {
-                    "union_types.ref must point to a TypeDefinition"
+                require(item is StructDefinition) {
+                    "union_types.ref must point to a StructDefinition"
                 }
                 item
             },

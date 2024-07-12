@@ -44,8 +44,8 @@ fun CompactInterDefinition.inflate(
             },
             interTypes = this.interTypes.map {
                 val item = onLookup(it) ?: return@it null
-                require(item is TypeDefinition) {
-                    "inter_types.ref must point to a TypeDefinition"
+                require(item is StructDefinition) {
+                    "inter_types.ref must point to a StructDefinition"
                 }
                 item
             },

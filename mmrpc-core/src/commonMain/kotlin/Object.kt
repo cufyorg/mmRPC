@@ -15,56 +15,58 @@
  */
 package org.cufy.mmrpc
 
-abstract class ElementObject {
-    abstract val info: ElementInfo
+interface ElementObject {
+    val info: ElementInfo
 }
 
-abstract class TypeObject : ElementObject() {
-    abstract override val info: TypeInfo
+interface TypeObject : ElementObject {
+    override val info: TypeInfo
 }
 
-abstract class EndpointObject : ElementObject() {
-    abstract override val info: EndpointInfo
+interface EndpointObject : ElementObject {
+    override val info: EndpointInfo
 }
 
 // Elements
 
-abstract class FaultObject : ElementObject() {
-    abstract override val info: FaultInfo
 interface ConstObject<T> : ElementObject {
     override val info: ConstInfo
 
     val value: T
 }
 
-abstract class FieldObject : ElementObject() {
-    abstract override val info: FieldInfo
+interface FaultObject : ElementObject {
+    override val info: FaultInfo
 }
 
-abstract class ProtocolObject : ElementObject() {
-    abstract override val info: ProtocolInfo
+interface FieldObject : ElementObject {
+    override val info: FieldInfo
 }
 
-abstract class RoutineObject<I, O> : ElementObject() {
-    abstract override val info: RoutineInfo
+interface ProtocolObject : ElementObject {
+    override val info: ProtocolInfo
+}
+
+interface RoutineObject<I, O> : ElementObject {
+    override val info: RoutineInfo
 }
 
 // Endpoints
 
-abstract class HttpEndpointObject : EndpointObject() {
-    abstract override val info: HttpEndpointInfo
+interface HttpEndpointObject : EndpointObject {
+    override val info: HttpEndpointInfo
 }
 
-abstract class IframeEndpointObject : EndpointObject() {
-    abstract override val info: IframeEndpointInfo
+interface IframeEndpointObject : EndpointObject {
+    override val info: IframeEndpointInfo
 }
 
-abstract class KafkaEndpointObject : EndpointObject() {
-    abstract override val info: KafkaEndpointInfo
+interface KafkaEndpointObject : EndpointObject {
+    override val info: KafkaEndpointInfo
 }
 
-abstract class KafkaPublicationEndpointObject : EndpointObject() {
-    abstract override val info: KafkaPublicationEndpointInfo
+interface KafkaPublicationEndpointObject : EndpointObject {
+    override val info: KafkaPublicationEndpointInfo
 }
 
 // Types
@@ -75,6 +77,6 @@ interface EnumObject<T> : TypeObject {
     val value: T
 }
 
-abstract class StructObject : TypeObject() {
-    abstract override val info: StructInfo
+interface StructObject : TypeObject {
+    override val info: StructInfo
 }
