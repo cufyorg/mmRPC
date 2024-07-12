@@ -15,8 +15,8 @@ data class CompactFieldDefinition(
     override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
     @SerialName("field_type.ref")
     val fieldType: CanonicalName,
-    @SerialName("field_default.ref")
-    val fieldDefault: CanonicalName? = null,
+    @SerialName("field_default")
+    val fieldDefault: Literal? = null,
 ) : CompactElementDefinition
 
 fun FieldDefinition.toCompact(): CompactFieldDefinition {
@@ -28,7 +28,7 @@ fun FieldDefinition.toCompact(): CompactFieldDefinition {
         metadata = this.metadata
             .map { it.toCompact() },
         fieldType = this.fieldType.canonicalName,
-        fieldDefault = this.fieldDefault?.canonicalName,
+        fieldDefault = this.fieldDefault,
     )
 }
 
@@ -51,13 +51,7 @@ fun CompactFieldDefinition.inflate(
                 }
                 item
             },
-            fieldDefault = this.fieldDefault?.let {
-                val item = onLookup(it) ?: return@it null
-                require(item is ConstDefinition) {
-                    "field_default.ref must point to a ConstDefinition"
-                }
-                item
-            }
+            fieldDefault = this.fieldDefault
         )
     }
 }

@@ -32,7 +32,7 @@ data class FieldDefinition(
     @SerialName("field_type")
     val fieldType: TypeDefinition,
     @SerialName("field_default")
-    val fieldDefault: ConstDefinition? = null,
+    val fieldDefault: Literal? = null,
 ) : ElementDefinition() {
     companion object {
         const val ANONYMOUS_NAME = "(anonymous<field>)"
@@ -41,7 +41,6 @@ data class FieldDefinition(
     override fun collectChildren() = sequence {
         yieldAll(metadata.asSequence().flatMap { it.collect() })
         yieldAll(fieldType.collect())
-        fieldDefault?.let { yieldAll(it.collect()) }
     }
 }
 
@@ -50,7 +49,7 @@ open class FieldDefinitionBuilder :
     override var name = FieldDefinition.ANONYMOUS_NAME
 
     open val type = DomainProperty<TypeDefinition>()
-    open val default = OptionalDomainProperty<ConstDefinition>()
+    open val default = OptionalLiteralDomainProperty()
 
     override fun build(): FieldDefinition {
         val asNamespace = this.namespace.value + this.name
@@ -61,7 +60,7 @@ open class FieldDefinitionBuilder :
             description = this.description,
             metadata = this.metadata.toList(),
             fieldType = this.type.value.get(asNamespace, name = "type"),
-            fieldDefault = this.default.value?.get(asNamespace, name = "default"),
+            fieldDefault = this.default.value,
         )
     }
 }

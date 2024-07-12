@@ -82,7 +82,7 @@ data class FieldInfo(
     @SerialName("field_type")
     val type: TypeInfo,
     @SerialName("field_default")
-    val default: ConstInfo?,
+    val default: Literal?,
 ) : ElementInfo()
 
 @Serializable

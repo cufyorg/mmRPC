@@ -132,6 +132,18 @@ open class NamespaceDomainProperty {
     }
 }
 
+open class OptionalLiteralDomainProperty {
+    var value: Literal? = null
+
+    operator fun timesAssign(value: Literal) {
+        this.value = value
+    }
+
+    operator fun timesAssign(value: ConstDefinition) {
+        this.value = value.constValue
+    }
+}
+
 ////////////////////////////////////////
 
 @Marker3
