@@ -23,33 +23,33 @@ import kotlin.jvm.JvmName
 @Serializable
 data class MetadataDefinitionUsage(
     val definition: MetadataDefinition,
-    val parameters: List<MetadataParameterDefinitionUsage>,
+    val fields: List<FieldDefinitionUsage>,
 ) {
     fun collect() = sequence {
         yieldAll(definition.collect())
-        yieldAll(parameters.asSequence().flatMap { it.collect() })
+        yieldAll(fields.asSequence().flatMap { it.collect() })
     }
 }
 
 open class MetadataDefinitionUsageBuilder {
     lateinit var definition: MetadataDefinition
 
-    protected open val parameters = mutableListOf<MetadataParameterDefinitionUsage>()
+    protected open val fields = mutableListOf<FieldDefinitionUsage>()
 
-    @JvmName("unaryPlusMetadataParameter")
-    operator fun MetadataParameterDefinitionUsage.unaryPlus() {
-        parameters += this
+    @JvmName("unaryPlusFieldDefinitionUsage")
+    operator fun FieldDefinitionUsage.unaryPlus() {
+        fields += this
     }
 
-    @JvmName("unaryPlusIterableMetadataParameter")
-    operator fun Iterable<MetadataParameterDefinitionUsage>.unaryPlus() {
-        parameters += this
+    @JvmName("unaryPlusIterableFieldDefinitionUsage")
+    operator fun Iterable<FieldDefinitionUsage>.unaryPlus() {
+        fields += this
     }
 
     fun build(): MetadataDefinitionUsage {
         return MetadataDefinitionUsage(
             definition = this.definition,
-            parameters = this.parameters.toList(),
+            fields = this.fields.toList(),
         )
     }
 }

@@ -321,55 +321,6 @@ interface FieldDefinitionSetDomainContainer {
     }
 }
 
-@Marker3
-interface MetadataParameterDefinitionSetDomainContainer {
-    @JvmName("unaryPlusUnnamedMetadataParameterDefinition")
-    operator fun Unnamed<MetadataParameterDefinition>.unaryPlus()
-
-    @JvmName("unaryPlusIterableUnnamedMetadataParameterDefinition")
-    operator fun Iterable<Unnamed<MetadataParameterDefinition>>.unaryPlus() {
-        for (it in this) +it
-    }
-
-    @JvmName("unaryPlusMetadataParameterDefinition")
-    operator fun MetadataParameterDefinition.unaryPlus() {
-        +Unnamed(this)
-    }
-
-    @JvmName("unaryPlusIterableMetadataParameterDefinition")
-    operator fun Iterable<MetadataParameterDefinition>.unaryPlus() {
-        for (it in this) +Unnamed(it)
-    }
-
-    operator fun String.invoke(
-        type: TypeDefinition,
-        block: MetadataParameterDefinitionBuilder.() -> Unit = {},
-    ) {
-        +Unnamed { namespace, _, _ ->
-            MetadataParameterDefinitionBuilder()
-                .also { it.name = this }
-                .also { it.namespace *= namespace }
-                .also { it.type *= type }
-                .apply(block)
-                .build()
-        }
-    }
-
-    operator fun String.invoke(
-        type: Unnamed<TypeDefinition>,
-        block: MetadataParameterDefinitionBuilder.() -> Unit = {},
-    ) {
-        +Unnamed { namespace, _, _ ->
-            MetadataParameterDefinitionBuilder()
-                .also { it.name = this }
-                .also { it.namespace *= namespace }
-                .also { it.type *= type }
-                .apply(block)
-                .build()
-        }
-    }
-}
-
 ////////////////////////////////////////
 
 @Marker3

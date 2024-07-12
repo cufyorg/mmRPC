@@ -33,11 +33,11 @@ object builtin : NamespaceObject() {
     val Float32 by scalar { +"builtin 32bit float" }
     val Float64 by scalar { +"builtin 64bit float" }
 
-    val Deprecated__message by metadata_param(String) { +"The deprecation message" }
+    val Deprecated__message by prop(String) { +"The deprecation message" }
     val Deprecated by metadata(Deprecated__message)
 
-    val Experimental__message by metadata_param(String)
-    val Experimental by metadata(Deprecated__message)
+    val Experimental__message by prop(String)
+    val Experimental by metadata(Experimental__message)
 
     /**
      * Namespace to be used for defining builtin faults.

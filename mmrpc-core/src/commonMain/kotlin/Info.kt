@@ -42,12 +42,12 @@ sealed class EndpointInfo : ElementInfo()
 @Serializable
 data class MetadataInfoUsage(
     val info: MetadataInfo,
-    val parameters: List<MetadataParameterInfoUsage>,
+    val fields: List<FieldInfoUsage>,
 )
 
 @Serializable
-data class MetadataParameterInfoUsage(
-    val info: MetadataParameterInfo,
+data class FieldInfoUsage(
+    val info: FieldInfo,
     val value: Literal,
 )
 
@@ -91,20 +91,8 @@ data class MetadataInfo(
     override val name: String,
     override val namespace: Namespace,
     override val metadata: List<MetadataInfoUsage>,
-    @SerialName("metadata_parameters")
-    val parameters: List<MetadataParameterInfo> = emptyList(),
-) : ElementInfo()
-
-@Serializable
-@SerialName("metadata-parameter")
-data class MetadataParameterInfo(
-    override val name: String,
-    override val namespace: Namespace,
-    override val metadata: List<MetadataInfoUsage>,
-    @SerialName("parameter_type")
-    val type: TypeInfo,
-    @SerialName("parameter_default")
-    val default: ConstInfo?,
+    @SerialName("metadata_fields")
+    val fields: List<FieldInfo> = emptyList(),
 ) : ElementInfo()
 
 @Serializable

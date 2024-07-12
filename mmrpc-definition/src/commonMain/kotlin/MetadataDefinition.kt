@@ -28,8 +28,8 @@ data class MetadataDefinition(
     override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
-    @SerialName("metadata_parameters")
-    val metadataParameters: List<MetadataParameterDefinition> = emptyList(),
+    @SerialName("metadata_fields")
+    val metadataFields: List<FieldDefinition> = emptyList(),
 ) : ElementDefinition() {
     companion object {
         const val ANONYMOUS_NAME = "(anonymous@)"
@@ -37,21 +37,21 @@ data class MetadataDefinition(
 
     override fun collectChildren() = sequence {
         yieldAll(metadata.asSequence().flatMap { it.collect() })
-        yieldAll(metadataParameters.asSequence().flatMap { it.collect() })
+        yieldAll(metadataFields.asSequence().flatMap { it.collect() })
     }
 }
 
 open class MetadataDefinitionBuilder :
-    MetadataParameterDefinitionSetDomainContainer,
+    FieldDefinitionSetDomainContainer,
     ElementDefinitionBuilder() {
     override var name = MetadataDefinition.ANONYMOUS_NAME
 
-    protected open var metadataParametersUnnamed = mutableListOf<Unnamed<MetadataParameterDefinition>>()
+    protected open var metadataFieldsUnnamed = mutableListOf<Unnamed<FieldDefinition>>()
 
     @Suppress("INAPPLICABLE_JVM_NAME")
-    @JvmName("unaryPlusUnnamedMetadataParameterDefinition")
-    override operator fun Unnamed<MetadataParameterDefinition>.unaryPlus() {
-        metadataParametersUnnamed += this
+    @JvmName("unaryPlusUnnamedFieldDefinition")
+    override operator fun Unnamed<FieldDefinition>.unaryPlus() {
+        metadataFieldsUnnamed += this
     }
 
     override fun build(): MetadataDefinition {
@@ -62,8 +62,8 @@ open class MetadataDefinitionBuilder :
             isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.toList(),
-            metadataParameters = this.metadataParametersUnnamed.mapIndexed { i, it ->
-                it.get(asNamespace, name = "parameter$i")
+            metadataFields = this.metadataFieldsUnnamed.mapIndexed { i, it ->
+                it.get(asNamespace, name = "field$i")
             },
         )
     }
@@ -90,18 +90,18 @@ val metadata = metadata()
 
 @Marker2
 fun metadata(
-    vararg parameters: MetadataParameterDefinition,
+    vararg fields: FieldDefinition,
     block: MetadataDefinitionBuilder.() -> Unit = {}
 ): Unnamed<MetadataDefinition> {
-    return metadata { +parameters.asList(); block() }
+    return metadata { +fields.asList(); block() }
 }
 
 @Marker2
 fun metadata(
-    vararg parameters: Unnamed<MetadataParameterDefinition>,
+    vararg fields: Unnamed<FieldDefinition>,
     block: MetadataDefinitionBuilder.() -> Unit = {}
 ): Unnamed<MetadataDefinition> {
-    return metadata { +parameters.asList(); block() }
+    return metadata { +fields.asList(); block() }
 }
 
 ////////////////////////////////////////

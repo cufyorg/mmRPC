@@ -20,8 +20,8 @@ import kotlinx.serialization.Serializable
 ////////////////////////////////////////
 
 @Serializable
-data class MetadataParameterDefinitionUsage(
-    val definition: MetadataParameterDefinition,
+data class FieldDefinitionUsage(
+    val definition: FieldDefinition,
     val value: Literal,
 ) {
     fun collect() = sequence {
@@ -29,12 +29,12 @@ data class MetadataParameterDefinitionUsage(
     }
 }
 
-open class MetadataParameterDefinitionUsageBuilder {
-    lateinit var definition: MetadataParameterDefinition
+open class FieldDefinitionUsageBuilder {
+    lateinit var definition: FieldDefinition
     lateinit var value: Literal
 
-    fun build(): MetadataParameterDefinitionUsage {
-        return MetadataParameterDefinitionUsage(
+    fun build(): FieldDefinitionUsage {
+        return FieldDefinitionUsage(
             definition = this.definition,
             value = this.value,
         )
@@ -43,11 +43,11 @@ open class MetadataParameterDefinitionUsageBuilder {
 
 ////////////////////////////////////////
 
-operator fun MetadataParameterDefinition.invoke(
+operator fun FieldDefinition.invoke(
     value: Literal,
-    block: MetadataParameterDefinitionUsageBuilder.() -> Unit = {}
-): MetadataParameterDefinitionUsage {
-    return MetadataParameterDefinitionUsageBuilder()
+    block: FieldDefinitionUsageBuilder.() -> Unit = {}
+): FieldDefinitionUsage {
+    return FieldDefinitionUsageBuilder()
         .also { it.definition = this }
         .also { it.value = value }
         .apply(block)

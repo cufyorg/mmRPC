@@ -33,6 +33,10 @@ interface EndpointObject : ElementObject {
 
 // Elements
 
+/**
+ * @param T [ConstInfo.type]
+ * @property value [ConstInfo.value]
+ */
 interface ConstObject<T> : ElementObject {
     override val __info__: ConstInfo
 
@@ -43,14 +47,22 @@ interface FaultObject : ElementObject {
     override val __info__: FaultInfo
 }
 
-interface FieldObject : ElementObject {
-    override val info: FieldInfo
+/**
+ * @param T [FieldInfo.type]
+ * @property default [FieldInfo.default]
+ */
+interface FieldObject<T> : ElementObject {
+    override val __info__: FieldInfo
 }
 
 interface ProtocolObject : ElementObject {
     override val __info__: ProtocolInfo
 }
 
+/**
+ * @param I [RoutineInfo.input]
+ * @param O [RoutineInfo.output]
+ */
 interface RoutineObject<I, O> : ElementObject {
     override val __info__: RoutineInfo
 }
@@ -65,22 +77,50 @@ interface IframeEndpointObject : EndpointObject {
     override val __info__: IframeEndpointInfo
 }
 
-interface KafkaEndpointObject : EndpointObject {
-    override val info: KafkaEndpointInfo
+/**
+ * @param K [KafkaEndpointInfo.key]
+ */
+interface KafkaEndpointObject<K> : EndpointObject {
+    override val __info__: KafkaEndpointInfo
 }
 
-interface KafkaPublicationEndpointObject : EndpointObject {
-    override val info: KafkaPublicationEndpointInfo
+/**
+ * @param K [KafkaPublicationEndpointInfo.key]
+ */
+interface KafkaPublicationEndpointObject<K> : EndpointObject {
+    override val __info__: KafkaPublicationEndpointInfo
 }
 
 // Types
 
+/**
+ * @param T [EnumInfo.type]
+ * @property value [EnumInfo.entries]
+ */
 interface EnumObject<T> : TypeObject {
     override val __info__: EnumInfo
 
     val value: T
 }
 
+/**
+ * @param N native type
+ * @property value the wrapped native value
+ */
+interface ScalarObject<N> : TypeObject {
+    override val __info__: ScalarInfo
+
+    val value: N
+}
+
 interface StructObject : TypeObject {
-    override val info: StructInfo
+    override val __info__: StructInfo
+}
+
+interface InterObject : TypeObject {
+    override val __info__: InterInfo
+}
+
+interface TupleObject : TypeObject {
+    override val __info__: TupleInfo
 }

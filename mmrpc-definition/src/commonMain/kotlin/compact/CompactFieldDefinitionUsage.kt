@@ -5,28 +5,28 @@ import kotlinx.serialization.Serializable
 import org.cufy.mmrpc.*
 
 @Serializable
-data class CompactMetadataParameterDefinitionUsage(
+data class CompactFieldDefinitionUsage(
     @SerialName("definition.ref")
     val definition: CanonicalName,
     val value: Literal,
 )
 
-fun MetadataParameterDefinitionUsage.toCompact(): CompactMetadataParameterDefinitionUsage {
-    return CompactMetadataParameterDefinitionUsage(
+fun FieldDefinitionUsage.toCompact(): CompactFieldDefinitionUsage {
+    return CompactFieldDefinitionUsage(
         definition = this.definition.canonicalName,
         value = this.value,
     )
 }
 
-fun CompactMetadataParameterDefinitionUsage.inflate(
+fun CompactFieldDefinitionUsage.inflate(
     onLookup: (CanonicalName) -> ElementDefinition?
-): () -> MetadataParameterDefinitionUsage? {
+): () -> FieldDefinitionUsage? {
     return it@{
-        MetadataParameterDefinitionUsage(
+        FieldDefinitionUsage(
             definition = this.definition.let {
                 val item = onLookup(it) ?: return@it null
-                require(item is MetadataParameterDefinition) {
-                    "definition.ref must point to a MetadataParameterDefinition"
+                require(item is FieldDefinition) {
+                    "definition.ref must point to a FieldDefinition"
                 }
                 item
             },

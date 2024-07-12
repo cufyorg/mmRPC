@@ -4,20 +4,20 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.cufy.mmrpc.CanonicalName
 import org.cufy.mmrpc.ElementDefinition
-import org.cufy.mmrpc.MetadataDefinitionUsage
 import org.cufy.mmrpc.MetadataDefinition
+import org.cufy.mmrpc.MetadataDefinitionUsage
 
 @Serializable
 data class CompactMetadataDefinitionUsage(
     @SerialName("definition.ref")
     val definition: CanonicalName,
-    val parameters: List<CompactMetadataParameterDefinitionUsage>,
+    val fields: List<CompactFieldDefinitionUsage>,
 )
 
 fun MetadataDefinitionUsage.toCompact(): CompactMetadataDefinitionUsage {
     return CompactMetadataDefinitionUsage(
         definition = this.definition.canonicalName,
-        parameters = this.parameters
+        fields = this.fields
             .map { it.toCompact() }
     )
 }
@@ -34,7 +34,7 @@ fun CompactMetadataDefinitionUsage.inflate(
                 }
                 item
             },
-            parameters = this.parameters.map {
+            fields = this.fields.map {
                 it.inflate(onLookup)() ?: return@it null
             }
         )

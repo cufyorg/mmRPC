@@ -13,8 +13,8 @@ data class CompactMetadataDefinition(
     override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
-    @SerialName("metadata_parameters.ref")
-    val metadataParameters: List<CanonicalName> = emptyList(),
+    @SerialName("metadata_fields.ref")
+    val metadataFields: List<CanonicalName> = emptyList(),
 ) : CompactElementDefinition
 
 fun MetadataDefinition.toCompact(): CompactMetadataDefinition {
@@ -25,7 +25,7 @@ fun MetadataDefinition.toCompact(): CompactMetadataDefinition {
         description = this.description,
         metadata = this.metadata
             .map { it.toCompact() },
-        metadataParameters = this.metadataParameters
+        metadataFields = this.metadataFields
             .map { it.canonicalName }
     )
 }
@@ -42,10 +42,10 @@ fun CompactMetadataDefinition.inflate(
             metadata = this.metadata.map {
                 it.inflate(onLookup)() ?: return@it null
             },
-            metadataParameters = this.metadataParameters.map {
+            metadataFields = this.metadataFields.map {
                 val item = onLookup(it) ?: return@it null
-                require(item is MetadataParameterDefinition) {
-                    "metadata_parameters.ref must point to a MetadataParameterDefinition"
+                require(item is FieldDefinition) {
+                    "metadata_fields.ref must point to a FieldDefinition"
                 }
                 item
             },
