@@ -105,9 +105,27 @@ val String?.literal get() = this?.literal ?: null.literal
 data class TupleLiteral(val value: List<Literal>) : Literal {
     constructor(vararg value: Literal) : this(value.asList())
 
-    override fun contentToString() = value.joinToString(", ", "[", "]") { it.contentToString() }
+    override fun contentToString() =
+        value.joinToString(", ", "[", "]") {
+            it.contentToString()
+        }
 }
 
 @Marker2
 fun literal(vararg value: Literal) =
     TupleLiteral(value.asList())
+
+@Serializable
+@SerialName("struct")
+data class StructLiteral(val value: Map<String, Literal>) : Literal {
+    constructor(vararg value: Pair<String, Literal>) : this(value.toMap())
+
+    override fun contentToString() =
+        value.entries.joinToString(", ", "{", "}") {
+            "${it.key} = ${it.value.contentToString()}"
+        }
+}
+
+@Marker2
+fun literal(vararg value: Pair<String, Literal>) =
+    StructLiteral(value.toMap())

@@ -175,8 +175,19 @@ fun const(
     block: ConstDefinitionBuilder.() -> Unit = {}
 ): Unnamed<ConstDefinition> {
     return const {
-        this.type *= tuple {
-        }
+        this.type *= tuple
+        this.value = value
+        block()
+    }
+}
+
+@Marker2
+fun const(
+    value: StructLiteral,
+    block: ConstDefinitionBuilder.() -> Unit = {}
+): Unnamed<ConstDefinition> {
+    return const {
+        this.type *= struct
         this.value = value
         block()
     }
