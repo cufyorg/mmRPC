@@ -1,22 +1,13 @@
-package org.cufy.mmrpc.gen.kotlin.util.poet
+package org.cufy.mmrpc.gen.kotlin.util.gen.structures
 
 import com.squareup.kotlinpoet.CodeBlock
 import org.cufy.mmrpc.*
 import org.cufy.mmrpc.gen.kotlin.GenGroup
-
-@Marker3
-fun GenGroup.createInfo(element: ArrayDefinition): CodeBlock {
-    return createCall(
-        function = CodeBlock.of("%T", ArrayInfo::class),
-        "name" to CodeBlock.of("%S", element.name),
-        "namespace" to createBoxedNamespace(element.namespace),
-        "metadata" to createCallSingleVararg(
-            function = CodeBlock.of("listOf"),
-            element.metadata.map { createInfoUsage(it) }
-        ),
-        "type" to refOfInfoOrCreateInfo(element.arrayType),
-    )
-}
+import org.cufy.mmrpc.gen.kotlin.util.gen.references.refOfINFOOrCreateInfo
+import org.cufy.mmrpc.gen.kotlin.util.poet.createBoxedLiteral
+import org.cufy.mmrpc.gen.kotlin.util.poet.createBoxedNamespace
+import org.cufy.mmrpc.gen.kotlin.util.poet.createCall
+import org.cufy.mmrpc.gen.kotlin.util.poet.createCallSingleVararg
 
 @Marker3
 fun GenGroup.createInfo(element: ConstDefinition): CodeBlock {
@@ -28,46 +19,15 @@ fun GenGroup.createInfo(element: ConstDefinition): CodeBlock {
             function = CodeBlock.of("listOf"),
             element.metadata.map { createInfoUsage(it) }
         ),
-        "type" to refOfInfoOrCreateInfo(element.constType),
+        "type" to refOfINFOOrCreateInfo(element.constType),
         "value" to createBoxedLiteral(element.constValue),
     )
 }
 
 @Marker3
-fun GenGroup.createInfo(element: InterDefinition): CodeBlock {
+fun GenGroup.createInfo(element: FaultDefinition): CodeBlock {
     return createCall(
-        function = CodeBlock.of("%T", InterInfo::class),
-        "name" to CodeBlock.of("%S", element.name),
-        "namespace" to createBoxedNamespace(element.namespace),
-        "metadata" to createCallSingleVararg(
-            function = CodeBlock.of("listOf"),
-            element.metadata.map { createInfoUsage(it) }
-        ),
-        "types" to createCallSingleVararg(
-            function = CodeBlock.of("listOf"),
-            element.interTypes.map { refOfInfoOrCreateInfo(it) }
-        ),
-    )
-}
-
-@Marker3
-fun GenGroup.createInfo(element: OptionalDefinition): CodeBlock {
-    return createCall(
-        function = CodeBlock.of("%T", OptionalInfo::class),
-        "name" to CodeBlock.of("%S", element.name),
-        "namespace" to createBoxedNamespace(element.namespace),
-        "metadata" to createCallSingleVararg(
-            function = CodeBlock.of("listOf"),
-            element.metadata.map { createInfoUsage(it) }
-        ),
-        "type" to refOfInfoOrCreateInfo(element.optionalType),
-    )
-}
-
-@Marker3
-fun GenGroup.createInfo(element: ScalarDefinition): CodeBlock {
-    return createCall(
-        function = CodeBlock.of("%T", ScalarInfo::class),
+        function = CodeBlock.of("%T", FaultInfo::class),
         "name" to CodeBlock.of("%S", element.name),
         "namespace" to createBoxedNamespace(element.namespace),
         "metadata" to createCallSingleVararg(
@@ -78,9 +38,27 @@ fun GenGroup.createInfo(element: ScalarDefinition): CodeBlock {
 }
 
 @Marker3
-fun GenGroup.createInfo(element: StructDefinition): CodeBlock {
+fun GenGroup.createInfo(element: FieldDefinition): CodeBlock {
     return createCall(
-        function = CodeBlock.of("%T", StructInfo::class),
+        function = CodeBlock.of("%T", FieldInfo::class),
+        "name" to CodeBlock.of("%S", element.name),
+        "namespace" to createBoxedNamespace(element.namespace),
+        "metadata" to createCallSingleVararg(
+            function = CodeBlock.of("listOf"),
+            element.metadata.map { createInfoUsage(it) }
+        ),
+        "type" to refOfINFOOrCreateInfo(element.fieldType),
+        "default" to element.fieldDefault.let {
+            if (it == null) CodeBlock.of("null")
+            else createBoxedLiteral(it)
+        },
+    )
+}
+
+@Marker3
+fun GenGroup.createInfo(element: MetadataDefinition): CodeBlock {
+    return createCall(
+        function = CodeBlock.of("%T", MetadataInfo::class),
         "name" to CodeBlock.of("%S", element.name),
         "namespace" to createBoxedNamespace(element.namespace),
         "metadata" to createCallSingleVararg(
@@ -89,41 +67,47 @@ fun GenGroup.createInfo(element: StructDefinition): CodeBlock {
         ),
         "fields" to createCallSingleVararg(
             function = CodeBlock.of("listOf"),
-            element.structFields.map { refOfInfoOrCreateInfo(it) }
+            element.metadataFields.map { createInfo(it) }
         ),
     )
 }
 
 @Marker3
-fun GenGroup.createInfo(element: TupleDefinition): CodeBlock {
+fun GenGroup.createInfo(element: ProtocolDefinition): CodeBlock {
     return createCall(
-        function = CodeBlock.of("%T", TupleInfo::class),
+        function = CodeBlock.of("%T", ProtocolInfo::class),
         "name" to CodeBlock.of("%S", element.name),
         "namespace" to createBoxedNamespace(element.namespace),
         "metadata" to createCallSingleVararg(
             function = CodeBlock.of("listOf"),
             element.metadata.map { createInfoUsage(it) }
         ),
-        "types" to createCallSingleVararg(
+        "routines" to createCallSingleVararg(
             function = CodeBlock.of("listOf"),
-            element.tupleTypes.map { refOfInfoOrCreateInfo(it) }
-        ),
+            element.protocolRoutines.map { refOfINFOOrCreateInfo(it) }
+        )
     )
 }
 
 @Marker3
-fun GenGroup.createInfo(element: UnionDefinition): CodeBlock {
+fun GenGroup.createInfo(element: RoutineDefinition): CodeBlock {
     return createCall(
-        function = CodeBlock.of("%T", UnionInfo::class),
+        function = CodeBlock.of("%T", RoutineInfo::class),
         "name" to CodeBlock.of("%S", element.name),
         "namespace" to createBoxedNamespace(element.namespace),
         "metadata" to createCallSingleVararg(
             function = CodeBlock.of("listOf"),
             element.metadata.map { createInfoUsage(it) }
         ),
-        "types" to createCallSingleVararg(
+        "endpoints" to createCallSingleVararg(
             function = CodeBlock.of("listOf"),
-            element.unionTypes.map { refOfInfoOrCreateInfo(it) }
+            element.routineEndpoints.map { refOfINFOOrCreateInfo(it) }
         ),
+        "fault" to createCallSingleVararg(
+            function = CodeBlock.of("listOf"),
+            element.routineFaultUnion.map { refOfINFOOrCreateInfo(it) }
+        ),
+        "input" to refOfINFOOrCreateInfo(element.routineInput),
+        "output" to refOfINFOOrCreateInfo(element.routineOutput),
     )
 }

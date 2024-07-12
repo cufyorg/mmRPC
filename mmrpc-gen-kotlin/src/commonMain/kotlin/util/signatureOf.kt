@@ -5,6 +5,7 @@ import org.cufy.mmrpc.*
 fun signatureOf(element: ElementDefinition): String {
     val discriminator = when (element) {
         is ArrayDefinition -> "array"
+        is EnumDefinition -> "enum"
         is ConstDefinition -> "const"
         is FaultDefinition -> "fault"
         is FieldDefinition -> "field"
@@ -14,7 +15,6 @@ fun signatureOf(element: ElementDefinition): String {
         is KafkaEndpointDefinition -> "kafka_endpoint"
         is KafkaPublicationEndpointDefinition -> "kafka_publication_endpoint"
         is MetadataDefinition -> "metadata"
-        is MetadataParameterDefinition -> "metadata-parameter"
         is OptionalDefinition -> "optional"
         is ProtocolDefinition -> "protocol"
         is RoutineDefinition -> "routine"

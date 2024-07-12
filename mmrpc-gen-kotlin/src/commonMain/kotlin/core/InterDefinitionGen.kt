@@ -2,13 +2,13 @@ package org.cufy.mmrpc.gen.kotlin.core
 
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.asClassName
-import org.cufy.mmrpc.StructDefinition
-import org.cufy.mmrpc.StructObject
+import org.cufy.mmrpc.InterDefinition
+import org.cufy.mmrpc.InterObject
 import org.cufy.mmrpc.gen.kotlin.GenContext
 import org.cufy.mmrpc.gen.kotlin.GenGroup
 import org.cufy.mmrpc.gen.kotlin.util.asPropertyName
-import org.cufy.mmrpc.gen.kotlin.util.gen.StructStrategy
-import org.cufy.mmrpc.gen.kotlin.util.gen.calculateStructStrategy
+import org.cufy.mmrpc.gen.kotlin.util.gen.InterStrategy
+import org.cufy.mmrpc.gen.kotlin.util.gen.calculateInterStrategy
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createOverrideObjectInfoProperty
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createSerialNameAnnotationSet
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createSerializableAnnotationSet
@@ -24,18 +24,18 @@ import org.cufy.mmrpc.gen.kotlin.util.poet.constructorSpec
 import org.cufy.mmrpc.gen.kotlin.util.poet.parameterSpec
 import org.cufy.mmrpc.gen.kotlin.util.poet.propertySpec
 
-class StructDefinitionGen(override val ctx: GenContext) : GenGroup() {
+class InterDefinitionGen(override val ctx: GenContext) : GenGroup() {
     override fun apply() {
         for (element in ctx.elements) {
-            if (element !is StructDefinition) continue
+            if (element !is InterDefinition) continue
             if (!hasGeneratedClass(element)) continue
 
             failGenBoundary {
-                when (calculateStructStrategy(element)) {
-                    StructStrategy.DATA_OBJECT
+                when (calculateInterStrategy(element)) {
+                    InterStrategy.DATA_OBJECT
                     -> applyCreateDataObject(element)
 
-                    StructStrategy.DATA_CLASS
+                    InterStrategy.DATA_CLASS
                     -> applyCreateDataClass(element)
                 }
             }
@@ -44,8 +44,8 @@ class StructDefinitionGen(override val ctx: GenContext) : GenGroup() {
 
     //
 
-    private fun applyCreateDataObject(element: StructDefinition) {
-        val superinterface = StructObject::class.asClassName()
+    private fun applyCreateDataObject(element: InterDefinition) {
+        val superinterface = InterObject::class.asClassName()
 
         createObject(element) {
             addModifiers(KModifier.DATA)
@@ -60,14 +60,19 @@ class StructDefinitionGen(override val ctx: GenContext) : GenGroup() {
         }
     }
 
-    private fun applyCreateDataClass(element: StructDefinition) {
-        val superinterface = StructObject::class.asClassName()
+    private fun applyCreateDataClass(element: InterDefinition) {
+        val combinedFields = element.interTypes.asSequence()
+            .flatMap { it.structFields }
+            .distinctBy { it.name }
+            .toList()
+
+        val superinterface = InterObject::class.asClassName()
         val companionObject = companionObjectSpec {
             addProperty(createStaticInfoProperty(element))
         }
 
         val primaryConstructor = constructorSpec {
-            val parameters = element.structFields.map {
+            val parameters = combinedFields.map {
                 parameterSpec(it.asPropertyName, typeOf(it.fieldType)) {
                     val default = it.fieldDefault
 
@@ -80,7 +85,7 @@ class StructDefinitionGen(override val ctx: GenContext) : GenGroup() {
             addParameters(parameters)
         }
 
-        val properties = element.structFields.map {
+        val properties = combinedFields.map {
             propertySpec(it.asPropertyName, typeOf(it.fieldType)) {
                 initializer(it.asPropertyName)
 

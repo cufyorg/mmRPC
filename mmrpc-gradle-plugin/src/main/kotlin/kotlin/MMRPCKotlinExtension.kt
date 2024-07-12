@@ -1,9 +1,8 @@
 package org.cufy.mmrpc.gradle.kotlin
 
 import org.cufy.mmrpc.gen.kotlin.GenFeature
+import org.cufy.mmrpc.gen.kotlin.GenPackaging
 import org.gradle.api.file.Directory
-import kotlin.properties.ReadWriteProperty
-import kotlin.reflect.KProperty
 
 class MMRPCKotlinExtension {
     /**
@@ -19,6 +18,9 @@ class MMRPCKotlinExtension {
     var packageName: String =
         MMRPCKotlin.DEFAULT_PACKAGE_NAME
 
+    var packaging: GenPackaging =
+        MMRPCKotlin.DEFAULT_PACKAGING
+
     val classes: MutableMap<String, String> =
         MMRPCKotlin.DEFAULT_CLASSES.toMutableMap()
 
@@ -31,14 +33,6 @@ class MMRPCKotlinExtension {
     val features: MutableSet<GenFeature> =
         mutableSetOf()
 
-    var featureKotlinxSerialization by feature(
-        GenFeature.KOTLINX_SERIALIZATION
-    )
-
-    var featureDebug by feature(
-        GenFeature.DEBUG
-    )
-
     /**
      * Output directory for generated DSL
      *
@@ -48,11 +42,19 @@ class MMRPCKotlinExtension {
 
     //
 
-    private fun feature(feature: GenFeature) = object : ReadWriteProperty<Any?, Boolean> {
-        override fun getValue(thisRef: Any?, property: KProperty<*>): Boolean =
-            feature in features
+    fun kotlinxSerialization() {
+        features += GenFeature.KOTLINX_SERIALIZATION
+    }
 
-        override fun setValue(thisRef: Any?, property: KProperty<*>, value: Boolean) =
-            if (value) features += feature else features -= feature
+    fun debug() {
+        features += GenFeature.DEBUG
+    }
+
+    fun noBuiltin() {
+        features += GenFeature.NO_BUILTIN
+    }
+
+    fun packingSubPackages() {
+        packaging = GenPackaging.SUB_PACKAGES
     }
 }

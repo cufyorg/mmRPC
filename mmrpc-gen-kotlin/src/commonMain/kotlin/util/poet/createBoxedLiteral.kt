@@ -2,10 +2,8 @@ package org.cufy.mmrpc.gen.kotlin.util.poet
 
 import com.squareup.kotlinpoet.CodeBlock
 import org.cufy.mmrpc.*
-import org.cufy.mmrpc.gen.kotlin.GenGroup
 
-@Marker3
-fun GenGroup.createBoxedLiteral(element: Literal): CodeBlock {
+fun createBoxedLiteral(element: Literal): CodeBlock {
     return when (element) {
         is NullLiteral
         -> CodeBlock.of("%T", NullLiteral::class)
@@ -27,6 +25,14 @@ fun GenGroup.createBoxedLiteral(element: Literal): CodeBlock {
             createCallSingleVararg(
                 function = CodeBlock.of("%T", TupleLiteral::class),
                 element.value.map { createBoxedLiteral(it) }
+            )
+        }
+
+        is StructLiteral
+        -> {
+            createCallSingleVararg(
+                function = CodeBlock.of("%T", StructLiteral::class),
+                element.value.map { CodeBlock.of("%S to %L", it.key, createBoxedLiteral(it.value)) }
             )
         }
     }

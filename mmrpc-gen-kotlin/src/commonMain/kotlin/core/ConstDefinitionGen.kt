@@ -2,89 +2,63 @@ package org.cufy.mmrpc.gen.kotlin.core
 
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
-import com.squareup.kotlinpoet.PropertySpec
-import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asClassName
-import org.cufy.mmrpc.*
+import org.cufy.mmrpc.ConstDefinition
+import org.cufy.mmrpc.ConstObject
 import org.cufy.mmrpc.gen.kotlin.GenContext
 import org.cufy.mmrpc.gen.kotlin.GenGroup
-import org.cufy.mmrpc.gen.kotlin.util.asClassName
-import org.cufy.mmrpc.gen.kotlin.util.fStaticInfo
-import org.cufy.mmrpc.gen.kotlin.util.fStaticValue
-import org.cufy.mmrpc.gen.kotlin.util.poet.*
+import org.cufy.mmrpc.gen.kotlin.util.F_STATIC_VALUE
+import org.cufy.mmrpc.gen.kotlin.util.gen.common.createOverrideObjectInfoProperty
+import org.cufy.mmrpc.gen.kotlin.util.gen.common.createSerialNameAnnotationSet
+import org.cufy.mmrpc.gen.kotlin.util.gen.common.createSerializableAnnotationSet
+import org.cufy.mmrpc.gen.kotlin.util.gen.common.createStaticInfoProperty
+import org.cufy.mmrpc.gen.kotlin.util.gen.hasGeneratedClass
+import org.cufy.mmrpc.gen.kotlin.util.gen.isCompileConst
+import org.cufy.mmrpc.gen.kotlin.util.gen.references.typeOf
+import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createAnnotationSet
+import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createKDoc
+import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createLiteral
+import org.cufy.mmrpc.gen.kotlin.util.poet.propertySpec
 
 class ConstDefinitionGen(override val ctx: GenContext) : GenGroup() {
     override fun apply() {
-        for (element in ctx.specSheet.collectChildren()) {
+        for (element in ctx.elements) {
             if (element !is ConstDefinition) continue
-            if (element.isAnonymous) continue
+            if (!hasGeneratedClass(element)) continue
 
             failGenBoundary {
-                onObject(element.namespace) {
-                    addType(createDataObject(element))
-                }
+                applyCreateDataObject(element)
             }
         }
     }
 
-    private fun createDataObject(element: ConstDefinition): TypeSpec {
-        return TypeSpec
-            .objectBuilder(element.asClassName)
-            .addModifiers(KModifier.DATA)
-            .addProperty(createStaticInfoProperty(element))
-            .addProperty(createStaticValueProperty(element))
-            .overrideObject(element)
-            .addKdoc(createKDoc(element))
-            .addAnnotations(createAnnotationSet(element.metadata))
-            .addAnnotations(createOptionalSerializableAnnotationSet())
-            .addAnnotations(createOptionalSerialNameAnnotationSet(element.canonicalName.value))
-            .build()
-    }
+    private fun applyCreateDataObject(element: ConstDefinition) {
+        val superinterface = ConstObject::class.asClassName()
+            .parameterizedBy(typeOf(element.constType))
 
-    private fun TypeSpec.Builder.overrideObject(element: ConstDefinition): TypeSpec.Builder {
-        val overrideObjectClass = ConstObject::class.asClassName()
-            .parameterizedBy(typeOf(element))
+        val staticValue = propertySpec(F_STATIC_VALUE, typeOf(element.constType)) {
+            if (isCompileConst(element.constType))
+                addModifiers(KModifier.CONST)
 
-        val infoPropertySpec = PropertySpec
-            .builder("info", ConstInfo::class)
-            .addModifiers(KModifier.OVERRIDE)
-            .initializer("%L", element.fStaticInfo)
-            .build()
-
-        val valuePropertySpec = PropertySpec
-            .builder("value", typeOf(element))
-            .addModifiers(KModifier.OVERRIDE)
-            .initializer("%L", element.fStaticValue)
-            .build()
-
-        return this
-            .superclass(overrideObjectClass)
-            .addProperty(infoPropertySpec)
-            .addProperty(valuePropertySpec)
-    }
-
-    private fun createStaticInfoProperty(element: ConstDefinition): PropertySpec {
-        return PropertySpec
-            .builder(element.fStaticInfo, ConstInfo::class)
-            .initializer("\n%L", createInfo(element))
-            .build()
-    }
-
-    private fun createStaticValueProperty(element: ConstDefinition): PropertySpec {
-        val isCompileTimeConstant = when {
-            element.constType !is ScalarDefinition -> false
-            element.constType.canonicalName !in ctx.nativeElements -> false
-            element.constValue is TupleLiteral -> false
-            else -> true
+            initializer(createLiteral(element))
+        }
+        val overrideValue = propertySpec("value", typeOf(element.constType)) {
+            addModifiers(KModifier.OVERRIDE)
+            initializer("%L", F_STATIC_VALUE)
         }
 
-        return PropertySpec
-            .builder(element.fStaticValue, typeOf(element))
-            .apply {
-                if (isCompileTimeConstant)
-                    addModifiers(KModifier.CONST)
-            }
-            .initializer(createLiteral(element))
-            .build()
+        createObject(element) {
+            addModifiers(KModifier.DATA)
+            addSuperinterface(superinterface)
+            addProperty(staticValue)
+            addProperty(overrideValue)
+            addProperty(createStaticInfoProperty(element))
+            addProperty(createOverrideObjectInfoProperty(element))
+
+            addKdoc(createKDoc(element))
+            addAnnotations(createAnnotationSet(element.metadata))
+            addAnnotations(createSerializableAnnotationSet())
+            addAnnotations(createSerialNameAnnotationSet(element.canonicalName.value))
+        }
     }
 }

@@ -1,70 +1,60 @@
 package org.cufy.mmrpc.gen.kotlin.core.endpoint
 
-import com.squareup.kotlinpoet.*
+import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.STRING
+import com.squareup.kotlinpoet.asClassName
 import org.cufy.mmrpc.KafkaPublicationEndpointDefinition
-import org.cufy.mmrpc.KafkaPublicationEndpointInfo
 import org.cufy.mmrpc.KafkaPublicationEndpointObject
 import org.cufy.mmrpc.gen.kotlin.GenContext
 import org.cufy.mmrpc.gen.kotlin.GenGroup
-import org.cufy.mmrpc.gen.kotlin.util.asClassName
-import org.cufy.mmrpc.gen.kotlin.util.fStaticInfo
-import org.cufy.mmrpc.gen.kotlin.util.fStaticTopic
-import org.cufy.mmrpc.gen.kotlin.util.poet.*
+import org.cufy.mmrpc.gen.kotlin.util.F_STATIC_TOPIC
+import org.cufy.mmrpc.gen.kotlin.util.gen.common.createOverrideObjectInfoProperty
+import org.cufy.mmrpc.gen.kotlin.util.gen.common.createSerialNameAnnotationSet
+import org.cufy.mmrpc.gen.kotlin.util.gen.common.createSerializableAnnotationSet
+import org.cufy.mmrpc.gen.kotlin.util.gen.common.createStaticInfoProperty
+import org.cufy.mmrpc.gen.kotlin.util.gen.hasGeneratedClass
+import org.cufy.mmrpc.gen.kotlin.util.gen.references.typeOf
+import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createAnnotationSet
+import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createKDoc
+import org.cufy.mmrpc.gen.kotlin.util.poet.propertySpec
 
 class KafkaPublicationGen(override val ctx: GenContext) : GenGroup() {
     override fun apply() {
-        for (element in ctx.specSheet.collectChildren()) {
+        for (element in ctx.elements) {
             if (element !is KafkaPublicationEndpointDefinition) continue
-            if (element.isAnonymous) continue
+            if (!hasGeneratedClass(element)) continue
 
             failGenBoundary {
-                onObject(element.namespace) {
-                    addType(createDataObject(element))
-                }
+                applyCreateDataObject(element)
             }
         }
     }
 
-    private fun createDataObject(element: KafkaPublicationEndpointDefinition): TypeSpec {
-        return TypeSpec
-            .objectBuilder(element.asClassName)
-            .addModifiers(KModifier.DATA)
-            .addProperty(createStaticInfoProperty(element))
-            .addProperty(createStaticTopicProperty(element))
-            .overrideObject(element)
-            .addKdoc(createKDoc(element))
-            .addAnnotations(createAnnotationSet(element.metadata))
-            .addAnnotations(createOptionalSerializableAnnotationSet())
-            .addAnnotations(createOptionalSerialNameAnnotationSet(element.canonicalName.value))
-            .build()
-    }
+    private fun applyCreateDataObject(element: KafkaPublicationEndpointDefinition) {
+        val superinterface = KafkaPublicationEndpointObject::class.asClassName().let {
+            when (val endpointKey = element.endpointKey) {
+                null -> it.parameterizedBy(STRING)
+                else -> it.parameterizedBy(typeOf(endpointKey))
+            }
+        }
 
-    private fun TypeSpec.Builder.overrideObject(element: KafkaPublicationEndpointDefinition): TypeSpec.Builder {
-        val overrideObjectClass = KafkaPublicationEndpointObject::class.asClassName()
+        val staticTopic = propertySpec(F_STATIC_TOPIC, STRING) {
+            addModifiers(KModifier.CONST)
+            initializer("%S", element.endpointTopic.value)
+        }
 
-        val infoPropertySpec = PropertySpec
-            .builder("info", KafkaPublicationEndpointInfo::class)
-            .addModifiers(KModifier.OVERRIDE)
-            .initializer("%L", element.fStaticInfo)
-            .build()
+        createObject(element) {
+            addModifiers(KModifier.DATA)
+            addSuperinterface(superinterface)
+            addProperty(staticTopic)
+            addProperty(createStaticInfoProperty(element))
+            addProperty(createOverrideObjectInfoProperty(element))
 
-        return this
-            .superclass(overrideObjectClass)
-            .addProperty(infoPropertySpec)
-    }
-
-    private fun createStaticInfoProperty(element: KafkaPublicationEndpointDefinition): PropertySpec {
-        return PropertySpec
-            .builder(element.fStaticInfo, KafkaPublicationEndpointInfo::class)
-            .initializer("\n%L", createInfo(element))
-            .build()
-    }
-
-    private fun createStaticTopicProperty(element: KafkaPublicationEndpointDefinition): PropertySpec {
-        return PropertySpec
-            .builder(element.fStaticTopic, STRING)
-            .addModifiers(KModifier.CONST)
-            .initializer("%S", element.endpointTopic.value)
-            .build()
+            addKdoc(createKDoc(element))
+            addAnnotations(createAnnotationSet(element.metadata))
+            addAnnotations(createSerializableAnnotationSet())
+            addAnnotations(createSerialNameAnnotationSet(element.canonicalName.value))
+        }
     }
 }

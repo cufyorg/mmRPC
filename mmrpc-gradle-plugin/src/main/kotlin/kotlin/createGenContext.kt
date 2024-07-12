@@ -5,10 +5,12 @@ import org.cufy.mmrpc.CanonicalName
 import org.cufy.mmrpc.SpecSheet
 import org.cufy.mmrpc.gen.kotlin.GenContext
 import org.cufy.mmrpc.gen.kotlin.GenFeature
+import org.cufy.mmrpc.gen.kotlin.GenPackaging
 
 fun createGenContext(
     specSheet: SpecSheet,
     packageName: String,
+    packaging: GenPackaging,
     classes: Map<String, String>,
     defaultScalarClass: String?,
     nativeElements: Set<String>,
@@ -16,6 +18,7 @@ fun createGenContext(
 ): GenContext {
     return GenContext(
         pkg = packageName,
+        packaging = packaging,
         specSheet = specSheet,
         classes = classes
             .asSequence()

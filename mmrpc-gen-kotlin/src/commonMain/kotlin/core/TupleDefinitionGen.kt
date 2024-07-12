@@ -2,13 +2,12 @@ package org.cufy.mmrpc.gen.kotlin.core
 
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.asClassName
-import org.cufy.mmrpc.StructDefinition
-import org.cufy.mmrpc.StructObject
+import org.cufy.mmrpc.TupleDefinition
+import org.cufy.mmrpc.TupleObject
 import org.cufy.mmrpc.gen.kotlin.GenContext
 import org.cufy.mmrpc.gen.kotlin.GenGroup
-import org.cufy.mmrpc.gen.kotlin.util.asPropertyName
-import org.cufy.mmrpc.gen.kotlin.util.gen.StructStrategy
-import org.cufy.mmrpc.gen.kotlin.util.gen.calculateStructStrategy
+import org.cufy.mmrpc.gen.kotlin.util.gen.TupleStrategy
+import org.cufy.mmrpc.gen.kotlin.util.gen.calculateTupleStrategy
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createOverrideObjectInfoProperty
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createSerialNameAnnotationSet
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createSerializableAnnotationSet
@@ -18,24 +17,24 @@ import org.cufy.mmrpc.gen.kotlin.util.gen.references.typeOf
 import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createAnnotationSet
 import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createKDoc
 import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createKDocShort
-import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createLiteral
 import org.cufy.mmrpc.gen.kotlin.util.poet.companionObjectSpec
 import org.cufy.mmrpc.gen.kotlin.util.poet.constructorSpec
 import org.cufy.mmrpc.gen.kotlin.util.poet.parameterSpec
 import org.cufy.mmrpc.gen.kotlin.util.poet.propertySpec
+import org.cufy.mmrpc.gen.kotlin.util.xth
 
-class StructDefinitionGen(override val ctx: GenContext) : GenGroup() {
+class TupleDefinitionGen(override val ctx: GenContext) : GenGroup() {
     override fun apply() {
         for (element in ctx.elements) {
-            if (element !is StructDefinition) continue
+            if (element !is TupleDefinition) continue
             if (!hasGeneratedClass(element)) continue
 
             failGenBoundary {
-                when (calculateStructStrategy(element)) {
-                    StructStrategy.DATA_OBJECT
+                when (calculateTupleStrategy(element)) {
+                    TupleStrategy.DATA_OBJECT
                     -> applyCreateDataObject(element)
 
-                    StructStrategy.DATA_CLASS
+                    TupleStrategy.DATA_CLASS
                     -> applyCreateDataClass(element)
                 }
             }
@@ -44,8 +43,8 @@ class StructDefinitionGen(override val ctx: GenContext) : GenGroup() {
 
     //
 
-    private fun applyCreateDataObject(element: StructDefinition) {
-        val superinterface = StructObject::class.asClassName()
+    private fun applyCreateDataObject(element: TupleDefinition) {
+        val superinterface = TupleObject::class.asClassName()
 
         createObject(element) {
             addModifiers(KModifier.DATA)
@@ -60,33 +59,27 @@ class StructDefinitionGen(override val ctx: GenContext) : GenGroup() {
         }
     }
 
-    private fun applyCreateDataClass(element: StructDefinition) {
-        val superinterface = StructObject::class.asClassName()
+    private fun applyCreateDataClass(element: TupleDefinition) {
+        val superinterface = TupleObject::class.asClassName()
         val companionObject = companionObjectSpec {
             addProperty(createStaticInfoProperty(element))
         }
 
         val primaryConstructor = constructorSpec {
-            val parameters = element.structFields.map {
-                parameterSpec(it.asPropertyName, typeOf(it.fieldType)) {
-                    val default = it.fieldDefault
-
-                    if (default != null) {
-                        defaultValue(createLiteral(it.fieldType, default))
-                    }
-                }
+            val parameters = element.tupleTypes.mapIndexed { position, type ->
+                parameterSpec(xth(position), typeOf(type))
             }
 
             addParameters(parameters)
         }
 
-        val properties = element.structFields.map {
-            propertySpec(it.asPropertyName, typeOf(it.fieldType)) {
-                initializer(it.asPropertyName)
+        val properties = element.tupleTypes.mapIndexed { position, type ->
+            propertySpec(xth(position), typeOf(type)) {
+                initializer(xth(position))
 
-                addKdoc(createKDocShort(it))
-                addAnnotations(createAnnotationSet(it.metadata))
-                addAnnotations(createSerialNameAnnotationSet(it.name))
+                addKdoc(createKDocShort(type))
+                addAnnotations(createAnnotationSet(type.metadata))
+                addAnnotations(createSerialNameAnnotationSet(type.name))
             }
         }
 

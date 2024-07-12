@@ -19,6 +19,8 @@ kotlin {
                 implementation(libs.kotlin.serialization.core)
 
                 implementation(libs.kotlinpoet)
+
+                implementation("net.pearx.kasechange:kasechange-jvm:1.4.1")
             }
         }
         commonTest {

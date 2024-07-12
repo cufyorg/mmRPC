@@ -1,172 +1,133 @@
 package org.cufy.mmrpc.gen.kotlin.core
 
-import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.PropertySpec
-import com.squareup.kotlinpoet.TypeSpec
-import org.cufy.mmrpc.ConstDefinition
+import com.squareup.kotlinpoet.asClassName
+import org.cufy.mmrpc.TypeObject
 import org.cufy.mmrpc.UnionDefinition
-import org.cufy.mmrpc.UnionInfo
 import org.cufy.mmrpc.gen.kotlin.GenContext
 import org.cufy.mmrpc.gen.kotlin.GenGroup
-import org.cufy.mmrpc.gen.kotlin.util.UnionStrategy
-import org.cufy.mmrpc.gen.kotlin.util.asClassName
-import org.cufy.mmrpc.gen.kotlin.util.calculateStrategy
-import org.cufy.mmrpc.gen.kotlin.util.fStaticInfo
-import org.cufy.mmrpc.gen.kotlin.util.poet.*
+import org.cufy.mmrpc.gen.kotlin.util.asUnionEntryName
+import org.cufy.mmrpc.gen.kotlin.util.gen.UnionStrategy
+import org.cufy.mmrpc.gen.kotlin.util.gen.calculateUnionStrategy
+import org.cufy.mmrpc.gen.kotlin.util.gen.common.*
+import org.cufy.mmrpc.gen.kotlin.util.gen.hasGeneratedClass
+import org.cufy.mmrpc.gen.kotlin.util.gen.references.generatedClassOf
+import org.cufy.mmrpc.gen.kotlin.util.gen.references.typeOf
+import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createAnnotationSet
+import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createKDoc
+import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createKDocShort
+import org.cufy.mmrpc.gen.kotlin.util.poet.classSpec
+import org.cufy.mmrpc.gen.kotlin.util.poet.companionObjectSpec
+import org.cufy.mmrpc.gen.kotlin.util.poet.constructorSpec
+import org.cufy.mmrpc.gen.kotlin.util.poet.propertySpec
 
 class UnionDefinitionGen(override val ctx: GenContext) : GenGroup() {
     override fun apply() {
-        for (element in ctx.specSheet.collectChildren()) {
+        for (element in ctx.elements) {
             if (element !is UnionDefinition) continue
-            if (element.isAnonymous) continue
+            if (!hasGeneratedClass(element)) continue
 
             failGenBoundary {
-                onObject(element.namespace) {
-                    when (calculateStrategy(element)) {
-                        UnionStrategy.SEALED_CLASS
-                        -> addType(createSealedClass(element))
+                when (calculateUnionStrategy(element)) {
+                    UnionStrategy.DATA_OBJECT
+                    -> applyCreateDataObject(element)
 
-                        UnionStrategy.SEALED_INTERFACE
-                        -> addType(createSealedInterface(element))
+                    UnionStrategy.SEALED_INTERFACE
+                    -> applyCreateSealedInterface(element)
 
-                        UnionStrategy.ENUM_CLASS
-                        -> addType(createEnumClass(element))
-
-                        UnionStrategy.DATA_OBJECT
-                        -> addType(createDataObject(element))
-                    }
+                    UnionStrategy.WRAPPER_SEALED_INTERFACE
+                    -> applyCreateWrapperSealedInterface(element)
                 }
             }
         }
     }
 
-    private fun createSealedClass(element: UnionDefinition): TypeSpec {
-        val companionObjectSpec = TypeSpec
-            .companionObjectBuilder()
-            .addProperty(createStaticInfoProperty(element))
-            .build()
+    //
 
-        return TypeSpec
-            .classBuilder(element.asClassName)
-            .addModifiers(KModifier.SEALED)
-            .addKdoc("@see %L", createKDocReference(element))
-            .addAnnotations(createAnnotationSet(element.metadata))
-            .addAnnotations(createOptionalSerializableAnnotationSet())
-            .addAnnotations(createOptionalSerialNameAnnotationSet(element.canonicalName.value))
-            .addSuperinterfaces(calculateUnionInterfaces(element))
-            .addType(companionObjectSpec)
-            .apply {
-                for (it in element.unionTypes) {
-                    val primaryConstructorSpec = FunSpec
-                        .constructorBuilder()
-                        .addParameter("value", typeOf(it))
-                        .build()
+    private fun applyCreateDataObject(element: UnionDefinition) {
+        val superinterface = TypeObject::class.asClassName()
 
-                    val valuePropertySpec = PropertySpec
-                        .builder("value", typeOf(it))
-                        .initializer("value")
-                        .build()
+        createObject(element) {
+            addModifiers(KModifier.DATA)
+            addSuperinterface(superinterface)
+            addProperty(createStaticInfoProperty(element))
+            addProperty(createOverrideObjectInfoProperty(element))
 
-                    val typeSpec = TypeSpec
-                        .classBuilder(it.name)
-                        .addModifiers(KModifier.VALUE)
-                        .addAnnotation(JvmInline::class)
-                        .superclass(classOf(element))
-                        .addKdoc("@see %L", createKDocReference(it))
-                        .addAnnotations(createAnnotationSet(it.metadata))
-                        .addAnnotations(createOptionalSerializableAnnotationSet())
-                        .addAnnotations(createOptionalSerialNameAnnotationSet(it.canonicalName.value))
-                        .primaryConstructor(primaryConstructorSpec)
-                        .addProperty(valuePropertySpec)
-                        .build()
+            addKdoc(createKDoc(element))
+            addAnnotations(createAnnotationSet(element.metadata))
+            addAnnotations(createSerializableAnnotationSet())
+            addAnnotations(createSerialNameAnnotationSet(element.canonicalName.value))
+        }
+    }
 
-                    addType(typeSpec)
-                }
+    private fun applyCreateSealedInterface(element: UnionDefinition) {
+        val superinterface = TypeObject::class.asClassName()
+        val companionObjectSpec = companionObjectSpec {
+            addProperty(createStaticInfoProperty(element))
+        }
+
+        createInterface(element) {
+            addModifiers(KModifier.SEALED)
+            addSuperinterface(superinterface)
+            addType(companionObjectSpec)
+
+            addKdoc(createKDoc(element))
+            addAnnotations(createAnnotationSet(element.metadata))
+            addAnnotations(createSerializableAnnotationSet())
+            addAnnotations(createSerialNameAnnotationSet(element.canonicalName.value))
+        }
+
+        for (unionType in element.unionTypes) {
+            on(unionType) {
+                addSuperinterface(generatedClassOf(element))
             }
-            .build()
+        }
     }
 
-    private fun createSealedInterface(element: UnionDefinition): TypeSpec {
-        val companionObjectSpec = TypeSpec
-            .companionObjectBuilder()
-            .addProperty(createStaticInfoProperty(element))
-            .build()
+    private fun applyCreateWrapperSealedInterface(element: UnionDefinition) {
+        val superinterface = TypeObject::class.asClassName()
+        val companionObject = companionObjectSpec {
+            addProperty(createStaticInfoProperty(element))
+        }
 
-        return TypeSpec
-            .interfaceBuilder(element.asClassName)
-            .addKdoc("@see %L", createKDocReference(element))
-            .addAnnotations(createAnnotationSet(element.metadata))
-            .addAnnotations(createOptionalSerializableAnnotationSet())
-            .addAnnotations(createOptionalSerialNameAnnotationSet(element.canonicalName.value))
-            .addModifiers(KModifier.SEALED)
-            .addSuperinterfaces(calculateUnionInterfaces(element))
-            .addType(companionObjectSpec)
-            .build()
-    }
-
-    private fun createEnumClass(element: UnionDefinition): TypeSpec {
-        @Suppress("UNCHECKED_CAST")
-        val unionTypes = element.unionTypes as List<ConstDefinition>
-        val commonType = unionTypes[0].constType
-
-        val companionObjectSpec = TypeSpec
-            .companionObjectBuilder()
-            .addProperty(createStaticInfoProperty(element))
-            .build()
-
-        val primaryConstructorSpec = FunSpec
-            .constructorBuilder()
-            .addParameter("value", typeOf(commonType))
-            .build()
-
-        val valuePropertySpec = PropertySpec
-            .builder("value", typeOf(commonType))
-            .initializer("value")
-            .build()
-
-        return TypeSpec
-            .enumBuilder(element.asClassName)
-            .addType(companionObjectSpec)
-            .addKdoc("@see %L", createKDocReference(element))
-            .addAnnotations(createAnnotationSet(element.metadata))
-            .addAnnotations(createOptionalSerializableAnnotationSet())
-            .addAnnotations(createOptionalSerialNameAnnotationSet(element.canonicalName.value))
-            .primaryConstructor(primaryConstructorSpec)
-            .addProperty(valuePropertySpec)
-            .apply {
-                for (it in unionTypes) {
-                    val typeSpec = TypeSpec
-                        .anonymousClassBuilder()
-                        .addKdoc("@see %L", createKDocReference(it))
-                        .addAnnotations(createAnnotationSet(it.metadata))
-                        // TODO is this ok? why not element.canonicalName.value?
-                        .addAnnotations(createOptionalSerialNameAnnotationSet(createLiteralInlinedOrRefOfValue(it)))
-                        .addSuperclassConstructorParameter(createLiteralOrRefOfValue(it))
-                        .build()
-
-                    addEnumConstant(it.name, typeSpec)
-                }
+        val types = element.unionTypes.map {
+            val itCompanionObject = companionObjectSpec {
+                addProperty(createDelegateStaticInfoProperty(it))
             }
-            .build()
-    }
 
-    private fun createDataObject(element: UnionDefinition): TypeSpec {
-        return TypeSpec
-            .objectBuilder(element.asClassName)
-            .addModifiers(KModifier.DATA)
-            .addProperty(createStaticInfoProperty(element))
-            .addKdoc(createKDoc(element))
-            .addAnnotations(createAnnotationSet(element.metadata))
-            .addAnnotations(createOptionalSerializableAnnotationSet())
-            .addAnnotations(createOptionalSerialNameAnnotationSet(element.canonicalName.value))
-            .build()
-    }
+            val itPrimaryConstructor = constructorSpec {
+                addParameter("value", typeOf(it))
+            }
+            val itValue = propertySpec("value", typeOf(it)) {
+                initializer("value")
+            }
 
-    private fun createStaticInfoProperty(element: UnionDefinition): PropertySpec {
-        return PropertySpec
-            .builder(element.fStaticInfo, UnionInfo::class)
-            .initializer("\n%L", createInfo(element))
-            .build()
+            classSpec(it.asUnionEntryName) {
+                addModifiers(KModifier.VALUE)
+                addAnnotation(JvmInline::class)
+                addSuperinterface(generatedClassOf(element))
+                addType(itCompanionObject)
+                primaryConstructor(itPrimaryConstructor)
+                addProperty(itValue)
+                addProperty(createOverrideObjectInfoProperty(it))
+
+                addKdoc(createKDocShort(it))
+                addAnnotations(createAnnotationSet(it.metadata))
+                addAnnotations(createSerializableAnnotationSet())
+                addAnnotations(createSerialNameAnnotationSet(it.canonicalName.value))
+            }
+        }
+
+        createInterface(element) {
+            addModifiers(KModifier.SEALED)
+            addSuperinterface(superinterface)
+            addType(companionObject)
+            addTypes(types)
+
+            addKdoc(createKDoc(element))
+            addAnnotations(createAnnotationSet(element.metadata))
+            addAnnotations(createSerializableAnnotationSet())
+            addAnnotations(createSerialNameAnnotationSet(element.canonicalName.value))
+        }
     }
 }

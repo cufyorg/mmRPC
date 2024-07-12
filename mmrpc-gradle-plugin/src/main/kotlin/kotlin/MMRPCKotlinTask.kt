@@ -4,6 +4,7 @@ import kotlinx.serialization.json.Json
 import org.cufy.mmrpc.compact.CompactSpecSheet
 import org.cufy.mmrpc.compact.inflate
 import org.cufy.mmrpc.gen.kotlin.GenFeature
+import org.cufy.mmrpc.gen.kotlin.GenPackaging
 import org.cufy.mmrpc.gen.kotlin.generateFileSpecSet
 import org.cufy.mmrpc.gen.kotlin.util.signatureOf
 import org.cufy.mmrpc.gradle.MMRPC
@@ -37,6 +38,10 @@ open class MMRPCKotlinTask : DefaultTask() {
         this.project.objects.property(String::class.java)
 
     @Input
+    val packaging: Property<GenPackaging> =
+        this.project.objects.property(GenPackaging::class.java)
+
+    @Input
     val classes: MapProperty<String, String> =
         this.project.objects.mapProperty(String::class.java, String::class.java)
 
@@ -61,6 +66,7 @@ open class MMRPCKotlinTask : DefaultTask() {
         this.description = "Generate Kotlin DSL from mmRPC Schema"
 
         this.packageName.convention(MMRPCKotlin.DEFAULT_PACKAGE_NAME)
+        this.packaging.convention(MMRPCKotlin.DEFAULT_PACKAGING)
         this.classes.convention(MMRPCKotlin.DEFAULT_CLASSES)
         this.nativeElements.convention(MMRPCKotlin.DEFAULT_NATIVE_ELEMENTS)
         this.features.convention(emptySet())
@@ -116,6 +122,7 @@ open class MMRPCKotlinTask : DefaultTask() {
         }
 
         this.packageName.set(extension.kotlin.packageName)
+        this.packaging.set(extension.kotlin.packaging)
         this.classes.set(extension.kotlin.classes)
         this.defaultScalarClass.set(extension.kotlin.defaultScalarClass)
         this.nativeElements.set(extension.kotlin.nativeElements)
@@ -182,10 +189,11 @@ open class MMRPCKotlinTask : DefaultTask() {
         val genContext = createGenContext(
             specSheet = specSheet,
             packageName = this.packageName.get(),
+            packaging = this.packaging.get(),
             classes = this.classes.get(),
             defaultScalarClass = this.defaultScalarClass.get(),
             nativeElements = this.nativeElements.get(),
-            features = this.features.get()
+            features = this.features.get(),
         )
 
         try {
@@ -208,17 +216,13 @@ open class MMRPCKotlinTask : DefaultTask() {
         }
 
         val fileSpecSet = try {
-            genContext.fileOptionalBlocks.forEach {
-                it.value += {
-                    addFileComment("This is an automatically generated file.\n")
-                    addFileComment("Modification to this file WILL be lost everytime\n")
-                    addFileComment("the code generation task is executed\n\n")
-                    addFileComment("This file was generated with mmrpc-gen-kotlin via\n")
-                    addFileComment("gradle plugin: org.cufy.mmrpc version: ${MMRPC.VERSION}\n")
-                }
+            generateFileSpecSet(genContext) {
+                addFileComment("This is an automatically generated file.\n")
+                addFileComment("Modification to this file WILL be lost everytime\n")
+                addFileComment("the code generation task is executed\n\n")
+                addFileComment("This file was generated with mmrpc-gen-kotlin via\n")
+                addFileComment("gradle plugin: org.cufy.mmrpc version: ${MMRPC.VERSION}\n")
             }
-
-            generateFileSpecSet(genContext)
         } catch (e: Exception) {
             val message = "$TAG: fetal code generation failure: ${e.message}"
             throw TaskInstantiationException(message, e)

@@ -1,8 +1,11 @@
 package org.cufy.mmrpc.gradle.kotlin
 
+import org.cufy.mmrpc.gen.kotlin.GenPackaging
+
 object MMRPCKotlin {
     const val TASK_NAME = "generateMMRPCKotlinSources"
-    const val DEFAULT_PACKAGE_NAME = "mmrpc"
+    const val DEFAULT_PACKAGE_NAME = ""
+    val DEFAULT_PACKAGING = GenPackaging.SUB_PACKAGES
 
     val DEFAULT_CLASSES = mapOf(
         "builtin.Any" to "kotlin.Any",

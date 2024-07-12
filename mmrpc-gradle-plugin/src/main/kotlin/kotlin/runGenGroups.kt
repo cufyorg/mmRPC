@@ -11,13 +11,16 @@ fun runGenGroups(ctx: GenContext) {
     /* =============== core =============== */
 
     ConstDefinitionGen(ctx).apply()
+    EnumDefinitionGen(ctx).apply()
     FaultDefinitionGen(ctx).apply()
     ProtocolDefinitionGen(ctx).apply()
     RoutineDefinitionGen(ctx).apply()
     FieldDefinitionGen(ctx).apply()
+    InterDefinitionGen(ctx).apply()
     MetadataDefinitionGen(ctx).apply()
     ScalarDefinitionGen(ctx).apply()
     StructDefinitionGen(ctx).apply()
+    TupleDefinitionGen(ctx).apply()
     UnionDefinitionGen(ctx).apply()
 
     /* =============== core.endpoint =============== */

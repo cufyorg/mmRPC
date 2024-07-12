@@ -1,59 +1,71 @@
 package org.cufy.mmrpc.gen.kotlin.core
 
+import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.asClassName
-import org.cufy.mmrpc.ScalarDefinition
-import org.cufy.mmrpc.ScalarObject
+import org.cufy.mmrpc.EnumDefinition
+import org.cufy.mmrpc.EnumObject
 import org.cufy.mmrpc.gen.kotlin.GenContext
 import org.cufy.mmrpc.gen.kotlin.GenGroup
+import org.cufy.mmrpc.gen.kotlin.util.asEnumEntryName
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createOverrideObjectInfoProperty
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createSerialNameAnnotationSet
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createSerializableAnnotationSet
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createStaticInfoProperty
 import org.cufy.mmrpc.gen.kotlin.util.gen.hasGeneratedClass
-import org.cufy.mmrpc.gen.kotlin.util.gen.references.nativeClassOf
+import org.cufy.mmrpc.gen.kotlin.util.gen.references.typeOf
 import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createAnnotationSet
 import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createKDoc
+import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createKDocShort
+import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createLiteral
+import org.cufy.mmrpc.gen.kotlin.util.poet.anonymousClassSpec
 import org.cufy.mmrpc.gen.kotlin.util.poet.companionObjectSpec
-import org.cufy.mmrpc.gen.kotlin.util.poet.constructorSpec
 import org.cufy.mmrpc.gen.kotlin.util.poet.propertySpec
 
-class ScalarDefinitionGen(override val ctx: GenContext) : GenGroup() {
+class EnumDefinitionGen(override val ctx: GenContext) : GenGroup() {
     override fun apply() {
         for (element in ctx.elements) {
-            if (element !is ScalarDefinition) continue
+            if (element !is EnumDefinition) continue
             if (!hasGeneratedClass(element)) continue
 
             failGenBoundary {
-                applyCreateValueClass(element)
+                applyCreateEnumClass(element)
             }
         }
     }
 
-    private fun applyCreateValueClass(element: ScalarDefinition) {
-        val superinterface = ScalarObject::class.asClassName()
-            .parameterizedBy(nativeClassOf(element))
+    private fun applyCreateEnumClass(element: EnumDefinition) {
+        val superinterface = EnumObject::class.asClassName()
+            .parameterizedBy(typeOf(element.enumType))
 
         val companionObject = companionObjectSpec {
             addProperty(createStaticInfoProperty(element))
         }
 
-        val primaryConstructor = constructorSpec {
-            addParameter("value", nativeClassOf(element))
-        }
-        val valuePropertySpec = propertySpec("value", nativeClassOf(element)) {
-            addModifiers(KModifier.OVERRIDE)
-            initializer("value")
+        val entries = element.enumEntries.associate {
+            val valueContentToString = CodeBlock.of(it.constValue.contentToString())
+
+            val itValue = propertySpec("value", typeOf(element.enumType)) {
+                addModifiers(KModifier.OVERRIDE)
+                initializer(createLiteral(it))
+            }
+
+            it.asEnumEntryName to anonymousClassSpec {
+                addProperty(itValue)
+
+                addKdoc(createKDocShort(it))
+                addAnnotations(createAnnotationSet(it.metadata))
+                addAnnotations(createSerialNameAnnotationSet(valueContentToString))
+            }
         }
 
-        createClass(element) {
-            addModifiers(KModifier.VALUE)
-            addAnnotation(JvmInline::class)
+        createEnum(element) {
             addSuperinterface(superinterface)
             addType(companionObject)
-            primaryConstructor(primaryConstructor)
-            addProperty(valuePropertySpec)
+            entries.forEach { (name, type) ->
+                addEnumConstant(name, type)
+            }
             addProperty(createOverrideObjectInfoProperty(element))
 
             addKdoc(createKDoc(element))

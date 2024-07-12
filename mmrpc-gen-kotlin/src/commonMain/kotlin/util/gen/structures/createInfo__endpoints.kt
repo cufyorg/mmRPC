@@ -1,8 +1,12 @@
-package org.cufy.mmrpc.gen.kotlin.util.poet
+package org.cufy.mmrpc.gen.kotlin.util.gen.structures
 
 import com.squareup.kotlinpoet.CodeBlock
 import org.cufy.mmrpc.*
 import org.cufy.mmrpc.gen.kotlin.GenGroup
+import org.cufy.mmrpc.gen.kotlin.util.gen.references.refOfINFOOrCreateInfo
+import org.cufy.mmrpc.gen.kotlin.util.poet.createBoxedNamespace
+import org.cufy.mmrpc.gen.kotlin.util.poet.createCall
+import org.cufy.mmrpc.gen.kotlin.util.poet.createCallSingleVararg
 
 @Marker3
 fun GenGroup.createInfo(element: HttpEndpointDefinition): CodeBlock {
@@ -75,7 +79,7 @@ fun GenGroup.createInfo(element: KafkaEndpointDefinition): CodeBlock {
         ),
         "key" to element.endpointKey.let {
             if (it == null) CodeBlock.of("null")
-            else refOfInfoOrCreateInfo(it)
+            else refOfINFOOrCreateInfo(it)
         },
     )
 }
@@ -101,7 +105,7 @@ fun GenGroup.createInfo(element: KafkaPublicationEndpointDefinition): CodeBlock 
         ),
         "key" to element.endpointKey.let {
             if (it == null) CodeBlock.of("null")
-            else refOfInfoOrCreateInfo(it)
+            else refOfINFOOrCreateInfo(it)
         },
     )
 }

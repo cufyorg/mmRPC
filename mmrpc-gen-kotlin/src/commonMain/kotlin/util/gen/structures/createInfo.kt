@@ -1,4 +1,4 @@
-package org.cufy.mmrpc.gen.kotlin.util.poet
+package org.cufy.mmrpc.gen.kotlin.util.gen.structures
 
 import com.squareup.kotlinpoet.CodeBlock
 import org.cufy.mmrpc.*
@@ -7,15 +7,15 @@ import org.cufy.mmrpc.gen.kotlin.GenGroup
 @Marker3
 fun GenGroup.createInfo(element: ElementDefinition): CodeBlock {
     return when (element) {
+        is ConstDefinition -> createInfo(element)
         is FaultDefinition -> createInfo(element)
         is FieldDefinition -> createInfo(element)
         is MetadataDefinition -> createInfo(element)
-        is MetadataParameterDefinition -> createInfo(element)
         is ProtocolDefinition -> createInfo(element)
         is RoutineDefinition -> createInfo(element)
 
         is ArrayDefinition -> createInfo(element)
-        is ConstDefinition -> createInfo(element)
+        is EnumDefinition -> createInfo(element)
         is InterDefinition -> createInfo(element)
         is OptionalDefinition -> createInfo(element)
         is ScalarDefinition -> createInfo(element)

@@ -1,70 +1,56 @@
 package org.cufy.mmrpc.gen.kotlin.core
 
-import com.squareup.kotlinpoet.*
+import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.STRING
+import com.squareup.kotlinpoet.asClassName
 import org.cufy.mmrpc.FieldDefinition
-import org.cufy.mmrpc.FieldInfo
 import org.cufy.mmrpc.FieldObject
 import org.cufy.mmrpc.gen.kotlin.GenContext
 import org.cufy.mmrpc.gen.kotlin.GenGroup
-import org.cufy.mmrpc.gen.kotlin.util.asClassName
-import org.cufy.mmrpc.gen.kotlin.util.fStaticInfo
-import org.cufy.mmrpc.gen.kotlin.util.fStaticName
-import org.cufy.mmrpc.gen.kotlin.util.poet.*
+import org.cufy.mmrpc.gen.kotlin.util.F_STATIC_NAME
+import org.cufy.mmrpc.gen.kotlin.util.gen.common.createOverrideObjectInfoProperty
+import org.cufy.mmrpc.gen.kotlin.util.gen.common.createSerialNameAnnotationSet
+import org.cufy.mmrpc.gen.kotlin.util.gen.common.createSerializableAnnotationSet
+import org.cufy.mmrpc.gen.kotlin.util.gen.common.createStaticInfoProperty
+import org.cufy.mmrpc.gen.kotlin.util.gen.hasGeneratedClass
+import org.cufy.mmrpc.gen.kotlin.util.gen.references.typeOf
+import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createAnnotationSet
+import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createKDoc
+import org.cufy.mmrpc.gen.kotlin.util.poet.propertySpec
 
 class FieldDefinitionGen(override val ctx: GenContext) : GenGroup() {
     override fun apply() {
-        for (element in ctx.specSheet.collectChildren()) {
+        for (element in ctx.elements) {
             if (element !is FieldDefinition) continue
-            if (element.isAnonymous) continue
+            if (!hasGeneratedClass(element)) continue
 
             failGenBoundary {
-                onObject(element.namespace) {
-                    addType(createDataObject(element))
-                }
+                applyCreateDataObject(element)
             }
         }
     }
 
-    private fun createDataObject(element: FieldDefinition): TypeSpec {
-        return TypeSpec
-            .objectBuilder(element.asClassName)
-            .addModifiers(KModifier.DATA)
-            .addProperty(createStaticInfoProperty(element))
-            .addProperty(createStaticNameProperty(element))
-            .overrideObject(element)
-            .addKdoc(createKDoc(element))
-            .addAnnotations(createAnnotationSet(element.metadata))
-            .addAnnotations(createOptionalSerializableAnnotationSet())
-            .addAnnotations(createOptionalSerialNameAnnotationSet(element.canonicalName.value))
-            .build()
-    }
+    private fun applyCreateDataObject(element: FieldDefinition) {
+        val superinterface = FieldObject::class.asClassName()
+            .parameterizedBy(typeOf(element.fieldType))
 
-    private fun TypeSpec.Builder.overrideObject(element: FieldDefinition): TypeSpec.Builder {
-        val overrideObjectClass = FieldObject::class.asClassName()
+        val staticName = propertySpec(F_STATIC_NAME, STRING) {
+            addModifiers(KModifier.CONST)
+            initializer("%S", element.name)
+        }
 
-        val infoPropertySpec = PropertySpec
-            .builder("info", FieldInfo::class)
-            .addModifiers(KModifier.OVERRIDE)
-            .initializer("%L", element.fStaticInfo)
-            .build()
+        createObject(element) {
+            addModifiers(KModifier.DATA)
+            addSuperinterface(superinterface)
+            addProperty(staticName)
+            addProperty(createStaticInfoProperty(element))
+            addProperty(createOverrideObjectInfoProperty(element))
 
-        return this
-            .superclass(overrideObjectClass)
-            .addProperty(infoPropertySpec)
-    }
-
-    private fun createStaticInfoProperty(element: FieldDefinition): PropertySpec {
-        return PropertySpec
-            .builder(element.fStaticInfo, FieldInfo::class)
-            .initializer("\n%L", createInfo(element))
-            .build()
-    }
-
-    private fun createStaticNameProperty(element: FieldDefinition): PropertySpec {
-        return PropertySpec
-            .builder(element.fStaticName, STRING)
-            .addModifiers(KModifier.CONST)
-            .initializer("%S", element.name)
-            .build()
+            addKdoc(createKDoc(element))
+            addAnnotations(createAnnotationSet(element.metadata))
+            addAnnotations(createSerializableAnnotationSet())
+            addAnnotations(createSerialNameAnnotationSet(element.canonicalName.value))
+        }
     }
 }

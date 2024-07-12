@@ -14,7 +14,7 @@ gradlePlugin {
             implementationClass = "org.cufy.mmrpc.gradle.MMRPCPlugin"
             displayName = "Code generators for mmRPC schema files"
             description = "Code generators for mmRPC schema files"
-            tags.set(listOf("kotlin"))
+            // tags.set(listOf("kotlin"))
         }
     }
 }

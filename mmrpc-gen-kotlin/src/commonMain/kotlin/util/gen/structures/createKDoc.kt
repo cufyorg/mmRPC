@@ -1,4 +1,4 @@
-package org.cufy.mmrpc.gen.kotlin.util.poet
+package org.cufy.mmrpc.gen.kotlin.util.gen.structures
 
 import com.squareup.kotlinpoet.CodeBlock
 import org.cufy.mmrpc.ElementDefinition
@@ -12,9 +12,10 @@ fun GenGroup.createKDoc(element: ElementDefinition): CodeBlock {
         add(buildString {
             append("### ")
             append(signatureOf(element))
-            appendLine()
-            appendLine()
+
             if (element.description.isNotBlank()) {
+                appendLine()
+                appendLine()
                 append(element.description)
                 appendLine()
             }

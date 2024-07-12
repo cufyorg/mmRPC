@@ -1,66 +1,29 @@
 package org.cufy.mmrpc.gen.kotlin.util
 
-import org.cufy.mmrpc.*
+import net.pearx.kasechange.toCamelCase
+import net.pearx.kasechange.toPascalCase
+import net.pearx.kasechange.toTrainCase
+import org.cufy.mmrpc.ConstDefinition
+import org.cufy.mmrpc.ElementDefinition
+import org.cufy.mmrpc.FieldDefinition
 
-//
+const val F_OBJECT_INFO = "__info__"
+const val F_STATIC_INFO = "__INFO__"
 
-inline val FaultDefinition.fStaticInfo get() = "INFO"
-inline val FieldDefinition.fStaticInfo get() = "INFO"
-inline val MetadataDefinition.fStaticInfo get() = "INFO"
-inline val ProtocolDefinition.fStaticInfo get() = "INFO"
-inline val RoutineDefinition.fStaticInfo get() = "INFO"
+const val F_STATIC_VALUE = "VALUE"
 
-//
+const val F_STATIC_NAME = "NAME"
+const val F_STATIC_PATH = "PATH"
+const val F_STATIC_TOPIC = "TOPIC"
 
-inline val HttpEndpointDefinition.fStaticInfo get() = "INFO"
-inline val IframeEndpointDefinition.fStaticInfo get() = "INFO"
-inline val KafkaEndpointDefinition.fStaticInfo get() = "INFO"
-inline val KafkaPublicationEndpointDefinition.fStaticInfo get() = "INFO"
+val ConstDefinition.asEnumEntryName: String
+    get() = name.furtherEscape().toTrainCase()
 
-//
+val ElementDefinition.asUnionEntryName: String
+    get() = name.furtherEscape().toTrainCase()
 
-inline val ConstDefinition.fStaticInfo get() = "INFO"
-inline val ScalarDefinition.fStaticInfo get() = "INFO"
-inline val StructDefinition.fStaticInfo get() = "INFO"
-inline val UnionDefinition.fStaticInfo get() = "INFO"
+val FieldDefinition.asPropertyName: String
+    get() = name.furtherEscape().toCamelCase()
 
-//
-
-inline val ConstDefinition.fStaticValue get() = "VALUE"
-inline val FieldDefinition.fStaticName get() = "NAME"
-
-inline val HttpEndpointDefinition.fStaticPath get() = "PATH"
-inline val IframeEndpointDefinition.fStaticPath get() = "PATH"
-inline val KafkaEndpointDefinition.fStaticTopic get() = "TOPIC"
-inline val KafkaPublicationEndpointDefinition.fStaticTopic get() = "TOPIC"
-
-// asClassName
-
-val Namespace.asClassName: String
-    get() = segments.joinToString("_") {
-        it.replace(':', '_')
-    }
-
-//
-
-inline val FaultDefinition.asClassName get() = name
-inline val FieldDefinition.asClassName get() = name
-inline val MetadataDefinition.asClassName get() = name
-inline val ProtocolDefinition.asClassName get() = name
-inline val RoutineDefinition.asClassName get() = name.replace(":", "_")
-
-//
-
-inline val HttpEndpointDefinition.asClassName get() = name
-inline val IframeEndpointDefinition.asClassName get() = name
-inline val KafkaEndpointDefinition.asClassName get() = name
-inline val KafkaPublicationEndpointDefinition.asClassName get() = name
-
-//
-
-inline val ConstDefinition.asClassName get() = name
-inline val ScalarDefinition.asClassName get() = name
-inline val StructDefinition.asClassName get() = name
-inline val UnionDefinition.asClassName get() = name
-
-//
+val ElementDefinition.asClassName: String
+    get() = name.furtherEscape().toPascalCase()

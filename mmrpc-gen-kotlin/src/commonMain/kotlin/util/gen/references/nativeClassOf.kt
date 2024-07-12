@@ -1,4 +1,4 @@
-package org.cufy.mmrpc.gen.kotlin.util.poet
+package org.cufy.mmrpc.gen.kotlin.util.gen.references
 
 import com.squareup.kotlinpoet.ClassName
 import org.cufy.mmrpc.Marker3

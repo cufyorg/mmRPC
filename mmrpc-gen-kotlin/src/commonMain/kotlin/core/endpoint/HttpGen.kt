@@ -1,70 +1,53 @@
 package org.cufy.mmrpc.gen.kotlin.core.endpoint
 
-import com.squareup.kotlinpoet.*
+import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.STRING
+import com.squareup.kotlinpoet.asClassName
 import org.cufy.mmrpc.HttpEndpointDefinition
-import org.cufy.mmrpc.HttpEndpointInfo
 import org.cufy.mmrpc.HttpEndpointObject
 import org.cufy.mmrpc.gen.kotlin.GenContext
 import org.cufy.mmrpc.gen.kotlin.GenGroup
-import org.cufy.mmrpc.gen.kotlin.util.asClassName
-import org.cufy.mmrpc.gen.kotlin.util.fStaticInfo
-import org.cufy.mmrpc.gen.kotlin.util.fStaticPath
-import org.cufy.mmrpc.gen.kotlin.util.poet.*
+import org.cufy.mmrpc.gen.kotlin.util.F_STATIC_PATH
+import org.cufy.mmrpc.gen.kotlin.util.gen.common.createOverrideObjectInfoProperty
+import org.cufy.mmrpc.gen.kotlin.util.gen.common.createSerialNameAnnotationSet
+import org.cufy.mmrpc.gen.kotlin.util.gen.common.createSerializableAnnotationSet
+import org.cufy.mmrpc.gen.kotlin.util.gen.common.createStaticInfoProperty
+import org.cufy.mmrpc.gen.kotlin.util.gen.hasGeneratedClass
+import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createAnnotationSet
+import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createKDoc
+import org.cufy.mmrpc.gen.kotlin.util.poet.propertySpec
 
 class HttpGen(override val ctx: GenContext) : GenGroup() {
     override fun apply() {
-        for (element in ctx.specSheet.collectChildren()) {
+        for (element in ctx.elements) {
             if (element !is HttpEndpointDefinition) continue
-            if (element.isAnonymous) continue
+            if (!hasGeneratedClass(element)) continue
 
             failGenBoundary {
-                onObject(element.namespace) {
-                    addType(createDataObject(element))
-                }
+                applyCreateDataObject(element)
             }
         }
     }
 
-    private fun createDataObject(element: HttpEndpointDefinition): TypeSpec {
-        return TypeSpec
-            .objectBuilder(element.asClassName)
-            .addModifiers(KModifier.DATA)
-            .addProperty(createStaticInfoProperty(element))
-            .addProperty(createStaticPathProperty(element))
-            .overrideObject(element)
-            .addKdoc(createKDoc(element))
-            .addAnnotations(createAnnotationSet(element.metadata))
-            .addAnnotations(createOptionalSerializableAnnotationSet())
-            .addAnnotations(createOptionalSerialNameAnnotationSet(element.canonicalName.value))
-            .build()
-    }
+    private fun applyCreateDataObject(element: HttpEndpointDefinition) {
+        val superinterface = HttpEndpointObject::class.asClassName()
 
-    private fun TypeSpec.Builder.overrideObject(element: HttpEndpointDefinition): TypeSpec.Builder {
-        val overrideObjectClass = HttpEndpointObject::class.asClassName()
+        val staticPath = propertySpec(F_STATIC_PATH, STRING) {
+            addModifiers(KModifier.CONST)
+            initializer("%S", element.endpointPath.value)
+        }
 
-        val infoPropertySpec = PropertySpec
-            .builder("info", HttpEndpointInfo::class)
-            .addModifiers(KModifier.OVERRIDE)
-            .initializer("%L", element.fStaticInfo)
-            .build()
+        createObject(element) {
+            addModifiers(KModifier.DATA)
+            addSuperinterface(superinterface)
+            addProperty(staticPath)
+            addProperty(createStaticInfoProperty(element))
+            addProperty(createOverrideObjectInfoProperty(element))
 
-        return this
-            .superclass(overrideObjectClass)
-            .addProperty(infoPropertySpec)
-    }
-
-    private fun createStaticInfoProperty(element: HttpEndpointDefinition): PropertySpec {
-        return PropertySpec
-            .builder(element.fStaticInfo, HttpEndpointInfo::class)
-            .initializer("\n%L", createInfo(element))
-            .build()
-    }
-
-    private fun createStaticPathProperty(element: HttpEndpointDefinition): PropertySpec {
-        return PropertySpec
-            .builder(element.fStaticPath, STRING)
-            .addModifiers(KModifier.CONST)
-            .initializer("%S", element.endpointPath.value)
-            .build()
+            addKdoc(createKDoc(element))
+            addAnnotations(createAnnotationSet(element.metadata))
+            addAnnotations(createSerializableAnnotationSet())
+            addAnnotations(createSerialNameAnnotationSet(element.canonicalName.value))
+        }
     }
 }
