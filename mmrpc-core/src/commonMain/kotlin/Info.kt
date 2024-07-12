@@ -267,6 +267,8 @@ data class UnionInfo(
     override val name: String,
     override val namespace: Namespace,
     override val metadata: List<MetadataInfoUsage>,
+    @SerialName("union_discriminator")
+    val discriminator: String,
     @SerialName("union_types")
     val types: List<StructInfo>,
 ) : TypeInfo()

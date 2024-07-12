@@ -30,6 +30,8 @@ data class UnionDefinition(
     override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
+    @SerialName("union_discriminator")
+    val unionDiscriminator: String = "type",
     @SerialName("union_types")
     val unionTypes: List<StructDefinition>,
 ) : TypeDefinition() {
@@ -48,6 +50,8 @@ open class UnionDefinitionBuilder :
     ElementDefinitionBuilder() {
     override var name = UnionDefinition.ANONYMOUS_NAME
 
+    open var discriminator: String = "type"
+
     protected open val unionTypesUnnamed = mutableListOf<Unnamed<StructDefinition>>()
 
     @Suppress("INAPPLICABLE_JVM_NAME")
@@ -64,6 +68,7 @@ open class UnionDefinitionBuilder :
             isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.toList(),
+            unionDiscriminator = this.discriminator,
             unionTypes = this.unionTypesUnnamed.mapIndexed { i, it ->
                 it.get(asNamespace, name = "type$i")
             },

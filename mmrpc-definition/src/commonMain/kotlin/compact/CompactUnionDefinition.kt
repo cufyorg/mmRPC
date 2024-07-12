@@ -13,6 +13,8 @@ data class CompactUnionDefinition(
     override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
+    @SerialName("union_discriminator")
+    val unionDiscriminator: String,
     @SerialName("union_types.ref")
     val unionTypes: List<CanonicalName>,
 ) : CompactElementDefinition
@@ -25,6 +27,7 @@ fun UnionDefinition.toCompact(): CompactUnionDefinition {
         description = this.description,
         metadata = this.metadata
             .map { it.toCompact() },
+        unionDiscriminator = this.unionDiscriminator,
         unionTypes = this.unionTypes
             .map { it.canonicalName }
     )
@@ -42,6 +45,7 @@ fun CompactUnionDefinition.inflate(
             metadata = this.metadata.map {
                 it.inflate(onLookup)() ?: return@it null
             },
+            unionDiscriminator = this.unionDiscriminator,
             unionTypes = this.unionTypes.map {
                 val item = onLookup(it) ?: return@it null
                 require(item is StructDefinition) {
