@@ -66,6 +66,8 @@ object Kafka {
      * The jwt should include the header `kid` which should be
      * the id of either a previously agreed upon key of the
      * client or a key in a previously agreed upon keyset uri.
+     * Additionally, the jwt should include the claim `client_id`
+     * which should be the id of the client.
      */
     val SameClient = KafkaSecurity("SameClient")
 
