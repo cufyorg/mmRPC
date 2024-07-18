@@ -58,7 +58,7 @@ object Kafka {
     /**
      * Requires confirmation of the identity of a client.
      *
-     * ### JWS MESSAGES
+     * ### JWS MESSAGES (experimental)
      *
      * The client is considered authenticated with itself
      * as the subject when it provides the message as the
@@ -70,6 +70,22 @@ object Kafka {
      * which should be the id of the client.
      */
     val SameClient = KafkaSecurity("SameClient")
+
+    /**
+     * Requires confirmation of the identity of a software.
+     *
+     * ### JWS MESSAGES (experimental)
+     *
+     * The client is considered authenticated with its software
+     * as the subject when it provides the message as the
+     * payload in a jwt signed by a trusted key of the software.
+     * The jwt should include the header `kid` which should be
+     * the id of either a previously agreed upon key of the
+     * software or a key in a previously agreed upon keyset uri.
+     * Additionally, the jwt should include the claim `software_id`
+     * which should be the id of the software.
+     */
+    val SameSoftware = KafkaSecurity("SameSoftware")
 
     // Planned to add Confidential with JWE
 }

@@ -51,6 +51,20 @@ object Http {
     val SameClient = HttpSecurity("SameClient")
 
     /**
+     * Requires confirmation of the identity of a software.
+     *
+     * ### OAUTH RFC6750
+     *
+     * The client is considered authenticated with its software
+     * as the subject when it provides an access token
+     * using [RFC6750](https://datatracker.ietf.org/doc/html/rfc6750)
+     * with its software id in the `software_id` claim
+     * and the `iss` claim is either a trusted **subject** identity
+     * provider or a trusted **client** identity provider.
+     */
+    val SameSoftware = HttpSecurity("SameSoftware")
+
+    /**
      * Requires confirmation of the identity of a client
      * and confirmation of consent from a subject to the
      * same client.

@@ -48,6 +48,17 @@ object Iframe {
      * its domain in the iframe's `document.referrer`.
      */
     val SameClient = IframeSecurity("SameClient")
+
+    /**
+     * Requires confirmation of the identity of a software.
+     *
+     * ### USING `document.referrer`
+     *
+     * The client is considered authenticated with its software
+     * as the subject when the iframe successfully identifies
+     * its software's domain in the iframe's `document.referrer`.
+     */
+    val SameSoftware = IframeSecurity("SameSoftware")
 }
 
 fun Namespace.toIframePath(): IframePath {
