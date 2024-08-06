@@ -68,7 +68,7 @@ object Kafka {
      * client or a key in a previously agreed upon keyset uri.
      *
      * Additionally, the jwt should include the claim `iss`
-     * which should be the id of the software.
+     * which should be the id of the client.
      *
      * If the jwt has the header `cty` is present, it must be one of:
      *
