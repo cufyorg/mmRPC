@@ -24,7 +24,7 @@ fun GenGroup.createAnnotationSet(metadata: List<MetadataDefinitionUsage>): List<
                 .apply {
                     for (usage in it.fields) {
                         val name = usage.definition.asPropertyName
-                        val literal = createLiteralInlined(
+                        val literal = createMetadataLiteral(
                             usage.definition.fieldType,
                             usage.value
                         )

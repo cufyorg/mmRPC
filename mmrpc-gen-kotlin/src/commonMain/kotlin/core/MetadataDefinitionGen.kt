@@ -39,7 +39,7 @@ class MetadataDefinitionGen(override val ctx: GenContext) : GenGroup() {
                     val default = it.fieldDefault
 
                     if (default != null) {
-                        defaultValue(createLiteralInlined(it.fieldType, default))
+                        defaultValue(createMetadataLiteral(it.fieldType, default))
                     }
                 }
             }
