@@ -4,16 +4,18 @@ import com.squareup.kotlinpoet.ClassName
 import org.cufy.mmrpc.Marker3
 import org.cufy.mmrpc.MetadataDefinition
 import org.cufy.mmrpc.gen.kotlin.GenGroup
-import org.cufy.mmrpc.gen.kotlin.util.gen.debugRejectAnonymous
+import org.cufy.mmrpc.gen.kotlin.util.gen.hasGeneratedClass
 import org.cufy.mmrpc.gen.kotlin.util.gen.isNative
+import org.cufy.mmrpc.gen.kotlin.util.gen.isUserdefined
 
 private const val TAG = "annotationClassOf"
 
 @Marker3
 fun GenGroup.annotationClassOf(element: MetadataDefinition): ClassName {
-    debugRejectAnonymous(TAG, element)
     return when {
         isNative(element) -> nativeClassOf(element)
-        else -> generatedClassOf(element)
+        isUserdefined(element) -> userdefinedClassOf(element)
+        hasGeneratedClass(element) -> generatedClassOf(element)
+        else -> failGen(TAG, element) { "Cannot determine annotation class of element." }
     }
 }

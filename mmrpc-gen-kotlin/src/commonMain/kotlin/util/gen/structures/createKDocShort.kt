@@ -8,6 +8,7 @@ import org.cufy.mmrpc.ScalarDefinition
 import org.cufy.mmrpc.gen.kotlin.GenGroup
 import org.cufy.mmrpc.gen.kotlin.util.gen.hasGeneratedClass
 import org.cufy.mmrpc.gen.kotlin.util.gen.isNative
+import org.cufy.mmrpc.gen.kotlin.util.gen.isUserdefined
 import org.cufy.mmrpc.gen.kotlin.util.gen.references.generatedClassOf
 import org.cufy.mmrpc.gen.kotlin.util.signatureOf
 
@@ -16,11 +17,13 @@ fun GenGroup.createKDocShort(element: ElementDefinition): CodeBlock {
     if (hasGeneratedClass(element))
         return CodeBlock.of("@see [%L]", generatedClassOf(element))
 
-    if (element is ScalarDefinition && isNative(element))
-        return CodeBlock.of("### %L", signatureOf(element))
+    if (element is ScalarDefinition)
+        if (isNative(element) || isUserdefined(element))
+            return CodeBlock.of("### %L", signatureOf(element))
 
-    if (element is MetadataDefinition && isNative(element))
-        return CodeBlock.of("### %L", signatureOf(element))
+    if (element is MetadataDefinition)
+        if (isNative(element) || isUserdefined(element))
+            return CodeBlock.of("### %L", signatureOf(element))
 
     return createKDoc(element)
 }

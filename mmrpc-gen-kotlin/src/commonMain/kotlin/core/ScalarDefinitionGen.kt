@@ -12,7 +12,7 @@ import org.cufy.mmrpc.gen.kotlin.util.gen.common.createSerialNameAnnotationSet
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createSerializableAnnotationSet
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createStaticInfoProperty
 import org.cufy.mmrpc.gen.kotlin.util.gen.hasGeneratedClass
-import org.cufy.mmrpc.gen.kotlin.util.gen.references.nativeClassOf
+import org.cufy.mmrpc.gen.kotlin.util.gen.references.primitiveClassOf
 import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createAnnotationSet
 import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createKDoc
 import org.cufy.mmrpc.gen.kotlin.util.poet.companionObjectSpec
@@ -33,16 +33,16 @@ class ScalarDefinitionGen(override val ctx: GenContext) : GenGroup() {
 
     private fun applyCreateValueClass(element: ScalarDefinition) {
         val superinterface = ScalarObject::class.asClassName()
-            .parameterizedBy(nativeClassOf(element))
+            .parameterizedBy(primitiveClassOf(element))
 
         val companionObject = companionObjectSpec {
             addProperty(createStaticInfoProperty(element))
         }
 
         val primaryConstructor = constructorSpec {
-            addParameter("value", nativeClassOf(element))
+            addParameter("value", primitiveClassOf(element))
         }
-        val valuePropertySpec = propertySpec("value", nativeClassOf(element)) {
+        val valuePropertySpec = propertySpec("value", primitiveClassOf(element)) {
             addModifiers(KModifier.OVERRIDE)
             initializer("value")
         }
