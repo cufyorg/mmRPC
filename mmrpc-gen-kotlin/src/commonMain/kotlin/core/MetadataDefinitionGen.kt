@@ -6,11 +6,11 @@ import org.cufy.mmrpc.gen.kotlin.GenGroup
 import org.cufy.mmrpc.gen.kotlin.util.asPropertyName
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createStaticInfoProperty
 import org.cufy.mmrpc.gen.kotlin.util.gen.hasGeneratedClass
-import org.cufy.mmrpc.gen.kotlin.util.gen.references.typeOf
+import org.cufy.mmrpc.gen.kotlin.util.gen.references.metadataTypeOf
 import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createAnnotationSet
 import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createKDoc
 import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createKDocShort
-import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createLiteralInlined
+import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createMetadataLiteral
 import org.cufy.mmrpc.gen.kotlin.util.poet.companionObjectSpec
 import org.cufy.mmrpc.gen.kotlin.util.poet.constructorSpec
 import org.cufy.mmrpc.gen.kotlin.util.poet.parameterSpec
@@ -35,7 +35,7 @@ class MetadataDefinitionGen(override val ctx: GenContext) : GenGroup() {
 
         val primaryConstructor = constructorSpec {
             val parameters = element.metadataFields.map {
-                parameterSpec(it.asPropertyName, typeOf(it.fieldType)) {
+                parameterSpec(it.asPropertyName, metadataTypeOf(it.fieldType)) {
                     val default = it.fieldDefault
 
                     if (default != null) {
@@ -48,7 +48,7 @@ class MetadataDefinitionGen(override val ctx: GenContext) : GenGroup() {
         }
 
         val properties = element.metadataFields.map {
-            propertySpec(it.asPropertyName, typeOf(it.fieldType)) {
+            propertySpec(it.asPropertyName, metadataTypeOf(it.fieldType)) {
                 initializer(it.asPropertyName)
 
                 addKdoc(createKDocShort(it))
