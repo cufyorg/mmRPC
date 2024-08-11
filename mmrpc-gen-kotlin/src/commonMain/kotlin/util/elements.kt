@@ -3,6 +3,9 @@ package org.cufy.mmrpc.gen.kotlin.util
 import org.cufy.mmrpc.*
 import kotlin.reflect.KClass
 
+/**
+ * The appropriate info class for this element definition.
+ */
 val ElementDefinition.infoClass: KClass<out ElementInfo>
     get() = when (this) {
         is ConstDefinition -> ConstInfo::class

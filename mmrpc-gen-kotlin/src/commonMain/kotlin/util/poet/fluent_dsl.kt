@@ -3,6 +3,8 @@ package org.cufy.mmrpc.gen.kotlin.util.poet
 import com.squareup.kotlinpoet.*
 import kotlin.reflect.KClass
 
+/* These are just convenience functions to make usage of kotlin-poet much easier and more readable. */
+
 // ParameterSpec.builder
 
 fun parameterSpec(name: String, type: TypeName, block: ParameterSpec.Builder.() -> Unit = {}): ParameterSpec {

@@ -8,6 +8,9 @@ import org.cufy.mmrpc.gen.kotlin.util.poet.createBoxedNamespace
 import org.cufy.mmrpc.gen.kotlin.util.poet.createCall
 import org.cufy.mmrpc.gen.kotlin.util.poet.createCallSingleVararg
 
+/**
+ * Return code that, when executed, returns [HttpEndpointInfo] representing the given [element].
+ */
 @Marker3
 fun GenGroup.createInfo(element: HttpEndpointDefinition): CodeBlock {
     return createCall(
@@ -36,6 +39,9 @@ fun GenGroup.createInfo(element: HttpEndpointDefinition): CodeBlock {
     )
 }
 
+/**
+ * Return code that, when executed, returns [IframeEndpointInfo] representing the given [element].
+ */
 @Marker3
 fun GenGroup.createInfo(element: IframeEndpointDefinition): CodeBlock {
     return createCall(
@@ -58,6 +64,9 @@ fun GenGroup.createInfo(element: IframeEndpointDefinition): CodeBlock {
     )
 }
 
+/**
+ * Return code that, when executed, returns [KafkaEndpointInfo] representing the given [element].
+ */
 @Marker3
 fun GenGroup.createInfo(element: KafkaEndpointDefinition): CodeBlock {
     return createCall(
@@ -84,6 +93,9 @@ fun GenGroup.createInfo(element: KafkaEndpointDefinition): CodeBlock {
     )
 }
 
+/**
+ * Return code that, when executed, returns [KafkaPublicationEndpointInfo] representing the given [element].
+ */
 @Marker3
 fun GenGroup.createInfo(element: KafkaPublicationEndpointDefinition): CodeBlock {
     return createCall(

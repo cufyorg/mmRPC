@@ -3,6 +3,9 @@ package org.cufy.mmrpc.gen.kotlin.util.poet
 import com.squareup.kotlinpoet.CodeBlock
 import org.cufy.mmrpc.*
 
+/**
+ * Return code that, when executed, returns the given literal [element].
+ */
 fun createBoxedLiteral(element: Literal): CodeBlock {
     return when (element) {
         is NullLiteral

@@ -3,6 +3,11 @@ package org.cufy.mmrpc.gen.kotlin.util.poet
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.joinToCode
 
+/**
+ * @param function code locating the function.
+ * @param parameters named parameters of the function.
+ * @return code invoking [function] with given named [parameters].
+ */
 fun createCall(function: CodeBlock, vararg parameters: Pair<String, CodeBlock>): CodeBlock {
     return createCall(
         function = function,
@@ -10,6 +15,11 @@ fun createCall(function: CodeBlock, vararg parameters: Pair<String, CodeBlock>):
     )
 }
 
+/**
+ * @param function code locating the function.
+ * @param parameters named parameters of the function.
+ * @return code invoking [function] with given named [parameters].
+ */
 fun createCall(function: CodeBlock, parameters: Map<String, CodeBlock>): CodeBlock {
     if (parameters.isEmpty())
         return CodeBlock.of("%L()", function)
@@ -23,6 +33,11 @@ fun createCall(function: CodeBlock, parameters: Map<String, CodeBlock>): CodeBlo
     )
 }
 
+/**
+ * @param function code locating the function.
+ * @param parameters positional parameters.
+ * @return code invoking [function] with given positional [parameters].
+ */
 fun createCallSingleVararg(function: CodeBlock, vararg parameters: CodeBlock): CodeBlock {
     return createCallSingleVararg(
         function = function,
@@ -30,6 +45,11 @@ fun createCallSingleVararg(function: CodeBlock, vararg parameters: CodeBlock): C
     )
 }
 
+/**
+ * @param function code locating the function.
+ * @param parameters positional parameters.
+ * @return code invoking [function] with given positional [parameters].
+ */
 fun createCallSingleVararg(function: CodeBlock, parameters: List<CodeBlock>): CodeBlock {
     if (parameters.isEmpty())
         return CodeBlock.of("%L()", function)

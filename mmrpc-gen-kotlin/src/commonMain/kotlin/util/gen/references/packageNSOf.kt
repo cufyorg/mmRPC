@@ -7,6 +7,9 @@ import org.cufy.mmrpc.gen.kotlin.GenGroup
 
 private const val MSG_TOPLEVEL_MISSING = "Unexpected Internal State: Namespace.Toplevel not in packagesNS"
 
+/**
+ * Return the namespace of the top most element the given [element] is on.
+ */
 @Marker3
 fun GenGroup.rootNSOf(element: ElementDefinition): Namespace {
     var pkg = element.namespace

@@ -18,6 +18,9 @@ class GenContext(
     override val ctx: GenContext = this
     override fun apply() {}
 
+    /**
+     * All the elements.
+     */
     val elements = buildSet {
         if (!featureNoBuiltin) {
             this += builtin.Any
@@ -39,8 +42,15 @@ class GenContext(
         this.addAll(specSheet.elements)
     }
 
+    /**
+     * All the elements each associated with itself as a namespace.
+     */
     val elementsNS = elements.associateBy { it.asNamespace }
 
+    /**
+     * The namespaces of all the elements excluding namespaces
+     * that representing elements.
+     */
     val rootsNS = elements.asSequence()
         .filterNot { it.isAnonymous }
         .flatMap { it.namespace.collect() }

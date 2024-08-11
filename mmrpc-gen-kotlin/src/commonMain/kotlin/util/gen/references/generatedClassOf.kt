@@ -11,6 +11,10 @@ import org.cufy.mmrpc.gen.kotlin.util.gen.debugRequireGeneratedClass
 
 private const val TAG = "generatedClassOf"
 
+/**
+ * Assuming the given [element] has a generated class,
+ * return the kotlin-poet classname of said generated class.
+ */
 @Marker3
 fun GenGroup.generatedClassOf(element: ElementDefinition): ClassName {
     debugRequireGeneratedClass(TAG, element)

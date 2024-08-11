@@ -8,6 +8,9 @@ import org.cufy.mmrpc.gen.kotlin.util.poet.createBoxedNamespace
 import org.cufy.mmrpc.gen.kotlin.util.poet.createCall
 import org.cufy.mmrpc.gen.kotlin.util.poet.createCallSingleVararg
 
+/**
+ * Return code that, when executed, returns [ArrayInfo] representing the given [element].
+ */
 @Marker3
 fun GenGroup.createInfo(element: ArrayDefinition): CodeBlock {
     return createCall(
@@ -22,6 +25,9 @@ fun GenGroup.createInfo(element: ArrayDefinition): CodeBlock {
     )
 }
 
+/**
+ * Return code that, when executed, returns [EnumInfo] representing the given [element].
+ */
 @Marker3
 fun GenGroup.createInfo(element: EnumDefinition): CodeBlock {
     return createCall(
@@ -40,6 +46,9 @@ fun GenGroup.createInfo(element: EnumDefinition): CodeBlock {
     )
 }
 
+/**
+ * Return code that, when executed, returns [InterInfo] representing the given [element].
+ */
 @Marker3
 fun GenGroup.createInfo(element: InterDefinition): CodeBlock {
     return createCall(
@@ -57,6 +66,9 @@ fun GenGroup.createInfo(element: InterDefinition): CodeBlock {
     )
 }
 
+/**
+ * Return code that, when executed, returns [OptionalInfo] representing the given [element].
+ */
 @Marker3
 fun GenGroup.createInfo(element: OptionalDefinition): CodeBlock {
     return createCall(
@@ -71,6 +83,9 @@ fun GenGroup.createInfo(element: OptionalDefinition): CodeBlock {
     )
 }
 
+/**
+ * Return code that, when executed, returns [ScalarInfo] representing the given [element].
+ */
 @Marker3
 fun GenGroup.createInfo(element: ScalarDefinition): CodeBlock {
     return createCall(
@@ -84,6 +99,9 @@ fun GenGroup.createInfo(element: ScalarDefinition): CodeBlock {
     )
 }
 
+/**
+ * Return code that, when executed, returns [StructInfo] representing the given [element].
+ */
 @Marker3
 fun GenGroup.createInfo(element: StructDefinition): CodeBlock {
     return createCall(
@@ -101,6 +119,9 @@ fun GenGroup.createInfo(element: StructDefinition): CodeBlock {
     )
 }
 
+/**
+ * Return code that, when executed, returns [TupleInfo] representing the given [element].
+ */
 @Marker3
 fun GenGroup.createInfo(element: TupleDefinition): CodeBlock {
     return createCall(
@@ -118,6 +139,9 @@ fun GenGroup.createInfo(element: TupleDefinition): CodeBlock {
     )
 }
 
+/**
+ * Return code that, when executed, returns [UnionInfo] representing the given [element].
+ */
 @Marker3
 fun GenGroup.createInfo(element: UnionDefinition): CodeBlock {
     return createCall(

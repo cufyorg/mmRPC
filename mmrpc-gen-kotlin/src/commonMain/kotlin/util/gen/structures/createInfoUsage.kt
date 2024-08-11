@@ -8,6 +8,9 @@ import org.cufy.mmrpc.gen.kotlin.util.poet.createBoxedLiteral
 import org.cufy.mmrpc.gen.kotlin.util.poet.createCall
 import org.cufy.mmrpc.gen.kotlin.util.poet.createCallSingleVararg
 
+/**
+ * Return code that, when executed, returns [MetadataInfoUsage] representing the given [element].
+ */
 @Marker3
 fun GenGroup.createInfoUsage(element: MetadataDefinitionUsage): CodeBlock {
     return createCall(
@@ -20,6 +23,9 @@ fun GenGroup.createInfoUsage(element: MetadataDefinitionUsage): CodeBlock {
     )
 }
 
+/**
+ * Return code that, when executed, returns [FieldInfoUsage] representing the given [element].
+ */
 @Marker3
 fun GenGroup.createInfoUsage(element: FieldDefinitionUsage): CodeBlock {
     return createCall(

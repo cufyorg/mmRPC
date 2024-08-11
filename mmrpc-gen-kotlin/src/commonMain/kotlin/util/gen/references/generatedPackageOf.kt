@@ -9,6 +9,10 @@ import org.cufy.mmrpc.gen.kotlin.util.gen.debugRequireGeneratedClass
 
 private const val TAG = "generatePackageOf"
 
+/**
+ * Assuming the given [element] has a generated class,
+ * return the package of said generated class.
+ */
 @Marker3
 fun GenGroup.generatedPackageOf(element: ElementDefinition): String {
     debugRequireGeneratedClass(TAG, element)

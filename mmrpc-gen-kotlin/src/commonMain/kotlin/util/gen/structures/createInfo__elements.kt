@@ -9,6 +9,9 @@ import org.cufy.mmrpc.gen.kotlin.util.poet.createBoxedNamespace
 import org.cufy.mmrpc.gen.kotlin.util.poet.createCall
 import org.cufy.mmrpc.gen.kotlin.util.poet.createCallSingleVararg
 
+/**
+ * Return code that, when executed, returns [ConstInfo] representing the given [element].
+ */
 @Marker3
 fun GenGroup.createInfo(element: ConstDefinition): CodeBlock {
     return createCall(
@@ -24,6 +27,9 @@ fun GenGroup.createInfo(element: ConstDefinition): CodeBlock {
     )
 }
 
+/**
+ * Return code that, when executed, returns [FaultInfo] representing the given [element].
+ */
 @Marker3
 fun GenGroup.createInfo(element: FaultDefinition): CodeBlock {
     return createCall(
@@ -37,6 +43,9 @@ fun GenGroup.createInfo(element: FaultDefinition): CodeBlock {
     )
 }
 
+/**
+ * Return code that, when executed, returns [FieldInfo] representing the given [element].
+ */
 @Marker3
 fun GenGroup.createInfo(element: FieldDefinition): CodeBlock {
     return createCall(
@@ -55,6 +64,9 @@ fun GenGroup.createInfo(element: FieldDefinition): CodeBlock {
     )
 }
 
+/**
+ * Return code that, when executed, returns [MetadataInfo] representing the given [element].
+ */
 @Marker3
 fun GenGroup.createInfo(element: MetadataDefinition): CodeBlock {
     return createCall(
@@ -72,6 +84,9 @@ fun GenGroup.createInfo(element: MetadataDefinition): CodeBlock {
     )
 }
 
+/**
+ * Return code that, when executed, returns [ProtocolInfo] representing the given [element].
+ */
 @Marker3
 fun GenGroup.createInfo(element: ProtocolDefinition): CodeBlock {
     return createCall(
@@ -89,6 +104,9 @@ fun GenGroup.createInfo(element: ProtocolDefinition): CodeBlock {
     )
 }
 
+/**
+ * Return code that, when executed, returns [RoutineInfo] representing the given [element].
+ */
 @Marker3
 fun GenGroup.createInfo(element: RoutineDefinition): CodeBlock {
     return createCall(

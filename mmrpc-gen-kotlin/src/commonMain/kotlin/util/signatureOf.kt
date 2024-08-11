@@ -2,6 +2,9 @@ package org.cufy.mmrpc.gen.kotlin.util
 
 import org.cufy.mmrpc.*
 
+/**
+ * Return a human-readable name of the given [element].
+ */
 fun signatureOf(element: ElementDefinition): String {
     val discriminator = when (element) {
         is ArrayDefinition -> "array"

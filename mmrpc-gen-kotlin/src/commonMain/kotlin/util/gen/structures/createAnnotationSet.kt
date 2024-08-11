@@ -7,6 +7,13 @@ import org.cufy.mmrpc.gen.kotlin.GenGroup
 import org.cufy.mmrpc.gen.kotlin.util.asPropertyName
 import org.cufy.mmrpc.gen.kotlin.util.gen.references.annotationClassOf
 
+/**
+ * Return a list containing each metadata in the given [metadata]
+ * list transformed into a kotlin-poet annotation spec.
+ *
+ * > this can be reduced to a single-in-single-out function
+ * > but was left this way for convenience.
+ */
 @Marker3
 fun GenGroup.createAnnotationSet(metadata: List<MetadataDefinitionUsage>): List<AnnotationSpec> {
     return buildList {

@@ -4,6 +4,9 @@ import com.squareup.kotlinpoet.CodeBlock
 import org.cufy.mmrpc.*
 import org.cufy.mmrpc.gen.kotlin.GenGroup
 
+/**
+ * Return code that, when executed, returns [ElementInfo] representing the given [element].
+ */
 @Marker3
 fun GenGroup.createInfo(element: ElementDefinition): CodeBlock {
     return when (element) {

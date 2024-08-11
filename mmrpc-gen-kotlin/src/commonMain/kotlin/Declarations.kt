@@ -4,8 +4,20 @@ import com.squareup.kotlinpoet.TypeSpec
 import org.cufy.mmrpc.ElementDefinition
 
 enum class GenFeature {
+    /**
+     * Adds appropriate kotlinx serialization
+     * annotations to generated code.
+     */
     KOTLINX_SERIALIZATION,
+
+    /**
+     * Enable debug assertions and logs.
+     */
     DEBUG,
+
+    /**
+     * Don't implicitly add builtin elements.
+     */
     NO_BUILTIN,
 }
 
