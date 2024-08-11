@@ -17,6 +17,9 @@ fun GenGroup.hasGeneratedClass(element: ElementDefinition): Boolean {
     if (element is MetadataDefinition)
         if (isNative(element) || isUserdefined(element))
             return false
+    if (element is ConstDefinition)
+        if (isNative(element))
+            return false
     val parent = ctx.elementsNS[element.namespace] ?: return true
     return hasGeneratedClass(parent)
 }
