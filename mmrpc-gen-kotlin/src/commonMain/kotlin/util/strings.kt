@@ -1,7 +1,5 @@
 package org.cufy.mmrpc.gen.kotlin.util
 
-import net.pearx.kasechange.toPascalCase
-
 internal fun String.furtherEscape(): String {
     return replace(":", "_")
 }
@@ -30,8 +28,4 @@ internal fun xth(position: Int): String {
         20 -> "twentieth"
         else -> "_${position}th"
     }
-}
-
-fun main() {
-    println("hello_WorldWideWeb3".toPascalCase())
 }

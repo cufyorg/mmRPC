@@ -4,6 +4,7 @@ import com.squareup.kotlinpoet.TypeSpec
 import org.cufy.mmrpc.ElementDefinition
 import org.cufy.mmrpc.Marker3
 import org.cufy.mmrpc.gen.kotlin.util.asClassName
+import org.cufy.mmrpc.gen.kotlin.util.gen.debug
 
 abstract class GenGroup {
     abstract val ctx: GenContext
@@ -33,6 +34,11 @@ abstract class GenGroup {
 
     @Marker3
     fun create(element: ElementDefinition, block: () -> TypeSpec.Builder) {
+        debug {
+            if (ctx.createElementNodes.any { it.element == element })
+                failGen("ctx.create", element) { "Element was registered twice." }
+        }
+
         ctx.createElementNodes += CreateElementNode(
             element = element,
             block = block,

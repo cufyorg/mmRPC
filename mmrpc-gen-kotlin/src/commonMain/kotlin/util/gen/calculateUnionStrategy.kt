@@ -15,7 +15,7 @@ enum class UnionStrategy {
 
 @Marker3
 fun GenGroup.calculateUnionStrategy(element: UnionDefinition): UnionStrategy {
-    debugRejectAnonymous(TAG, element)
+    debugRequireGeneratedClass(TAG, element)
 
     if (element.unionTypes.isEmpty()) return UnionStrategy.DATA_OBJECT
 

@@ -13,7 +13,7 @@ enum class InterStrategy {
 
 @Marker3
 fun GenGroup.calculateInterStrategy(element: InterDefinition): InterStrategy {
-    debugRejectAnonymous(TAG, element)
+    debugRequireGeneratedClass(TAG, element)
 
     if (element.interTypes.all { it.structFields.isEmpty() })
         return InterStrategy.DATA_OBJECT

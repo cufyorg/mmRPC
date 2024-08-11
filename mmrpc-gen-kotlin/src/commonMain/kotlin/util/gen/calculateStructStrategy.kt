@@ -13,7 +13,7 @@ enum class StructStrategy {
 
 @Marker3
 fun GenGroup.calculateStructStrategy(element: StructDefinition): StructStrategy {
-    debugRejectAnonymous(TAG, element)
+    debugRequireGeneratedClass(TAG, element)
 
     if (element.structFields.isEmpty())
         return StructStrategy.DATA_OBJECT

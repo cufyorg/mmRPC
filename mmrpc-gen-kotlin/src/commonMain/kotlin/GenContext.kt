@@ -54,7 +54,7 @@ class GenContext(
     val rootsNS = elements.asSequence()
         .filterNot { it.isAnonymous }
         .flatMap { it.namespace.collect() }
-        .filterNot { it in elementsNS }
+        .minus(elementsNS.keys)
         .plus(Namespace.Toplevel)
         .toSet()
 

@@ -13,7 +13,7 @@ enum class TupleStrategy {
 
 @Marker3
 fun GenGroup.calculateTupleStrategy(element: TupleDefinition): TupleStrategy {
-    debugRejectAnonymous(TAG, element)
+    debugRequireGeneratedClass(TAG, element)
 
     if (element.tupleTypes.isEmpty())
         return TupleStrategy.DATA_OBJECT
