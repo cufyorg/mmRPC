@@ -32,6 +32,12 @@ const val F_STATIC_VALUE = "VALUE"
 const val F_STATIC_NAME = "NAME"
 
 /**
+ * For any element that has a static field holding its canonical name,
+ * this is the name of said static field.
+ */
+const val F_STATIC_CANONICAL_NAME = "CANONICAL_NAME"
+
+/**
  * For any element that has a static field holding its `path` value,
  * this is the name of said static field.
  */
