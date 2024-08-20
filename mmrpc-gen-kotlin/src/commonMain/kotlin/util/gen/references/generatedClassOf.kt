@@ -27,8 +27,8 @@ private fun GenScope.implSubPackages(element: ElementDefinition): ClassName {
     val ns = rootNSOf(element)
     val nsv = ns.canonicalName.value.furtherEscape()
     val pkg = when {
-        ctx.pkg.isEmpty() -> nsv
-        else -> "${ctx.pkg}.$nsv"
+        ctx.packageName.isEmpty() -> nsv
+        else -> "${ctx.packageName}.$nsv"
     }
     val names = element.asNamespace.collect()
         .drop(ns.segments.size)

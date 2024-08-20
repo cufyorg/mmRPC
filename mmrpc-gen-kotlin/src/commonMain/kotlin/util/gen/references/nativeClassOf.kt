@@ -17,7 +17,7 @@ private const val TAG = "nativeClassOf"
 @Marker3
 fun GenScope.nativeClassOf(element: MetadataDefinition): ClassName {
     debug { if (!isNative(element)) failGen(TAG, element) { "element not native" } }
-    return ctx.classes[element.canonicalName]
+    return ctx.nativeMetadataClasses[element.canonicalName]
         ?: failGen(TAG, element) { "element class is not set" }
 }
 
@@ -28,7 +28,6 @@ fun GenScope.nativeClassOf(element: MetadataDefinition): ClassName {
 @Marker3
 fun GenScope.nativeClassOf(element: ScalarDefinition): ClassName {
     debug { if (!isNative(element)) failGen(TAG, element) { "element not native" } }
-    return ctx.classes[element.canonicalName]
-        ?: ctx.defaultScalarClass
+    return ctx.nativeScalarClasses[element.canonicalName]
         ?: failGen(TAG, element) { "no element to native class mapping nor a default scalar class was set" }
 }

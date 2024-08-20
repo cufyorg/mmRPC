@@ -12,7 +12,7 @@ import org.cufy.mmrpc.gen.kotlin.GenScope
  */
 @Marker3
 fun GenScope.isNative(element: ScalarDefinition): Boolean {
-    return element.canonicalName in ctx.nativeElements
+    return element.canonicalName in ctx.nativeScalarClasses
 }
 
 /**
@@ -21,7 +21,7 @@ fun GenScope.isNative(element: ScalarDefinition): Boolean {
  */
 @Marker3
 fun GenScope.isNative(element: MetadataDefinition): Boolean {
-    return element.canonicalName in ctx.nativeElements
+    return element.canonicalName in ctx.nativeMetadataClasses
 }
 
 /**
@@ -30,5 +30,5 @@ fun GenScope.isNative(element: MetadataDefinition): Boolean {
  */
 @Marker3
 fun GenScope.isNative(element: ConstDefinition): Boolean {
-    return element.canonicalName in ctx.nativeElements
+    return element.canonicalName in ctx.nativeConstants
 }

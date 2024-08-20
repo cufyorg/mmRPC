@@ -17,7 +17,7 @@ private const val TAG = "userdefinedClassOf"
 @Marker3
 fun GenScope.userdefinedClassOf(element: MetadataDefinition): ClassName {
     debug { if (!isUserdefined(element)) failGen(TAG, element) { "element not userdefined" } }
-    return ctx.classes[element.canonicalName]
+    return ctx.userdefinedMetadataClasses[element.canonicalName]
         ?: failGen(TAG, element) { "element class is not set" }
 }
 
@@ -28,6 +28,6 @@ fun GenScope.userdefinedClassOf(element: MetadataDefinition): ClassName {
 @Marker3
 fun GenScope.userdefinedClassOf(element: ScalarDefinition): ClassName {
     debug { if (!isUserdefined(element)) failGen(TAG, element) { "element not userdefined" } }
-    return ctx.classes[element.canonicalName]
+    return ctx.userdefinedScalarClasses[element.canonicalName]
         ?: failGen(TAG, element) { "no element to userdefined-class mapping was set" }
 }

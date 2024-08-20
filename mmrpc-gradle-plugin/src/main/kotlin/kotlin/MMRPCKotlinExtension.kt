@@ -13,35 +13,57 @@ class MMRPCKotlinExtension {
     var enabled: Boolean = true
 
     /**
-     * Package name for generated DSL
-     */
-    var packageName: String =
-        MMRPCKotlin.DEFAULT_PACKAGE_NAME
-
-    var packaging: GenPackaging =
-        MMRPCKotlin.DEFAULT_PACKAGING
-
-    val classes: MutableMap<String, String> =
-        MMRPCKotlin.DEFAULT_CLASSES.toMutableMap()
-
-    val classNames: MutableMap<String, String> =
-        mutableMapOf()
-
-    var defaultScalarClass: String? =
-        null
-
-    val nativeElements: MutableSet<String> =
-        MMRPCKotlin.DEFAULT_NATIVE_ELEMENTS.toMutableSet()
-
-    val features: MutableSet<GenFeature> =
-        mutableSetOf()
-
-    /**
      * Output directory for generated DSL
      *
      * Default: `generated/sources/mmrpc/main/kotlin`
      */
     var outputDirectory: Directory? = null
+
+    //
+
+    /**
+     * Package name for generated DSL
+     */
+    var packageName: String =
+        MMRPCKotlin.Defaults.PACKAGE_NAME
+
+    var packaging: GenPackaging =
+        MMRPCKotlin.Defaults.PACKAGING
+
+    val features: MutableSet<GenFeature> =
+        MMRPCKotlin.Defaults.FEATURES.toMutableSet()
+
+    // names
+
+    val classNames: MutableMap<String, String> =
+        MMRPCKotlin.Defaults.CLASS_NAMES.toMutableMap()
+
+    // scalar classes
+
+    var defaultScalarClass: String =
+        MMRPCKotlin.Defaults.DEFAULT_SCALAR_CLASS
+
+    val scalarClasses: MutableMap<String, String> =
+        MMRPCKotlin.Defaults.SCALAR_CLASSES.toMutableMap()
+
+    // native classes
+
+    val nativeScalarClasses: MutableMap<String, String> =
+        MMRPCKotlin.Defaults.NATIVE_SCALAR_CLASSES.toMutableMap()
+
+    val nativeMetadataClasses: MutableMap<String, String> =
+        MMRPCKotlin.Defaults.NATIVE_METADATA_CLASSES.toMutableMap()
+
+    val nativeConstants: MutableSet<String> =
+        MMRPCKotlin.Defaults.NATIVE_CONSTANTS.toMutableSet()
+
+    // userdefined classes
+
+    val customScalarClasses: MutableMap<String, String> =
+        MMRPCKotlin.Defaults.USERDEFINED_SCALAR_CLASSES.toMutableMap()
+
+    val customMetadataClasses: MutableMap<String, String> =
+        MMRPCKotlin.Defaults.USERDEFINED_METADATA_CLASSES.toMutableMap()
 
     //
 

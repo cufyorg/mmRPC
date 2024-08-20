@@ -5,8 +5,10 @@ object MMRPC {
     const val GROUP_NAME = "mmrpc"
     const val EXTENSION_NAME = "mmrpc"
 
-    val DEFAULT_DIRECTORIES = listOf(
-        "src/main/resources/",
-        "src/commonMain/resources/",
-    )
+    object Defaults {
+        val DIRECTORIES = setOf(
+            "src/main/resources/",
+            "src/commonMain/resources/",
+        )
+    }
 }

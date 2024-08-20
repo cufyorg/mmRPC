@@ -7,14 +7,28 @@ import org.cufy.mmrpc.SpecSheet
 import org.cufy.mmrpc.builtin
 
 class GenContext(
-    val pkg: String,
-    val packaging: GenPackaging,
     val specSheet: SpecSheet,
-    val classes: Map<CanonicalName, ClassName>,
-    val classNames: Map<CanonicalName, String>,
-    val defaultScalarClass: ClassName?,
-    val nativeElements: Set<CanonicalName>,
+
+    //
+    val packageName: String,
+    val packaging: GenPackaging,
     val features: Set<GenFeature>,
+
+    // names
+    val classNames: Map<CanonicalName, String>,
+
+    // scalar classes
+    val defaultScalarClass: ClassName?,
+    val scalarClasses: Map<CanonicalName, ClassName>,
+
+    // native classes
+    val nativeScalarClasses: Map<CanonicalName, ClassName>,
+    val nativeMetadataClasses: Map<CanonicalName, ClassName>,
+    val nativeConstants: Set<CanonicalName>,
+
+    // userdefined classes
+    val userdefinedScalarClasses: Map<CanonicalName, ClassName>,
+    val userdefinedMetadataClasses: Map<CanonicalName, ClassName>,
 ) : GenScope() {
     override val ctx: GenContext = this
     override fun apply() {}

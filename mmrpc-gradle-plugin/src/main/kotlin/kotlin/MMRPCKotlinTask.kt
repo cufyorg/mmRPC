@@ -1,8 +1,11 @@
 package org.cufy.mmrpc.gradle.kotlin
 
+import com.squareup.kotlinpoet.ClassName
 import kotlinx.serialization.json.Json
+import org.cufy.mmrpc.CanonicalName
 import org.cufy.mmrpc.compact.CompactSpecSheet
 import org.cufy.mmrpc.compact.inflate
+import org.cufy.mmrpc.gen.kotlin.GenContext
 import org.cufy.mmrpc.gen.kotlin.GenFeature
 import org.cufy.mmrpc.gen.kotlin.GenPackaging
 import org.cufy.mmrpc.gen.kotlin.generateFileSpecSet
@@ -33,6 +36,12 @@ open class MMRPCKotlinTask : DefaultTask() {
     val directories: ListProperty<Directory> =
         this.project.objects.listProperty(Directory::class.java)
 
+    @OutputDirectory
+    val outputDirectory: DirectoryProperty =
+        this.project.objects.directoryProperty()
+
+    //
+
     @Input
     val packageName: Property<String> =
         this.project.objects.property(String::class.java)
@@ -42,60 +51,87 @@ open class MMRPCKotlinTask : DefaultTask() {
         this.project.objects.property(GenPackaging::class.java)
 
     @Input
-    val classes: MapProperty<String, String> =
-        this.project.objects.mapProperty(String::class.java, String::class.java)
+    val features: SetProperty<GenFeature> =
+        this.project.objects.setProperty(GenFeature::class.java)
+
+    // names
 
     @Input
     val classNames: MapProperty<String, String> =
         this.project.objects.mapProperty(String::class.java, String::class.java)
 
+    // scalar classes
+
     @Input
-    val defaultScalarClass: Property<String?> =
+    val defaultScalarClass: Property<String> =
         this.project.objects.property(String::class.java)
 
     @Input
-    val nativeElements: SetProperty<String> =
-        this.project.objects.setProperty(String::class.java)
+    val scalarClasses: MapProperty<String, String> =
+        this.project.objects.mapProperty(String::class.java, String::class.java)
+
+    // native classes
 
     @Input
-    val features: SetProperty<GenFeature> =
-        this.project.objects.setProperty(GenFeature::class.java)
+    val nativeScalarClasses: MapProperty<String, String> =
+        this.project.objects.mapProperty(String::class.java, String::class.java)
 
-    @OutputDirectory
-    val outputDirectory: DirectoryProperty =
-        this.project.objects.directoryProperty()
+    @Input
+    val nativeMetadataClasses: MapProperty<String, String> =
+        this.project.objects.mapProperty(String::class.java, String::class.java)
+
+    @Input
+    val nativeConstants: SetProperty<String> =
+        this.project.objects.setProperty(String::class.java)
+
+    // userdefined classes
+
+    @Input
+    val userdefinedScalarClasses: MapProperty<String, String> =
+        this.project.objects.mapProperty(String::class.java, String::class.java)
+
+    @Input
+    val userdefinedMetadataClasses: MapProperty<String, String> =
+        this.project.objects.mapProperty(String::class.java, String::class.java)
 
     init {
         this.group = MMRPC.GROUP_NAME
         this.description = "Generate Kotlin DSL from mmRPC Schema"
 
-        this.packageName.convention(MMRPCKotlin.DEFAULT_PACKAGE_NAME)
-        this.packaging.convention(MMRPCKotlin.DEFAULT_PACKAGING)
-        this.classes.convention(MMRPCKotlin.DEFAULT_CLASSES)
-        this.classNames.convention(emptyMap())
-        this.nativeElements.convention(MMRPCKotlin.DEFAULT_NATIVE_ELEMENTS)
-        this.features.convention(emptySet())
-
         this.files.convention(emptyList())
+        this.directories.convention(this.project.provider {
+            MMRPC.Defaults.DIRECTORIES.map { path ->
+                val fileProvider = this.project.provider { File(path) }
 
-        run {
-            val directoriesProvider = this.project.provider {
-                MMRPC.DEFAULT_DIRECTORIES.map { path ->
-                    val fileProvider = this.project.provider { File(path) }
-                    this.project.layout.dir(fileProvider).get()
-                }
+                this.project.layout.dir(fileProvider).get()
             }
+        })
+        this.outputDirectory.convention(run {
+            val path = MMRPCKotlin.Defaults.OUTPUT_DIRECTORY
 
-            this.directories.convention(directoriesProvider)
-        }
-        run {
-            val outputDirectoryProvider = run {
-                val path = MMRPCKotlin.DEFAULT_OUTPUT_DIRECTORY
-                this.project.layout.buildDirectory.dir(path)
-            }
+            this.project.layout.buildDirectory.dir(path)
+        })
 
-            this.outputDirectory.convention(outputDirectoryProvider)
-        }
+        //
+        this.packageName.convention(MMRPCKotlin.Defaults.PACKAGE_NAME)
+        this.packaging.convention(MMRPCKotlin.Defaults.PACKAGING)
+        this.features.convention(MMRPCKotlin.Defaults.FEATURES)
+
+        // names
+        this.classNames.convention(MMRPCKotlin.Defaults.CLASS_NAMES)
+
+        // scalar classes
+        this.defaultScalarClass.convention(MMRPCKotlin.Defaults.DEFAULT_SCALAR_CLASS)
+        this.scalarClasses.convention(MMRPCKotlin.Defaults.SCALAR_CLASSES)
+
+        // native classes
+        this.nativeScalarClasses.convention(MMRPCKotlin.Defaults.NATIVE_SCALAR_CLASSES)
+        this.nativeMetadataClasses.convention(MMRPCKotlin.Defaults.NATIVE_METADATA_CLASSES)
+        this.nativeConstants.convention(MMRPCKotlin.Defaults.NATIVE_CONSTANTS)
+
+        // userdefined classes
+        this.userdefinedScalarClasses.convention(MMRPCKotlin.Defaults.USERDEFINED_SCALAR_CLASSES)
+        this.userdefinedMetadataClasses.convention(MMRPCKotlin.Defaults.USERDEFINED_METADATA_CLASSES)
     }
 
     fun load(extension: MMRPCExtension) {
@@ -125,18 +161,30 @@ open class MMRPCKotlinTask : DefaultTask() {
 
             this.directories.convention(directoriesProvider)
         }
-
-        this.packageName.set(extension.kotlin.packageName)
-        this.packaging.set(extension.kotlin.packaging)
-        this.classes.set(extension.kotlin.classes)
-        this.classNames.set(extension.kotlin.classNames)
-        this.defaultScalarClass.set(extension.kotlin.defaultScalarClass)
-        this.nativeElements.set(extension.kotlin.nativeElements)
-        this.features.set(extension.kotlin.features)
-
         extension.kotlin.outputDirectory?.also {
             this.outputDirectory.set(it)
         }
+
+        //
+        this.packageName.set(extension.kotlin.packageName)
+        this.packaging.set(extension.kotlin.packaging)
+        this.features.set(extension.kotlin.features)
+
+        // names
+        this.classNames.set(extension.kotlin.classNames)
+
+        // scalar classes
+        this.defaultScalarClass.set(extension.kotlin.defaultScalarClass)
+        this.scalarClasses.set(extension.kotlin.scalarClasses)
+
+        // native classes
+        this.nativeScalarClasses.set(extension.kotlin.nativeScalarClasses)
+        this.nativeMetadataClasses.set(extension.kotlin.nativeMetadataClasses)
+        this.nativeConstants.set(extension.kotlin.nativeConstants)
+
+        // userdefined classes
+        this.userdefinedScalarClasses.set(extension.kotlin.customScalarClasses)
+        this.userdefinedMetadataClasses.set(extension.kotlin.customMetadataClasses)
     }
 
     fun prepare() {
@@ -192,15 +240,33 @@ open class MMRPCKotlinTask : DefaultTask() {
             throw TaskInstantiationException(message, e)
         }
 
-        val genContext = createGenContext(
+        val genContext = GenContext(
             specSheet = specSheet,
+            //
             packageName = this.packageName.get(),
             packaging = this.packaging.get(),
-            classes = this.classes.get(),
-            classNames = this.classNames.get(),
-            defaultScalarClass = this.defaultScalarClass.get(),
-            nativeElements = this.nativeElements.get(),
             features = this.features.get(),
+            // names
+            classNames = this.classNames.get().entries
+                .associate { CanonicalName(it.key) to it.value },
+            // scalar classes
+            defaultScalarClass = this.defaultScalarClass.get()
+                .let { ClassName.bestGuess(it) },
+            scalarClasses = this.scalarClasses.get().entries
+                .associate { CanonicalName(it.key) to ClassName.bestGuess(it.value) },
+            // native classes
+            nativeScalarClasses = this.nativeScalarClasses.get().entries
+                .associate { CanonicalName(it.key) to ClassName.bestGuess(it.value) },
+            nativeMetadataClasses = this.nativeMetadataClasses.get().entries
+                .associate { CanonicalName(it.key) to ClassName.bestGuess(it.value) },
+            nativeConstants = this.nativeConstants.get()
+                .map { CanonicalName(it) }
+                .toSet(),
+            // userdefined classes
+            userdefinedScalarClasses = this.userdefinedScalarClasses.get().entries
+                .associate { CanonicalName(it.key) to ClassName.bestGuess(it.value) },
+            userdefinedMetadataClasses = this.userdefinedMetadataClasses.get().entries
+                .associate { CanonicalName(it.key) to ClassName.bestGuess(it.value) },
         )
 
         try {

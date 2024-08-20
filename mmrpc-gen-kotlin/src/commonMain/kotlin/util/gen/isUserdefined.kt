@@ -11,8 +11,7 @@ import org.cufy.mmrpc.gen.kotlin.GenScope
  */
 @Marker3
 fun GenScope.isUserdefined(element: ScalarDefinition): Boolean {
-    return element.canonicalName in ctx.classes &&
-            element.canonicalName !in ctx.nativeElements
+    return element.canonicalName in ctx.userdefinedScalarClasses
 }
 
 /**
@@ -21,6 +20,5 @@ fun GenScope.isUserdefined(element: ScalarDefinition): Boolean {
  */
 @Marker3
 fun GenScope.isUserdefined(element: MetadataDefinition): Boolean {
-    return element.canonicalName in ctx.classes &&
-            element.canonicalName !in ctx.nativeElements
+    return element.canonicalName in ctx.userdefinedMetadataClasses
 }
