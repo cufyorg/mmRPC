@@ -46,6 +46,10 @@ open class MMRPCKotlinTask : DefaultTask() {
         this.project.objects.mapProperty(String::class.java, String::class.java)
 
     @Input
+    val classNames: MapProperty<String, String> =
+        this.project.objects.mapProperty(String::class.java, String::class.java)
+
+    @Input
     val defaultScalarClass: Property<String?> =
         this.project.objects.property(String::class.java)
 
@@ -68,6 +72,7 @@ open class MMRPCKotlinTask : DefaultTask() {
         this.packageName.convention(MMRPCKotlin.DEFAULT_PACKAGE_NAME)
         this.packaging.convention(MMRPCKotlin.DEFAULT_PACKAGING)
         this.classes.convention(MMRPCKotlin.DEFAULT_CLASSES)
+        this.classNames.convention(emptyMap())
         this.nativeElements.convention(MMRPCKotlin.DEFAULT_NATIVE_ELEMENTS)
         this.features.convention(emptySet())
 
@@ -124,6 +129,7 @@ open class MMRPCKotlinTask : DefaultTask() {
         this.packageName.set(extension.kotlin.packageName)
         this.packaging.set(extension.kotlin.packaging)
         this.classes.set(extension.kotlin.classes)
+        this.classNames.set(extension.kotlin.classNames)
         this.defaultScalarClass.set(extension.kotlin.defaultScalarClass)
         this.nativeElements.set(extension.kotlin.nativeElements)
         this.features.set(extension.kotlin.features)
@@ -191,6 +197,7 @@ open class MMRPCKotlinTask : DefaultTask() {
             packageName = this.packageName.get(),
             packaging = this.packaging.get(),
             classes = this.classes.get(),
+            classNames = this.classNames.get(),
             defaultScalarClass = this.defaultScalarClass.get(),
             nativeElements = this.nativeElements.get(),
             features = this.features.get(),

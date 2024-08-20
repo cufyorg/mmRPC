@@ -12,6 +12,7 @@ fun createGenContext(
     packageName: String,
     packaging: GenPackaging,
     classes: Map<String, String>,
+    classNames: Map<String, String>,
     defaultScalarClass: String?,
     nativeElements: Set<String>,
     features: Set<GenFeature>,
@@ -24,6 +25,7 @@ fun createGenContext(
             .asSequence()
             .map { CanonicalName(it.key) to ClassName.bestGuess(it.value) }
             .toMap(),
+        classNames = classNames.mapKeys { CanonicalName(it.key) },
         defaultScalarClass = defaultScalarClass
             ?.let { ClassName.bestGuess(it) },
         nativeElements = nativeElements

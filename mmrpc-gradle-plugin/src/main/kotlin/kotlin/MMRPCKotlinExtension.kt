@@ -24,6 +24,9 @@ class MMRPCKotlinExtension {
     val classes: MutableMap<String, String> =
         MMRPCKotlin.DEFAULT_CLASSES.toMutableMap()
 
+    val classNames: MutableMap<String, String> =
+        mutableMapOf()
+
     var defaultScalarClass: String? =
         null
 
@@ -52,6 +55,14 @@ class MMRPCKotlinExtension {
 
     fun noBuiltin() {
         features += GenFeature.NO_BUILTIN
+    }
+
+    fun generateFieldObjects() {
+        features += GenFeature.GEN_FIELD_OBJECTS
+    }
+
+    fun keepTypeClassNames() {
+        features += GenFeature.KEEP_TYPE_CLASS_NAMES
     }
 
     fun packingSubPackages() {
