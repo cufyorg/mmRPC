@@ -5,7 +5,7 @@ import com.squareup.kotlinpoet.asClassName
 import org.cufy.mmrpc.FaultDefinition
 import org.cufy.mmrpc.FaultObject
 import org.cufy.mmrpc.gen.kotlin.GenContext
-import org.cufy.mmrpc.gen.kotlin.GenGroup
+import org.cufy.mmrpc.gen.kotlin.GenScope
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createOverrideObjectInfoProperty
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createSerialNameAnnotationSet
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createSerializableAnnotationSet
@@ -14,7 +14,7 @@ import org.cufy.mmrpc.gen.kotlin.util.gen.hasGeneratedClass
 import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createAnnotationSet
 import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createKDoc
 
-class FaultDefinitionGen(override val ctx: GenContext) : GenGroup() {
+class FaultDefinitionGen(override val ctx: GenContext) : GenScope() {
     override fun apply() {
         for (element in ctx.elements) {
             if (element !is FaultDefinition) continue

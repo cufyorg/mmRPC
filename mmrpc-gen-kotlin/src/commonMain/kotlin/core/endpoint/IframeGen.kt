@@ -6,7 +6,7 @@ import com.squareup.kotlinpoet.asClassName
 import org.cufy.mmrpc.IframeEndpointDefinition
 import org.cufy.mmrpc.IframeEndpointObject
 import org.cufy.mmrpc.gen.kotlin.GenContext
-import org.cufy.mmrpc.gen.kotlin.GenGroup
+import org.cufy.mmrpc.gen.kotlin.GenScope
 import org.cufy.mmrpc.gen.kotlin.util.F_STATIC_PATH
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createOverrideObjectInfoProperty
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createSerialNameAnnotationSet
@@ -17,7 +17,7 @@ import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createAnnotationSet
 import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createKDoc
 import org.cufy.mmrpc.gen.kotlin.util.poet.propertySpec
 
-class IframeGen(override val ctx: GenContext) : GenGroup() {
+class IframeGen(override val ctx: GenContext) : GenScope() {
     override fun apply() {
         for (element in ctx.elements) {
             if (element !is IframeEndpointDefinition) continue

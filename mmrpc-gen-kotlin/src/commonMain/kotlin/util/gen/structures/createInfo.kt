@@ -2,13 +2,13 @@ package org.cufy.mmrpc.gen.kotlin.util.gen.structures
 
 import com.squareup.kotlinpoet.CodeBlock
 import org.cufy.mmrpc.*
-import org.cufy.mmrpc.gen.kotlin.GenGroup
+import org.cufy.mmrpc.gen.kotlin.GenScope
 
 /**
  * Return code that, when executed, returns [ElementInfo] representing the given [element].
  */
 @Marker3
-fun GenGroup.createInfo(element: ElementDefinition): CodeBlock {
+fun GenScope.createInfo(element: ElementDefinition): CodeBlock {
     return when (element) {
         is ConstDefinition -> createInfo(element)
         is FaultDefinition -> createInfo(element)

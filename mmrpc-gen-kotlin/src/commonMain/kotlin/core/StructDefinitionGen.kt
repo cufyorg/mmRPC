@@ -5,7 +5,7 @@ import com.squareup.kotlinpoet.asClassName
 import org.cufy.mmrpc.StructDefinition
 import org.cufy.mmrpc.StructObject
 import org.cufy.mmrpc.gen.kotlin.GenContext
-import org.cufy.mmrpc.gen.kotlin.GenGroup
+import org.cufy.mmrpc.gen.kotlin.GenScope
 import org.cufy.mmrpc.gen.kotlin.util.gen.StructStrategy
 import org.cufy.mmrpc.gen.kotlin.util.gen.calculateStructStrategy
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createOverrideObjectInfoProperty
@@ -24,7 +24,7 @@ import org.cufy.mmrpc.gen.kotlin.util.poet.constructorSpec
 import org.cufy.mmrpc.gen.kotlin.util.poet.parameterSpec
 import org.cufy.mmrpc.gen.kotlin.util.poet.propertySpec
 
-class StructDefinitionGen(override val ctx: GenContext) : GenGroup() {
+class StructDefinitionGen(override val ctx: GenContext) : GenScope() {
     override fun apply() {
         for (element in ctx.elements) {
             if (element !is StructDefinition) continue

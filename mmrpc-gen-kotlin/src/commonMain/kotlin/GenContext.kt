@@ -14,7 +14,7 @@ class GenContext(
     val defaultScalarClass: ClassName?,
     val nativeElements: Set<CanonicalName>,
     val features: Set<GenFeature>,
-) : GenGroup() {
+) : GenScope() {
     override val ctx: GenContext = this
     override fun apply() {}
 

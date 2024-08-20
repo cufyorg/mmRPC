@@ -1,9 +1,9 @@
 package org.cufy.mmrpc.gen.kotlin.util.gen
 
-import org.cufy.mmrpc.gen.kotlin.GenGroup
+import org.cufy.mmrpc.gen.kotlin.GenScope
 import org.cufy.mmrpc.gen.kotlin.featureDebug
 
-fun GenGroup.debugLog(tag: String, msg: String) {
+fun GenScope.debugLog(tag: String, msg: String) {
     if (!ctx.featureDebug) return
 
     println("mmRPG: $tag: $msg".colored(fg = 36, bg = 40))

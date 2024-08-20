@@ -2,7 +2,7 @@ package org.cufy.mmrpc.gen.kotlin.core
 
 import org.cufy.mmrpc.MetadataDefinition
 import org.cufy.mmrpc.gen.kotlin.GenContext
-import org.cufy.mmrpc.gen.kotlin.GenGroup
+import org.cufy.mmrpc.gen.kotlin.GenScope
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createStaticInfoProperty
 import org.cufy.mmrpc.gen.kotlin.util.gen.hasGeneratedClass
 import org.cufy.mmrpc.gen.kotlin.util.gen.references.asPropertyName
@@ -16,7 +16,7 @@ import org.cufy.mmrpc.gen.kotlin.util.poet.constructorSpec
 import org.cufy.mmrpc.gen.kotlin.util.poet.parameterSpec
 import org.cufy.mmrpc.gen.kotlin.util.poet.propertySpec
 
-class MetadataDefinitionGen(override val ctx: GenContext) : GenGroup() {
+class MetadataDefinitionGen(override val ctx: GenContext) : GenScope() {
     override fun apply() {
         for (element in ctx.elements) {
             if (element !is MetadataDefinition) continue

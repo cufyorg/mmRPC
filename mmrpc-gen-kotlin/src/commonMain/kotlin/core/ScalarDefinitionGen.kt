@@ -6,7 +6,7 @@ import com.squareup.kotlinpoet.asClassName
 import org.cufy.mmrpc.ScalarDefinition
 import org.cufy.mmrpc.ScalarObject
 import org.cufy.mmrpc.gen.kotlin.GenContext
-import org.cufy.mmrpc.gen.kotlin.GenGroup
+import org.cufy.mmrpc.gen.kotlin.GenScope
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createOverrideObjectInfoProperty
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createSerialNameAnnotationSet
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createSerializableAnnotationSet
@@ -19,7 +19,7 @@ import org.cufy.mmrpc.gen.kotlin.util.poet.companionObjectSpec
 import org.cufy.mmrpc.gen.kotlin.util.poet.constructorSpec
 import org.cufy.mmrpc.gen.kotlin.util.poet.propertySpec
 
-class ScalarDefinitionGen(override val ctx: GenContext) : GenGroup() {
+class ScalarDefinitionGen(override val ctx: GenContext) : GenScope() {
     override fun apply() {
         for (element in ctx.elements) {
             if (element !is ScalarDefinition) continue

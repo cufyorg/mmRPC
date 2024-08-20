@@ -5,7 +5,7 @@ import com.squareup.kotlinpoet.asClassName
 import org.cufy.mmrpc.InterDefinition
 import org.cufy.mmrpc.InterObject
 import org.cufy.mmrpc.gen.kotlin.GenContext
-import org.cufy.mmrpc.gen.kotlin.GenGroup
+import org.cufy.mmrpc.gen.kotlin.GenScope
 import org.cufy.mmrpc.gen.kotlin.util.gen.InterStrategy
 import org.cufy.mmrpc.gen.kotlin.util.gen.calculateInterStrategy
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createOverrideObjectInfoProperty
@@ -24,7 +24,7 @@ import org.cufy.mmrpc.gen.kotlin.util.poet.constructorSpec
 import org.cufy.mmrpc.gen.kotlin.util.poet.parameterSpec
 import org.cufy.mmrpc.gen.kotlin.util.poet.propertySpec
 
-class InterDefinitionGen(override val ctx: GenContext) : GenGroup() {
+class InterDefinitionGen(override val ctx: GenContext) : GenScope() {
     override fun apply() {
         for (element in ctx.elements) {
             if (element !is InterDefinition) continue

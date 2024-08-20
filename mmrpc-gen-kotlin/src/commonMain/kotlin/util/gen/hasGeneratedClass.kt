@@ -1,13 +1,13 @@
 package org.cufy.mmrpc.gen.kotlin.util.gen
 
 import org.cufy.mmrpc.*
-import org.cufy.mmrpc.gen.kotlin.GenGroup
+import org.cufy.mmrpc.gen.kotlin.GenScope
 
 /**
  * Return true, if the given [element] is supposed to have a generated class.
  */
 @Marker3
-fun GenGroup.hasGeneratedClass(element: ElementDefinition): Boolean {
+fun GenScope.hasGeneratedClass(element: ElementDefinition): Boolean {
     if (element.isAnonymous) return false
     if (element is ArrayDefinition) return false
     if (element is OptionalDefinition) return false

@@ -6,7 +6,7 @@ import org.cufy.mmrpc.Marker3
 import org.cufy.mmrpc.gen.kotlin.util.gen.debug
 import org.cufy.mmrpc.gen.kotlin.util.gen.references.asClassName
 
-abstract class GenGroup {
+abstract class GenScope {
     abstract val ctx: GenContext
 
     abstract fun apply()

@@ -6,7 +6,7 @@ import com.squareup.kotlinpoet.asClassName
 import org.cufy.mmrpc.ConstDefinition
 import org.cufy.mmrpc.ConstObject
 import org.cufy.mmrpc.gen.kotlin.GenContext
-import org.cufy.mmrpc.gen.kotlin.GenGroup
+import org.cufy.mmrpc.gen.kotlin.GenScope
 import org.cufy.mmrpc.gen.kotlin.util.F_STATIC_VALUE
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createOverrideObjectInfoProperty
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createSerialNameAnnotationSet
@@ -20,7 +20,7 @@ import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createKDoc
 import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createLiteral
 import org.cufy.mmrpc.gen.kotlin.util.poet.propertySpec
 
-class ConstDefinitionGen(override val ctx: GenContext) : GenGroup() {
+class ConstDefinitionGen(override val ctx: GenContext) : GenScope() {
     override fun apply() {
         for (element in ctx.elements) {
             if (element !is ConstDefinition) continue

@@ -5,12 +5,12 @@ import com.squareup.kotlinpoet.CodeBlock
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.cufy.mmrpc.Marker3
-import org.cufy.mmrpc.gen.kotlin.GenGroup
+import org.cufy.mmrpc.gen.kotlin.GenScope
 import org.cufy.mmrpc.gen.kotlin.featureKotlinxSerialization
 import org.cufy.mmrpc.gen.kotlin.util.poet.annotationSpec
 
 @Marker3
-fun GenGroup.createSerializableAnnotationSet(): Set<AnnotationSpec> {
+fun GenScope.createSerializableAnnotationSet(): Set<AnnotationSpec> {
     return buildSet {
         if (ctx.featureKotlinxSerialization) {
             val annotation = annotationSpec(Serializable::class)
@@ -20,12 +20,12 @@ fun GenGroup.createSerializableAnnotationSet(): Set<AnnotationSpec> {
 }
 
 @Marker3
-fun GenGroup.createSerialNameAnnotationSet(serialName: String): Set<AnnotationSpec> {
+fun GenScope.createSerialNameAnnotationSet(serialName: String): Set<AnnotationSpec> {
     return createSerialNameAnnotationSet(CodeBlock.of("%S", serialName))
 }
 
 @Marker3
-fun GenGroup.createSerialNameAnnotationSet(serialName: CodeBlock): Set<AnnotationSpec> {
+fun GenScope.createSerialNameAnnotationSet(serialName: CodeBlock): Set<AnnotationSpec> {
     return buildSet {
         if (ctx.featureKotlinxSerialization) {
             val annotation = annotationSpec(SerialName::class) {

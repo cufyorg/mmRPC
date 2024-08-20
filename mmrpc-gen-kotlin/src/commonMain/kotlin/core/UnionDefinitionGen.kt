@@ -5,7 +5,7 @@ import com.squareup.kotlinpoet.asClassName
 import org.cufy.mmrpc.TypeObject
 import org.cufy.mmrpc.UnionDefinition
 import org.cufy.mmrpc.gen.kotlin.GenContext
-import org.cufy.mmrpc.gen.kotlin.GenGroup
+import org.cufy.mmrpc.gen.kotlin.GenScope
 import org.cufy.mmrpc.gen.kotlin.util.gen.UnionStrategy
 import org.cufy.mmrpc.gen.kotlin.util.gen.calculateUnionStrategy
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.*
@@ -21,7 +21,7 @@ import org.cufy.mmrpc.gen.kotlin.util.poet.companionObjectSpec
 import org.cufy.mmrpc.gen.kotlin.util.poet.constructorSpec
 import org.cufy.mmrpc.gen.kotlin.util.poet.propertySpec
 
-class UnionDefinitionGen(override val ctx: GenContext) : GenGroup() {
+class UnionDefinitionGen(override val ctx: GenContext) : GenScope() {
     override fun apply() {
         for (element in ctx.elements) {
             if (element !is UnionDefinition) continue

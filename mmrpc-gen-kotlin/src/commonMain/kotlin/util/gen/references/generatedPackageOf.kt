@@ -2,8 +2,8 @@ package org.cufy.mmrpc.gen.kotlin.util.gen.references
 
 import org.cufy.mmrpc.ElementDefinition
 import org.cufy.mmrpc.Marker3
-import org.cufy.mmrpc.gen.kotlin.GenGroup
 import org.cufy.mmrpc.gen.kotlin.GenPackaging
+import org.cufy.mmrpc.gen.kotlin.GenScope
 import org.cufy.mmrpc.gen.kotlin.util.furtherEscape
 import org.cufy.mmrpc.gen.kotlin.util.gen.debugRequireGeneratedClass
 
@@ -14,7 +14,7 @@ private const val TAG = "generatePackageOf"
  * return the package of said generated class.
  */
 @Marker3
-fun GenGroup.generatedPackageOf(element: ElementDefinition): String {
+fun GenScope.generatedPackageOf(element: ElementDefinition): String {
     debugRequireGeneratedClass(TAG, element)
 
     return when (ctx.packaging) {
@@ -22,7 +22,7 @@ fun GenGroup.generatedPackageOf(element: ElementDefinition): String {
     }
 }
 
-private fun GenGroup.implSubPackages(element: ElementDefinition): String {
+private fun GenScope.implSubPackages(element: ElementDefinition): String {
     val ns = rootNSOf(element)
     val nsv = ns.canonicalName.value.furtherEscape()
     return when {

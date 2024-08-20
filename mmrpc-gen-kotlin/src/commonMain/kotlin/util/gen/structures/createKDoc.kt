@@ -3,11 +3,11 @@ package org.cufy.mmrpc.gen.kotlin.util.gen.structures
 import com.squareup.kotlinpoet.CodeBlock
 import org.cufy.mmrpc.ElementDefinition
 import org.cufy.mmrpc.Marker3
-import org.cufy.mmrpc.gen.kotlin.GenGroup
+import org.cufy.mmrpc.gen.kotlin.GenScope
 import org.cufy.mmrpc.gen.kotlin.util.signatureOf
 
 @Marker3
-fun GenGroup.createKDoc(element: ElementDefinition): CodeBlock {
+fun GenScope.createKDoc(element: ElementDefinition): CodeBlock {
     return CodeBlock.Builder().apply {
         add(buildString {
             append("### ")

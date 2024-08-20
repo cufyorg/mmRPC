@@ -4,7 +4,7 @@ import com.squareup.kotlinpoet.CodeBlock
 import org.cufy.mmrpc.ElementDefinition
 import org.cufy.mmrpc.ElementInfo
 import org.cufy.mmrpc.Marker3
-import org.cufy.mmrpc.gen.kotlin.GenGroup
+import org.cufy.mmrpc.gen.kotlin.GenScope
 import org.cufy.mmrpc.gen.kotlin.util.F_STATIC_INFO
 import org.cufy.mmrpc.gen.kotlin.util.gen.debugRequireGeneratedClass
 import org.cufy.mmrpc.gen.kotlin.util.gen.hasGeneratedClass
@@ -17,7 +17,7 @@ private const val TAG = "refOfINFO"
  * return a code expression referencing said field.
  */
 @Marker3
-fun GenGroup.refOfINFO(element: ElementDefinition): CodeBlock {
+fun GenScope.refOfINFO(element: ElementDefinition): CodeBlock {
     debugRequireGeneratedClass(TAG, element)
     return CodeBlock.of("%T.%L", generatedClassOf(element), F_STATIC_INFO)
 }
@@ -28,7 +28,7 @@ fun GenGroup.refOfINFO(element: ElementDefinition): CodeBlock {
  * Otherwise, return a code expression creating the [ElementInfo] of [element].
  */
 @Marker3
-fun GenGroup.refOfINFOOrCreateInfo(element: ElementDefinition): CodeBlock {
+fun GenScope.refOfINFOOrCreateInfo(element: ElementDefinition): CodeBlock {
     return when {
         hasGeneratedClass(element) -> refOfINFO(element)
         else -> createInfo(element)

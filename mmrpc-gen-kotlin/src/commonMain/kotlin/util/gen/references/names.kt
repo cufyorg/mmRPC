@@ -7,7 +7,7 @@ import org.cufy.mmrpc.ConstDefinition
 import org.cufy.mmrpc.ElementDefinition
 import org.cufy.mmrpc.FieldDefinition
 import org.cufy.mmrpc.Marker3
-import org.cufy.mmrpc.gen.kotlin.GenGroup
+import org.cufy.mmrpc.gen.kotlin.GenScope
 import org.cufy.mmrpc.gen.kotlin.util.furtherEscape
 
 /**
@@ -15,7 +15,7 @@ import org.cufy.mmrpc.gen.kotlin.util.furtherEscape
  * this is the name of the generated entry by [element].
  */
 @Marker3
-fun GenGroup.asEnumEntryName(element: ConstDefinition): String {
+fun GenScope.asEnumEntryName(element: ConstDefinition): String {
     return element.name.furtherEscape().toScreamingSnakeCase()
 }
 
@@ -24,7 +24,7 @@ fun GenGroup.asEnumEntryName(element: ConstDefinition): String {
  * this is the name of the generated entry by [element].
  */
 @Marker3
-fun GenGroup.asUnionEntryName(element: ElementDefinition): String {
+fun GenScope.asUnionEntryName(element: ElementDefinition): String {
     return element.name.furtherEscape().toScreamingSnakeCase()
 }
 
@@ -32,7 +32,7 @@ fun GenGroup.asUnionEntryName(element: ElementDefinition): String {
  * Return the name of the property generated from [element] (assuming it has one).
  */
 @Marker3
-fun GenGroup.asPropertyName(element: FieldDefinition): String {
+fun GenScope.asPropertyName(element: FieldDefinition): String {
     return element.name.furtherEscape().toCamelCase()
 }
 
@@ -40,6 +40,6 @@ fun GenGroup.asPropertyName(element: FieldDefinition): String {
  * Return the name of the generated class (assuming it has one) of [element].
  */
 @Marker3
-fun GenGroup.asClassName(element: ElementDefinition): String {
+fun GenScope.asClassName(element: ElementDefinition): String {
     return element.name.furtherEscape().toPascalCase()
 }

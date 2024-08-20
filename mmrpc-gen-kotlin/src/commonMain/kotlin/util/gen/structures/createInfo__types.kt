@@ -2,7 +2,7 @@ package org.cufy.mmrpc.gen.kotlin.util.gen.structures
 
 import com.squareup.kotlinpoet.CodeBlock
 import org.cufy.mmrpc.*
-import org.cufy.mmrpc.gen.kotlin.GenGroup
+import org.cufy.mmrpc.gen.kotlin.GenScope
 import org.cufy.mmrpc.gen.kotlin.util.gen.references.refOfINFOOrCreateInfo
 import org.cufy.mmrpc.gen.kotlin.util.poet.createBoxedNamespace
 import org.cufy.mmrpc.gen.kotlin.util.poet.createCall
@@ -12,7 +12,7 @@ import org.cufy.mmrpc.gen.kotlin.util.poet.createCallSingleVararg
  * Return code that, when executed, returns [ArrayInfo] representing the given [element].
  */
 @Marker3
-fun GenGroup.createInfo(element: ArrayDefinition): CodeBlock {
+fun GenScope.createInfo(element: ArrayDefinition): CodeBlock {
     return createCall(
         function = CodeBlock.of("%T", ArrayInfo::class),
         "name" to CodeBlock.of("%S", element.name),
@@ -29,7 +29,7 @@ fun GenGroup.createInfo(element: ArrayDefinition): CodeBlock {
  * Return code that, when executed, returns [EnumInfo] representing the given [element].
  */
 @Marker3
-fun GenGroup.createInfo(element: EnumDefinition): CodeBlock {
+fun GenScope.createInfo(element: EnumDefinition): CodeBlock {
     return createCall(
         function = CodeBlock.of("%T", EnumInfo::class),
         "name" to CodeBlock.of("%S", element.name),
@@ -50,7 +50,7 @@ fun GenGroup.createInfo(element: EnumDefinition): CodeBlock {
  * Return code that, when executed, returns [InterInfo] representing the given [element].
  */
 @Marker3
-fun GenGroup.createInfo(element: InterDefinition): CodeBlock {
+fun GenScope.createInfo(element: InterDefinition): CodeBlock {
     return createCall(
         function = CodeBlock.of("%T", InterInfo::class),
         "name" to CodeBlock.of("%S", element.name),
@@ -70,7 +70,7 @@ fun GenGroup.createInfo(element: InterDefinition): CodeBlock {
  * Return code that, when executed, returns [OptionalInfo] representing the given [element].
  */
 @Marker3
-fun GenGroup.createInfo(element: OptionalDefinition): CodeBlock {
+fun GenScope.createInfo(element: OptionalDefinition): CodeBlock {
     return createCall(
         function = CodeBlock.of("%T", OptionalInfo::class),
         "name" to CodeBlock.of("%S", element.name),
@@ -87,7 +87,7 @@ fun GenGroup.createInfo(element: OptionalDefinition): CodeBlock {
  * Return code that, when executed, returns [ScalarInfo] representing the given [element].
  */
 @Marker3
-fun GenGroup.createInfo(element: ScalarDefinition): CodeBlock {
+fun GenScope.createInfo(element: ScalarDefinition): CodeBlock {
     return createCall(
         function = CodeBlock.of("%T", ScalarInfo::class),
         "name" to CodeBlock.of("%S", element.name),
@@ -103,7 +103,7 @@ fun GenGroup.createInfo(element: ScalarDefinition): CodeBlock {
  * Return code that, when executed, returns [StructInfo] representing the given [element].
  */
 @Marker3
-fun GenGroup.createInfo(element: StructDefinition): CodeBlock {
+fun GenScope.createInfo(element: StructDefinition): CodeBlock {
     return createCall(
         function = CodeBlock.of("%T", StructInfo::class),
         "name" to CodeBlock.of("%S", element.name),
@@ -123,7 +123,7 @@ fun GenGroup.createInfo(element: StructDefinition): CodeBlock {
  * Return code that, when executed, returns [TupleInfo] representing the given [element].
  */
 @Marker3
-fun GenGroup.createInfo(element: TupleDefinition): CodeBlock {
+fun GenScope.createInfo(element: TupleDefinition): CodeBlock {
     return createCall(
         function = CodeBlock.of("%T", TupleInfo::class),
         "name" to CodeBlock.of("%S", element.name),
@@ -143,7 +143,7 @@ fun GenGroup.createInfo(element: TupleDefinition): CodeBlock {
  * Return code that, when executed, returns [UnionInfo] representing the given [element].
  */
 @Marker3
-fun GenGroup.createInfo(element: UnionDefinition): CodeBlock {
+fun GenScope.createInfo(element: UnionDefinition): CodeBlock {
     return createCall(
         function = CodeBlock.of("%T", UnionInfo::class),
         "name" to CodeBlock.of("%S", element.name),

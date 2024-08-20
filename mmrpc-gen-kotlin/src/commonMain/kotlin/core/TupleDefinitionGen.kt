@@ -5,7 +5,7 @@ import com.squareup.kotlinpoet.asClassName
 import org.cufy.mmrpc.TupleDefinition
 import org.cufy.mmrpc.TupleObject
 import org.cufy.mmrpc.gen.kotlin.GenContext
-import org.cufy.mmrpc.gen.kotlin.GenGroup
+import org.cufy.mmrpc.gen.kotlin.GenScope
 import org.cufy.mmrpc.gen.kotlin.util.gen.TupleStrategy
 import org.cufy.mmrpc.gen.kotlin.util.gen.calculateTupleStrategy
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createOverrideObjectInfoProperty
@@ -23,7 +23,7 @@ import org.cufy.mmrpc.gen.kotlin.util.poet.parameterSpec
 import org.cufy.mmrpc.gen.kotlin.util.poet.propertySpec
 import org.cufy.mmrpc.gen.kotlin.util.xth
 
-class TupleDefinitionGen(override val ctx: GenContext) : GenGroup() {
+class TupleDefinitionGen(override val ctx: GenContext) : GenScope() {
     override fun apply() {
         for (element in ctx.elements) {
             if (element !is TupleDefinition) continue

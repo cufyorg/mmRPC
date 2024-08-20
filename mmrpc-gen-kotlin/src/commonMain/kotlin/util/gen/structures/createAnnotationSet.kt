@@ -3,7 +3,7 @@ package org.cufy.mmrpc.gen.kotlin.util.gen.structures
 import com.squareup.kotlinpoet.AnnotationSpec
 import org.cufy.mmrpc.Marker3
 import org.cufy.mmrpc.MetadataDefinitionUsage
-import org.cufy.mmrpc.gen.kotlin.GenGroup
+import org.cufy.mmrpc.gen.kotlin.GenScope
 import org.cufy.mmrpc.gen.kotlin.util.gen.references.annotationClassOf
 import org.cufy.mmrpc.gen.kotlin.util.gen.references.asPropertyName
 
@@ -15,7 +15,7 @@ import org.cufy.mmrpc.gen.kotlin.util.gen.references.asPropertyName
  * > but was left this way for convenience.
  */
 @Marker3
-fun GenGroup.createAnnotationSet(metadata: List<MetadataDefinitionUsage>): List<AnnotationSpec> {
+fun GenScope.createAnnotationSet(metadata: List<MetadataDefinitionUsage>): List<AnnotationSpec> {
     return buildList {
         for (it in metadata) {
             if (it.definition.isAnonymous) continue

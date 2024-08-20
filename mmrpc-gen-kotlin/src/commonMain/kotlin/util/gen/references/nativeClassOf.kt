@@ -4,7 +4,7 @@ import com.squareup.kotlinpoet.ClassName
 import org.cufy.mmrpc.Marker3
 import org.cufy.mmrpc.MetadataDefinition
 import org.cufy.mmrpc.ScalarDefinition
-import org.cufy.mmrpc.gen.kotlin.GenGroup
+import org.cufy.mmrpc.gen.kotlin.GenScope
 import org.cufy.mmrpc.gen.kotlin.util.gen.debug
 import org.cufy.mmrpc.gen.kotlin.util.gen.isNative
 
@@ -15,7 +15,7 @@ private const val TAG = "nativeClassOf"
  * Assuming the [element] was declared by the user to be a native kotlin class.
  */
 @Marker3
-fun GenGroup.nativeClassOf(element: MetadataDefinition): ClassName {
+fun GenScope.nativeClassOf(element: MetadataDefinition): ClassName {
     debug { if (!isNative(element)) failGen(TAG, element) { "element not native" } }
     return ctx.classes[element.canonicalName]
         ?: failGen(TAG, element) { "element class is not set" }
@@ -26,7 +26,7 @@ fun GenGroup.nativeClassOf(element: MetadataDefinition): ClassName {
  * Assuming the [element] was declared by the user to be a native kotlin class.
  */
 @Marker3
-fun GenGroup.nativeClassOf(element: ScalarDefinition): ClassName {
+fun GenScope.nativeClassOf(element: ScalarDefinition): ClassName {
     debug { if (!isNative(element)) failGen(TAG, element) { "element not native" } }
     return ctx.classes[element.canonicalName]
         ?: ctx.defaultScalarClass

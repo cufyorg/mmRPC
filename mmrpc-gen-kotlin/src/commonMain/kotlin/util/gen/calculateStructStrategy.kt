@@ -2,7 +2,7 @@ package org.cufy.mmrpc.gen.kotlin.util.gen
 
 import org.cufy.mmrpc.Marker3
 import org.cufy.mmrpc.StructDefinition
-import org.cufy.mmrpc.gen.kotlin.GenGroup
+import org.cufy.mmrpc.gen.kotlin.GenScope
 
 private const val TAG = "calculateStructStrategy"
 
@@ -12,7 +12,7 @@ enum class StructStrategy {
 }
 
 @Marker3
-fun GenGroup.calculateStructStrategy(element: StructDefinition): StructStrategy {
+fun GenScope.calculateStructStrategy(element: StructDefinition): StructStrategy {
     debugRequireGeneratedClass(TAG, element)
 
     if (element.structFields.isEmpty())

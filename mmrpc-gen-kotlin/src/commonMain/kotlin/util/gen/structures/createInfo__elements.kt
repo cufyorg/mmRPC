@@ -2,7 +2,7 @@ package org.cufy.mmrpc.gen.kotlin.util.gen.structures
 
 import com.squareup.kotlinpoet.CodeBlock
 import org.cufy.mmrpc.*
-import org.cufy.mmrpc.gen.kotlin.GenGroup
+import org.cufy.mmrpc.gen.kotlin.GenScope
 import org.cufy.mmrpc.gen.kotlin.util.gen.references.refOfINFOOrCreateInfo
 import org.cufy.mmrpc.gen.kotlin.util.poet.createBoxedLiteral
 import org.cufy.mmrpc.gen.kotlin.util.poet.createBoxedNamespace
@@ -13,7 +13,7 @@ import org.cufy.mmrpc.gen.kotlin.util.poet.createCallSingleVararg
  * Return code that, when executed, returns [ConstInfo] representing the given [element].
  */
 @Marker3
-fun GenGroup.createInfo(element: ConstDefinition): CodeBlock {
+fun GenScope.createInfo(element: ConstDefinition): CodeBlock {
     return createCall(
         function = CodeBlock.of("%T", ConstInfo::class),
         "name" to CodeBlock.of("%S", element.name),
@@ -31,7 +31,7 @@ fun GenGroup.createInfo(element: ConstDefinition): CodeBlock {
  * Return code that, when executed, returns [FaultInfo] representing the given [element].
  */
 @Marker3
-fun GenGroup.createInfo(element: FaultDefinition): CodeBlock {
+fun GenScope.createInfo(element: FaultDefinition): CodeBlock {
     return createCall(
         function = CodeBlock.of("%T", FaultInfo::class),
         "name" to CodeBlock.of("%S", element.name),
@@ -47,7 +47,7 @@ fun GenGroup.createInfo(element: FaultDefinition): CodeBlock {
  * Return code that, when executed, returns [FieldInfo] representing the given [element].
  */
 @Marker3
-fun GenGroup.createInfo(element: FieldDefinition): CodeBlock {
+fun GenScope.createInfo(element: FieldDefinition): CodeBlock {
     return createCall(
         function = CodeBlock.of("%T", FieldInfo::class),
         "name" to CodeBlock.of("%S", element.name),
@@ -68,7 +68,7 @@ fun GenGroup.createInfo(element: FieldDefinition): CodeBlock {
  * Return code that, when executed, returns [MetadataInfo] representing the given [element].
  */
 @Marker3
-fun GenGroup.createInfo(element: MetadataDefinition): CodeBlock {
+fun GenScope.createInfo(element: MetadataDefinition): CodeBlock {
     return createCall(
         function = CodeBlock.of("%T", MetadataInfo::class),
         "name" to CodeBlock.of("%S", element.name),
@@ -88,7 +88,7 @@ fun GenGroup.createInfo(element: MetadataDefinition): CodeBlock {
  * Return code that, when executed, returns [ProtocolInfo] representing the given [element].
  */
 @Marker3
-fun GenGroup.createInfo(element: ProtocolDefinition): CodeBlock {
+fun GenScope.createInfo(element: ProtocolDefinition): CodeBlock {
     return createCall(
         function = CodeBlock.of("%T", ProtocolInfo::class),
         "name" to CodeBlock.of("%S", element.name),
@@ -108,7 +108,7 @@ fun GenGroup.createInfo(element: ProtocolDefinition): CodeBlock {
  * Return code that, when executed, returns [RoutineInfo] representing the given [element].
  */
 @Marker3
-fun GenGroup.createInfo(element: RoutineDefinition): CodeBlock {
+fun GenScope.createInfo(element: RoutineDefinition): CodeBlock {
     return createCall(
         function = CodeBlock.of("%T", RoutineInfo::class),
         "name" to CodeBlock.of("%S", element.name),

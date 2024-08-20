@@ -3,7 +3,7 @@ package org.cufy.mmrpc.gen.kotlin.util.gen.references
 import com.squareup.kotlinpoet.ClassName
 import org.cufy.mmrpc.Marker3
 import org.cufy.mmrpc.MetadataDefinition
-import org.cufy.mmrpc.gen.kotlin.GenGroup
+import org.cufy.mmrpc.gen.kotlin.GenScope
 import org.cufy.mmrpc.gen.kotlin.util.gen.hasGeneratedClass
 import org.cufy.mmrpc.gen.kotlin.util.gen.isNative
 import org.cufy.mmrpc.gen.kotlin.util.gen.isUserdefined
@@ -11,7 +11,7 @@ import org.cufy.mmrpc.gen.kotlin.util.gen.isUserdefined
 private const val TAG = "annotationClassOf"
 
 @Marker3
-fun GenGroup.annotationClassOf(element: MetadataDefinition): ClassName {
+fun GenScope.annotationClassOf(element: MetadataDefinition): ClassName {
     return when {
         isNative(element) -> nativeClassOf(element)
         isUserdefined(element) -> userdefinedClassOf(element)
