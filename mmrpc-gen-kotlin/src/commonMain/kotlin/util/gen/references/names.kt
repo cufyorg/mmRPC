@@ -41,5 +41,6 @@ fun GenScope.asPropertyName(element: FieldDefinition): String {
  */
 @Marker3
 fun GenScope.asClassName(element: ElementDefinition): String {
-    return element.name.furtherEscape().toPascalCase()
+    return ctx.classNames[element.canonicalName]
+        ?: element.name.furtherEscape().toPascalCase()
 }

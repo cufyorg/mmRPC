@@ -1,7 +1,6 @@
 package org.cufy.mmrpc.gen.kotlin.util.gen.references
 
 import com.squareup.kotlinpoet.ClassName
-import net.pearx.kasechange.toPascalCase
 import org.cufy.mmrpc.ElementDefinition
 import org.cufy.mmrpc.Marker3
 import org.cufy.mmrpc.gen.kotlin.GenPackaging
@@ -31,9 +30,12 @@ private fun GenScope.implSubPackages(element: ElementDefinition): ClassName {
         ctx.pkg.isEmpty() -> nsv
         else -> "${ctx.pkg}.$nsv"
     }
-    val names = element.asNamespace.segments.asSequence()
+    val names = element.asNamespace.collect()
         .drop(ns.segments.size)
-        .map { it.furtherEscape().toPascalCase() }
+        .map { ctx.elementsNS[it] }
+        .filterNotNull() // ??? why would this happen? it is possible to have nulls yet unexpected
+        .map { asClassName(it) }
         .toList()
+
     return ClassName(pkg, names)
 }

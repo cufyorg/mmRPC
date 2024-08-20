@@ -11,6 +11,7 @@ class GenContext(
     val packaging: GenPackaging,
     val specSheet: SpecSheet,
     val classes: Map<CanonicalName, ClassName>,
+    val classNames: Map<CanonicalName, String>,
     val defaultScalarClass: ClassName?,
     val nativeElements: Set<CanonicalName>,
     val features: Set<GenFeature>,
