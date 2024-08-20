@@ -8,12 +8,12 @@ import org.cufy.mmrpc.EnumDefinition
 import org.cufy.mmrpc.EnumObject
 import org.cufy.mmrpc.gen.kotlin.GenContext
 import org.cufy.mmrpc.gen.kotlin.GenGroup
-import org.cufy.mmrpc.gen.kotlin.util.asEnumEntryName
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createOverrideObjectInfoProperty
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createSerialNameAnnotationSet
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createSerializableAnnotationSet
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createStaticInfoProperty
 import org.cufy.mmrpc.gen.kotlin.util.gen.hasGeneratedClass
+import org.cufy.mmrpc.gen.kotlin.util.gen.references.asEnumEntryName
 import org.cufy.mmrpc.gen.kotlin.util.gen.references.typeOf
 import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createAnnotationSet
 import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createKDoc
@@ -51,7 +51,7 @@ class EnumDefinitionGen(override val ctx: GenContext) : GenGroup() {
                 initializer(createLiteral(it))
             }
 
-            it.asEnumEntryName to anonymousClassSpec {
+            asEnumEntryName(it) to anonymousClassSpec {
                 addProperty(itValue)
 
                 addKdoc(createKDocShort(it))

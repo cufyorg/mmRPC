@@ -3,9 +3,9 @@ package org.cufy.mmrpc.gen.kotlin.util.gen.structures
 import com.squareup.kotlinpoet.CodeBlock
 import org.cufy.mmrpc.*
 import org.cufy.mmrpc.gen.kotlin.GenGroup
-import org.cufy.mmrpc.gen.kotlin.util.asEnumEntryName
-import org.cufy.mmrpc.gen.kotlin.util.asPropertyName
 import org.cufy.mmrpc.gen.kotlin.util.gen.*
+import org.cufy.mmrpc.gen.kotlin.util.gen.references.asEnumEntryName
+import org.cufy.mmrpc.gen.kotlin.util.gen.references.asPropertyName
 import org.cufy.mmrpc.gen.kotlin.util.gen.references.generatedClassOf
 import org.cufy.mmrpc.gen.kotlin.util.gen.references.userdefinedClassOf
 import org.cufy.mmrpc.gen.kotlin.util.poet.createCall
@@ -94,7 +94,7 @@ private fun GenGroup.createLiteralOfEnum(element: EnumDefinition, literal: Liter
     winner ?: failGen(TAG, element) { "illegal value: $literal (enum entry not found)" }
 
     // create a reference to that entry
-    return CodeBlock.of("%T.%L", generatedClassOf(element), winner.asEnumEntryName)
+    return CodeBlock.of("%T.%L", generatedClassOf(element), asEnumEntryName(winner))
 }
 
 private fun GenGroup.createLiteralOfOptional(element: OptionalDefinition, literal: Literal): CodeBlock {
@@ -154,7 +154,7 @@ private fun GenGroup.createLiteralOfStruct(element: StructDefinition, literal: S
                 function = CodeBlock.of("%T", generatedClassOf(element)),
                 literal.value.entries.associate { (name, value) ->
                     val field = fieldOfOrThrow(name)
-                    field.asPropertyName to createLiteral(field.fieldType, value)
+                    asPropertyName(field) to createLiteral(field.fieldType, value)
                 }
             )
         }
@@ -181,7 +181,7 @@ private fun GenGroup.createLiteralOfInter(element: InterDefinition, literal: Str
                 function = CodeBlock.of("%T", generatedClassOf(element)),
                 literal.value.entries.associate { (name, value) ->
                     val field = fieldOfOrThrow(name)
-                    field.asPropertyName to createLiteral(field.fieldType, value)
+                    asPropertyName(field) to createLiteral(field.fieldType, value)
                 }
             )
         }

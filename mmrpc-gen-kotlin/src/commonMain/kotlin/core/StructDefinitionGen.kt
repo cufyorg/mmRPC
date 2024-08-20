@@ -6,7 +6,6 @@ import org.cufy.mmrpc.StructDefinition
 import org.cufy.mmrpc.StructObject
 import org.cufy.mmrpc.gen.kotlin.GenContext
 import org.cufy.mmrpc.gen.kotlin.GenGroup
-import org.cufy.mmrpc.gen.kotlin.util.asPropertyName
 import org.cufy.mmrpc.gen.kotlin.util.gen.StructStrategy
 import org.cufy.mmrpc.gen.kotlin.util.gen.calculateStructStrategy
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createOverrideObjectInfoProperty
@@ -14,6 +13,7 @@ import org.cufy.mmrpc.gen.kotlin.util.gen.common.createSerialNameAnnotationSet
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createSerializableAnnotationSet
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createStaticInfoProperty
 import org.cufy.mmrpc.gen.kotlin.util.gen.hasGeneratedClass
+import org.cufy.mmrpc.gen.kotlin.util.gen.references.asPropertyName
 import org.cufy.mmrpc.gen.kotlin.util.gen.references.typeOf
 import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createAnnotationSet
 import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createKDoc
@@ -68,7 +68,7 @@ class StructDefinitionGen(override val ctx: GenContext) : GenGroup() {
 
         val primaryConstructor = constructorSpec {
             val parameters = element.structFields.map {
-                parameterSpec(it.asPropertyName, typeOf(it.fieldType)) {
+                parameterSpec(asPropertyName(it), typeOf(it.fieldType)) {
                     val default = it.fieldDefault
 
                     if (default != null) {
@@ -81,8 +81,8 @@ class StructDefinitionGen(override val ctx: GenContext) : GenGroup() {
         }
 
         val properties = element.structFields.map {
-            propertySpec(it.asPropertyName, typeOf(it.fieldType)) {
-                initializer(it.asPropertyName)
+            propertySpec(asPropertyName(it), typeOf(it.fieldType)) {
+                initializer(asPropertyName(it))
 
                 addKdoc(createKDocShort(it))
                 addAnnotations(createAnnotationSet(it.metadata))

@@ -6,11 +6,11 @@ import org.cufy.mmrpc.TypeObject
 import org.cufy.mmrpc.UnionDefinition
 import org.cufy.mmrpc.gen.kotlin.GenContext
 import org.cufy.mmrpc.gen.kotlin.GenGroup
-import org.cufy.mmrpc.gen.kotlin.util.asUnionEntryName
 import org.cufy.mmrpc.gen.kotlin.util.gen.UnionStrategy
 import org.cufy.mmrpc.gen.kotlin.util.gen.calculateUnionStrategy
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.*
 import org.cufy.mmrpc.gen.kotlin.util.gen.hasGeneratedClass
+import org.cufy.mmrpc.gen.kotlin.util.gen.references.asUnionEntryName
 import org.cufy.mmrpc.gen.kotlin.util.gen.references.generatedClassOf
 import org.cufy.mmrpc.gen.kotlin.util.gen.references.typeOf
 import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createAnnotationSet
@@ -102,7 +102,7 @@ class UnionDefinitionGen(override val ctx: GenContext) : GenGroup() {
                 initializer("value")
             }
 
-            classSpec(it.asUnionEntryName) {
+            classSpec(asUnionEntryName(it)) {
                 addModifiers(KModifier.VALUE)
                 addAnnotation(JvmInline::class)
                 addSuperinterface(generatedClassOf(element))

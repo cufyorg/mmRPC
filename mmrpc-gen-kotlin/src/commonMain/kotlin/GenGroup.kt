@@ -3,8 +3,8 @@ package org.cufy.mmrpc.gen.kotlin
 import com.squareup.kotlinpoet.TypeSpec
 import org.cufy.mmrpc.ElementDefinition
 import org.cufy.mmrpc.Marker3
-import org.cufy.mmrpc.gen.kotlin.util.asClassName
 import org.cufy.mmrpc.gen.kotlin.util.gen.debug
+import org.cufy.mmrpc.gen.kotlin.util.gen.references.asClassName
 
 abstract class GenGroup {
     abstract val ctx: GenContext
@@ -48,7 +48,7 @@ abstract class GenGroup {
     @Marker3
     fun createObject(element: ElementDefinition, block: TypeSpec.Builder.() -> Unit) {
         create(element) {
-            TypeSpec.objectBuilder(element.asClassName)
+            TypeSpec.objectBuilder(asClassName(element))
                 .apply(block)
         }
     }
@@ -56,7 +56,7 @@ abstract class GenGroup {
     @Marker3
     fun createEnum(element: ElementDefinition, block: TypeSpec.Builder.() -> Unit) {
         create(element) {
-            TypeSpec.enumBuilder(element.asClassName)
+            TypeSpec.enumBuilder(asClassName(element))
                 .apply(block)
         }
     }
@@ -64,7 +64,7 @@ abstract class GenGroup {
     @Marker3
     fun createClass(element: ElementDefinition, block: TypeSpec.Builder.() -> Unit) {
         create(element) {
-            TypeSpec.classBuilder(element.asClassName)
+            TypeSpec.classBuilder(asClassName(element))
                 .apply(block)
         }
     }
@@ -72,7 +72,7 @@ abstract class GenGroup {
     @Marker3
     fun createInterface(element: ElementDefinition, block: TypeSpec.Builder.() -> Unit) {
         create(element) {
-            TypeSpec.interfaceBuilder(element.asClassName)
+            TypeSpec.interfaceBuilder(asClassName(element))
                 .apply(block)
         }
     }
@@ -80,7 +80,7 @@ abstract class GenGroup {
     @Marker3
     fun createAnnotation(element: ElementDefinition, block: TypeSpec.Builder.() -> Unit) {
         create(element) {
-            TypeSpec.annotationBuilder(element.asClassName)
+            TypeSpec.annotationBuilder(asClassName(element))
                 .apply(block)
         }
     }

@@ -4,8 +4,8 @@ import com.squareup.kotlinpoet.AnnotationSpec
 import org.cufy.mmrpc.Marker3
 import org.cufy.mmrpc.MetadataDefinitionUsage
 import org.cufy.mmrpc.gen.kotlin.GenGroup
-import org.cufy.mmrpc.gen.kotlin.util.asPropertyName
 import org.cufy.mmrpc.gen.kotlin.util.gen.references.annotationClassOf
+import org.cufy.mmrpc.gen.kotlin.util.gen.references.asPropertyName
 
 /**
  * Return a list containing each metadata in the given [metadata]
@@ -23,7 +23,7 @@ fun GenGroup.createAnnotationSet(metadata: List<MetadataDefinitionUsage>): List<
             val annotationSpec = AnnotationSpec.builder(annotationClassOf(it.definition))
                 .apply {
                     for (usage in it.fields) {
-                        val name = usage.definition.asPropertyName
+                        val name = asPropertyName(usage.definition)
                         val literal = createMetadataLiteral(
                             usage.definition.fieldType,
                             usage.value

@@ -3,7 +3,7 @@ package org.cufy.mmrpc.gen.kotlin.util.gen.structures
 import com.squareup.kotlinpoet.CodeBlock
 import org.cufy.mmrpc.*
 import org.cufy.mmrpc.gen.kotlin.GenGroup
-import org.cufy.mmrpc.gen.kotlin.util.asEnumEntryName
+import org.cufy.mmrpc.gen.kotlin.util.gen.references.asEnumEntryName
 import org.cufy.mmrpc.gen.kotlin.util.gen.references.generatedClassOf
 import org.cufy.mmrpc.gen.kotlin.util.poet.createCallSingleVararg
 
@@ -67,7 +67,7 @@ private fun GenGroup.createMetadataLiteralOfEnum(element: EnumDefinition, litera
     winner ?: failGen(TAG, element) { "illegal value: $literal (enum entry not found)" }
 
     // create a reference to that entry
-    return CodeBlock.of("%T.%L", generatedClassOf(element), winner.asEnumEntryName)
+    return CodeBlock.of("%T.%L", generatedClassOf(element), asEnumEntryName(winner))
 }
 
 // ===================={ TupleLiteral  }==================== //
