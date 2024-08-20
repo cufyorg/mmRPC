@@ -7,7 +7,7 @@ import org.cufy.mmrpc.gen.kotlin.core.endpoint.IframeGen
 import org.cufy.mmrpc.gen.kotlin.core.endpoint.KafkaGen
 import org.cufy.mmrpc.gen.kotlin.core.endpoint.KafkaPublicationGen
 
-fun runGenGroups(ctx: GenContext) {
+fun applyGen(ctx: GenContext) {
     /* =============== core =============== */
 
     ConstDefinitionGen(ctx).apply()

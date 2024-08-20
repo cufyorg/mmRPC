@@ -270,7 +270,7 @@ open class MMRPCKotlinTask : DefaultTask() {
         )
 
         try {
-            runGenGroups(genContext)
+            applyGen(genContext)
         } catch (e: Exception) {
             val message = "$TAG: fetal code generation failure: ${e.message}"
             throw TaskInstantiationException(message, e)
