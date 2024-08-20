@@ -132,6 +132,10 @@ class Namespace : Comparable<Namespace> {
         return create0(this.segments.subList(0, this.segments.size - n))
     }
 
+    /**
+     * A sequence of the namespaces from (and including) the root
+     * namespace to (and including) this namespace. (In order)
+     */
     fun collect(): Sequence<Namespace> {
         return sequence {
             repeat(segments.size) { i ->
