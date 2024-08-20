@@ -19,6 +19,11 @@ enum class GenFeature {
      * Don't implicitly add builtin elements.
      */
     NO_BUILTIN,
+
+    /**
+     * Generate field definition object classes.
+     */
+    GEN_FIELD_OBJECTS,
 }
 
 val GenContext.featureKotlinxSerialization
@@ -29,6 +34,9 @@ val GenContext.featureDebug
 
 val GenContext.featureNoBuiltin
     get() = GenFeature.NO_BUILTIN in features
+
+val GenContext.featureGenFieldObjects
+    get() = GenFeature.GEN_FIELD_OBJECTS in features
 
 enum class GenPackaging {
     /**
