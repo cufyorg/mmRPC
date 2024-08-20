@@ -3,11 +3,9 @@ package org.cufy.mmrpc.gen.kotlin.util.gen.references
 import net.pearx.kasechange.toCamelCase
 import net.pearx.kasechange.toPascalCase
 import net.pearx.kasechange.toScreamingSnakeCase
-import org.cufy.mmrpc.ConstDefinition
-import org.cufy.mmrpc.ElementDefinition
-import org.cufy.mmrpc.FieldDefinition
-import org.cufy.mmrpc.Marker3
+import org.cufy.mmrpc.*
 import org.cufy.mmrpc.gen.kotlin.GenScope
+import org.cufy.mmrpc.gen.kotlin.featureKeepTypeClassNames
 import org.cufy.mmrpc.gen.kotlin.util.furtherEscape
 
 /**
@@ -41,6 +39,11 @@ fun GenScope.asPropertyName(element: FieldDefinition): String {
  */
 @Marker3
 fun GenScope.asClassName(element: ElementDefinition): String {
-    return ctx.classNames[element.canonicalName]
-        ?: element.name.furtherEscape().toPascalCase()
+    ctx.classNames[element.canonicalName]?.let { return it }
+
+    if (ctx.featureKeepTypeClassNames)
+        if (element is TypeDefinition)
+            return element.name
+
+    return element.name.furtherEscape().toPascalCase()
 }
