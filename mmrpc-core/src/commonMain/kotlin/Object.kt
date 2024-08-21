@@ -109,6 +109,8 @@ interface ScalarObject<N> : TypeObject {
 
 interface StructObject : TypeObject {
     override val __info__: StructInfo
+
+    fun toMap(): Map<String, Any?>
 }
 
 interface InterObject : TypeObject {

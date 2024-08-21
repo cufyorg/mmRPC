@@ -1,7 +1,7 @@
 package org.cufy.mmrpc.gen.kotlin.core
 
-import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.asClassName
+import com.squareup.kotlinpoet.*
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import org.cufy.mmrpc.StructDefinition
 import org.cufy.mmrpc.StructObject
 import org.cufy.mmrpc.gen.kotlin.GenContext
@@ -19,10 +19,7 @@ import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createAnnotationSet
 import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createKDoc
 import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createKDocShort
 import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createLiteral
-import org.cufy.mmrpc.gen.kotlin.util.poet.companionObjectSpec
-import org.cufy.mmrpc.gen.kotlin.util.poet.constructorSpec
-import org.cufy.mmrpc.gen.kotlin.util.poet.parameterSpec
-import org.cufy.mmrpc.gen.kotlin.util.poet.propertySpec
+import org.cufy.mmrpc.gen.kotlin.util.poet.*
 
 class StructDefinitionGen(override val ctx: GenContext) : GenScope() {
     override fun apply() {
@@ -57,6 +54,13 @@ class StructDefinitionGen(override val ctx: GenContext) : GenScope() {
             addAnnotations(createAnnotationSet(element.metadata))
             addAnnotations(createSerializableAnnotationSet())
             addAnnotations(createSerialNameAnnotationSet(element.canonicalName.value))
+
+            // toMap() implementation
+            addFunction(funSpec("toMap") {
+                addModifiers(KModifier.OVERRIDE)
+                returns(MAP.parameterizedBy(STRING, ANY.copy(nullable = true)))
+                addStatement("return emptyMap()")
+            })
         }
     }
 
@@ -102,6 +106,18 @@ class StructDefinitionGen(override val ctx: GenContext) : GenScope() {
             addAnnotations(createAnnotationSet(element.metadata))
             addAnnotations(createSerializableAnnotationSet())
             addAnnotations(createSerialNameAnnotationSet(element.canonicalName.value))
+
+            // toMap() implementation
+            addFunction(funSpec("toMap") {
+                addModifiers(KModifier.OVERRIDE)
+                returns(MAP.parameterizedBy(STRING, ANY.copy(nullable = true)))
+                addStatement("return %L", createCallSingleVararg(
+                    function = CodeBlock.of("mapOf"),
+                    element.structFields.map {
+                        CodeBlock.of("%S to %L", it.name, asPropertyName(it))
+                    }
+                ))
+            })
         }
     }
 }
