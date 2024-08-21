@@ -63,14 +63,17 @@ object Kafka {
      * The client is considered authenticated with itself
      * as the subject when it provides the message as the
      * payload in a jwt signed by a trusted key of the client.
-     * The jwt should include the header `kid` which should be
-     * the id of either a previously agreed upon key of the
-     * client or a key in a previously agreed upon keyset uri.
      *
-     * Additionally, the jwt should include the claim `iss`
-     * which should be the id of the client.
+     * The means for obtaining or verifying the key used for signing
+     * the jwt is out of the scope of this specification.
      *
-     * If the jwt has the header `cty` is present, it must be one of:
+     * The jwt should include the claim `iss` which should be
+     * the id of the client.
+     *
+     * The jwt should have the header `topic` which should be the
+     * topic the jwt was dispatched to.
+     *
+     * If the jwt has the header `cty` present, it must be one of:
      *
      * - `jwt`
      * - `application/jwt`
@@ -87,14 +90,17 @@ object Kafka {
      * The client is considered authenticated with its software
      * as the subject when it provides the message as the
      * payload in a jwt signed by a trusted key of the software.
-     * The jwt should include the header `kid` which should be
-     * the id of either a previously agreed upon key of the
-     * software or a key in a previously agreed upon keyset uri.
      *
-     * Additionally, the jwt should include the claim `iss`
-     * which should be the id of the software.
+     * The means for obtaining or verifying the key used for signing
+     * the jwt is out of the scope of this specification.
      *
-     * If the jwt has the header `cty` is present, it must be one of:
+     * The jwt should include the claim `iss` which should be the
+     * id of the software.
+     *
+     * The jwt should have the header `topic` which should be the
+     * topic the jwt was dispatched to.
+     *
+     * If the jwt has the header `cty` present, it must be one of:
      *
      * - `jwt`
      * - `application/jwt`

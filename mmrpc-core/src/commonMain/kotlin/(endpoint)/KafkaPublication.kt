@@ -63,11 +63,24 @@ object KafkaPublication {
      * The server is considered proved itself when it provides
      * the message as the payload in a jwt signed by a trusted
      * key of the server.
-     * The jwt should include the header `kid` which should be
-     * the id of either a previously agreed upon key of the
-     * server or a key in a previously agreed upon keyset uri.
+     *
+     * The means for obtaining or verifying the key used for signing
+     * the jwt is out of the scope of this specification.
+     *
+     * The jwt should include the claim `iss` which should be a previously
+     * agreed upon name or uri of the service.
+     *
+     * The jwt should have the header `topic` which should be the
+     * topic the jwt was dispatched to.
+     *
+     * If the jwt has the header `cty` present, it must be one of:
+     *
+     * - `jwt`
+     * - `application/jwt`
+     * - `mmrpc-event+jwt`
+     * - `application/mmrpc-event+jwt`
      */
-    val Stamp = KafkaPublicationTopic("Stamp")
+    val Stamp = KafkaPublicationSecurity("Stamp")
 
     // Planned to add Confidential with JWE
 }
