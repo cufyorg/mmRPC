@@ -17,10 +17,7 @@ import org.cufy.mmrpc.gen.kotlin.util.gen.references.typeOf
 import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createAnnotationSet
 import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createKDoc
 import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createKDocShort
-import org.cufy.mmrpc.gen.kotlin.util.poet.companionObjectSpec
-import org.cufy.mmrpc.gen.kotlin.util.poet.constructorSpec
-import org.cufy.mmrpc.gen.kotlin.util.poet.parameterSpec
-import org.cufy.mmrpc.gen.kotlin.util.poet.propertySpec
+import org.cufy.mmrpc.gen.kotlin.util.poet.*
 import org.cufy.mmrpc.gen.kotlin.util.xth
 
 class TupleDefinitionGen(override val ctx: GenContext) : GenScope() {
@@ -57,11 +54,12 @@ class TupleDefinitionGen(override val ctx: GenContext) : GenScope() {
             addAnnotations(createSerializableAnnotationSet())
             addAnnotations(createSerialNameAnnotationSet(element.canonicalName.value))
 
-            // list delegate
-            addSuperinterface(
-                LIST.parameterizedBy(ANY.copy(nullable = true)),
-                CodeBlock.of("emptyList()"),
-            )
+            // toList() implementation
+            addFunction(funSpec("toList") {
+                addModifiers(KModifier.OVERRIDE)
+                returns(LIST.parameterizedBy(ANY.copy(nullable = true)))
+                addStatement("return emptyList()")
+            })
         }
     }
 
@@ -102,18 +100,17 @@ class TupleDefinitionGen(override val ctx: GenContext) : GenScope() {
             addAnnotations(createSerializableAnnotationSet())
             addAnnotations(createSerialNameAnnotationSet(element.canonicalName.value))
 
-            // list delegate
-            addSuperinterface(
-                LIST.parameterizedBy(ANY.copy(nullable = true)),
-                buildCodeBlock {
-                    add("listOf(")
-                    repeat(element.tupleTypes.size) {
-                        if (it != 0) add(", ")
-                        add(xth(it))
+            // toList() implementation
+            addFunction(funSpec("toList") {
+                addModifiers(KModifier.OVERRIDE)
+                returns(LIST.parameterizedBy(ANY.copy(nullable = true)))
+                addStatement("return %L", createCallSingleVararg(
+                    function = CodeBlock.of("listOf"),
+                    List(element.tupleTypes.size) { position ->
+                        CodeBlock.of("%L", xth(position))
                     }
-                    add(")")
-                }
-            )
+                ))
+            })
         }
     }
 }
