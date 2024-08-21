@@ -1,7 +1,7 @@
 package org.cufy.mmrpc.gen.kotlin.core
 
-import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.asClassName
+import com.squareup.kotlinpoet.*
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import org.cufy.mmrpc.TupleDefinition
 import org.cufy.mmrpc.TupleObject
 import org.cufy.mmrpc.gen.kotlin.GenContext
@@ -56,6 +56,12 @@ class TupleDefinitionGen(override val ctx: GenContext) : GenScope() {
             addAnnotations(createAnnotationSet(element.metadata))
             addAnnotations(createSerializableAnnotationSet())
             addAnnotations(createSerialNameAnnotationSet(element.canonicalName.value))
+
+            // list delegate
+            addSuperinterface(
+                LIST.parameterizedBy(ANY.copy(nullable = true)),
+                CodeBlock.of("emptyList()"),
+            )
         }
     }
 
@@ -95,6 +101,19 @@ class TupleDefinitionGen(override val ctx: GenContext) : GenScope() {
             addAnnotations(createAnnotationSet(element.metadata))
             addAnnotations(createSerializableAnnotationSet())
             addAnnotations(createSerialNameAnnotationSet(element.canonicalName.value))
+
+            // list delegate
+            addSuperinterface(
+                LIST.parameterizedBy(ANY.copy(nullable = true)),
+                buildCodeBlock {
+                    add("listOf(")
+                    repeat(element.tupleTypes.size) {
+                        if (it != 0) add(", ")
+                        add(xth(it))
+                    }
+                    add(")")
+                }
+            )
         }
     }
 }

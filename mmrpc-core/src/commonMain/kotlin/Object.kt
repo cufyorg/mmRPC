@@ -116,6 +116,6 @@ interface InterObject : TypeObject {
     override val __info__: InterInfo
 }
 
-interface TupleObject : TypeObject {
+interface TupleObject : TypeObject, List<Any?> {
     override val __info__: TupleInfo
 }
