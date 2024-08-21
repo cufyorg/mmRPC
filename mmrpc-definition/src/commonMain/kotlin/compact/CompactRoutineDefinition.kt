@@ -21,8 +21,8 @@ data class CompactRoutineDefinition(
     val routineInput: CanonicalName,
     @SerialName("routine_output.ref")
     val routineOutput: CanonicalName,
-    @SerialName("routine_key.ref")
-    val routineKey: CanonicalName? = null,
+    @SerialName("routine_key")
+    val routineKey: List<String>? = null,
 ) : CompactElementDefinition
 
 fun RoutineDefinition.toCompact(): CompactRoutineDefinition {
@@ -39,7 +39,7 @@ fun RoutineDefinition.toCompact(): CompactRoutineDefinition {
             .map { it.canonicalName },
         routineInput = this.routineInput.canonicalName,
         routineOutput = this.routineOutput.canonicalName,
-        routineKey = this.routineKey?.canonicalName,
+        routineKey = this.routineKey,
     )
 }
 
@@ -83,13 +83,7 @@ fun CompactRoutineDefinition.inflate(
                 }
                 item
             },
-            routineKey = this.routineKey?.let {
-                val item = onLookup(it) ?: return@it null
-                require(item is TupleDefinition) {
-                    "routine_key.ref must point to a TupleDefinition"
-                }
-                item
-            },
+            routineKey = this.routineKey,
         )
     }
 }

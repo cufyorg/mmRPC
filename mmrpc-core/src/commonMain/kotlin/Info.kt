@@ -120,7 +120,7 @@ data class RoutineInfo(
     @SerialName("routine_output")
     val output: StructInfo,
     @SerialName("routine_key")
-    val key: TupleInfo?,
+    val key: List<String>?,
 ) : ElementInfo()
 
 // endpoints

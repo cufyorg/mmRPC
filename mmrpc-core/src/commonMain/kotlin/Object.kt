@@ -62,9 +62,8 @@ interface ProtocolObject : ElementObject {
 /**
  * @param I [RoutineInfo.input]
  * @param O [RoutineInfo.output]
- * @param K [RoutineInfo.key]
  */
-interface RoutineObject<I, O, K> : ElementObject {
+interface RoutineObject<I, O> : ElementObject {
     override val __info__: RoutineInfo
 }
 

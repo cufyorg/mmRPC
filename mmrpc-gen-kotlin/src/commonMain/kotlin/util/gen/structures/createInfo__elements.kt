@@ -129,7 +129,10 @@ fun GenScope.createInfo(element: RoutineDefinition): CodeBlock {
         "output" to refOfINFOOrCreateInfo(element.routineOutput),
         "key" to element.routineKey.let {
             if (it == null) CodeBlock.of("null")
-            else refOfINFOOrCreateInfo(it)
+            else createCallSingleVararg(
+                function = CodeBlock.of("listOf"),
+                it.map { n -> CodeBlock.of("%s", n) }
+            )
         },
     )
 }

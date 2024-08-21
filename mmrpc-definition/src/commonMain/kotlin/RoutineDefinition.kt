@@ -50,7 +50,7 @@ data class RoutineDefinition(
      * the specified.
      */
     @SerialName("routine_key")
-    val routineKey: TupleDefinition? = null,
+    val routineKey: List<String>? = null,
 ) : ElementDefinition() {
     companion object {
         const val ANONYMOUS_NAME = "(anonymous<routine>)"
@@ -62,7 +62,6 @@ data class RoutineDefinition(
         yieldAll(routineFaultUnion.asSequence().flatMap { it.collect() })
         yieldAll(routineInput.collect())
         yieldAll(routineOutput.collect())
-        routineKey?.let { yieldAll(it.collect()) }
     }
 }
 
@@ -72,7 +71,7 @@ open class RoutineDefinitionBuilder :
     ElementDefinitionBuilder() {
     override var name = RoutineDefinition.ANONYMOUS_NAME
 
-    open val key = OptionalDomainProperty<TupleDefinition>()
+    open val key = mutableListOf<String>()
 
     protected open val routineEndpointsUnnamed = mutableListOf<Unnamed<EndpointDefinition>>()
     protected open val routineFaultUnionUnnamed = mutableListOf<Unnamed<FaultDefinition>>()
@@ -90,6 +89,11 @@ open class RoutineDefinitionBuilder :
     @JvmName("unaryPlusUnnamedFaultDefinition")
     override operator fun Unnamed<FaultDefinition>.unaryPlus() {
         routineFaultUnionUnnamed += this
+    }
+
+    @Marker0
+    open fun key(vararg n: String) {
+        key += n
     }
 
     @Marker0
@@ -130,8 +134,14 @@ open class RoutineDefinitionBuilder :
                     .apply { for (it in blocks) it() }
                     .build()
             },
-            routineKey = this.key.value?.get(asNamespace, name = "key"),
-        )
+            routineKey = this.key.toList(),
+        ).also { built ->
+            for (k in built.routineKey.orEmpty()) {
+                if (built.routineInput.structFields.none { it.name == k }) {
+                    error("Routine key item is not in defined input fields: $k")
+                }
+            }
+        }
     }
 }
 
