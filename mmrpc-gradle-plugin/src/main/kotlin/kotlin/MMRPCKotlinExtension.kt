@@ -87,6 +87,10 @@ class MMRPCKotlinExtension {
         features += GenFeature.KEEP_TYPE_CLASS_NAMES
     }
 
+    fun keepFieldPropertyNames() {
+        features += GenFeature.KEEP_FIELD_PROPERTY_NAMES
+    }
+
     fun packingSubPackages() {
         packaging = GenPackaging.SUB_PACKAGES
     }

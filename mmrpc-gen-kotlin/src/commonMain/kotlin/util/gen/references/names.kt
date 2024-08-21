@@ -5,6 +5,7 @@ import net.pearx.kasechange.toPascalCase
 import net.pearx.kasechange.toScreamingSnakeCase
 import org.cufy.mmrpc.*
 import org.cufy.mmrpc.gen.kotlin.GenScope
+import org.cufy.mmrpc.gen.kotlin.featureKeepFieldPropertyNames
 import org.cufy.mmrpc.gen.kotlin.featureKeepTypeClassNames
 import org.cufy.mmrpc.gen.kotlin.util.furtherEscape
 
@@ -31,6 +32,9 @@ fun GenScope.asUnionEntryName(element: ElementDefinition): String {
  */
 @Marker3
 fun GenScope.asPropertyName(element: FieldDefinition): String {
+    if (ctx.featureKeepFieldPropertyNames)
+        return element.name
+
     return element.name.furtherEscape().toCamelCase()
 }
 

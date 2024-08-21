@@ -29,6 +29,11 @@ enum class GenFeature {
      * Keep original type class names.
      */
     KEEP_TYPE_CLASS_NAMES,
+
+    /**
+     * Keep original field property names.
+     */
+    KEEP_FIELD_PROPERTY_NAMES,
 }
 
 val GenContext.featureKotlinxSerialization
@@ -45,6 +50,9 @@ val GenContext.featureGenFieldObjects
 
 val GenContext.featureKeepTypeClassNames
     get() = GenFeature.KEEP_TYPE_CLASS_NAMES in features
+
+val GenContext.featureKeepFieldPropertyNames
+    get() = GenFeature.KEEP_FIELD_PROPERTY_NAMES in features
 
 enum class GenPackaging {
     /**
