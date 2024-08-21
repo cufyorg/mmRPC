@@ -119,6 +119,8 @@ data class RoutineInfo(
     val input: StructInfo,
     @SerialName("routine_output")
     val output: StructInfo,
+    @SerialName("routine_key")
+    val key: TupleInfo?,
 ) : ElementInfo()
 
 // endpoints
@@ -159,8 +161,6 @@ data class KafkaEndpointInfo(
     val topic: KafkaTopic,
     @SerialName("endpoint_security_inter")
     val security: List<KafkaSecurity>,
-    @SerialName("endpoint_key")
-    val key: TupleInfo?,
 ) : EndpointInfo()
 
 @Serializable
@@ -173,8 +173,6 @@ data class KafkaPublicationEndpointInfo(
     val topic: KafkaPublicationTopic,
     @SerialName("endpoint_security_inter")
     val security: List<KafkaPublicationSecurity>,
-    @SerialName("endpoint_key")
-    val key: TupleInfo?,
 ) : EndpointInfo()
 
 // types

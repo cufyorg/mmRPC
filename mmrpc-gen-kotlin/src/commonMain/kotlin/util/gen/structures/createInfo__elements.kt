@@ -127,5 +127,9 @@ fun GenScope.createInfo(element: RoutineDefinition): CodeBlock {
         ),
         "input" to refOfINFOOrCreateInfo(element.routineInput),
         "output" to refOfINFOOrCreateInfo(element.routineOutput),
+        "key" to element.routineKey.let {
+            if (it == null) CodeBlock.of("null")
+            else refOfINFOOrCreateInfo(it)
+        },
     )
 }

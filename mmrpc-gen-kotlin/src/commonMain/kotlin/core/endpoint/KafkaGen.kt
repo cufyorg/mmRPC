@@ -1,7 +1,6 @@
 package org.cufy.mmrpc.gen.kotlin.core.endpoint
 
 import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.asClassName
 import org.cufy.mmrpc.KafkaEndpointDefinition
@@ -14,7 +13,6 @@ import org.cufy.mmrpc.gen.kotlin.util.gen.common.createSerialNameAnnotationSet
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createSerializableAnnotationSet
 import org.cufy.mmrpc.gen.kotlin.util.gen.common.createStaticInfoProperty
 import org.cufy.mmrpc.gen.kotlin.util.gen.hasGeneratedClass
-import org.cufy.mmrpc.gen.kotlin.util.gen.references.typeOf
 import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createAnnotationSet
 import org.cufy.mmrpc.gen.kotlin.util.gen.structures.createKDoc
 import org.cufy.mmrpc.gen.kotlin.util.poet.propertySpec
@@ -32,12 +30,7 @@ class KafkaGen(override val ctx: GenContext) : GenScope() {
     }
 
     private fun applyCreateDataObject(element: KafkaEndpointDefinition) {
-        val superinterface = KafkaEndpointObject::class.asClassName().let {
-            when (val endpointKey = element.endpointKey) {
-                null -> it.parameterizedBy(STRING)
-                else -> it.parameterizedBy(typeOf(endpointKey))
-            }
-        }
+        val superinterface = KafkaEndpointObject::class.asClassName()
 
         val staticTopic = propertySpec(F_STATIC_TOPIC, STRING) {
             addModifiers(KModifier.CONST)

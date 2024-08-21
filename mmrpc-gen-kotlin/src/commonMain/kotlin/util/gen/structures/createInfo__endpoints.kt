@@ -86,10 +86,6 @@ fun GenScope.createInfo(element: KafkaEndpointDefinition): CodeBlock {
                 CodeBlock.of("%T(%S)", KafkaSecurity::class, it.name)
             }
         ),
-        "key" to element.endpointKey.let {
-            if (it == null) CodeBlock.of("null")
-            else refOfINFOOrCreateInfo(it)
-        },
     )
 }
 
@@ -115,9 +111,5 @@ fun GenScope.createInfo(element: KafkaPublicationEndpointDefinition): CodeBlock 
                 CodeBlock.of("%T(%S)", KafkaPublicationSecurity::class, it.name)
             }
         ),
-        "key" to element.endpointKey.let {
-            if (it == null) CodeBlock.of("null")
-            else refOfINFOOrCreateInfo(it)
-        },
     )
 }

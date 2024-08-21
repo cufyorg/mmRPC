@@ -62,8 +62,9 @@ interface ProtocolObject : ElementObject {
 /**
  * @param I [RoutineInfo.input]
  * @param O [RoutineInfo.output]
+ * @param K [RoutineInfo.key]
  */
-interface RoutineObject<I, O> : ElementObject {
+interface RoutineObject<I, O, K> : ElementObject {
     override val __info__: RoutineInfo
 }
 
@@ -77,17 +78,11 @@ interface IframeEndpointObject : EndpointObject {
     override val __info__: IframeEndpointInfo
 }
 
-/**
- * @param K [KafkaEndpointInfo.key]
- */
-interface KafkaEndpointObject<K> : EndpointObject {
+interface KafkaEndpointObject : EndpointObject {
     override val __info__: KafkaEndpointInfo
 }
 
-/**
- * @param K [KafkaPublicationEndpointInfo.key]
- */
-interface KafkaPublicationEndpointObject<K> : EndpointObject {
+interface KafkaPublicationEndpointObject : EndpointObject {
     override val __info__: KafkaPublicationEndpointInfo
 }
 

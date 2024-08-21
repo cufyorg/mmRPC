@@ -21,8 +21,6 @@ data class CompactKafkaEndpointDefinition(
     val endpointSecurityInter: List<KafkaSecurity> = listOf(
         Kafka.KafkaACL,
     ),
-    @SerialName("endpoint_key.ref")
-    val endpointKey: CanonicalName? = null,
 ) : CompactElementDefinition
 
 fun KafkaEndpointDefinition.toCompact(): CompactKafkaEndpointDefinition {
@@ -35,7 +33,6 @@ fun KafkaEndpointDefinition.toCompact(): CompactKafkaEndpointDefinition {
             .map { it.toCompact() },
         endpointTopic = this.endpointTopic,
         endpointSecurityInter = this.endpointSecurityInter,
-        endpointKey = this.endpointKey?.canonicalName,
     )
 }
 
@@ -53,13 +50,6 @@ fun CompactKafkaEndpointDefinition.inflate(
             },
             endpointTopic = this.endpointTopic,
             endpointSecurityInter = this.endpointSecurityInter,
-            endpointKey = this.endpointKey?.let {
-                val item = onLookup(it) ?: return@it null
-                require(item is TupleDefinition) {
-                    "endpoint_key.ref must point to a TupleDefinition"
-                }
-                item
-            },
         )
     }
 }

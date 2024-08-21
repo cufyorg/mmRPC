@@ -33,7 +33,14 @@ data class RoutineDefinitionGen(override val ctx: GenContext) : GenScope() {
 
     private fun applyCreateDataObject(element: RoutineDefinition) {
         val superinterface = RoutineObject::class.asClassName()
-            .parameterizedBy(typeOf(element.routineInput), typeOf(element.routineOutput))
+            .parameterizedBy(
+                /* I */ typeOf(element.routineInput),
+                /* O */ typeOf(element.routineOutput),
+                /* K */ element.routineKey.let {
+                    if (it == null) STRING
+                    else typeOf(it)
+                }
+            )
 
         val staticCanonicalName = propertySpec(F_STATIC_CANONICAL_NAME, STRING) {
             addModifiers(KModifier.CONST)

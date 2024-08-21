@@ -37,19 +37,6 @@ data class KafkaEndpointDefinition(
     val endpointSecurityInter: List<KafkaSecurity> = listOf(
         Kafka.KafkaACL,
     ),
-    /**
-     * How to calculate the record key.
-     *
-     * The key is calculated by taking the `md5` hash of
-     * the result of concatenating the string representation
-     * of each value in the key tuple with `;` as the separator.
-     *
-     * This is considered a suggestion and implementations can
-     * use other means for calculating the record key other that
-     * the specified.
-     */
-    @SerialName("endpoint_key")
-    val endpointKey: TupleDefinition? = null,
 ) : EndpointDefinition() {
     companion object {
         const val ANONYMOUS_NAME = "(anonymous<kafka_endpoint>)"
@@ -57,7 +44,6 @@ data class KafkaEndpointDefinition(
 
     override fun collectChildren() = sequence {
         yieldAll(metadata.asSequence().flatMap { it.collect() })
-        endpointKey?.let { yieldAll(it.collect()) }
     }
 }
 
@@ -66,7 +52,6 @@ open class KafkaEndpointDefinitionBuilder :
     override var name = KafkaEndpointDefinition.ANONYMOUS_NAME
 
     open var topic: String? = null
-    open val key = OptionalDomainProperty<TupleDefinition>()
 
     protected open var endpointSecurityInter = mutableSetOf<KafkaSecurity>()
 
@@ -75,7 +60,6 @@ open class KafkaEndpointDefinitionBuilder :
     }
 
     override fun build(): KafkaEndpointDefinition {
-        val asNamespace = this.namespace.value + this.name
         return KafkaEndpointDefinition(
             name = this.name,
             namespace = this.namespace.value,
@@ -86,7 +70,6 @@ open class KafkaEndpointDefinitionBuilder :
                 ?.let { KafkaTopic(it) }
                 ?: this.namespace.value.toKafkaTopic(),
             endpointSecurityInter = this.endpointSecurityInter.toList(),
-            endpointKey = this.key.value?.get(asNamespace, name = "key"),
         )
     }
 }

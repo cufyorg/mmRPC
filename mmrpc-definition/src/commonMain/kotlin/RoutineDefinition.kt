@@ -38,6 +38,19 @@ data class RoutineDefinition(
     val routineInput: StructDefinition = StructDefinition.Empty,
     @SerialName("routine_output")
     val routineOutput: StructDefinition = StructDefinition.Empty,
+    /**
+     * How to calculate the event key.
+     *
+     * The key is calculated by taking the `md5` hash of
+     * the result of concatenating the string representation
+     * of each value in the key tuple with `;` as the separator.
+     *
+     * This is considered a suggestion and implementations can
+     * use other means for calculating the key other that
+     * the specified.
+     */
+    @SerialName("routine_key")
+    val routineKey: TupleDefinition? = null,
 ) : ElementDefinition() {
     companion object {
         const val ANONYMOUS_NAME = "(anonymous<routine>)"
@@ -49,6 +62,7 @@ data class RoutineDefinition(
         yieldAll(routineFaultUnion.asSequence().flatMap { it.collect() })
         yieldAll(routineInput.collect())
         yieldAll(routineOutput.collect())
+        routineKey?.let { yieldAll(it.collect()) }
     }
 }
 
@@ -57,6 +71,8 @@ open class RoutineDefinitionBuilder :
     FaultDefinitionSetDomainContainer,
     ElementDefinitionBuilder() {
     override var name = RoutineDefinition.ANONYMOUS_NAME
+
+    open val key = OptionalDomainProperty<TupleDefinition>()
 
     protected open val routineEndpointsUnnamed = mutableListOf<Unnamed<EndpointDefinition>>()
     protected open val routineFaultUnionUnnamed = mutableListOf<Unnamed<FaultDefinition>>()
@@ -114,6 +130,7 @@ open class RoutineDefinitionBuilder :
                     .apply { for (it in blocks) it() }
                     .build()
             },
+            routineKey = this.key.value?.get(asNamespace, name = "key"),
         )
     }
 }
