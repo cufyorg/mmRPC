@@ -87,6 +87,10 @@ class MMRPCKotlinExtension {
         features += GenFeature.KEEP_TYPE_CLASS_NAMES
     }
 
+    fun keepFaultClassNames() {
+        features += GenFeature.KEEP_FAULT_CLASS_NAMES
+    }
+
     fun keepFieldPropertyNames() {
         features += GenFeature.KEEP_FIELD_PROPERTY_NAMES
     }

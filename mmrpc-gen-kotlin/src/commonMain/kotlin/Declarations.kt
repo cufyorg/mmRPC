@@ -31,6 +31,11 @@ enum class GenFeature {
     KEEP_TYPE_CLASS_NAMES,
 
     /**
+     * Keep original fault class names.
+     */
+    KEEP_FAULT_CLASS_NAMES,
+
+    /**
      * Keep original field property names.
      */
     KEEP_FIELD_PROPERTY_NAMES,
@@ -50,6 +55,9 @@ val GenContext.featureGenFieldObjects
 
 val GenContext.featureKeepTypeClassNames
     get() = GenFeature.KEEP_TYPE_CLASS_NAMES in features
+
+val GenContext.featureKeepFaultClassNames
+    get() = GenFeature.KEEP_FAULT_CLASS_NAMES in features
 
 val GenContext.featureKeepFieldPropertyNames
     get() = GenFeature.KEEP_FIELD_PROPERTY_NAMES in features

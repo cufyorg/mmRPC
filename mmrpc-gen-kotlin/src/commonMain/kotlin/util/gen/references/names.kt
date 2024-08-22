@@ -5,6 +5,7 @@ import net.pearx.kasechange.toPascalCase
 import net.pearx.kasechange.toScreamingSnakeCase
 import org.cufy.mmrpc.*
 import org.cufy.mmrpc.gen.kotlin.GenScope
+import org.cufy.mmrpc.gen.kotlin.featureKeepFaultClassNames
 import org.cufy.mmrpc.gen.kotlin.featureKeepFieldPropertyNames
 import org.cufy.mmrpc.gen.kotlin.featureKeepTypeClassNames
 import org.cufy.mmrpc.gen.kotlin.util.furtherEscape
@@ -48,6 +49,13 @@ fun GenScope.asClassName(element: ElementDefinition): String {
     if (element is TypeDefinition) {
         if (ctx.featureKeepTypeClassNames)
             return element.name.furtherEscape()
+    }
+
+    if (element is FaultDefinition) {
+        if (ctx.featureKeepFaultClassNames)
+            return element.name.furtherEscape()
+
+        return element.name.furtherEscape().toScreamingSnakeCase()
     }
 
     return element.name.furtherEscape().toPascalCase()
