@@ -16,7 +16,7 @@ internal fun generateFileSpecSet__SUB_PACKAGES(
     return buildList {
         for (node in ctx.createElementNodes) {
             val ancestor = ctx.createElementNodes.find {
-                node.element.namespace in it.element.asNamespace
+                node.element.asNamespace in it.element.asNamespace
             }
 
             if (ancestor != null) {
