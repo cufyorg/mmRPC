@@ -144,11 +144,12 @@ class Namespace : Comparable<Namespace> {
         }
     }
 
+    /**
+     * Return `true` if [namespace] contains this namespace as a
+     * prefix and is not equal to this namespace.
+     */
     operator fun contains(namespace: Namespace): Boolean {
-        if (namespace.segments.isEmpty())
-            return false
-
-        if (this.segments.size > namespace.segments.size)
+        if (this.segments.size >= namespace.segments.size)
             return false
 
         repeat(this.segments.size) {

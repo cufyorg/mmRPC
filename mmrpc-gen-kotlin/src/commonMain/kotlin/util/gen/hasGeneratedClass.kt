@@ -12,17 +12,22 @@ fun GenScope.hasGeneratedClass(element: ElementDefinition): Boolean {
     if (element.isAnonymous) return false
     if (element is ArrayDefinition) return false
     if (element is OptionalDefinition) return false
-    if (element is FieldDefinition)
-        return ctx.featureGenFieldObjects
-    if (element is ScalarDefinition)
+    if (element is FieldDefinition) {
+        if (!ctx.featureGenFieldObjects)
+            return false
+    }
+    if (element is ScalarDefinition) {
         if (isNative(element) || isUserdefined(element))
             return false
-    if (element is MetadataDefinition)
+    }
+    if (element is MetadataDefinition) {
         if (isNative(element) || isUserdefined(element))
             return false
-    if (element is ConstDefinition)
+    }
+    if (element is ConstDefinition) {
         if (isNative(element))
             return false
+    }
     val parent = ctx.elementsNS[element.namespace] ?: return true
     return hasGeneratedClass(parent)
 }

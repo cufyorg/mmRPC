@@ -33,7 +33,7 @@ fun GenScope.asUnionEntryName(element: ElementDefinition): String {
 @Marker3
 fun GenScope.asPropertyName(element: FieldDefinition): String {
     if (ctx.featureKeepFieldPropertyNames)
-        return element.name
+        return element.name.furtherEscape()
 
     return element.name.furtherEscape().toCamelCase()
 }
@@ -45,9 +45,10 @@ fun GenScope.asPropertyName(element: FieldDefinition): String {
 fun GenScope.asClassName(element: ElementDefinition): String {
     ctx.classNames[element.canonicalName]?.let { return it }
 
-    if (ctx.featureKeepTypeClassNames)
-        if (element is TypeDefinition)
-            return element.name
+    if (element is TypeDefinition) {
+        if (ctx.featureKeepTypeClassNames)
+            return element.name.furtherEscape()
+    }
 
     return element.name.furtherEscape().toPascalCase()
 }
