@@ -83,6 +83,10 @@ class MMRPCKotlinExtension {
         features += GenFeature.GEN_FIELD_OBJECTS
     }
 
+    fun generateEndpointObjects() {
+        features += GenFeature.GEN_ENDPOINT_OBJECTS
+    }
+
     fun keepTypeClassNames() {
         features += GenFeature.KEEP_TYPE_CLASS_NAMES
     }

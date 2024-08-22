@@ -2,6 +2,7 @@ package org.cufy.mmrpc.gen.kotlin.util.gen
 
 import org.cufy.mmrpc.*
 import org.cufy.mmrpc.gen.kotlin.GenScope
+import org.cufy.mmrpc.gen.kotlin.featureGenEndpointObjects
 import org.cufy.mmrpc.gen.kotlin.featureGenFieldObjects
 
 /**
@@ -14,6 +15,10 @@ fun GenScope.hasGeneratedClass(element: ElementDefinition): Boolean {
     if (element is OptionalDefinition) return false
     if (element is FieldDefinition) {
         if (!ctx.featureGenFieldObjects)
+            return false
+    }
+    if (element is EndpointDefinition) {
+        if (!ctx.featureGenEndpointObjects)
             return false
     }
     if (element is ScalarDefinition) {
