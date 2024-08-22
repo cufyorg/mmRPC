@@ -47,6 +47,24 @@ class SpecSheet {
     var elements: Set<ElementDefinition> = emptySet()
         private set
 
+    /**
+     * A set of all the namespaces with direct elements.
+     *
+     * > Namespaces with no direct elements and namespaces
+     * > representing an element are excluded.
+     */
+    val namespaces by lazy {
+        val excludes = elements.asSequence()
+            .map { it.asNamespace }
+            .toSet()
+
+        elements.asSequence()
+            .filterNot { it.isAnonymous }
+            .map { it.namespace }
+            .minus(excludes)
+            .toSet()
+    }
+
     constructor()
 
     constructor(vararg elements: ElementDefinition) {
