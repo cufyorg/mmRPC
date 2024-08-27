@@ -18,6 +18,20 @@ query and the response objects always encoded as JSON. This way, if the designer
 function that creates something and a function that deletes it, the designer is required
 to define two paths instead of a single one with two methods. Thus, forcing consistency.
 
+### Ultimate Goal
+
+This is NOT a specification for a new communication protocol but a way to generate
+specifications, clients and UI for existing communication protocols.
+
+Someone can use this project to create specification for a http service and not anything
+else and the specification still be a valid and compatible http.
+
+It is because of this goal, content encoding was chosen to be the widely used JSON format
+with the shape of the content controlled by the user of this project.
+
+Don't be intimidated by the number of modules or generators, these are optional helpers for
+the user to make use of the specification they wrote.
+
 ### Q/A
 
 - Q - When will you complete the docs?
