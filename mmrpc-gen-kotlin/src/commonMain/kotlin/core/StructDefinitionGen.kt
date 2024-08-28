@@ -114,7 +114,7 @@ class StructDefinitionGen(override val ctx: GenContext) : GenScope() {
                 addStatement("return %L", createCallSingleVararg(
                     function = CodeBlock.of("mapOf"),
                     element.structFields.map {
-                        CodeBlock.of("%S to %L", it.name, asPropertyName(it))
+                        CodeBlock.of("%S to %N", it.name, asPropertyName(it))
                     }
                 ))
             })
