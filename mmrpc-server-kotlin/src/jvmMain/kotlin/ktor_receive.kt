@@ -5,7 +5,6 @@ import io.ktor.http.HttpMethod.Companion.Get
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import kotlinx.serialization.json.buildJsonObject
-import org.cufy.json.LenientJson
 import org.cufy.json.decodeJsonCatching
 import org.cufy.json.deserializeCatching
 import org.cufy.json.deserializeJsonCatching
@@ -18,18 +17,18 @@ inline fun <reified I : StructObject> ApplicationCall.receiveQueryCatching(): Re
         for ((name, strings) in parameters.entries()) {
             val value = strings
                 .joinToString("")
-                .decodeJsonCatching(LenientJson)
+                .decodeJsonCatching(json)
                 .getOrElse { return failure(it) }
 
             put(name, value)
         }
     }
 
-    return element.deserializeCatching<I>(LenientJson)
+    return element.deserializeCatching<I>(json)
 }
 
 suspend inline fun <reified I : StructObject> ApplicationCall.receiveJsonCatching(): Result<I> {
-    return receiveText().deserializeJsonCatching<I>(LenientJson)
+    return receiveText().deserializeJsonCatching<I>(json)
 }
 
 suspend inline fun <reified I : StructObject> ApplicationCall.receiveCatching(routine: RoutineObject<I, *>): Result<I> {

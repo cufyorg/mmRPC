@@ -2,7 +2,6 @@ package org.cufy.mmrpc.server
 
 import org.cufy.jose.decodeCompactJWSCatching
 import org.cufy.jose.unverified
-import org.cufy.json.LenientJson
 import org.cufy.json.deserializeJsonCatching
 import org.cufy.kafka.routing.KafkaEvent
 import org.cufy.kafka.routing.header
@@ -17,11 +16,11 @@ suspend inline fun <reified I : StructObject> KafkaEvent.receiveJWTCatching(): R
         .getOrElse { return failure(it) }
         .unverified()
         .payload
-        .deserializeJsonCatching<I>()
+        .deserializeJsonCatching<I>(json)
 }
 
 suspend inline fun <reified I : StructObject> KafkaEvent.receiveJsonCatching(): Result<I> {
-    return receiveText().deserializeJsonCatching<I>(LenientJson)
+    return receiveText().deserializeJsonCatching<I>(json)
 }
 
 suspend inline fun <reified I : StructObject> KafkaEvent.receiveCatching(routine: RoutineObject<I, *>): Result<I> {
