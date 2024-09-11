@@ -1,4 +1,4 @@
-package org.cufy.mmrpc.server.kotlin.kafka
+package org.cufy.mmrpc.server
 
 import org.cufy.jose.decodeCompactJWSCatching
 import org.cufy.json.LenientJson

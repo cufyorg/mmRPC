@@ -24,6 +24,8 @@ kotlin {
                 implementation("org.cufy.serialization:cufyorg-crypto:a82f624ef6")
 
                 implementation("io.ktor:ktor-server-core:2.3.12")
+                implementation("org.apache.kafka:kafka-clients:3.7.0")
+                implementation("org.cufy.kotlin-kafka-routing:kotlin-kafka-routing:1c349988f2")
             }
         }
         commonTest {

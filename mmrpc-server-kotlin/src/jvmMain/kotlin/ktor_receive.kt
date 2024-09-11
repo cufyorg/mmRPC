@@ -1,4 +1,4 @@
-package org.cufy.mmrpc.server.kotlin.ktor
+package org.cufy.mmrpc.server
 
 import io.ktor.http.HttpMethod.Companion.Delete
 import io.ktor.http.HttpMethod.Companion.Get
