@@ -49,8 +49,8 @@ suspend inline fun <reified I : StructObject> KafkaProducer<String, String>.publ
 suspend inline fun <reified I : StructObject> KafkaProducer<String, String>.publish(
     routine: RoutineObject<I, *>,
     input: I,
-    iss: String,
     jwks: JWKSet,
+    iss: String? = null,
 ) {
     val endpoints = routine.__info__.endpoints
         .filterIsInstance<KafkaPublicationEndpointInfo>()
@@ -59,12 +59,15 @@ suspend inline fun <reified I : StructObject> KafkaProducer<String, String>.publ
         "Routine does not have any Kafka Publication endpoints"
     }
 
-    val keyString = generateKey(routine, input)
-    val valueString = input
-        .serializeToJsonObject()
-        .plus("iss" to iss)
-        .encodeToString()
     val headers = mapOf("Content-Type" to "application/jwt")
+    val keyString = generateKey(routine, input)
+    val valueString = when {
+        iss == null -> input.serializeToJsonString()
+        else -> JsonObject {
+            set("iss", iss)
+            putAll(input.serializeToJsonObject())
+        }.encodeToString()
+    }
 
     for (endpoint in endpoints) {
         val valueCompactJWS = valueString
