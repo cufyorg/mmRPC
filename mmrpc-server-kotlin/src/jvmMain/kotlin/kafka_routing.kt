@@ -22,7 +22,7 @@ fun <R : RoutineObject<*, *>> KafkaRoute.handle(
 
     for (endpoint in endpoints) {
         consume(endpoint.topic.value) {
-            handle { block(this, routine) }
+            block(this, routine)
         }
     }
 }
@@ -41,7 +41,7 @@ fun <R : RoutineObject<*, *>> KafkaRoute.handlePublication(
 
     for (endpoint in endpoints) {
         consume(endpoint.topic.value) {
-            handle { block(this, routine) }
+            block(this, routine)
         }
     }
 }
