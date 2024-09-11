@@ -1,6 +1,7 @@
 package org.cufy.mmrpc.server
 
 import org.cufy.jose.decodeCompactJWSCatching
+import org.cufy.jose.unverified
 import org.cufy.json.LenientJson
 import org.cufy.json.deserializeJsonCatching
 import org.cufy.kafka.routing.KafkaEvent
@@ -14,6 +15,7 @@ suspend inline fun <reified I : StructObject> KafkaEvent.receiveJWTCatching(): R
     return receiveText()
         .decodeCompactJWSCatching()
         .getOrElse { return failure(it) }
+        .unverified()
         .payload
         .deserializeJsonCatching<I>()
 }
