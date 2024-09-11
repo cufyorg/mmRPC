@@ -8,8 +8,7 @@ import org.apache.kafka.common.header.internals.RecordHeader
 import org.cufy.jose.JWKSet
 import org.cufy.jose.sign
 import org.cufy.jose.toJWT
-import org.cufy.json.serializeToJsonString
-import org.cufy.json.set
+import org.cufy.json.*
 import org.cufy.mmrpc.KafkaEndpointInfo
 import org.cufy.mmrpc.RoutineObject
 import org.cufy.mmrpc.StructObject
@@ -50,6 +49,7 @@ suspend inline fun <reified I : StructObject> KafkaProducer<String, String>.emit
 suspend inline fun <reified I : StructObject> KafkaProducer<String, String>.emit(
     routine: RoutineObject<I, *>,
     input: I,
+    iss: String,
     jwks: JWKSet,
 ) {
     val endpoints = routine.__info__.endpoints
@@ -60,7 +60,10 @@ suspend inline fun <reified I : StructObject> KafkaProducer<String, String>.emit
     }
 
     val keyString = generateKey(routine, input)
-    val valueString = input.serializeToJsonString()
+    val valueString = input
+        .serializeToJsonObject()
+        .plus("iss" to iss)
+        .encodeToString()
     val headers = mapOf("Content-Type" to "application/jwt")
 
     for (endpoint in endpoints) {
