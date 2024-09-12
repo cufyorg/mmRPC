@@ -70,6 +70,9 @@ object Kafka {
      * The jwt should include the claim `iss` which should be
      * the id of the client.
      *
+     * The jwt should include the claim `aud` which should include
+     * a previously agreed upon name or uri of the service.
+     *
      * The jwt should have the header `topic` which should be the
      * topic the jwt was dispatched to.
      *
@@ -96,6 +99,9 @@ object Kafka {
      *
      * The jwt should include the claim `iss` which should be the
      * id of the software.
+     *
+     * The jwt should include the claim `aud` which should include
+     * a previously agreed upon name or uri of the service.
      *
      * The jwt should have the header `topic` which should be the
      * topic the jwt was dispatched to.

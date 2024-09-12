@@ -2,6 +2,7 @@ package org.cufy.mmrpc.client
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.JsonArray
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.header.internals.RecordHeader
@@ -51,6 +52,7 @@ suspend inline fun <reified I : StructObject> KafkaProducer<String, String>.emit
     input: I,
     jwks: JWKSet,
     iss: String? = null,
+    aud: List<String> = emptyList(),
 ) {
     val endpoints = routine.__info__.endpoints
         .filterIsInstance<KafkaEndpointInfo>()
@@ -62,9 +64,11 @@ suspend inline fun <reified I : StructObject> KafkaProducer<String, String>.emit
     val headers = mapOf("Content-Type" to "application/jwt")
     val keyString = generateKey(routine, input)
     val valueString = when {
-        iss == null -> input.serializeToJsonString()
+        iss == null && aud.isEmpty() -> input.serializeToJsonString()
         else -> JsonObject {
-            set("iss", iss)
+            if (iss != null) set("iss", iss)
+            if (aud.size == 1) set("aud", aud.first())
+            if (aud.isNotEmpty()) set("aud", JsonArray(aud.map { it.json }))
             putAll(input.serializeToJsonObject())
         }.encodeToString()
     }
