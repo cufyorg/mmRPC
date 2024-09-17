@@ -23,6 +23,7 @@ fun SpecSheet.toCompact(): CompactSpecSheet {
     return CompactSpecSheet(
         elements = collectChildren()
             .map { it.toCompact() }
+            .sortedBy { it.canonicalName.value }
             .toSet()
     )
 }
