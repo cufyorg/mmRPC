@@ -18,12 +18,12 @@ data class CompactOptionalDefinition(
     val optionalType: CanonicalName,
 ) : CompactElementDefinition
 
-fun OptionalDefinition.toCompact(): CompactOptionalDefinition {
+fun OptionalDefinition.toCompact(strip: Boolean = false): CompactOptionalDefinition {
     return CompactOptionalDefinition(
-        canonicalName = canonicalName,
-        description = this.description,
+        canonicalName = this.canonicalName,
+        description = if (strip) "" else this.description,
         metadata = this.metadata
-            .map { it.toCompact() },
+            .map { it.toCompact(strip) },
         optionalType = this.optionalType.canonicalName,
     )
 }

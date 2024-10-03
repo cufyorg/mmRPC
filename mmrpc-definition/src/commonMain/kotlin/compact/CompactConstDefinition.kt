@@ -17,12 +17,12 @@ data class CompactConstDefinition(
     val constValue: Literal,
 ) : CompactElementDefinition
 
-fun ConstDefinition.toCompact(): CompactConstDefinition {
+fun ConstDefinition.toCompact(strip: Boolean = false): CompactConstDefinition {
     return CompactConstDefinition(
-        canonicalName = canonicalName,
-        description = this.description,
+        canonicalName = this.canonicalName,
+        description = if (strip) "" else this.description,
         metadata = this.metadata
-            .map { it.toCompact() },
+            .map { it.toCompact(strip) },
         constType = this.constType.canonicalName,
         constValue = this.constValue,
     )

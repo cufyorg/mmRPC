@@ -18,12 +18,12 @@ data class CompactStructDefinition(
     val structFields: List<CanonicalName> = emptyList(),
 ) : CompactElementDefinition
 
-fun StructDefinition.toCompact(): CompactStructDefinition {
+fun StructDefinition.toCompact(strip: Boolean = false): CompactStructDefinition {
     return CompactStructDefinition(
-        canonicalName = canonicalName,
-        description = this.description,
+        canonicalName = this.canonicalName,
+        description = if (strip) "" else this.description,
         metadata = this.metadata
-            .map { it.toCompact() },
+            .map { it.toCompact(strip) },
         structFields = this.structFields
             .map { it.canonicalName },
     )

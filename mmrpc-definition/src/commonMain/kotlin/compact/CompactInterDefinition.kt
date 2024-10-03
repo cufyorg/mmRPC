@@ -18,12 +18,12 @@ data class CompactInterDefinition(
     val interTypes: List<CanonicalName>,
 ) : CompactElementDefinition
 
-fun InterDefinition.toCompact(): CompactInterDefinition {
+fun InterDefinition.toCompact(strip: Boolean = false): CompactInterDefinition {
     return CompactInterDefinition(
-        canonicalName = canonicalName,
-        description = this.description,
+        canonicalName = this.canonicalName,
+        description = if (strip) "" else this.description,
         metadata = this.metadata
-            .map { it.toCompact() },
+            .map { it.toCompact(strip) },
         interTypes = this.interTypes
             .map { it.canonicalName },
     )

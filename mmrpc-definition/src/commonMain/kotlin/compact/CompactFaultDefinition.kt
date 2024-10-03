@@ -15,12 +15,12 @@ data class CompactFaultDefinition(
     override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
 ) : CompactElementDefinition
 
-fun FaultDefinition.toCompact(): CompactFaultDefinition {
+fun FaultDefinition.toCompact(strip: Boolean = false): CompactFaultDefinition {
     return CompactFaultDefinition(
-        canonicalName = canonicalName,
-        description = this.description,
+        canonicalName = this.canonicalName,
+        description = if (strip) "" else this.description,
         metadata = this.metadata
-            .map { it.toCompact() },
+            .map { it.toCompact(strip) },
     )
 }
 

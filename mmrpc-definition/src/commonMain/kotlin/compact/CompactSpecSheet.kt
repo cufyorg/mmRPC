@@ -19,10 +19,10 @@ value class CompactSpecSheet(val elements: Set<CompactElementDefinition> = empty
         CompactSpecSheet(this.elements + specSheet.elements)
 }
 
-fun SpecSheet.toCompact(): CompactSpecSheet {
+fun SpecSheet.toCompact(strip: Boolean = false): CompactSpecSheet {
     return CompactSpecSheet(
         elements = collectChildren()
-            .map { it.toCompact() }
+            .map { it.toCompact(strip) }
             .sortedBy { it.canonicalName.value }
             .toSet()
     )

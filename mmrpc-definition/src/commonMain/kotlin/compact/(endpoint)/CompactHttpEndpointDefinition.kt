@@ -23,12 +23,12 @@ data class CompactHttpEndpointDefinition(
     val endpointSecurityInter: List<HttpSecurity> = emptyList(),
 ) : CompactElementDefinition
 
-fun HttpEndpointDefinition.toCompact(): CompactHttpEndpointDefinition {
+fun HttpEndpointDefinition.toCompact(strip: Boolean = false): CompactHttpEndpointDefinition {
     return CompactHttpEndpointDefinition(
-        canonicalName = canonicalName,
-        description = this.description,
+        canonicalName = this.canonicalName,
+        description = if (strip) "" else this.description,
         metadata = this.metadata
-            .map { it.toCompact() },
+            .map { it.toCompact(strip) },
         endpointPath = this.endpointPath,
         endpointMethodUnion = this.endpointMethodUnion,
         endpointSecurityInter = this.endpointSecurityInter,

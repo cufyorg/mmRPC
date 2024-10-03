@@ -19,12 +19,12 @@ data class CompactIframeEndpointDefinition(
     val endpointSecurityInter: List<IframeSecurity> = emptyList(),
 ) : CompactElementDefinition
 
-fun IframeEndpointDefinition.toCompact(): CompactIframeEndpointDefinition {
+fun IframeEndpointDefinition.toCompact(strip: Boolean = false): CompactIframeEndpointDefinition {
     return CompactIframeEndpointDefinition(
-        canonicalName = canonicalName,
-        description = this.description,
+        canonicalName = this.canonicalName,
+        description = if (strip) "" else this.description,
         metadata = this.metadata
-            .map { it.toCompact() },
+            .map { it.toCompact(strip) },
         endpointPath = this.endpointPath,
         endpointSecurityInter = this.endpointSecurityInter,
     )

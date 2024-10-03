@@ -14,16 +14,16 @@ data class CompactMetadataDefinitionUsage(
     val fields: List<CompactFieldDefinitionUsage>,
 )
 
-fun MetadataDefinitionUsage.toCompact(): CompactMetadataDefinitionUsage {
+fun MetadataDefinitionUsage.toCompact(strip: Boolean = false): CompactMetadataDefinitionUsage {
     return CompactMetadataDefinitionUsage(
         definition = this.definition.canonicalName,
         fields = this.fields
-            .map { it.toCompact() }
+            .map { it.toCompact(strip) }
     )
 }
 
 fun CompactMetadataDefinitionUsage.inflate(
-    onLookup: (CanonicalName) -> ElementDefinition?
+    onLookup: (CanonicalName) -> ElementDefinition?,
 ): () -> MetadataDefinitionUsage? {
     return it@{
         MetadataDefinitionUsage(

@@ -21,12 +21,12 @@ data class CompactKafkaEndpointDefinition(
     ),
 ) : CompactElementDefinition
 
-fun KafkaEndpointDefinition.toCompact(): CompactKafkaEndpointDefinition {
+fun KafkaEndpointDefinition.toCompact(strip: Boolean = false): CompactKafkaEndpointDefinition {
     return CompactKafkaEndpointDefinition(
-        canonicalName = canonicalName,
-        description = this.description,
+        canonicalName = this.canonicalName,
+        description = if (strip) "" else this.description,
         metadata = this.metadata
-            .map { it.toCompact() },
+            .map { it.toCompact(strip) },
         endpointTopic = this.endpointTopic,
         endpointSecurityInter = this.endpointSecurityInter,
     )

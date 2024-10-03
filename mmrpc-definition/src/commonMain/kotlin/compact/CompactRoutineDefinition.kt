@@ -23,12 +23,12 @@ data class CompactRoutineDefinition(
     val routineKey: List<String>? = null,
 ) : CompactElementDefinition
 
-fun RoutineDefinition.toCompact(): CompactRoutineDefinition {
+fun RoutineDefinition.toCompact(strip: Boolean = false): CompactRoutineDefinition {
     return CompactRoutineDefinition(
-        canonicalName = canonicalName,
-        description = this.description,
+        canonicalName = this.canonicalName,
+        description = if (strip) "" else this.description,
         metadata = this.metadata
-            .map { it.toCompact() },
+            .map { it.toCompact(strip) },
         routineEndpoints = this.routineEndpoints
             .map { it.canonicalName },
         routineFaultUnion = this.routineFaultUnion

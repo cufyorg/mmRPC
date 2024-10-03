@@ -11,7 +11,7 @@ data class CompactFieldDefinitionUsage(
     val value: Literal,
 )
 
-fun FieldDefinitionUsage.toCompact(): CompactFieldDefinitionUsage {
+fun FieldDefinitionUsage.toCompact(strip: Boolean = false): CompactFieldDefinitionUsage {
     return CompactFieldDefinitionUsage(
         definition = this.definition.canonicalName,
         value = this.value,
@@ -19,7 +19,7 @@ fun FieldDefinitionUsage.toCompact(): CompactFieldDefinitionUsage {
 }
 
 fun CompactFieldDefinitionUsage.inflate(
-    onLookup: (CanonicalName) -> ElementDefinition?
+    onLookup: (CanonicalName) -> ElementDefinition?,
 ): () -> FieldDefinitionUsage? {
     return it@{
         FieldDefinitionUsage(

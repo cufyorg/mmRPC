@@ -20,12 +20,12 @@ data class CompactUnionDefinition(
     val unionTypes: List<CanonicalName>,
 ) : CompactElementDefinition
 
-fun UnionDefinition.toCompact(): CompactUnionDefinition {
+fun UnionDefinition.toCompact(strip: Boolean = false): CompactUnionDefinition {
     return CompactUnionDefinition(
-        canonicalName = canonicalName,
-        description = this.description,
+        canonicalName = this.canonicalName,
+        description = if (strip) "" else this.description,
         metadata = this.metadata
-            .map { it.toCompact() },
+            .map { it.toCompact(strip) },
         unionDiscriminator = this.unionDiscriminator,
         unionTypes = this.unionTypes
             .map { it.canonicalName }

@@ -15,12 +15,12 @@ data class CompactScalarDefinition(
     override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
 ) : CompactElementDefinition
 
-fun ScalarDefinition.toCompact(): CompactScalarDefinition {
+fun ScalarDefinition.toCompact(strip: Boolean = false): CompactScalarDefinition {
     return CompactScalarDefinition(
-        canonicalName = canonicalName,
-        description = this.description,
+        canonicalName = this.canonicalName,
+        description = if (strip) "" else this.description,
         metadata = this.metadata
-            .map { it.toCompact() },
+            .map { it.toCompact(strip) },
     )
 }
 

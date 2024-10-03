@@ -18,12 +18,12 @@ data class CompactProtocolDefinition(
     val protocolRoutines: List<CanonicalName> = emptyList(),
 ) : CompactElementDefinition
 
-fun ProtocolDefinition.toCompact(): CompactProtocolDefinition {
+fun ProtocolDefinition.toCompact(strip: Boolean = false): CompactProtocolDefinition {
     return CompactProtocolDefinition(
-        canonicalName = canonicalName,
-        description = this.description,
+        canonicalName = this.canonicalName,
+        description = if (strip) "" else this.description,
         metadata = this.metadata
-            .map { it.toCompact() },
+            .map { it.toCompact(strip) },
         protocolRoutines = this.protocolRoutines
             .map { it.canonicalName },
     )
