@@ -31,4 +31,6 @@ dependencies {
     implementation(libs.kotlinpoet)
 
     api("org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.0")
+
+    implementation("net.mamoe.yamlkt:yamlkt:0.13.0")
 }

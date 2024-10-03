@@ -1,7 +1,9 @@
 package org.cufy.mmrpc.gradle.kotlin
 
 import com.squareup.kotlinpoet.ClassName
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import net.mamoe.yamlkt.Yaml
 import org.cufy.mmrpc.CanonicalName
 import org.cufy.mmrpc.compact.CompactSpecSheet
 import org.cufy.mmrpc.compact.inflate
@@ -211,8 +213,11 @@ open class MMRPCKotlinTask : DefaultTask() {
 
         // add automatically-scanned files from directories
         filesGotten += this.directories.get().flatMap {
-            this.project.fileTree(it) { it.include("**.mmrpc.json") }
-                .filter { it.isFile }.files
+            this.project.fileTree(it) {
+                it.include("**.mmrpc.json")
+                it.include("**.mmrpc.yaml")
+                it.include("**.mmrpc.yml")
+            }.filter { it.isFile }.files
         }
 
         var compactSpecSheet = CompactSpecSheet()
@@ -225,11 +230,28 @@ open class MMRPCKotlinTask : DefaultTask() {
                 continue
             }
 
-            compactSpecSheet += try {
-                Json.decodeFromString<CompactSpecSheet>(source)
-            } catch (cause: Exception) {
-                this.logger.error("$TAG: Couldn't decode file: ${file.absolutePath}", cause)
-                continue
+            when (file.extension) {
+                "json" -> {
+                    compactSpecSheet += try {
+                        Json.decodeFromString<CompactSpecSheet>(source)
+                    } catch (cause: Exception) {
+                        this.logger.error("$TAG: Couldn't decode file: ${file.absolutePath}", cause)
+                        continue
+                    }
+                }
+
+                "yaml", "yml" -> {
+                    compactSpecSheet += try {
+                        Yaml.decodeFromString<CompactSpecSheet>(source)
+                    } catch (cause: Exception) {
+                        this.logger.error("$TAG: Couldn't decode file: ${file.absolutePath}", cause)
+                        continue
+                    }
+                }
+
+                else -> {
+                    this.logger.error("$TAG: Unrecognized file extension ${file.absolutePath}")
+                }
             }
         }
 

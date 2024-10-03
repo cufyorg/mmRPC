@@ -11,7 +11,12 @@ open class MMRPCExtension {
     var files: FileCollection? = null
 
     /**
-     * Input directories. (scanned for *.mmrpc.json)
+     * Input directories.
+     *
+     * Supported Extensions:
+     * - **.mmrpc.json
+     * - **.mmrpc.yaml
+     * - **.mmrpc.yml
      *
      * Default: `["src/main/resources/", "src/commonMain/resources/"]`
      */
