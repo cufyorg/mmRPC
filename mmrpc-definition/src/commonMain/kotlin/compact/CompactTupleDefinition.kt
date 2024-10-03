@@ -2,13 +2,16 @@ package org.cufy.mmrpc.compact
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.cufy.mmrpc.*
+import org.cufy.mmrpc.CanonicalName
+import org.cufy.mmrpc.ElementDefinition
+import org.cufy.mmrpc.TupleDefinition
+import org.cufy.mmrpc.TypeDefinition
 
 @Serializable
 @SerialName("tuple")
 data class CompactTupleDefinition(
-    override val name: String = TupleDefinition.ANONYMOUS_NAME,
-    override val namespace: Namespace = Namespace.Toplevel,
+    @SerialName("canonical_name")
+    override val canonicalName: CanonicalName,
     @SerialName("is_inline")
     override val isInline: Boolean = true,
     override val description: String = "",
@@ -19,8 +22,7 @@ data class CompactTupleDefinition(
 
 fun TupleDefinition.toCompact(): CompactTupleDefinition {
     return CompactTupleDefinition(
-        name = this.name,
-        namespace = this.namespace,
+        canonicalName = canonicalName,
         isInline = this.isInline,
         description = this.description,
         metadata = this.metadata
@@ -31,7 +33,7 @@ fun TupleDefinition.toCompact(): CompactTupleDefinition {
 }
 
 fun CompactTupleDefinition.inflate(
-    onLookup: (CanonicalName) -> ElementDefinition?
+    onLookup: (CanonicalName) -> ElementDefinition?,
 ): () -> TupleDefinition? {
     return it@{
         TupleDefinition(

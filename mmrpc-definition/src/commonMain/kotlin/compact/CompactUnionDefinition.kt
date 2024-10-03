@@ -2,13 +2,16 @@ package org.cufy.mmrpc.compact
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.cufy.mmrpc.*
+import org.cufy.mmrpc.CanonicalName
+import org.cufy.mmrpc.ElementDefinition
+import org.cufy.mmrpc.StructDefinition
+import org.cufy.mmrpc.UnionDefinition
 
 @Serializable
 @SerialName("union")
 data class CompactUnionDefinition(
-    override val name: String = UnionDefinition.ANONYMOUS_NAME,
-    override val namespace: Namespace = Namespace.Toplevel,
+    @SerialName("canonical_name")
+    override val canonicalName: CanonicalName,
     @SerialName("is_inline")
     override val isInline: Boolean = true,
     override val description: String = "",
@@ -21,8 +24,7 @@ data class CompactUnionDefinition(
 
 fun UnionDefinition.toCompact(): CompactUnionDefinition {
     return CompactUnionDefinition(
-        name = this.name,
-        namespace = this.namespace,
+        canonicalName = canonicalName,
         isInline = this.isInline,
         description = this.description,
         metadata = this.metadata
@@ -34,7 +36,7 @@ fun UnionDefinition.toCompact(): CompactUnionDefinition {
 }
 
 fun CompactUnionDefinition.inflate(
-    onLookup: (CanonicalName) -> ElementDefinition?
+    onLookup: (CanonicalName) -> ElementDefinition?,
 ): () -> UnionDefinition? {
     return it@{
         UnionDefinition(

@@ -2,13 +2,16 @@ package org.cufy.mmrpc.compact
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.cufy.mmrpc.*
+import org.cufy.mmrpc.ArrayDefinition
+import org.cufy.mmrpc.CanonicalName
+import org.cufy.mmrpc.ElementDefinition
+import org.cufy.mmrpc.TypeDefinition
 
 @Serializable
 @SerialName("array")
 data class CompactArrayDefinition(
-    override val name: String = ArrayDefinition.ANONYMOUS_NAME,
-    override val namespace: Namespace = Namespace.Toplevel,
+    @SerialName("canonical_name")
+    override val canonicalName: CanonicalName,
     @SerialName("is_inline")
     override val isInline: Boolean = true,
     override val description: String = "",
@@ -19,8 +22,7 @@ data class CompactArrayDefinition(
 
 fun ArrayDefinition.toCompact(): CompactArrayDefinition {
     return CompactArrayDefinition(
-        name = this.name,
-        namespace = this.namespace,
+        canonicalName = canonicalName,
         isInline = this.isInline,
         description = this.description,
         metadata = this.metadata
@@ -30,7 +32,7 @@ fun ArrayDefinition.toCompact(): CompactArrayDefinition {
 }
 
 fun CompactArrayDefinition.inflate(
-    onLookup: (CanonicalName) -> ElementDefinition?
+    onLookup: (CanonicalName) -> ElementDefinition?,
 ): () -> ArrayDefinition? {
     return it@{
         ArrayDefinition(

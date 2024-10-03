@@ -7,8 +7,8 @@ import org.cufy.mmrpc.*
 @Serializable
 @SerialName("routine")
 data class CompactRoutineDefinition(
-    override val name: String = RoutineDefinition.ANONYMOUS_NAME,
-    override val namespace: Namespace = Namespace.Toplevel,
+    @SerialName("canonical_name")
+    override val canonicalName: CanonicalName,
     @SerialName("is_inline")
     override val isInline: Boolean = true,
     override val description: String = "",
@@ -27,8 +27,7 @@ data class CompactRoutineDefinition(
 
 fun RoutineDefinition.toCompact(): CompactRoutineDefinition {
     return CompactRoutineDefinition(
-        name = this.name,
-        namespace = this.namespace,
+        canonicalName = canonicalName,
         isInline = this.isInline,
         description = this.description,
         metadata = this.metadata
@@ -44,7 +43,7 @@ fun RoutineDefinition.toCompact(): CompactRoutineDefinition {
 }
 
 fun CompactRoutineDefinition.inflate(
-    onLookup: (CanonicalName) -> ElementDefinition?
+    onLookup: (CanonicalName) -> ElementDefinition?,
 ): () -> RoutineDefinition? {
     return it@{
         RoutineDefinition(

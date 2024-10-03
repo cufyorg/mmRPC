@@ -2,13 +2,16 @@ package org.cufy.mmrpc.compact
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.cufy.mmrpc.*
+import org.cufy.mmrpc.CanonicalName
+import org.cufy.mmrpc.ElementDefinition
+import org.cufy.mmrpc.OptionalDefinition
+import org.cufy.mmrpc.TypeDefinition
 
 @Serializable
 @SerialName("optional")
 data class CompactOptionalDefinition(
-    override val name: String = OptionalDefinition.ANONYMOUS_NAME,
-    override val namespace: Namespace = Namespace.Toplevel,
+    @SerialName("canonical_name")
+    override val canonicalName: CanonicalName,
     @SerialName("is_inline")
     override val isInline: Boolean = true,
     override val description: String = "",
@@ -19,8 +22,7 @@ data class CompactOptionalDefinition(
 
 fun OptionalDefinition.toCompact(): CompactOptionalDefinition {
     return CompactOptionalDefinition(
-        name = this.name,
-        namespace = this.namespace,
+        canonicalName = canonicalName,
         isInline = this.isInline,
         description = this.description,
         metadata = this.metadata
@@ -30,7 +32,7 @@ fun OptionalDefinition.toCompact(): CompactOptionalDefinition {
 }
 
 fun CompactOptionalDefinition.inflate(
-    onLookup: (CanonicalName) -> ElementDefinition?
+    onLookup: (CanonicalName) -> ElementDefinition?,
 ): () -> OptionalDefinition? {
     return it@{
         OptionalDefinition(

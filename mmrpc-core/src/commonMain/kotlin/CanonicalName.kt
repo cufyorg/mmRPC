@@ -21,7 +21,10 @@ import kotlin.jvm.JvmInline
 @JvmInline
 @Serializable
 value class CanonicalName(val value: String) : Comparable<CanonicalName> {
-    val asNamespace get() = Namespace(this)
+    inline val name get() = value.substringAfterLast(".")
+    inline val namespace get() = asNamespace.parent
+    inline val namespaceOrNull get() = asNamespace.parentOrNull
+    inline val asNamespace get() = Namespace(value.split("."))
 
     override fun compareTo(other: CanonicalName) =
         value.compareTo(other.value)

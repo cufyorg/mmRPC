@@ -7,8 +7,8 @@ import org.cufy.mmrpc.*
 @Serializable
 @SerialName("field")
 data class CompactFieldDefinition(
-    override val name: String = FieldDefinition.ANONYMOUS_NAME,
-    override val namespace: Namespace = Namespace.Toplevel,
+    @SerialName("canonical_name")
+    override val canonicalName: CanonicalName,
     @SerialName("is_inline")
     override val isInline: Boolean = true,
     override val description: String = "",
@@ -21,8 +21,7 @@ data class CompactFieldDefinition(
 
 fun FieldDefinition.toCompact(): CompactFieldDefinition {
     return CompactFieldDefinition(
-        name = this.name,
-        namespace = this.namespace,
+        canonicalName = canonicalName,
         isInline = this.isInline,
         description = this.description,
         metadata = this.metadata
@@ -33,7 +32,7 @@ fun FieldDefinition.toCompact(): CompactFieldDefinition {
 }
 
 fun CompactFieldDefinition.inflate(
-    onLookup: (CanonicalName) -> ElementDefinition?
+    onLookup: (CanonicalName) -> ElementDefinition?,
 ): () -> FieldDefinition? {
     return it@{
         FieldDefinition(

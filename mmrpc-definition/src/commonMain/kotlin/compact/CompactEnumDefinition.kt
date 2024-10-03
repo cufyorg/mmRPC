@@ -7,8 +7,8 @@ import org.cufy.mmrpc.*
 @Serializable
 @SerialName("enum")
 data class CompactEnumDefinition(
-    override val name: String = EnumDefinition.ANONYMOUS_NAME,
-    override val namespace: Namespace = Namespace.Toplevel,
+    @SerialName("canonical_name")
+    override val canonicalName: CanonicalName,
     @SerialName("is_inline")
     override val isInline: Boolean = true,
     override val description: String = "",
@@ -21,8 +21,7 @@ data class CompactEnumDefinition(
 
 fun EnumDefinition.toCompact(): CompactEnumDefinition {
     return CompactEnumDefinition(
-        name = this.name,
-        namespace = this.namespace,
+        canonicalName = canonicalName,
         isInline = this.isInline,
         description = this.description,
         metadata = this.metadata
@@ -34,7 +33,7 @@ fun EnumDefinition.toCompact(): CompactEnumDefinition {
 }
 
 fun CompactEnumDefinition.inflate(
-    onLookup: (CanonicalName) -> ElementDefinition?
+    onLookup: (CanonicalName) -> ElementDefinition?,
 ): () -> EnumDefinition? {
     return it@{
         EnumDefinition(

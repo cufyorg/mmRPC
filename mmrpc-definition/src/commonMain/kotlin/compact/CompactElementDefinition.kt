@@ -6,15 +6,17 @@ import org.cufy.mmrpc.*
 
 @Serializable
 sealed interface CompactElementDefinition {
-    val name: String
-    val namespace: Namespace
+    @SerialName("canonical_name")
+    val canonicalName: CanonicalName
 
     @SerialName("is_inline")
     val isInline: Boolean
     val description: String
     val metadata: List<CompactMetadataDefinitionUsage>
 
-    val canonicalName get() = CanonicalName(namespace, name)
+    val name get() = canonicalName.name
+    val namespace get() = canonicalName.namespace
+
     val isAnonymous get() = namespace.isAnonymous || Namespace.isAnonymousSegment(name)
 }
 
@@ -42,7 +44,7 @@ fun ElementDefinition.toCompact(): CompactElementDefinition {
 }
 
 fun CompactElementDefinition.inflate(
-    onLookup: (CanonicalName) -> ElementDefinition?
+    onLookup: (CanonicalName) -> ElementDefinition?,
 ): () -> ElementDefinition? {
     return when (this) {
         is CompactArrayDefinition -> inflate(onLookup)

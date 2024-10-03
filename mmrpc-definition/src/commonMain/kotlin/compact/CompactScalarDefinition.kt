@@ -4,14 +4,13 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.cufy.mmrpc.CanonicalName
 import org.cufy.mmrpc.ElementDefinition
-import org.cufy.mmrpc.Namespace
 import org.cufy.mmrpc.ScalarDefinition
 
 @Serializable
 @SerialName("scalar")
 data class CompactScalarDefinition(
-    override val name: String = ScalarDefinition.ANONYMOUS_NAME,
-    override val namespace: Namespace = Namespace.Toplevel,
+    @SerialName("canonical_name")
+    override val canonicalName: CanonicalName,
     @SerialName("is_inline")
     override val isInline: Boolean = true,
     override val description: String = "",
@@ -20,8 +19,7 @@ data class CompactScalarDefinition(
 
 fun ScalarDefinition.toCompact(): CompactScalarDefinition {
     return CompactScalarDefinition(
-        name = this.name,
-        namespace = this.namespace,
+        canonicalName = canonicalName,
         isInline = this.isInline,
         description = this.description,
         metadata = this.metadata
@@ -30,7 +28,7 @@ fun ScalarDefinition.toCompact(): CompactScalarDefinition {
 }
 
 fun CompactScalarDefinition.inflate(
-    onLookup: (CanonicalName) -> ElementDefinition?
+    onLookup: (CanonicalName) -> ElementDefinition?,
 ): () -> ScalarDefinition? {
     return it@{
         ScalarDefinition(

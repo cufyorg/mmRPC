@@ -9,14 +9,14 @@ import org.cufy.mmrpc.*
 @Serializable
 @SerialName("kafka_publication_endpoint")
 data class CompactKafkaPublicationEndpointDefinition(
-    override val name: String = KafkaPublicationEndpointDefinition.ANONYMOUS_NAME,
-    override val namespace: Namespace = Namespace.Toplevel,
+    @SerialName("canonical_name")
+    override val canonicalName: CanonicalName,
     @SerialName("is_inline")
     override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
     @SerialName("endpoint_topic")
-    val endpointTopic: KafkaPublicationTopic = namespace.toKafkaPublicationTopic(),
+    val endpointTopic: KafkaPublicationTopic,
     @SerialName("endpoint_security_inter")
     val endpointSecurityInter: List<KafkaPublicationSecurity> = listOf(
         KafkaPublication.KafkaACL,
@@ -25,8 +25,7 @@ data class CompactKafkaPublicationEndpointDefinition(
 
 fun KafkaPublicationEndpointDefinition.toCompact(): CompactKafkaPublicationEndpointDefinition {
     return CompactKafkaPublicationEndpointDefinition(
-        name = this.name,
-        namespace = this.namespace,
+        canonicalName = canonicalName,
         isInline = this.isInline,
         description = this.description,
         metadata = this.metadata
@@ -37,7 +36,7 @@ fun KafkaPublicationEndpointDefinition.toCompact(): CompactKafkaPublicationEndpo
 }
 
 fun CompactKafkaPublicationEndpointDefinition.inflate(
-    onLookup: (CanonicalName) -> ElementDefinition?
+    onLookup: (CanonicalName) -> ElementDefinition?,
 ): () -> KafkaPublicationEndpointDefinition? {
     return it@{
         KafkaPublicationEndpointDefinition(
