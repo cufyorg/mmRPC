@@ -26,8 +26,6 @@ import kotlin.jvm.JvmName
 data class RoutineDefinition(
     override val name: String = ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
-    @SerialName("is_inline")
-    override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
     @SerialName("routine_endpoints")
@@ -111,7 +109,6 @@ open class RoutineDefinitionBuilder :
         return RoutineDefinition(
             name = this.name,
             namespace = this.namespace.value,
-            isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.toList(),
             routineEndpoints = this.routineEndpointsUnnamed.mapIndexed { i, it ->

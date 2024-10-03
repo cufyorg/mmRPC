@@ -12,8 +12,6 @@ import org.cufy.mmrpc.StructDefinition
 data class CompactInterDefinition(
     @SerialName("canonical_name")
     override val canonicalName: CanonicalName,
-    @SerialName("is_inline")
-    override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
     @SerialName("inter_types.ref")
@@ -23,7 +21,6 @@ data class CompactInterDefinition(
 fun InterDefinition.toCompact(): CompactInterDefinition {
     return CompactInterDefinition(
         canonicalName = canonicalName,
-        isInline = this.isInline,
         description = this.description,
         metadata = this.metadata
             .map { it.toCompact() },
@@ -39,7 +36,6 @@ fun CompactInterDefinition.inflate(
         InterDefinition(
             name = this.name,
             namespace = this.namespace,
-            isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.map {
                 it.inflate(onLookup)() ?: return@it null

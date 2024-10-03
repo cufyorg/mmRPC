@@ -26,8 +26,6 @@ import kotlin.jvm.JvmName
 data class EnumDefinition(
     override val name: String = ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
-    @SerialName("is_inline")
-    override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
     val enumType: TypeDefinition,
@@ -64,7 +62,6 @@ open class EnumDefinitionBuilder :
         return EnumDefinition(
             name = this.name,
             namespace = this.namespace.value,
-            isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.toList(),
             enumType = this.type.value.get(asNamespace, name = "type"),
@@ -79,11 +76,10 @@ open class EnumDefinitionBuilder :
 internal fun enum(
     block: EnumDefinitionBuilder.() -> Unit = {},
 ): Unnamed<EnumDefinition> {
-    return Unnamed { namespace, name, isInline ->
+    return Unnamed { namespace, name ->
         EnumDefinitionBuilder()
             .also { it.name = name ?: return@also }
             .also { it.namespace *= namespace }
-            .also { it.isInline = isInline }
             .apply(block)
             .build()
     }

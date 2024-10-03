@@ -27,8 +27,6 @@ import kotlinx.serialization.Serializable
 data class KafkaPublicationEndpointDefinition(
     override val name: String = ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
-    @SerialName("is_inline")
-    override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
     @SerialName("endpoint_topic")
@@ -63,7 +61,6 @@ open class KafkaPublicationEndpointDefinitionBuilder :
         return KafkaPublicationEndpointDefinition(
             name = this.name,
             namespace = this.namespace.value,
-            isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.toList(),
             endpointTopic = this.topic
@@ -76,13 +73,12 @@ open class KafkaPublicationEndpointDefinitionBuilder :
 
 @Marker2
 fun endpointKafkaPublication(
-    block: KafkaPublicationEndpointDefinitionBuilder.() -> Unit = {}
+    block: KafkaPublicationEndpointDefinitionBuilder.() -> Unit = {},
 ): Unnamed<KafkaPublicationEndpointDefinition> {
-    return Unnamed { namespace, name, isInline ->
+    return Unnamed { namespace, name ->
         KafkaPublicationEndpointDefinitionBuilder()
             .also { it.name = name ?: return@also }
             .also { it.namespace *= namespace }
-            .also { it.isInline = isInline }
             .apply(block)
             .build()
     }
@@ -103,7 +99,7 @@ val RoutineDefinitionBuilder.kafkaPublication: Unit
 
 @Marker1
 fun RoutineDefinitionBuilder.kafkaPublication(
-    block: KafkaPublicationEndpointDefinitionBuilder.() -> Unit = {}
+    block: KafkaPublicationEndpointDefinitionBuilder.() -> Unit = {},
 ) {
     +endpointKafkaPublication { name = "kafkaPublication"; +KafkaPublication.KafkaACL; block() }
 }

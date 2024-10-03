@@ -12,8 +12,6 @@ import org.cufy.mmrpc.UnionDefinition
 data class CompactUnionDefinition(
     @SerialName("canonical_name")
     override val canonicalName: CanonicalName,
-    @SerialName("is_inline")
-    override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
     @SerialName("union_discriminator")
@@ -25,7 +23,6 @@ data class CompactUnionDefinition(
 fun UnionDefinition.toCompact(): CompactUnionDefinition {
     return CompactUnionDefinition(
         canonicalName = canonicalName,
-        isInline = this.isInline,
         description = this.description,
         metadata = this.metadata
             .map { it.toCompact() },
@@ -42,7 +39,6 @@ fun CompactUnionDefinition.inflate(
         UnionDefinition(
             name = this.name,
             namespace = this.namespace,
-            isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.map {
                 it.inflate(onLookup)() ?: return@it null

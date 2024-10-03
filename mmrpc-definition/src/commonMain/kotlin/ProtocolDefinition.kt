@@ -26,8 +26,6 @@ import kotlin.jvm.JvmName
 data class ProtocolDefinition(
     override val name: String = ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
-    @SerialName("is_inline")
-    override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
     @SerialName("protocol_routines")
@@ -61,7 +59,6 @@ open class ProtocolDefinitionBuilder :
         return ProtocolDefinition(
             namespace = this.namespace.value,
             name = this.name,
-            isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.toList(),
             protocolRoutines = this.protocolRoutinesUnnamed.mapIndexed { i, it ->
@@ -73,13 +70,12 @@ open class ProtocolDefinitionBuilder :
 
 @Marker2
 fun protocol(
-    block: ProtocolDefinitionBuilder.() -> Unit = {}
+    block: ProtocolDefinitionBuilder.() -> Unit = {},
 ): Unnamed<ProtocolDefinition> {
-    return Unnamed { namespace, name, isInline ->
+    return Unnamed { namespace, name ->
         ProtocolDefinitionBuilder()
             .also { it.name = name ?: return@also }
             .also { it.namespace *= namespace }
-            .also { it.isInline = isInline }
             .apply(block)
             .build()
     }
@@ -93,7 +89,7 @@ val protocol = protocol()
 @Marker2
 fun protocol(
     vararg routines: RoutineDefinition,
-    block: ProtocolDefinitionBuilder.() -> Unit = {}
+    block: ProtocolDefinitionBuilder.() -> Unit = {},
 ): Unnamed<ProtocolDefinition> {
     return protocol { +routines.asList(); block() }
 }
@@ -101,7 +97,7 @@ fun protocol(
 @Marker2
 fun protocol(
     vararg routines: Unnamed<RoutineDefinition>,
-    block: ProtocolDefinitionBuilder.() -> Unit = {}
+    block: ProtocolDefinitionBuilder.() -> Unit = {},
 ): Unnamed<ProtocolDefinition> {
     return protocol { +routines.asList(); block() }
 }

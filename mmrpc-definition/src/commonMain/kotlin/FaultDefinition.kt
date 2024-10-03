@@ -25,8 +25,6 @@ import kotlinx.serialization.Serializable
 data class FaultDefinition(
     override val name: String = ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
-    @SerialName("is_inline")
-    override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
 ) : ElementDefinition() {
@@ -44,11 +42,9 @@ open class FaultDefinitionBuilder :
     override var name = FaultDefinition.ANONYMOUS_NAME
 
     override fun build(): FaultDefinition {
-        val asNamespace = this.namespace.value + this.name
         return FaultDefinition(
             name = this.name,
             namespace = this.namespace.value,
-            isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.toList(),
         )
@@ -57,13 +53,12 @@ open class FaultDefinitionBuilder :
 
 @Marker2
 fun fault(
-    block: FaultDefinitionBuilder.() -> Unit = {}
+    block: FaultDefinitionBuilder.() -> Unit = {},
 ): Unnamed<FaultDefinition> {
-    return Unnamed { namespace, name, isInline ->
+    return Unnamed { namespace, name ->
         FaultDefinitionBuilder()
             .also { it.name = name ?: return@also }
             .also { it.namespace *= namespace }
-            .also { it.isInline = isInline }
             .apply(block)
             .build()
     }

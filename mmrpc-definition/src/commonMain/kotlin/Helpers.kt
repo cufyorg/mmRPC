@@ -50,24 +50,24 @@ abstract class NamespaceObject {
 ////////////////////////////////////////
 
 fun interface UnnamedBlock<out T> {
-    operator fun invoke(ns: Namespace, name: String?, isInline: Boolean): T
+    operator fun invoke(ns: Namespace, name: String?): T
 }
 
 class Unnamed<out T>(private val block: UnnamedBlock<T>) {
-    constructor(block: (Namespace) -> T) : this({ ns, _, _ -> block(ns) })
-    constructor(value: T) : this({ _, _, _ -> value })
+    constructor(block: (Namespace) -> T) : this({ ns, _ -> block(ns) })
+    constructor(value: T) : this({ _, _ -> value })
 
-    fun get(namespace: Namespace, isInline: Boolean = true) =
-        block(namespace, name = null, isInline = isInline)
+    fun get(namespace: Namespace) =
+        block(namespace, name = null)
 
-    fun get(namespace: Namespace, name: String, isInline: Boolean = true) =
-        block(namespace, name, isInline = isInline)
+    fun get(namespace: Namespace, name: String) =
+        block(namespace, name)
 
-    fun get(obj: NamespaceObject, isInline: Boolean = true) =
-        block(obj.namespace, name = null, isInline = isInline)
+    fun get(obj: NamespaceObject) =
+        block(obj.namespace, name = null)
 
-    fun get(obj: NamespaceObject, name: String, isInline: Boolean = true) =
-        block(obj.namespace, name, isInline = isInline)
+    fun get(obj: NamespaceObject, name: String) =
+        block(obj.namespace, name)
 
     private val values = mutableMapOf<Pair<Namespace, String?>, T>()
 
@@ -76,7 +76,7 @@ class Unnamed<out T>(private val block: UnnamedBlock<T>) {
             val splits = property.name.split("__")
             val ns = namespace + splits.dropLast(1)
             val n = splits.last()
-            block(ns, n, isInline = false)
+            block(ns, n)
         }
     }
 
@@ -85,12 +85,12 @@ class Unnamed<out T>(private val block: UnnamedBlock<T>) {
             val splits = property.name.split("__")
             val ns = obj.namespace + splits.dropLast(1)
             val n = splits.last()
-            block(ns, n, isInline = false)
+            block(ns, n)
         }
     }
 
     operator fun provideDelegate(thisRef: Any?, property: KProperty<*>): Unnamed<T> {
-        return Unnamed { namespace, name, isInline -> block(namespace, name, isInline) }
+        return Unnamed { namespace, name -> block(namespace, name) }
     }
 }
 
@@ -272,9 +272,9 @@ interface RoutineDefinitionSetDomainContainer {
     }
 
     operator fun String.invoke(
-        block: RoutineDefinitionBuilder.() -> Unit
+        block: RoutineDefinitionBuilder.() -> Unit,
     ) {
-        +Unnamed { namespace, _, _ ->
+        +Unnamed { namespace, _ ->
             RoutineDefinitionBuilder()
                 .also { it.name = this }
                 .also { it.namespace *= namespace }
@@ -308,7 +308,7 @@ interface FieldDefinitionSetDomainContainer {
         type: TypeDefinition,
         block: FieldDefinitionBuilder.() -> Unit = {},
     ) {
-        +Unnamed { namespace, _, _ ->
+        +Unnamed { namespace, _ ->
             FieldDefinitionBuilder()
                 .also { it.name = this }
                 .also { it.namespace *= namespace }
@@ -322,7 +322,7 @@ interface FieldDefinitionSetDomainContainer {
         type: Unnamed<TypeDefinition>,
         block: FieldDefinitionBuilder.() -> Unit = {},
     ) {
-        +Unnamed { namespace, _, _ ->
+        +Unnamed { namespace, _ ->
             FieldDefinitionBuilder()
                 .also { it.name = this }
                 .also { it.namespace *= namespace }
@@ -339,7 +339,6 @@ interface FieldDefinitionSetDomainContainer {
 abstract class ElementDefinitionBuilder {
     abstract var name: String
     open val namespace = NamespaceDomainProperty()
-    open var isInline = true
     open var description = ""
 
     protected open val metadata = mutableListOf<MetadataDefinitionUsage>()

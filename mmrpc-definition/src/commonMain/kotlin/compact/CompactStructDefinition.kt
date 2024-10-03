@@ -12,8 +12,6 @@ import org.cufy.mmrpc.StructDefinition
 data class CompactStructDefinition(
     @SerialName("canonical_name")
     override val canonicalName: CanonicalName,
-    @SerialName("is_inline")
-    override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
     @SerialName("struct_fields.ref")
@@ -23,7 +21,6 @@ data class CompactStructDefinition(
 fun StructDefinition.toCompact(): CompactStructDefinition {
     return CompactStructDefinition(
         canonicalName = canonicalName,
-        isInline = this.isInline,
         description = this.description,
         metadata = this.metadata
             .map { it.toCompact() },
@@ -39,7 +36,6 @@ fun CompactStructDefinition.inflate(
         StructDefinition(
             name = this.name,
             namespace = this.namespace,
-            isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.map {
                 it.inflate(onLookup)() ?: return@it null

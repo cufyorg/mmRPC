@@ -9,8 +9,6 @@ import org.cufy.mmrpc.*
 data class CompactConstDefinition(
     @SerialName("canonical_name")
     override val canonicalName: CanonicalName,
-    @SerialName("is_inline")
-    override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
     @SerialName("const_type.ref")
@@ -22,7 +20,6 @@ data class CompactConstDefinition(
 fun ConstDefinition.toCompact(): CompactConstDefinition {
     return CompactConstDefinition(
         canonicalName = canonicalName,
-        isInline = this.isInline,
         description = this.description,
         metadata = this.metadata
             .map { it.toCompact() },
@@ -38,7 +35,6 @@ fun CompactConstDefinition.inflate(
         ConstDefinition(
             name = this.name,
             namespace = this.namespace,
-            isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.map {
                 it.inflate(onLookup)() ?: return@it null

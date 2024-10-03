@@ -11,8 +11,6 @@ import org.cufy.mmrpc.*
 data class CompactHttpEndpointDefinition(
     @SerialName("canonical_name")
     override val canonicalName: CanonicalName,
-    @SerialName("is_inline")
-    override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
     @SerialName("endpoint_path")
@@ -28,7 +26,6 @@ data class CompactHttpEndpointDefinition(
 fun HttpEndpointDefinition.toCompact(): CompactHttpEndpointDefinition {
     return CompactHttpEndpointDefinition(
         canonicalName = canonicalName,
-        isInline = this.isInline,
         description = this.description,
         metadata = this.metadata
             .map { it.toCompact() },
@@ -45,7 +42,6 @@ fun CompactHttpEndpointDefinition.inflate(
         HttpEndpointDefinition(
             name = this.name,
             namespace = this.namespace,
-            isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.map {
                 it.inflate(onLookup)() ?: return@it null

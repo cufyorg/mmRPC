@@ -25,8 +25,6 @@ import kotlinx.serialization.Serializable
 data class ConstDefinition(
     override val name: String = ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
-    @SerialName("is_inline")
-    override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
     @SerialName("const_type")
@@ -56,7 +54,6 @@ open class ConstDefinitionBuilder :
         return ConstDefinition(
             name = this.name,
             namespace = this.namespace.value,
-            isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.toList(),
             constType = this.type.value.get(asNamespace, name = "type"),
@@ -69,11 +66,10 @@ open class ConstDefinitionBuilder :
 internal fun const(
     block: ConstDefinitionBuilder.() -> Unit = {}
 ): Unnamed<ConstDefinition> {
-    return Unnamed { namespace, name, isInline ->
+    return Unnamed { namespace, name ->
         ConstDefinitionBuilder()
             .also { it.name = name ?: return@also }
             .also { it.namespace *= namespace }
-            .also { it.isInline = isInline }
             .apply(block)
             .build()
     }

@@ -9,8 +9,6 @@ import org.cufy.mmrpc.*
 data class CompactEnumDefinition(
     @SerialName("canonical_name")
     override val canonicalName: CanonicalName,
-    @SerialName("is_inline")
-    override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
     @SerialName("enum_type.ref")
@@ -22,7 +20,6 @@ data class CompactEnumDefinition(
 fun EnumDefinition.toCompact(): CompactEnumDefinition {
     return CompactEnumDefinition(
         canonicalName = canonicalName,
-        isInline = this.isInline,
         description = this.description,
         metadata = this.metadata
             .map { it.toCompact() },
@@ -39,7 +36,6 @@ fun CompactEnumDefinition.inflate(
         EnumDefinition(
             name = this.name,
             namespace = this.namespace,
-            isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.map {
                 it.inflate(onLookup)() ?: return@it null

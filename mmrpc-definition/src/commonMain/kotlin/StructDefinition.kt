@@ -26,8 +26,6 @@ import kotlin.jvm.JvmName
 data class StructDefinition(
     override val name: String = ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
-    @SerialName("is_inline")
-    override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
     @SerialName("struct_fields")
@@ -62,7 +60,6 @@ open class StructDefinitionBuilder :
         return StructDefinition(
             name = this.name,
             namespace = this.namespace.value,
-            isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.toList(),
             structFields = this.structFieldsUnnamed.mapIndexed { i, it ->
@@ -74,13 +71,12 @@ open class StructDefinitionBuilder :
 
 @Marker2
 fun struct(
-    block: StructDefinitionBuilder.() -> Unit = {}
+    block: StructDefinitionBuilder.() -> Unit = {},
 ): Unnamed<StructDefinition> {
-    return Unnamed { namespace, name, isInline ->
+    return Unnamed { namespace, name ->
         StructDefinitionBuilder()
             .also { it.name = name ?: return@also }
             .also { it.namespace *= namespace }
-            .also { it.isInline = isInline }
             .apply(block)
             .build()
     }
@@ -94,7 +90,7 @@ val struct = struct()
 @Marker2
 fun struct(
     vararg fields: FieldDefinition,
-    block: StructDefinitionBuilder.() -> Unit = {}
+    block: StructDefinitionBuilder.() -> Unit = {},
 ): Unnamed<StructDefinition> {
     return struct { +fields.asList(); block() }
 }
@@ -102,7 +98,7 @@ fun struct(
 @Marker2
 fun struct(
     vararg fields: Unnamed<FieldDefinition>,
-    block: StructDefinitionBuilder.() -> Unit = {}
+    block: StructDefinitionBuilder.() -> Unit = {},
 ): Unnamed<StructDefinition> {
     return struct { +fields.asList(); block() }
 }

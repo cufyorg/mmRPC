@@ -26,8 +26,6 @@ import kotlin.jvm.JvmName
 data class TupleDefinition(
     override val name: String = ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
-    @SerialName("is_inline")
-    override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
     @SerialName("tuple_types")
@@ -62,7 +60,6 @@ open class TupleDefinitionBuilder :
         return TupleDefinition(
             name = this.name,
             namespace = this.namespace.value,
-            isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.toList(),
             tupleTypes = this.tupleTypesUnnamed.mapIndexed { i, it ->
@@ -76,11 +73,10 @@ open class TupleDefinitionBuilder :
 fun tuple(
     block: TupleDefinitionBuilder.() -> Unit = {},
 ): Unnamed<TupleDefinition> {
-    return Unnamed { namespace, name, isInline ->
+    return Unnamed { namespace, name ->
         TupleDefinitionBuilder()
             .also { it.name = name ?: return@also }
             .also { it.namespace *= namespace }
-            .also { it.isInline = isInline }
             .apply(block)
             .build()
     }

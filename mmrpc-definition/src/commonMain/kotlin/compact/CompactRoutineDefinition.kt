@@ -9,8 +9,6 @@ import org.cufy.mmrpc.*
 data class CompactRoutineDefinition(
     @SerialName("canonical_name")
     override val canonicalName: CanonicalName,
-    @SerialName("is_inline")
-    override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
     @SerialName("routine_endpoints.ref")
@@ -28,7 +26,6 @@ data class CompactRoutineDefinition(
 fun RoutineDefinition.toCompact(): CompactRoutineDefinition {
     return CompactRoutineDefinition(
         canonicalName = canonicalName,
-        isInline = this.isInline,
         description = this.description,
         metadata = this.metadata
             .map { it.toCompact() },
@@ -49,7 +46,6 @@ fun CompactRoutineDefinition.inflate(
         RoutineDefinition(
             name = this.name,
             namespace = this.namespace,
-            isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.map {
                 it.inflate(onLookup)() ?: return@it null

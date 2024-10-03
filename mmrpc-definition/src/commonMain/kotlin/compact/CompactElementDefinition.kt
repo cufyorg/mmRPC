@@ -9,8 +9,6 @@ sealed interface CompactElementDefinition {
     @SerialName("canonical_name")
     val canonicalName: CanonicalName
 
-    @SerialName("is_inline")
-    val isInline: Boolean
     val description: String
     val metadata: List<CompactMetadataDefinitionUsage>
 

@@ -11,8 +11,6 @@ import org.cufy.mmrpc.*
 data class CompactKafkaPublicationEndpointDefinition(
     @SerialName("canonical_name")
     override val canonicalName: CanonicalName,
-    @SerialName("is_inline")
-    override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
     @SerialName("endpoint_topic")
@@ -26,7 +24,6 @@ data class CompactKafkaPublicationEndpointDefinition(
 fun KafkaPublicationEndpointDefinition.toCompact(): CompactKafkaPublicationEndpointDefinition {
     return CompactKafkaPublicationEndpointDefinition(
         canonicalName = canonicalName,
-        isInline = this.isInline,
         description = this.description,
         metadata = this.metadata
             .map { it.toCompact() },
@@ -42,7 +39,6 @@ fun CompactKafkaPublicationEndpointDefinition.inflate(
         KafkaPublicationEndpointDefinition(
             name = this.name,
             namespace = this.namespace,
-            isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.map {
                 it.inflate(onLookup)() ?: return@it null

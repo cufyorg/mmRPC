@@ -24,8 +24,6 @@ import kotlin.jvm.JvmName
 data class MetadataDefinition(
     override val name: String = ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
-    @SerialName("is_inline")
-    override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
     @SerialName("metadata_fields")
@@ -59,7 +57,6 @@ open class MetadataDefinitionBuilder :
         return MetadataDefinition(
             name = this.name,
             namespace = this.namespace.value,
-            isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.toList(),
             metadataFields = this.metadataFieldsUnnamed.mapIndexed { i, it ->
@@ -71,13 +68,12 @@ open class MetadataDefinitionBuilder :
 
 @Marker2
 fun metadata(
-    block: MetadataDefinitionBuilder.() -> Unit = {}
+    block: MetadataDefinitionBuilder.() -> Unit = {},
 ): Unnamed<MetadataDefinition> {
-    return Unnamed { namespace, name, isInline ->
+    return Unnamed { namespace, name ->
         MetadataDefinitionBuilder()
             .also { it.name = name ?: return@also }
             .also { it.namespace *= namespace }
-            .also { it.isInline = isInline }
             .apply(block)
             .build()
     }
@@ -91,7 +87,7 @@ val metadata = metadata()
 @Marker2
 fun metadata(
     vararg fields: FieldDefinition,
-    block: MetadataDefinitionBuilder.() -> Unit = {}
+    block: MetadataDefinitionBuilder.() -> Unit = {},
 ): Unnamed<MetadataDefinition> {
     return metadata { +fields.asList(); block() }
 }
@@ -99,7 +95,7 @@ fun metadata(
 @Marker2
 fun metadata(
     vararg fields: Unnamed<FieldDefinition>,
-    block: MetadataDefinitionBuilder.() -> Unit = {}
+    block: MetadataDefinitionBuilder.() -> Unit = {},
 ): Unnamed<MetadataDefinition> {
     return metadata { +fields.asList(); block() }
 }

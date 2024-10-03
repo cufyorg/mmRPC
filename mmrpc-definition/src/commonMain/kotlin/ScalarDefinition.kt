@@ -25,8 +25,6 @@ import kotlinx.serialization.Serializable
 data class ScalarDefinition(
     override val name: String = ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
-    @SerialName("is_inline")
-    override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
 ) : TypeDefinition() {
@@ -44,11 +42,9 @@ open class ScalarDefinitionBuilder :
     override var name = ScalarDefinition.ANONYMOUS_NAME
 
     override fun build(): ScalarDefinition {
-        val asNamespace = this.namespace.value + this.name
         return ScalarDefinition(
             name = this.name,
             namespace = this.namespace.value,
-            isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.toList(),
         )
@@ -57,13 +53,12 @@ open class ScalarDefinitionBuilder :
 
 @Marker2
 fun scalar(
-    block: ScalarDefinitionBuilder.() -> Unit = {}
+    block: ScalarDefinitionBuilder.() -> Unit = {},
 ): Unnamed<ScalarDefinition> {
-    return Unnamed { namespace, name, isInline ->
+    return Unnamed { namespace, name ->
         ScalarDefinitionBuilder()
             .also { it.name = name ?: return@also }
             .also { it.namespace *= namespace }
-            .also { it.isInline = isInline }
             .also(block)
             .build()
     }

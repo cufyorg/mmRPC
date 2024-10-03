@@ -12,8 +12,6 @@ import org.cufy.mmrpc.TypeDefinition
 data class CompactOptionalDefinition(
     @SerialName("canonical_name")
     override val canonicalName: CanonicalName,
-    @SerialName("is_inline")
-    override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
     @SerialName("optional_type.ref")
@@ -23,7 +21,6 @@ data class CompactOptionalDefinition(
 fun OptionalDefinition.toCompact(): CompactOptionalDefinition {
     return CompactOptionalDefinition(
         canonicalName = canonicalName,
-        isInline = this.isInline,
         description = this.description,
         metadata = this.metadata
             .map { it.toCompact() },
@@ -38,7 +35,6 @@ fun CompactOptionalDefinition.inflate(
         OptionalDefinition(
             name = this.name,
             namespace = this.namespace,
-            isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.map {
                 it.inflate(onLookup)() ?: return@it null

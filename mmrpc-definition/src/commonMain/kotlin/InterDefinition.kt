@@ -26,8 +26,6 @@ import kotlin.jvm.JvmName
 data class InterDefinition(
     override val name: String = ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
-    @SerialName("is_inline")
-    override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
     @SerialName("inter_types")
@@ -61,7 +59,6 @@ open class InterDefinitionBuilder :
         return InterDefinition(
             name = this.name,
             namespace = this.namespace.value,
-            isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.toList(),
             interTypes = this.interTypesUnnamed.mapIndexed { i, it ->
@@ -73,13 +70,12 @@ open class InterDefinitionBuilder :
 
 @Marker2
 fun inter(
-    block: InterDefinitionBuilder.() -> Unit = {}
+    block: InterDefinitionBuilder.() -> Unit = {},
 ): Unnamed<InterDefinition> {
-    return Unnamed { namespace, name, isInline ->
+    return Unnamed { namespace, name ->
         InterDefinitionBuilder()
             .also { it.name = name ?: return@also }
             .also { it.namespace *= namespace }
-            .also { it.isInline = isInline }
             .apply(block)
             .build()
     }
@@ -90,7 +86,7 @@ fun inter(
 @Marker2
 fun inter(
     vararg types: StructDefinition,
-    block: InterDefinitionBuilder.() -> Unit = {}
+    block: InterDefinitionBuilder.() -> Unit = {},
 ): Unnamed<InterDefinition> {
     return inter { +types.asList(); block() }
 }
@@ -98,7 +94,7 @@ fun inter(
 @Marker2
 fun inter(
     vararg types: Unnamed<StructDefinition>,
-    block: InterDefinitionBuilder.() -> Unit = {}
+    block: InterDefinitionBuilder.() -> Unit = {},
 ): Unnamed<InterDefinition> {
     return inter { +types.asList(); block() }
 }

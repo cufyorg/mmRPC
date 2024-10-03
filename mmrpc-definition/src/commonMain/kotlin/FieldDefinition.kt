@@ -25,8 +25,6 @@ import kotlinx.serialization.Serializable
 data class FieldDefinition(
     override val name: String = ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
-    @SerialName("is_inline")
-    override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
     @SerialName("field_type")
@@ -56,7 +54,6 @@ open class FieldDefinitionBuilder :
         return FieldDefinition(
             name = this.name,
             namespace = this.namespace.value,
-            isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.toList(),
             fieldType = this.type.value.get(asNamespace, name = "type"),
@@ -69,11 +66,10 @@ open class FieldDefinitionBuilder :
 internal fun prop(
     block: FieldDefinitionBuilder.() -> Unit = {},
 ): Unnamed<FieldDefinition> {
-    return Unnamed { namespace, name, isInline ->
+    return Unnamed { namespace, name ->
         FieldDefinitionBuilder()
             .also { it.name = name ?: return@also }
             .also { it.namespace *= namespace }
-            .also { it.isInline = isInline }
             .apply(block)
             .build()
     }

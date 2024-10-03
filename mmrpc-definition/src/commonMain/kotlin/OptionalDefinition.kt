@@ -25,8 +25,6 @@ import kotlinx.serialization.Serializable
 data class OptionalDefinition(
     override val name: String = ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
-    @SerialName("is_inline")
-    override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
     @SerialName("optional_type")
@@ -53,7 +51,6 @@ open class OptionalDefinitionBuilder :
         return OptionalDefinition(
             name = this.name,
             namespace = this.namespace.value,
-            isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.toList(),
             optionalType = this.type.value.get(asNamespace, name = "type"),
@@ -63,13 +60,12 @@ open class OptionalDefinitionBuilder :
 
 @Marker2
 internal fun optional(
-    block: OptionalDefinitionBuilder.() -> Unit = {}
+    block: OptionalDefinitionBuilder.() -> Unit = {},
 ): Unnamed<OptionalDefinition> {
-    return Unnamed { namespace, name, isInline ->
+    return Unnamed { namespace, name ->
         OptionalDefinitionBuilder()
             .also { it.name = name ?: return@also }
             .also { it.namespace *= namespace }
-            .also { it.isInline = isInline }
             .apply(block)
             .build()
     }

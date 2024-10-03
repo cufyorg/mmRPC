@@ -27,8 +27,6 @@ import kotlinx.serialization.Serializable
 data class IframeEndpointDefinition(
     override val name: String = ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
-    @SerialName("is_inline")
-    override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
     @SerialName("endpoint_path")
@@ -58,11 +56,9 @@ open class IframeEndpointDefinitionBuilder :
     }
 
     override fun build(): IframeEndpointDefinition {
-        val asNamespace = this.namespace.value + this.name
         return IframeEndpointDefinition(
             name = this.name,
             namespace = this.namespace.value,
-            isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.toList(),
             endpointPath = this.path
@@ -75,13 +71,12 @@ open class IframeEndpointDefinitionBuilder :
 
 @Marker2
 fun endpointIframe(
-    block: IframeEndpointDefinitionBuilder.() -> Unit = {}
+    block: IframeEndpointDefinitionBuilder.() -> Unit = {},
 ): Unnamed<IframeEndpointDefinition> {
-    return Unnamed { namespace, name, isInline ->
+    return Unnamed { namespace, name ->
         IframeEndpointDefinitionBuilder()
             .also { it.name = name ?: return@also }
             .also { it.namespace *= namespace }
-            .also { it.isInline = isInline }
             .apply(block)
             .build()
     }
@@ -102,7 +97,7 @@ val RoutineDefinitionBuilder.iframe: Unit
 
 @Marker1
 fun RoutineDefinitionBuilder.iframe(
-    block: IframeEndpointDefinitionBuilder.() -> Unit = {}
+    block: IframeEndpointDefinitionBuilder.() -> Unit = {},
 ) {
     +endpointIframe { name = "iframe"; block() }
 }

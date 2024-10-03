@@ -15,7 +15,6 @@
  */
 package org.cufy.mmrpc
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -23,8 +22,6 @@ sealed class ElementDefinition {
     abstract val name: String
     abstract val namespace: Namespace
 
-    @SerialName("is_inline")
-    abstract val isInline: Boolean
     abstract val description: String
     abstract val metadata: List<MetadataDefinitionUsage>
 

@@ -25,8 +25,6 @@ import kotlinx.serialization.Serializable
 data class ArrayDefinition(
     override val name: String = ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
-    @SerialName("is_inline")
-    override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
     @SerialName("array_type")
@@ -53,7 +51,6 @@ open class ArrayDefinitionBuilder :
         return ArrayDefinition(
             name = this.name,
             namespace = this.namespace.value,
-            isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.toList(),
             arrayType = this.type.value.get(asNamespace, name = "type"),
@@ -63,13 +60,12 @@ open class ArrayDefinitionBuilder :
 
 @Marker2
 internal fun array(
-    block: ArrayDefinitionBuilder.() -> Unit = {}
+    block: ArrayDefinitionBuilder.() -> Unit = {},
 ): Unnamed<ArrayDefinition> {
-    return Unnamed { namespace, name, isInline ->
+    return Unnamed { namespace, name ->
         ArrayDefinitionBuilder()
             .also { it.name = name ?: return@also }
             .also { it.namespace *= namespace }
-            .also { it.isInline = isInline }
             .apply(block)
             .build()
     }

@@ -27,8 +27,6 @@ import kotlinx.serialization.Serializable
 data class HttpEndpointDefinition(
     override val name: String = ANONYMOUS_NAME,
     override val namespace: Namespace = Namespace.Toplevel,
-    @SerialName("is_inline")
-    override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
     @SerialName("endpoint_path")
@@ -67,11 +65,9 @@ open class HttpEndpointDefinitionBuilder :
     }
 
     override fun build(): HttpEndpointDefinition {
-        val asNamespace = this.namespace.value + this.name
         return HttpEndpointDefinition(
             name = this.name,
             namespace = this.namespace.value,
-            isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.toList(),
             endpointPath = this.path
@@ -85,13 +81,12 @@ open class HttpEndpointDefinitionBuilder :
 
 @Marker2
 fun endpointHttp(
-    block: HttpEndpointDefinitionBuilder.() -> Unit = {}
+    block: HttpEndpointDefinitionBuilder.() -> Unit = {},
 ): Unnamed<HttpEndpointDefinition> {
-    return Unnamed { namespace, name, isInline ->
+    return Unnamed { namespace, name ->
         HttpEndpointDefinitionBuilder()
             .also { it.name = name ?: return@also }
             .also { it.namespace *= namespace }
-            .also { it.isInline = isInline }
             .apply(block)
             .build()
     }
@@ -112,7 +107,7 @@ val RoutineDefinitionBuilder.http: Unit
 
 @Marker1
 fun RoutineDefinitionBuilder.http(
-    block: HttpEndpointDefinitionBuilder.() -> Unit = {}
+    block: HttpEndpointDefinitionBuilder.() -> Unit = {},
 ) {
     +endpointHttp { name = "http"; +Http.POST; block() }
 }

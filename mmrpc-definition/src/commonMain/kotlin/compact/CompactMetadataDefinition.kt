@@ -12,8 +12,6 @@ import org.cufy.mmrpc.MetadataDefinition
 data class CompactMetadataDefinition(
     @SerialName("canonical_name")
     override val canonicalName: CanonicalName,
-    @SerialName("is_inline")
-    override val isInline: Boolean = true,
     override val description: String = "",
     override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
     @SerialName("metadata_fields.ref")
@@ -23,7 +21,6 @@ data class CompactMetadataDefinition(
 fun MetadataDefinition.toCompact(): CompactMetadataDefinition {
     return CompactMetadataDefinition(
         canonicalName = canonicalName,
-        isInline = this.isInline,
         description = this.description,
         metadata = this.metadata
             .map { it.toCompact() },
@@ -39,7 +36,6 @@ fun CompactMetadataDefinition.inflate(
         MetadataDefinition(
             name = this.name,
             namespace = this.namespace,
-            isInline = this.isInline,
             description = this.description,
             metadata = this.metadata.map {
                 it.inflate(onLookup)() ?: return@it null
