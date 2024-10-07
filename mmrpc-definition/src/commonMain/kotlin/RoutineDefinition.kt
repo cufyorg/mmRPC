@@ -48,7 +48,7 @@ data class RoutineDefinition(
      * the specified.
      */
     @SerialName("routine_key")
-    val routineKey: List<String>? = null,
+    val routineKey: List<String> = emptyList(),
 ) : ElementDefinition() {
     companion object {
         const val ANONYMOUS_NAME = "(anonymous<routine>)"
@@ -133,7 +133,7 @@ open class RoutineDefinitionBuilder :
             },
             routineKey = this.key.toList(),
         ).also { built ->
-            for (k in built.routineKey.orEmpty()) {
+            for (k in built.routineKey) {
                 if (built.routineInput.structFields.none { it.name == k }) {
                     error("Routine key item is not in defined input fields: $k")
                 }

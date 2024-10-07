@@ -20,7 +20,7 @@ data class CompactRoutineDefinition(
     @SerialName("routine_output.ref")
     val routineOutput: CanonicalName,
     @SerialName("routine_key")
-    val routineKey: List<String>? = null,
+    val routineKey: List<String> = emptyList(),
 ) : CompactElementDefinition
 
 fun RoutineDefinition.toCompact(strip: Boolean = false): CompactRoutineDefinition {
