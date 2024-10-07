@@ -1,9 +1,9 @@
 package org.cufy.mmrpc.gradle.kotlin
 
+import com.charleskorn.kaml.Yaml
 import com.squareup.kotlinpoet.ClassName
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import net.mamoe.yamlkt.Yaml
 import org.cufy.mmrpc.CanonicalName
 import org.cufy.mmrpc.compact.CompactSpecSheet
 import org.cufy.mmrpc.compact.inflate
@@ -242,7 +242,8 @@ open class MMRPCKotlinTask : DefaultTask() {
 
                 "yaml", "yml" -> {
                     compactSpecSheet += try {
-                        Yaml.decodeFromString<CompactSpecSheet>(source)
+//                        Yaml.decodeFromString<CompactSpecSheet>(source)
+                        Yaml.default.decodeFromString<CompactSpecSheet>(source)
                     } catch (cause: Exception) {
                         this.logger.error("$TAG: Couldn't decode file: ${file.absolutePath}", cause)
                         continue
