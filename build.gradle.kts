@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "org.cufy"
-version = "2.0.0"
+version = "local_snapshot"
 
 tasks.wrapper {
     gradleVersion = "8.7"

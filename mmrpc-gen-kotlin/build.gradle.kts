@@ -20,7 +20,7 @@ kotlin {
 
                 implementation(libs.kotlinpoet)
 
-                implementation("net.pearx.kasechange:kasechange-jvm:1.4.1")
+                implementation(libs.pearx.kasechange)
             }
         }
         commonTest {

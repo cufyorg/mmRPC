@@ -28,10 +28,9 @@ dependencies {
     implementation(libs.kotlin.serialization.core)
     implementation(libs.kotlin.serialization.json)
 
+    api(libs.kotlin.gradle.plugin)
+
     implementation(libs.kotlinpoet)
 
-    api("org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.0")
-
-//    implementation("net.mamoe.yamlkt:yamlkt:0.13.0")
-    implementation("com.charleskorn.kaml:kaml:0.61.0")
+    implementation(libs.charleskorn.kaml)
 }

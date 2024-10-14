@@ -11,4 +11,24 @@ kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializat
 kotlin-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.8.1" }
 kotlin-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.6.0" }
 
+charleskorn-kaml = { module = "com.charleskorn.kaml:kaml", version = "0.61.0" }
+pearx-kasechange = { module = "net.pearx.kasechange:kasechange-jvm", version = "1.4.1" }
+
+# Code Generation Dependencies
+
+kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version = "2.0.0" }
+
 kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
+
+# Client and Server Dependencies
+
+ktor-server-core = { module = "io.ktor:ktor-server-core", version = "2.3.12" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version = "2.3.12" }
+
+kafka-clients = { module = "org.apache.kafka:kafka-clients", version = "3.7.0" }
+kafka-streams = { module = "org.apache.kafka:kafka-streams", version = "3.7.0" }
+
+kaftor = { module = "org.cufy.kaftor:kaftor", version = "0.1.0" }
+josekt = { module = "org.cufy.josekt:josekt", version = "0.1.0" }
+extkt-json = { module = "org.cufy.extkt:extkt-json", version = "0.1.0" }
+extkt-crypto = { module = "org.cufy.extkt:extkt-crypto", version = "0.1.0" }

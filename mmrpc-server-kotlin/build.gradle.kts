@@ -19,13 +19,15 @@ kotlin {
                 implementation(libs.kotlin.serialization.core)
                 implementation(libs.kotlin.serialization.json)
 
-                implementation("org.cufy.serialization:cufyorg-json:a82f624ef6")
-                implementation("org.cufy.serialization:cufyorg-jose:a82f624ef6")
-                implementation("org.cufy.serialization:cufyorg-crypto:a82f624ef6")
+                implementation(libs.ktor.server.core)
 
-                implementation("io.ktor:ktor-server-core:2.3.12")
-                implementation("org.apache.kafka:kafka-clients:3.7.0")
-                implementation("org.cufy.kotlin-kafka-routing:kotlin-kafka-routing:1c349988f2")
+                implementation(libs.kafka.clients)
+                implementation(libs.kafka.streams)
+
+                implementation(libs.kaftor)
+                implementation(libs.josekt)
+                implementation(libs.extkt.json)
+                implementation(libs.extkt.crypto)
             }
         }
         commonTest {
