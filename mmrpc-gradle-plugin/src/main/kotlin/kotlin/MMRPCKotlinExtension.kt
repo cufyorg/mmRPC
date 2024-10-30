@@ -38,6 +38,9 @@ class MMRPCKotlinExtension {
     val classNames: MutableMap<String, String> =
         MMRPCKotlin.Defaults.CLASS_NAMES.toMutableMap()
 
+    val protocolSuffix: String =
+        MMRPCKotlin.Defaults.PROTOCOL_SUFFIX
+
     // scalar classes
 
     var defaultScalarClass: String =

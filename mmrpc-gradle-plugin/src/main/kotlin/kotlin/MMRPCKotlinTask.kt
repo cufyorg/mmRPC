@@ -63,6 +63,10 @@ open class MMRPCKotlinTask : DefaultTask() {
     val classNames: MapProperty<String, String> =
         this.project.objects.mapProperty(String::class.java, String::class.java)
 
+    @Input
+    val protocolSuffix: Property<String> =
+        this.project.objects.property(String::class.java)
+
     // scalar classes
 
     @Input
@@ -122,6 +126,7 @@ open class MMRPCKotlinTask : DefaultTask() {
 
         // names
         this.classNames.convention(MMRPCKotlin.Defaults.CLASS_NAMES)
+        this.protocolSuffix.convention(MMRPCKotlin.Defaults.PROTOCOL_SUFFIX)
 
         // scalar classes
         this.defaultScalarClass.convention(MMRPCKotlin.Defaults.DEFAULT_SCALAR_CLASS)
@@ -175,6 +180,7 @@ open class MMRPCKotlinTask : DefaultTask() {
 
         // names
         this.classNames.set(extension.kotlin.classNames)
+        this.protocolSuffix.set(extension.kotlin.protocolSuffix)
 
         // scalar classes
         this.defaultScalarClass.set(extension.kotlin.defaultScalarClass)
@@ -275,6 +281,7 @@ open class MMRPCKotlinTask : DefaultTask() {
             // names
             classNames = this.classNames.get().entries
                 .associate { CanonicalName(it.key) to it.value },
+            protocolSuffix = this.protocolSuffix.get(),
             // scalar classes
             defaultScalarClass = this.defaultScalarClass.get()
                 .let { ClassName.bestGuess(it) },

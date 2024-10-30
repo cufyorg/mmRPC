@@ -46,6 +46,11 @@ fun GenScope.asPropertyName(element: FieldDefinition): String {
 fun GenScope.asClassName(element: ElementDefinition): String {
     ctx.classNames[element.canonicalName]?.let { return it }
 
+    if (element is ProtocolDefinition) {
+        return element.name.furtherEscape().toPascalCase()
+            .plus(ctx.protocolSuffix)
+    }
+
     if (element is TypeDefinition) {
         if (ctx.featureKeepTypeClassNames)
             return element.name.furtherEscape()

@@ -19,6 +19,7 @@ object MMRPCKotlin {
         // names
 
         val CLASS_NAMES = emptyMap<String, String>()
+        const val PROTOCOL_SUFFIX = "Protocol"
 
         // scalar classes
 
