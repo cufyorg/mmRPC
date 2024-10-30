@@ -36,6 +36,7 @@ data class ScalarDefinition(
 
     override fun collectChildren() = sequence {
         yieldAll(metadata.asSequence().flatMap { it.collect() })
+        scalarType?.let { yieldAll(it.collect()) }
     }
 }
 
