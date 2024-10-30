@@ -27,6 +27,8 @@ data class ScalarDefinition(
     override val namespace: Namespace = Namespace.Toplevel,
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
+    @SerialName("scalar_type")
+    val scalarType: ScalarDefinition? = null,
 ) : TypeDefinition() {
     companion object {
         const val ANONYMOUS_NAME = "(anonymous<scalar>)"
@@ -41,12 +43,16 @@ open class ScalarDefinitionBuilder :
     ElementDefinitionBuilder() {
     override var name = ScalarDefinition.ANONYMOUS_NAME
 
+    open val type = OptionalDomainProperty<ScalarDefinition>()
+
     override fun build(): ScalarDefinition {
+        val asNamespace = this.namespace.value + this.name
         return ScalarDefinition(
             name = this.name,
             namespace = this.namespace.value,
             description = this.description,
             metadata = this.metadata.toList(),
+            scalarType = this.type.value?.get(asNamespace, name = "type"),
         )
     }
 }
@@ -62,6 +68,14 @@ fun scalar(
             .also(block)
             .build()
     }
+}
+
+@Marker2
+fun scalar(
+    type: ScalarDefinition? = null,
+    block: ScalarDefinitionBuilder.() -> Unit = {},
+): Unnamed<ScalarDefinition> {
+    return scalar { type?.let { this.type *= it }; block() }
 }
 
 ////////////////////////////////////////

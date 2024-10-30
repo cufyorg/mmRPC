@@ -13,6 +13,8 @@ data class CompactScalarDefinition(
     override val canonicalName: CanonicalName,
     override val description: String = "",
     override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
+    @SerialName("scalar_type.ref")
+    val scalarType: CanonicalName? = null,
 ) : CompactElementDefinition
 
 fun ScalarDefinition.toCompact(strip: Boolean = false): CompactScalarDefinition {
@@ -21,6 +23,7 @@ fun ScalarDefinition.toCompact(strip: Boolean = false): CompactScalarDefinition 
         description = if (strip) "" else this.description,
         metadata = this.metadata
             .map { it.toCompact(strip) },
+        scalarType = this.scalarType?.canonicalName,
     )
 }
 
@@ -35,6 +38,13 @@ fun CompactScalarDefinition.inflate(
             metadata = this.metadata.map {
                 it.inflate(onLookup)() ?: return@it null
             },
+            scalarType = this.scalarType?.let {
+                val item = onLookup(it) ?: return@it null
+                require(item is ScalarDefinition) {
+                    "scalar_type.ref must point to a ScalarDefinition"
+                }
+                item
+            }
         )
     }
 }

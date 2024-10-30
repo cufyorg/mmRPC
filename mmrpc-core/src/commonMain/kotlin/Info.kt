@@ -92,7 +92,7 @@ data class MetadataInfo(
     override val namespace: Namespace,
     override val metadata: List<MetadataInfoUsage>,
     @SerialName("metadata_fields")
-    val fields: List<FieldInfo> = emptyList(),
+    val fields: List<FieldInfo>,
 ) : ElementInfo()
 
 @Serializable
@@ -225,6 +225,8 @@ data class ScalarInfo(
     override val name: String,
     override val namespace: Namespace,
     override val metadata: List<MetadataInfoUsage>,
+    @SerialName("scalar_type")
+    val type: ScalarInfo?,
 ) : TypeInfo()
 
 @Serializable
@@ -234,7 +236,7 @@ data class StructInfo(
     override val namespace: Namespace,
     override val metadata: List<MetadataInfoUsage>,
     @SerialName("struct_fields")
-    val fields: List<FieldInfo> = emptyList(),
+    val fields: List<FieldInfo>,
 ) : TypeInfo()
 
 @Serializable

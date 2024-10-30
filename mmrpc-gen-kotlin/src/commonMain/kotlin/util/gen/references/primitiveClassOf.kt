@@ -13,6 +13,7 @@ private const val TAG = "primitiveClassOf"
 @Marker3
 fun GenScope.primitiveClassOf(element: ScalarDefinition): ClassName {
     return ctx.scalarClasses[element.canonicalName]
+        ?: element.scalarType?.let { primitiveClassOf(it) }
         ?: ctx.defaultScalarClass
         ?: failGen(TAG, element) { "element class is not set nor a default class" }
 }

@@ -96,6 +96,10 @@ fun GenScope.createInfo(element: ScalarDefinition): CodeBlock {
             function = CodeBlock.of("listOf"),
             element.metadata.map { createInfoUsage(it) }
         ),
+        "type" to when (val scalarType = element.scalarType) {
+            null -> CodeBlock.of("null")
+            else -> refOfINFOOrCreateInfo(scalarType)
+        },
     )
 }
 
