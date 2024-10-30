@@ -4,6 +4,7 @@ import com.squareup.kotlinpoet.ClassName
 import org.cufy.mmrpc.Marker3
 import org.cufy.mmrpc.ScalarDefinition
 import org.cufy.mmrpc.gen.kotlin.GenScope
+import org.cufy.mmrpc.gen.kotlin.util.gen.isNative
 
 private const val TAG = "primitiveClassOf"
 
@@ -12,6 +13,7 @@ private const val TAG = "primitiveClassOf"
  */
 @Marker3
 fun GenScope.primitiveClassOf(element: ScalarDefinition): ClassName {
+    if (isNative(element)) return nativeClassOf(element)
     return ctx.scalarClasses[element.canonicalName]
         ?: element.scalarType?.let { primitiveClassOf(it) }
         ?: ctx.defaultScalarClass

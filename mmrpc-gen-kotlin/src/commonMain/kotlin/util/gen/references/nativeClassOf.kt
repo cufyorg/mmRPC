@@ -29,5 +29,5 @@ fun GenScope.nativeClassOf(element: MetadataDefinition): ClassName {
 fun GenScope.nativeClassOf(element: ScalarDefinition): ClassName {
     debug { if (!isNative(element)) failGen(TAG, element) { "element not native" } }
     return ctx.nativeScalarClasses[element.canonicalName]
-        ?: failGen(TAG, element) { "no element to native class mapping nor a default scalar class was set" }
+        ?: failGen(TAG, element) { "no element to native class mapping" }
 }
