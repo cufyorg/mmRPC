@@ -3,7 +3,7 @@ package org.cufy.mmrpc.server
 import org.cufy.kaftor.KafkaRoute
 import org.cufy.kaftor.KafkaRoutingContext
 import org.cufy.kaftor.consume
-import org.cufy.kaftor.dsl.KaftorDsl
+import org.cufy.kaftor.utils.dsl.KaftorDsl
 import org.cufy.mmrpc.KafkaEndpointInfo
 import org.cufy.mmrpc.KafkaPublicationEndpointInfo
 import org.cufy.mmrpc.RoutineObject

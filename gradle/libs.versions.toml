@@ -28,7 +28,7 @@ ktor-client-core = { module = "io.ktor:ktor-client-core", version = "3.0.0" }
 kafka-clients = { module = "org.apache.kafka:kafka-clients", version = "3.7.0" }
 kafka-streams = { module = "org.apache.kafka:kafka-streams", version = "3.7.0" }
 
-kaftor = { module = "org.cufy.kaftor:kaftor", version = "0.1.1" }
+kaftor = { module = "org.cufy.kaftor:kaftor", version = "0.2.0" }
 josekt = { module = "org.cufy.josekt:josekt", version = "0.1.0" }
 extkt-json = { module = "org.cufy.extkt:extkt-json", version = "0.1.0" }
 extkt-crypto = { module = "org.cufy.extkt:extkt-crypto", version = "0.1.0" }
