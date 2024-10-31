@@ -1,17 +1,15 @@
 package org.cufy.mmrpc.server
 
 import io.ktor.http.*
-import io.ktor.server.application.*
 import io.ktor.server.routing.*
-import io.ktor.util.*
-import io.ktor.util.pipeline.*
+import io.ktor.utils.io.*
 import org.cufy.mmrpc.HttpEndpointInfo
 import org.cufy.mmrpc.RoutineObject
 
 @KtorDsl
 fun <R : RoutineObject<*, *>> Route.handle(
     routine: R,
-    block: suspend PipelineContext<Unit, ApplicationCall>.(R) -> Unit,
+    block: suspend RoutingContext.(R) -> Unit,
 ) {
     val endpoints = routine.__info__.endpoints
         .filterIsInstance<HttpEndpointInfo>()
