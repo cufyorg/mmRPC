@@ -18,4 +18,19 @@ open class FaultException : Exception {
     constructor(canonicalName: CanonicalName, cause: Throwable?) : super(cause) {
         this.canonicalName = canonicalName
     }
+
+    infix fun canonicalEquals(canonicalName: String) =
+        this.canonicalName.value == canonicalName
+
+    infix fun canonicalEquals(canonicalName: CanonicalName) =
+        this.canonicalName == canonicalName
+
+    infix fun canonicalEquals(fault: FaultInfo) =
+        this.canonicalName == fault.canonicalName
+
+    infix fun canonicalEquals(fault: FaultObject) =
+        this.canonicalName == fault.__info__.canonicalName
+
+    infix fun canonicalEquals(fault: FaultException) =
+        this.canonicalName == fault.canonicalName
 }
