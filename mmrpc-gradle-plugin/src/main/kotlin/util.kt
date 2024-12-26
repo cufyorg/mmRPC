@@ -45,12 +45,10 @@ private fun Project.addToKotlinMultiplatformSourceSet(task: Task, directory: Fil
     }
 
     // well, here we go.
-    afterEvaluate {
-        tasks.configureEach {
-            if (name == "compileCommonMainKotlinMetadata")
-                it.dependsOn("generateMMRPCKotlinSources")
-            if (name == "compileKotlinJs")
-                it.dependsOn("generateMMRPCKotlinSources")
-        }
+    tasks.configureEach {
+        if (it.name == "compileCommonMainKotlinMetadata")
+            it.dependsOn("generateMMRPCKotlinSources")
+        if (it.name == "compileKotlinJs")
+            it.dependsOn("generateMMRPCKotlinSources")
     }
 }
