@@ -43,4 +43,12 @@ private fun Project.addToKotlinMultiplatformSourceSet(task: Task, directory: Fil
     kotlinExtension.sourceSets.findByName("commonMain")?.apply {
         kotlin.srcDir(directory.path)
     }
+
+    // well, here we go.
+    tasks.configureEach {
+        if (name == "compileCommonMainKotlinMetadata")
+            it.dependsOn("generateMMRPCKotlinSources")
+        if (name == "compileKotlinJs")
+            it.dependsOn("generateMMRPCKotlinSources")
+    }
 }
