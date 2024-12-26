@@ -5,6 +5,7 @@ import com.squareup.kotlinpoet.ClassName
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.cufy.mmrpc.CanonicalName
+import org.cufy.mmrpc.builtin
 import org.cufy.mmrpc.compact.CompactElementDefinition
 import org.cufy.mmrpc.compact.CompactSpecSheet
 import org.cufy.mmrpc.compact.inflate
@@ -275,11 +276,32 @@ open class MMRPCKotlinTask : DefaultTask() {
             throw TaskInstantiationException(message, e)
         }
 
+        val elements = buildSet {
+            if (GenFeature.NO_BUILTIN !in features.get()) {
+                this += builtin.Any
+                this += builtin.NULL
+                this += builtin.String
+                this += builtin.Boolean
+                this += builtin.TRUE
+                this += builtin.FALSE
+                this += builtin.Int32
+                this += builtin.UInt32
+                this += builtin.Int64
+                this += builtin.UInt64
+                this += builtin.Float32
+                this += builtin.Float64
+                this += builtin.Deprecated
+                this += builtin.Experimental
+            }
+
+            addAll(specSheet.elements)
+        }
+
         val genContext = GenContext(
-            specSheet = specSheet,
+            elements = elements,
             ignore = collectIgnored(
-                specSheet = specSheet,
-                range = this.range.get(),
+                elements = elements,
+                includeRange = this.range.get(),
             ),
             //
             packageName = this.packageName.get(),
