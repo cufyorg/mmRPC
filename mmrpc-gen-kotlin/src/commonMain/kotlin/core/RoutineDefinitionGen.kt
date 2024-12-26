@@ -24,6 +24,7 @@ data class RoutineDefinitionGen(override val ctx: GenContext) : GenScope() {
         for (element in ctx.elements) {
             if (element !is RoutineDefinition) continue
             if (!hasGeneratedClass(element)) continue
+            if (element.canonicalName in ctx.ignore) continue
 
             failGenBoundary {
                 applyCreateDataObject(element)

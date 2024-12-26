@@ -8,6 +8,7 @@ import org.cufy.mmrpc.builtin
 
 class GenContext(
     val specSheet: SpecSheet,
+    val ignore: Set<CanonicalName>,
 
     //
     val packageName: String,

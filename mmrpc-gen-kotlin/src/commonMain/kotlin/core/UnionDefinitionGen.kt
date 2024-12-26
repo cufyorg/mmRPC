@@ -26,6 +26,7 @@ class UnionDefinitionGen(override val ctx: GenContext) : GenScope() {
         for (element in ctx.elements) {
             if (element !is UnionDefinition) continue
             if (!hasGeneratedClass(element)) continue
+            if (element.canonicalName in ctx.ignore) continue
 
             failGenBoundary {
                 when (calculateUnionStrategy(element)) {

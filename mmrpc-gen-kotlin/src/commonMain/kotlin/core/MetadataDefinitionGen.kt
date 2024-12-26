@@ -21,6 +21,7 @@ class MetadataDefinitionGen(override val ctx: GenContext) : GenScope() {
         for (element in ctx.elements) {
             if (element !is MetadataDefinition) continue
             if (!hasGeneratedClass(element)) continue
+            if (element.canonicalName in ctx.ignore) continue
 
             failGenBoundary {
                 applyCreateAnnotationClass(element)

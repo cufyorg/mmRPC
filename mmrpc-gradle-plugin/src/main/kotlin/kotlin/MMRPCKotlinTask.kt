@@ -8,10 +8,7 @@ import org.cufy.mmrpc.CanonicalName
 import org.cufy.mmrpc.compact.CompactElementDefinition
 import org.cufy.mmrpc.compact.CompactSpecSheet
 import org.cufy.mmrpc.compact.inflate
-import org.cufy.mmrpc.gen.kotlin.GenContext
-import org.cufy.mmrpc.gen.kotlin.GenFeature
-import org.cufy.mmrpc.gen.kotlin.GenPackaging
-import org.cufy.mmrpc.gen.kotlin.generateFileSpecSet
+import org.cufy.mmrpc.gen.kotlin.*
 import org.cufy.mmrpc.gen.kotlin.util.signatureOf
 import org.cufy.mmrpc.gradle.MMRPC
 import org.cufy.mmrpc.gradle.MMRPCExtension
@@ -52,6 +49,10 @@ open class MMRPCKotlinTask : DefaultTask() {
     @Input
     val packaging: Property<GenPackaging> =
         this.project.objects.property(GenPackaging::class.java)
+
+    @Input
+    val range: Property<GenRange> =
+        this.project.objects.property(GenRange::class.java)
 
     @Input
     val features: SetProperty<GenFeature> =
@@ -122,6 +123,7 @@ open class MMRPCKotlinTask : DefaultTask() {
         //
         this.packageName.convention(MMRPCKotlin.Defaults.PACKAGE_NAME)
         this.packaging.convention(MMRPCKotlin.Defaults.PACKAGING)
+        this.range.convention(MMRPCKotlin.Defaults.RANGE)
         this.features.convention(MMRPCKotlin.Defaults.FEATURES)
 
         // names
@@ -176,6 +178,7 @@ open class MMRPCKotlinTask : DefaultTask() {
         //
         this.packageName.set(extension.kotlin.packageName)
         this.packaging.set(extension.kotlin.packaging)
+        this.range.set(extension.kotlin.range)
         this.features.set(extension.kotlin.features)
 
         // names
@@ -274,6 +277,10 @@ open class MMRPCKotlinTask : DefaultTask() {
 
         val genContext = GenContext(
             specSheet = specSheet,
+            ignore = collectIgnored(
+                specSheet = specSheet,
+                range = this.range.get(),
+            ),
             //
             packageName = this.packageName.get(),
             packaging = this.packaging.get(),

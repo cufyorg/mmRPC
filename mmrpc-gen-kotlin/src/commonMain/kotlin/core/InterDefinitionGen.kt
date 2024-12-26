@@ -29,6 +29,7 @@ class InterDefinitionGen(override val ctx: GenContext) : GenScope() {
         for (element in ctx.elements) {
             if (element !is InterDefinition) continue
             if (!hasGeneratedClass(element)) continue
+            if (element.canonicalName in ctx.ignore) continue
 
             failGenBoundary {
                 when (calculateInterStrategy(element)) {

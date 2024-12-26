@@ -2,6 +2,7 @@ package org.cufy.mmrpc.gradle.kotlin
 
 import org.cufy.mmrpc.gen.kotlin.GenFeature
 import org.cufy.mmrpc.gen.kotlin.GenPackaging
+import org.cufy.mmrpc.gen.kotlin.GenRange
 
 object MMRPCKotlin {
     const val TASK_NAME = "generateMMRPCKotlinSources"
@@ -14,6 +15,7 @@ object MMRPCKotlin {
 
         const val PACKAGE_NAME = ""
         val PACKAGING = GenPackaging.SUB_PACKAGES
+        val RANGE = GenRange.EVERYTHING
         val FEATURES = emptySet<GenFeature>()
 
         // names

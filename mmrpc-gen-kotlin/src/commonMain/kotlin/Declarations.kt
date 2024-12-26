@@ -77,6 +77,12 @@ enum class GenPackaging {
     SUB_PACKAGES,
 }
 
+enum class GenRange {
+    EVERYTHING,
+    SHARED_ONLY,
+    COMM_ONLY,
+}
+
 @Suppress("serial")
 open class GenException(
     val failure: GenFailure,

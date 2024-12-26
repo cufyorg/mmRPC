@@ -25,6 +25,7 @@ class TupleDefinitionGen(override val ctx: GenContext) : GenScope() {
         for (element in ctx.elements) {
             if (element !is TupleDefinition) continue
             if (!hasGeneratedClass(element)) continue
+            if (element.canonicalName in ctx.ignore) continue
 
             failGenBoundary {
                 when (calculateTupleStrategy(element)) {

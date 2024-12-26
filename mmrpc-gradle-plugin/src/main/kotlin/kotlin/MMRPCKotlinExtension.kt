@@ -2,6 +2,7 @@ package org.cufy.mmrpc.gradle.kotlin
 
 import org.cufy.mmrpc.gen.kotlin.GenFeature
 import org.cufy.mmrpc.gen.kotlin.GenPackaging
+import org.cufy.mmrpc.gen.kotlin.GenRange
 import org.gradle.api.file.Directory
 
 class MMRPCKotlinExtension {
@@ -29,6 +30,9 @@ class MMRPCKotlinExtension {
 
     var packaging: GenPackaging =
         MMRPCKotlin.Defaults.PACKAGING
+
+    var range: GenRange =
+        MMRPCKotlin.Defaults.RANGE
 
     val features: MutableSet<GenFeature> =
         MMRPCKotlin.Defaults.FEATURES.toMutableSet()
@@ -104,5 +108,17 @@ class MMRPCKotlinExtension {
 
     fun packingSubPackages() {
         packaging = GenPackaging.SUB_PACKAGES
+    }
+
+    fun generateEverything() {
+        range = GenRange.EVERYTHING
+    }
+
+    fun generateSharedOnly() {
+        range = GenRange.SHARED_ONLY
+    }
+
+    fun generateCommOnly() {
+        range = GenRange.COMM_ONLY
     }
 }
