@@ -5,8 +5,8 @@ import com.squareup.kotlinpoet.ClassName
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.cufy.mmrpc.CanonicalName
+import org.cufy.mmrpc.MmrpcSpec
 import org.cufy.mmrpc.builtin
-import org.cufy.mmrpc.compact.CompactElementDefinition
 import org.cufy.mmrpc.compact.CompactSpecSheet
 import org.cufy.mmrpc.compact.inflate
 import org.cufy.mmrpc.gen.kotlin.*
@@ -241,24 +241,25 @@ open class MmrpcKotlinGenerateSourcesTask : DefaultTask() {
 
             when (file.extension) {
                 "json" -> {
-                    compactSpecSheet += try {
-                        Json.decodeFromString<CompactSpecSheet>(source)
+                    val spec = try {
+                        Json.decodeFromString<MmrpcSpec>(source)
                     } catch (cause: Exception) {
                         this.logger.error("$name: Couldn't decode file: ${file.absolutePath}", cause)
                         continue
                     }
+
+                    compactSpecSheet += spec.elements
                 }
 
                 "yaml", "yml" -> {
-                    compactSpecSheet += try {
-//                        Yaml.decodeFromString<CompactSpecSheet>(source)
-//                        Yaml.default.decodeFromString<CompactSpecSheet>(source)
-                        Yaml.default.decodeFromString<Set<CompactElementDefinition>>(source)
-                            .let { CompactSpecSheet(it) }
+                    val spec = try {
+                        Yaml.default.decodeFromString<MmrpcSpec>(source)
                     } catch (cause: Exception) {
                         this.logger.error("$name: Couldn't decode file: ${file.absolutePath}", cause)
                         continue
                     }
+
+                    compactSpecSheet += spec.elements
                 }
 
                 else -> {
