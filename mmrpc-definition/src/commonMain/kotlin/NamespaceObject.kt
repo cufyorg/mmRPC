@@ -1,23 +1,23 @@
 package org.cufy.mmrpc
 
 abstract class NamespaceObject {
-    var namespace: CanonicalName
+    var canonicalName: CanonicalName
         protected set
 
     constructor() {
-        this.namespace = CanonicalName(inferSegment())
+        this.canonicalName = CanonicalName(inferSegment())
     }
 
     constructor(vararg segments: String) {
-        this.namespace = CanonicalName(segments.asList())
+        this.canonicalName = CanonicalName(segments.asList())
     }
 
     constructor(parent: NamespaceObject) {
-        this.namespace = parent.namespace + inferSegment()
+        this.canonicalName = parent.canonicalName + inferSegment()
     }
 
     constructor(parent: NamespaceObject, vararg segments: String) {
-        this.namespace = parent.namespace + segments.asList()
+        this.canonicalName = parent.canonicalName + segments.asList()
     }
 
     private fun inferSegment(): String {

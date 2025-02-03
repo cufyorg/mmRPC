@@ -17,10 +17,10 @@ class Unnamed<out T>(private val block: UnnamedBlock<T>) {
         block(namespace, name)
 
     fun get(obj: NamespaceObject) =
-        block(obj.namespace, name = null)
+        block(obj.canonicalName, name = null)
 
     fun get(obj: NamespaceObject, name: String) =
-        block(obj.namespace, name)
+        block(obj.canonicalName, name)
 
     private val values = mutableMapOf<Pair<CanonicalName, String?>, T>()
 
@@ -34,9 +34,9 @@ class Unnamed<out T>(private val block: UnnamedBlock<T>) {
     }
 
     operator fun getValue(obj: NamespaceObject, property: KProperty<*>): T {
-        return values.getOrPut(obj.namespace to property.name) {
+        return values.getOrPut(obj.canonicalName to property.name) {
             val splits = property.name.split("__")
-            val ns = obj.namespace + splits.dropLast(1)
+            val ns = obj.canonicalName + splits.dropLast(1)
             val n = splits.last()
             block(ns, n)
         }
