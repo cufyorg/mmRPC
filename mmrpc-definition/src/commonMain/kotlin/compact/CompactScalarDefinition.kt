@@ -17,11 +17,11 @@ data class CompactScalarDefinition(
     val type_ref: CanonicalName? = null,
 ) : CompactElementDefinition
 
-fun ScalarDefinition.toCompact(strip: Boolean = false): CompactScalarDefinition {
+fun ScalarDefinition.toCompact(): CompactScalarDefinition {
     return CompactScalarDefinition(
         canonical_name = this.canonicalName,
-        description = if (strip) "" else this.description,
-        metadata = this.metadata.map { it.toCompact(strip) },
+        description = this.description,
+        metadata = this.metadata.map { it.toCompact() },
         type_ref = this.type?.canonicalName,
     )
 }

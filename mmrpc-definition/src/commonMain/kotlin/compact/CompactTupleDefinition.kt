@@ -18,11 +18,11 @@ data class CompactTupleDefinition(
     val types_ref: List<CanonicalName> = emptyList(),
 ) : CompactElementDefinition
 
-fun TupleDefinition.toCompact(strip: Boolean = false): CompactTupleDefinition {
+fun TupleDefinition.toCompact(): CompactTupleDefinition {
     return CompactTupleDefinition(
         canonical_name = this.canonicalName,
-        description = if (strip) "" else this.description,
-        metadata = this.metadata.map { it.toCompact(strip) },
+        description = this.description,
+        metadata = this.metadata.map { it.toCompact() },
         types_ref = this.types.map { it.canonicalName },
     )
 }

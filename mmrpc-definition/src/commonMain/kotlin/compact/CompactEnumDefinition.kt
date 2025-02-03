@@ -16,11 +16,11 @@ data class CompactEnumDefinition(
     val entries_ref: List<CanonicalName>,
 ) : CompactElementDefinition
 
-fun EnumDefinition.toCompact(strip: Boolean = false): CompactEnumDefinition {
+fun EnumDefinition.toCompact(): CompactEnumDefinition {
     return CompactEnumDefinition(
         canonical_name = this.canonicalName,
-        description = if (strip) "" else this.description,
-        metadata = this.metadata.map { it.toCompact(strip) },
+        description = this.description,
+        metadata = this.metadata.map { it.toCompact() },
         type_ref = this.type.canonicalName,
         entries_ref = this.entries.map { it.canonicalName }
     )

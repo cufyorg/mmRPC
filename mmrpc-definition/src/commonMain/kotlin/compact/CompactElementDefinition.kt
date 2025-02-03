@@ -15,22 +15,22 @@ sealed interface CompactElementDefinition {
     val namespace get() = canonical_name.namespace
 }
 
-fun ElementDefinition.toCompact(strip: Boolean = false): CompactElementDefinition {
+fun ElementDefinition.toCompact(): CompactElementDefinition {
     return when (this) {
-        is ArrayDefinition -> toCompact(strip)
-        is ConstDefinition -> toCompact(strip)
-        is EnumDefinition -> toCompact(strip)
-        is FaultDefinition -> toCompact(strip)
-        is FieldDefinition -> toCompact(strip)
-        is InterDefinition -> toCompact(strip)
-        is MetadataDefinition -> toCompact(strip)
-        is OptionalDefinition -> toCompact(strip)
-        is ProtocolDefinition -> toCompact(strip)
-        is RoutineDefinition -> toCompact(strip)
-        is ScalarDefinition -> toCompact(strip)
-        is StructDefinition -> toCompact(strip)
-        is TupleDefinition -> toCompact(strip)
-        is UnionDefinition -> toCompact(strip)
+        is ArrayDefinition -> toCompact()
+        is ConstDefinition -> toCompact()
+        is EnumDefinition -> toCompact()
+        is FaultDefinition -> toCompact()
+        is FieldDefinition -> toCompact()
+        is InterDefinition -> toCompact()
+        is MetadataDefinition -> toCompact()
+        is OptionalDefinition -> toCompact()
+        is ProtocolDefinition -> toCompact()
+        is RoutineDefinition -> toCompact()
+        is ScalarDefinition -> toCompact()
+        is StructDefinition -> toCompact()
+        is TupleDefinition -> toCompact()
+        is UnionDefinition -> toCompact()
     }
 }
 

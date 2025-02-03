@@ -19,10 +19,31 @@ value class CompactSpecSheet(val elements: Set<CompactElementDefinition> = empty
         CompactSpecSheet(this.elements + specSheet.elements)
 }
 
-fun SpecSheet.toCompact(strip: Boolean = false): CompactSpecSheet {
+fun CompactSpecSheet.strip(): CompactSpecSheet {
+    return CompactSpecSheet(elements.map {
+        when (it) {
+            is CompactConstDefinition -> it.copy(description = "")
+            is CompactFaultDefinition -> it.copy(description = "")
+            is CompactFieldDefinition -> it.copy(description = "")
+            is CompactMetadataDefinition -> it.copy(description = "")
+            is CompactProtocolDefinition -> it.copy(description = "")
+            is CompactRoutineDefinition -> it.copy(description = "")
+            is CompactArrayDefinition -> it.copy(description = "")
+            is CompactEnumDefinition -> it.copy(description = "")
+            is CompactInterDefinition -> it.copy(description = "")
+            is CompactOptionalDefinition -> it.copy(description = "")
+            is CompactScalarDefinition -> it.copy(description = "")
+            is CompactStructDefinition -> it.copy(description = "")
+            is CompactTupleDefinition -> it.copy(description = "")
+            is CompactUnionDefinition -> it.copy(description = "")
+        }
+    })
+}
+
+fun SpecSheet.toCompact(): CompactSpecSheet {
     return CompactSpecSheet(
         elements = collectChildren()
-            .map { it.toCompact(strip) }
+            .map { it.toCompact() }
             .sortedBy { it.canonical_name.value }
             .toSet()
     )

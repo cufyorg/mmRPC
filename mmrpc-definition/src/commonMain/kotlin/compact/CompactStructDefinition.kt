@@ -18,11 +18,11 @@ data class CompactStructDefinition(
     val fields_ref: List<CanonicalName> = emptyList(),
 ) : CompactElementDefinition
 
-fun StructDefinition.toCompact(strip: Boolean = false): CompactStructDefinition {
+fun StructDefinition.toCompact(): CompactStructDefinition {
     return CompactStructDefinition(
         canonical_name = this.canonicalName,
-        description = if (strip) "" else this.description,
-        metadata = this.metadata.map { it.toCompact(strip) },
+        description = this.description,
+        metadata = this.metadata.map { it.toCompact() },
         fields_ref = this.fields.map { it.canonicalName },
     )
 }

@@ -18,11 +18,11 @@ data class CompactMetadataDefinition(
     val fields_ref: List<CanonicalName> = emptyList(),
 ) : CompactElementDefinition
 
-fun MetadataDefinition.toCompact(strip: Boolean = false): CompactMetadataDefinition {
+fun MetadataDefinition.toCompact(): CompactMetadataDefinition {
     return CompactMetadataDefinition(
         canonical_name = this.canonicalName,
-        description = if (strip) "" else this.description,
-        metadata = this.metadata.map { it.toCompact(strip) },
+        description = this.description,
+        metadata = this.metadata.map { it.toCompact() },
         fields_ref = this.fields.map { it.canonicalName }
     )
 }

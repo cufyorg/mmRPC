@@ -10,7 +10,7 @@ data class CompactFieldDefinitionUsage(
     val value: Literal,
 )
 
-fun FieldDefinitionUsage.toCompact(strip: Boolean = false): CompactFieldDefinitionUsage {
+fun FieldDefinitionUsage.toCompact(): CompactFieldDefinitionUsage {
     return CompactFieldDefinitionUsage(
         definition_ref = this.definition.canonicalName,
         value = this.value,

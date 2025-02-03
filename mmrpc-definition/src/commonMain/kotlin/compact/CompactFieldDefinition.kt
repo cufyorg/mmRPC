@@ -16,11 +16,11 @@ data class CompactFieldDefinition(
     val default: Literal? = null,
 ) : CompactElementDefinition
 
-fun FieldDefinition.toCompact(strip: Boolean = false): CompactFieldDefinition {
+fun FieldDefinition.toCompact(): CompactFieldDefinition {
     return CompactFieldDefinition(
         canonical_name = this.canonicalName,
-        description = if (strip) "" else this.description,
-        metadata = this.metadata.map { it.toCompact(strip) },
+        description = this.description,
+        metadata = this.metadata.map { it.toCompact() },
         type_ref = this.type.canonicalName,
         default = this.default,
     )

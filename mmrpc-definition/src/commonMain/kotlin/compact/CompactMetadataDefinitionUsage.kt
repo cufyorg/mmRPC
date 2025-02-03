@@ -13,10 +13,10 @@ data class CompactMetadataDefinitionUsage(
     val fields: List<CompactFieldDefinitionUsage>,
 )
 
-fun MetadataDefinitionUsage.toCompact(strip: Boolean = false): CompactMetadataDefinitionUsage {
+fun MetadataDefinitionUsage.toCompact(): CompactMetadataDefinitionUsage {
     return CompactMetadataDefinitionUsage(
         definition_ref = this.definition.canonicalName,
-        fields = this.fields.map { it.toCompact(strip) }
+        fields = this.fields.map { it.toCompact() }
     )
 }
 

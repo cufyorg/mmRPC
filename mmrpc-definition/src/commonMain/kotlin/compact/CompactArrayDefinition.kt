@@ -18,11 +18,11 @@ data class CompactArrayDefinition(
     val type_ref: CanonicalName,
 ) : CompactElementDefinition
 
-fun ArrayDefinition.toCompact(strip: Boolean = false): CompactArrayDefinition {
+fun ArrayDefinition.toCompact(): CompactArrayDefinition {
     return CompactArrayDefinition(
         canonical_name = this.canonicalName,
-        description = if (strip) "" else this.description,
-        metadata = this.metadata.map { it.toCompact(strip) },
+        description = this.description,
+        metadata = this.metadata.map { it.toCompact() },
         type_ref = this.type.canonicalName,
     )
 }

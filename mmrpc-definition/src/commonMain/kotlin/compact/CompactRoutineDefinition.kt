@@ -18,11 +18,11 @@ data class CompactRoutineDefinition(
     val output_ref: CanonicalName,
 ) : CompactElementDefinition
 
-fun RoutineDefinition.toCompact(strip: Boolean = false): CompactRoutineDefinition {
+fun RoutineDefinition.toCompact(): CompactRoutineDefinition {
     return CompactRoutineDefinition(
         canonical_name = this.canonicalName,
-        description = if (strip) "" else this.description,
-        metadata = this.metadata.map { it.toCompact(strip) },
+        description = this.description,
+        metadata = this.metadata.map { it.toCompact() },
         comm = this.comm,
         faults_ref = this.faults.map { it.canonicalName },
         input_ref = this.input.canonicalName,
