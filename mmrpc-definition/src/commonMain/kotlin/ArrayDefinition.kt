@@ -23,37 +23,29 @@ import kotlinx.serialization.Serializable
 @Serializable
 @SerialName("array")
 data class ArrayDefinition(
-    override val name: String = ANONYMOUS_NAME,
-    override val namespace: Namespace = Namespace.Toplevel,
+    override val canonicalName: CanonicalName,
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
-    @SerialName("array_type")
-    val arrayType: TypeDefinition,
-) : TypeDefinition() {
-    companion object {
-        const val ANONYMOUS_NAME = "(anonymous[])"
-    }
 
+    val type: TypeDefinition,
+) : TypeDefinition() {
     override fun collectChildren() = sequence {
         yieldAll(metadata.asSequence().flatMap { it.collect() })
-        yieldAll(arrayType.collect())
+        yieldAll(type.collect())
     }
 }
 
 open class ArrayDefinitionBuilder :
     ElementDefinitionBuilder() {
-    override var name = ArrayDefinition.ANONYMOUS_NAME
-
     open val type = DomainProperty<TypeDefinition>()
 
     override fun build(): ArrayDefinition {
-        val asNamespace = this.namespace.value + this.name
+        val canonicalName = CanonicalName(this.namespace, this.name)
         return ArrayDefinition(
-            name = this.name,
-            namespace = this.namespace.value,
+            canonicalName = canonicalName,
             description = this.description,
             metadata = this.metadata.toList(),
-            arrayType = this.type.value.get(asNamespace, name = "type"),
+            type = this.type.value.get(canonicalName, name = "type"),
         )
     }
 }
@@ -65,7 +57,7 @@ internal fun array(
     return Unnamed { namespace, name ->
         ArrayDefinitionBuilder()
             .also { it.name = name ?: return@also }
-            .also { it.namespace *= namespace }
+            .also { it.namespace = namespace }
             .apply(block)
             .build()
     }

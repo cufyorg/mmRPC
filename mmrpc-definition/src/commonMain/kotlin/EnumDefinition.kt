@@ -24,49 +24,59 @@ import kotlin.jvm.JvmName
 @Serializable
 @SerialName("enum")
 data class EnumDefinition(
-    override val name: String = ANONYMOUS_NAME,
-    override val namespace: Namespace = Namespace.Toplevel,
+    override val canonicalName: CanonicalName,
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
-    val enumType: TypeDefinition,
-    @SerialName("enum_entries")
-    val enumEntries: List<ConstDefinition>,
-) : TypeDefinition() {
-    companion object {
-        const val ANONYMOUS_NAME = "(anonymous<enum>)"
-    }
 
+    val type: TypeDefinition,
+    val entries: List<ConstDefinition>,
+) : TypeDefinition() {
     override fun collectChildren() = sequence {
         yieldAll(metadata.asSequence().flatMap { it.collect() })
-        yieldAll(enumEntries.asSequence().flatMap { it.collect() })
+        yieldAll(type.collect())
+        yieldAll(entries.asSequence().flatMap { it.collect() })
     }
 }
 
 open class EnumDefinitionBuilder :
-    ConstDefinitionSetDomainContainer,
     ElementDefinitionBuilder() {
-    override var name = EnumDefinition.ANONYMOUS_NAME
-
     open val type = DomainProperty<TypeDefinition>()
+    protected open val entries = mutableListOf<Unnamed<ConstDefinition>>()
 
-    protected open val enumEntriesUnnamed = mutableListOf<Unnamed<ConstDefinition>>()
+////////////////////////////////////////
 
     @Suppress("INAPPLICABLE_JVM_NAME")
     @JvmName("unaryPlusUnnamedConstDefinition")
-    override operator fun Unnamed<ConstDefinition>.unaryPlus() {
-        enumEntriesUnnamed += this
+    operator fun Unnamed<ConstDefinition>.unaryPlus() {
+        entries += this
     }
 
+    @JvmName("unaryPlusIterableUnnamedConstDefinition")
+    operator fun Iterable<Unnamed<ConstDefinition>>.unaryPlus() {
+        for (it in this) +it
+    }
+
+    @JvmName("unaryPlusConstDefinition")
+    operator fun ConstDefinition.unaryPlus() {
+        +Unnamed(this)
+    }
+
+    @JvmName("unaryPlusIterableConstDefinition")
+    operator fun Iterable<ConstDefinition>.unaryPlus() {
+        for (it in this) +Unnamed(it)
+    }
+
+////////////////////////////////////////
+
     override fun build(): EnumDefinition {
-        val asNamespace = this.namespace.value + this.name
+        val canonicalName = CanonicalName(this.namespace, this.name)
         return EnumDefinition(
-            name = this.name,
-            namespace = this.namespace.value,
+            canonicalName = canonicalName,
             description = this.description,
             metadata = this.metadata.toList(),
-            enumType = this.type.value.get(asNamespace, name = "type"),
-            enumEntries = this.enumEntriesUnnamed.mapIndexed { i, it ->
-                it.get(asNamespace, name = "entry$i")
+            type = this.type.value.get(canonicalName, name = "type"),
+            entries = this.entries.mapIndexed { i, it ->
+                it.get(canonicalName, name = "entry$i")
             },
         )
     }
@@ -79,7 +89,7 @@ internal fun enum(
     return Unnamed { namespace, name ->
         EnumDefinitionBuilder()
             .also { it.name = name ?: return@also }
-            .also { it.namespace *= namespace }
+            .also { it.namespace = namespace }
             .apply(block)
             .build()
     }

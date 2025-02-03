@@ -24,46 +24,55 @@ import kotlin.jvm.JvmName
 @Serializable
 @SerialName("tuple")
 data class TupleDefinition(
-    override val name: String = ANONYMOUS_NAME,
-    override val namespace: Namespace = Namespace.Toplevel,
+    override val canonicalName: CanonicalName,
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
-    @SerialName("tuple_types")
-    val tupleTypes: List<TypeDefinition> = emptyList(),
-) : TypeDefinition() {
-    companion object {
-        val Empty = TupleDefinition()
-        const val ANONYMOUS_NAME = "(anonymous())"
-    }
 
+    val types: List<TypeDefinition> = emptyList(),
+) : TypeDefinition() {
     override fun collectChildren() = sequence {
         yieldAll(metadata.asSequence().flatMap { it.collect() })
-        yieldAll(tupleTypes.asSequence().flatMap { it.collect() })
+        yieldAll(types.asSequence().flatMap { it.collect() })
     }
 }
 
 open class TupleDefinitionBuilder :
-    TypeDefinitionSetDomainContainer,
     ElementDefinitionBuilder() {
-    override var name = TupleDefinition.ANONYMOUS_NAME
+    protected open val types = mutableListOf<Unnamed<TypeDefinition>>()
 
-    protected open val tupleTypesUnnamed = mutableListOf<Unnamed<TypeDefinition>>()
+////////////////////////////////////////
 
     @Suppress("INAPPLICABLE_JVM_NAME")
     @JvmName("unaryPlusUnnamedTypeDefinition")
-    override operator fun Unnamed<TypeDefinition>.unaryPlus() {
-        tupleTypesUnnamed += this
+    operator fun Unnamed<TypeDefinition>.unaryPlus() {
+        types += this
     }
 
+    @JvmName("unaryPlusIterableUnnamedTypeDefinition")
+    operator fun Iterable<Unnamed<TypeDefinition>>.unaryPlus() {
+        for (it in this) +it
+    }
+
+    @JvmName("unaryPlusTypeDefinition")
+    operator fun TypeDefinition.unaryPlus() {
+        +Unnamed(this)
+    }
+
+    @JvmName("unaryPlusIterableTypeDefinition")
+    operator fun Iterable<TypeDefinition>.unaryPlus() {
+        for (it in this) +Unnamed(it)
+    }
+
+////////////////////////////////////////
+
     override fun build(): TupleDefinition {
-        val asNamespace = this.namespace.value + this.name
+        val canonicalName = CanonicalName(this.namespace, this.name)
         return TupleDefinition(
-            name = this.name,
-            namespace = this.namespace.value,
+            canonicalName = canonicalName,
             description = this.description,
             metadata = this.metadata.toList(),
-            tupleTypes = this.tupleTypesUnnamed.mapIndexed { i, it ->
-                it.get(asNamespace, name = "type$i")
+            types = this.types.mapIndexed { i, it ->
+                it.get(canonicalName, name = "type$i")
             },
         )
     }
@@ -76,7 +85,7 @@ fun tuple(
     return Unnamed { namespace, name ->
         TupleDefinitionBuilder()
             .also { it.name = name ?: return@also }
-            .also { it.namespace *= namespace }
+            .also { it.namespace = namespace }
             .apply(block)
             .build()
     }

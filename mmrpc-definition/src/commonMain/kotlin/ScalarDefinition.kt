@@ -23,37 +23,29 @@ import kotlinx.serialization.Serializable
 @Serializable
 @SerialName("scalar")
 data class ScalarDefinition(
-    override val name: String = ANONYMOUS_NAME,
-    override val namespace: Namespace = Namespace.Toplevel,
+    override val canonicalName: CanonicalName,
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
-    @SerialName("scalar_type")
-    val scalarType: ScalarDefinition? = null,
-) : TypeDefinition() {
-    companion object {
-        const val ANONYMOUS_NAME = "(anonymous<scalar>)"
-    }
 
+    val type: ScalarDefinition? = null,
+) : TypeDefinition() {
     override fun collectChildren() = sequence {
         yieldAll(metadata.asSequence().flatMap { it.collect() })
-        scalarType?.let { yieldAll(it.collect()) }
+        type?.let { yieldAll(it.collect()) }
     }
 }
 
 open class ScalarDefinitionBuilder :
     ElementDefinitionBuilder() {
-    override var name = ScalarDefinition.ANONYMOUS_NAME
-
     open val type = OptionalDomainProperty<ScalarDefinition>()
 
     override fun build(): ScalarDefinition {
-        val asNamespace = this.namespace.value + this.name
+        val canonicalName = CanonicalName(this.namespace, this.name)
         return ScalarDefinition(
-            name = this.name,
-            namespace = this.namespace.value,
+            canonicalName = canonicalName,
             description = this.description,
             metadata = this.metadata.toList(),
-            scalarType = this.type.value?.get(asNamespace, name = "type"),
+            type = this.type.value?.get(canonicalName, name = "type"),
         )
     }
 }
@@ -65,7 +57,7 @@ fun scalar(
     return Unnamed { namespace, name ->
         ScalarDefinitionBuilder()
             .also { it.name = name ?: return@also }
-            .also { it.namespace *= namespace }
+            .also { it.namespace = namespace }
             .also(block)
             .build()
     }

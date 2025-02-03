@@ -19,16 +19,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 sealed class ElementDefinition {
-    abstract val name: String
-    abstract val namespace: Namespace
-
+    abstract val canonicalName: CanonicalName
     abstract val description: String
     abstract val metadata: List<MetadataDefinitionUsage>
 
-    val canonicalName by lazy { CanonicalName(namespace, name) }
-    val isAnonymous by lazy { namespace.isAnonymous || Namespace.isAnonymousSegment(name) }
-
-    val asNamespace by lazy { namespace + name }
+    val name by lazy { canonicalName.name }
+    val namespace by lazy { canonicalName.namespace }
 
     fun collect() = sequenceOf(this) + collectChildren()
 
@@ -37,6 +33,3 @@ sealed class ElementDefinition {
 
 @Serializable
 sealed class TypeDefinition : ElementDefinition()
-
-@Serializable
-sealed class EndpointDefinition : ElementDefinition()

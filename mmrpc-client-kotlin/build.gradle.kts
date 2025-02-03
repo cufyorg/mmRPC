@@ -12,7 +12,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation(project(":mmrpc-core"))
+                implementation(project(":mmrpc-runtime"))
                 implementation(project(":mmrpc-definition"))
 
                 implementation(kotlin("stdlib"))

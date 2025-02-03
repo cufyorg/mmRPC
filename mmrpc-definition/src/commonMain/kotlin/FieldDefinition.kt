@@ -23,41 +23,32 @@ import kotlinx.serialization.Serializable
 @Serializable
 @SerialName("field")
 data class FieldDefinition(
-    override val name: String = ANONYMOUS_NAME,
-    override val namespace: Namespace = Namespace.Toplevel,
+    override val canonicalName: CanonicalName,
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
-    @SerialName("field_type")
-    val fieldType: TypeDefinition,
-    @SerialName("field_default")
-    val fieldDefault: Literal? = null,
-) : ElementDefinition() {
-    companion object {
-        const val ANONYMOUS_NAME = "(anonymous<field>)"
-    }
 
+    val type: TypeDefinition,
+    val default: Literal? = null,
+) : ElementDefinition() {
     override fun collectChildren() = sequence {
         yieldAll(metadata.asSequence().flatMap { it.collect() })
-        yieldAll(fieldType.collect())
+        yieldAll(type.collect())
     }
 }
 
 open class FieldDefinitionBuilder :
     ElementDefinitionBuilder() {
-    override var name = FieldDefinition.ANONYMOUS_NAME
-
     open val type = DomainProperty<TypeDefinition>()
     open val default = OptionalLiteralDomainProperty()
 
     override fun build(): FieldDefinition {
-        val asNamespace = this.namespace.value + this.name
+        val canonicalName = CanonicalName(this.namespace, this.name)
         return FieldDefinition(
-            name = this.name,
-            namespace = this.namespace.value,
+            canonicalName = canonicalName,
             description = this.description,
             metadata = this.metadata.toList(),
-            fieldType = this.type.value.get(asNamespace, name = "type"),
-            fieldDefault = this.default.value,
+            type = this.type.value.get(canonicalName, name = "type"),
+            default = this.default.value,
         )
     }
 }
@@ -69,7 +60,7 @@ internal fun prop(
     return Unnamed { namespace, name ->
         FieldDefinitionBuilder()
             .also { it.name = name ?: return@also }
-            .also { it.namespace *= namespace }
+            .also { it.namespace = namespace }
             .apply(block)
             .build()
     }

@@ -55,11 +55,10 @@ class SpecSheet {
      */
     val namespaces by lazy {
         val excludes = elements.asSequence()
-            .map { it.asNamespace }
+            .map { it.canonicalName }
             .toSet()
 
         elements.asSequence()
-            .filterNot { it.isAnonymous }
             .map { it.namespace }
             .minus(excludes)
             .toSet()

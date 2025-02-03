@@ -12,11 +12,9 @@ For example, HTTP REST APIs defines the route `path` and `method` and various re
 content types and various response body content types. This makes the API design worry about
 things other than what the route actually does. Thus, this specification dsl assumes that
 every routine (which is what it is called here), if was declared to have an HTTP Endpoint,
-to always support the `POST` method and always have the request object be encoded as JSON
-objects unless for GET requests which then assumes the request will be encoded in the url
-query and the response objects always encoded as JSON. This way, if the designer wants a
-function that creates something and a function that deletes it, the designer is required
-to define two paths instead of a single one with two methods. Thus, forcing consistency.
+to only support the `POST` method. This way, if the designer wants a function that creates
+something and a function that deletes it, the designer is required to define two paths instead
+of a single one with two methods. Thus, forcing consistency.
 
 ### Ultimate Goal
 
@@ -25,9 +23,6 @@ specifications, clients and UI for existing communication protocols.
 
 Someone can use this project to create specification for a http service and not anything
 else and the specification still be a valid and compatible http.
-
-It is because of this goal, content encoding was chosen to be the widely used JSON format
-with the shape of the content controlled by the user of this project.
 
 Don't be intimidated by the number of modules or generators, these are optional helpers for
 the user to make use of the specification they wrote.

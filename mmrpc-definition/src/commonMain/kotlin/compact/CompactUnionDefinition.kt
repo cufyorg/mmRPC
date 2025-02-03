@@ -7,28 +7,25 @@ import org.cufy.mmrpc.ElementDefinition
 import org.cufy.mmrpc.StructDefinition
 import org.cufy.mmrpc.UnionDefinition
 
+@Suppress("PropertyName")
 @Serializable
 @SerialName("union")
 data class CompactUnionDefinition(
-    @SerialName("canonical_name")
-    override val canonicalName: CanonicalName,
+    override val canonical_name: CanonicalName,
     override val description: String = "",
     override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
-    @SerialName("union_discriminator")
-    val unionDiscriminator: String,
-    @SerialName("union_types.ref")
-    val unionTypes: List<CanonicalName>,
+
+    val discriminator: String,
+    val types_ref: List<CanonicalName>,
 ) : CompactElementDefinition
 
 fun UnionDefinition.toCompact(strip: Boolean = false): CompactUnionDefinition {
     return CompactUnionDefinition(
-        canonicalName = this.canonicalName,
+        canonical_name = this.canonicalName,
         description = if (strip) "" else this.description,
-        metadata = this.metadata
-            .map { it.toCompact(strip) },
-        unionDiscriminator = this.unionDiscriminator,
-        unionTypes = this.unionTypes
-            .map { it.canonicalName }
+        metadata = this.metadata.map { it.toCompact(strip) },
+        discriminator = this.discriminator,
+        types_ref = this.types.map { it.canonicalName }
     )
 }
 
@@ -37,17 +34,16 @@ fun CompactUnionDefinition.inflate(
 ): () -> UnionDefinition? {
     return it@{
         UnionDefinition(
-            name = this.name,
-            namespace = this.namespace,
+            canonicalName = this.canonical_name,
             description = this.description,
             metadata = this.metadata.map {
                 it.inflate(onLookup)() ?: return@it null
             },
-            unionDiscriminator = this.unionDiscriminator,
-            unionTypes = this.unionTypes.map {
+            discriminator = this.discriminator,
+            types = this.types_ref.map {
                 val item = onLookup(it) ?: return@it null
                 require(item is StructDefinition) {
-                    "union_types.ref must point to a StructDefinition"
+                    "<union>.types_ref must point to a StructDefinition"
                 }
                 item
             },

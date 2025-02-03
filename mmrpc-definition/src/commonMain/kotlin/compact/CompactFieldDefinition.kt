@@ -4,27 +4,25 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.cufy.mmrpc.*
 
+@Suppress("PropertyName")
 @Serializable
 @SerialName("field")
 data class CompactFieldDefinition(
-    @SerialName("canonical_name")
-    override val canonicalName: CanonicalName,
+    override val canonical_name: CanonicalName,
     override val description: String = "",
     override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
-    @SerialName("field_type.ref")
-    val fieldType: CanonicalName,
-    @SerialName("field_default")
-    val fieldDefault: Literal? = null,
+
+    val type_ref: CanonicalName,
+    val default: Literal? = null,
 ) : CompactElementDefinition
 
 fun FieldDefinition.toCompact(strip: Boolean = false): CompactFieldDefinition {
     return CompactFieldDefinition(
-        canonicalName = this.canonicalName,
+        canonical_name = this.canonicalName,
         description = if (strip) "" else this.description,
-        metadata = this.metadata
-            .map { it.toCompact(strip) },
-        fieldType = this.fieldType.canonicalName,
-        fieldDefault = this.fieldDefault,
+        metadata = this.metadata.map { it.toCompact(strip) },
+        type_ref = this.type.canonicalName,
+        default = this.default,
     )
 }
 
@@ -33,20 +31,19 @@ fun CompactFieldDefinition.inflate(
 ): () -> FieldDefinition? {
     return it@{
         FieldDefinition(
-            name = this.name,
-            namespace = this.namespace,
+            canonicalName = this.canonical_name,
             description = this.description,
             metadata = this.metadata.map {
                 it.inflate(onLookup)() ?: return@it null
             },
-            fieldType = this.fieldType.let {
+            type = this.type_ref.let {
                 val item = onLookup(it) ?: return@it null
                 require(item is TypeDefinition) {
-                    "field_type.ref must point to a TypeDefinition"
+                    "<field>.type_ref must point to a TypeDefinition"
                 }
                 item
             },
-            fieldDefault = this.fieldDefault
+            default = this.default
         )
     }
 }

@@ -2,9 +2,13 @@ package org.cufy.mmrpc.gen.kotlin
 
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.TypeSpec
-import org.cufy.mmrpc.gen.kotlin.util.gen.debug
-import org.cufy.mmrpc.gen.kotlin.util.gen.debugLog
-import org.cufy.mmrpc.gen.kotlin.util.gen.references.generatedClassOf
+import org.cufy.mmrpc.gen.kotlin.common.debug
+import org.cufy.mmrpc.gen.kotlin.common.debugLog
+import org.cufy.mmrpc.gen.kotlin.common.declarationsClassOf
+import org.cufy.mmrpc.gen.kotlin.common.generatedClassOf
+import org.cufy.mmrpc.gen.kotlin.util.companionObjectSpec
+import org.cufy.mmrpc.gen.kotlin.util.fetchKind
+import org.cufy.mmrpc.gen.kotlin.util.fileSpec
 
 private const val TAG = "generateFileSpecSet__SUB_PACKAGES"
 
@@ -13,53 +17,62 @@ internal fun generateFileSpecSet__SUB_PACKAGES(
     ctx: GenContext,
     onEachFile: FileSpec.Builder.() -> Unit,
 ): List<FileSpec> {
+    val types = ctx.createTypeNodes.map { it.canonicalName }
+
+    val createTypeNodeMap = ctx.createTypeNodes
+        .groupBy { node ->
+            types.asSequence()
+                .filter { node.canonicalName in it }
+                .maxOrNull()
+        }
+    val injectTypeNodeMap = ctx.injectTypeNodes
+        .groupBy { it.canonicalName }
+    val injectScopeNodeMap = ctx.injectScopeNodes
+        .groupBy { it.canonicalName }
+
+    ctx.debug {
+        for (cn in injectTypeNodeMap.keys) if (cn !in types)
+            ctx.debugLog(TAG, "Element was ignored due to it having no direct parent: $cn")
+    }
+
+    fun createTypeSpec(node: CreateTypeNode): TypeSpec {
+        val spec = node.block()
+
+        createTypeNodeMap[node.canonicalName].orEmpty()
+            .forEach { spec.addType(createTypeSpec(it)) }
+        injectTypeNodeMap[node.canonicalName].orEmpty()
+            .forEach { it.block(spec) }
+
+        if (!injectScopeNodeMap[node.canonicalName].isNullOrEmpty()) {
+            if (spec.fetchKind() == TypeSpec.Kind.OBJECT) {
+                injectScopeNodeMap[node.canonicalName].orEmpty()
+                    .forEach { it.block(spec) }
+            } else {
+                spec.addType(companionObjectSpec {
+                    injectScopeNodeMap[node.canonicalName].orEmpty()
+                        .forEach { it.block(this) }
+                })
+            }
+        }
+
+        return spec.build()
+    }
+
     return buildList {
-        for (node in ctx.createElementNodes) {
-            val ancestor = ctx.createElementNodes.find {
-                node.element.asNamespace in it.element.asNamespace
-            }
+        for (node in createTypeNodeMap[null].orEmpty()) {
+            add(fileSpec(ctx.generatedClassOf(node.canonicalName)) {
+                addType(createTypeSpec(node))
+                onEachFile()
+            })
+        }
 
-            if (ancestor != null) {
-                ctx.debug {
-                    val parent = ctx.createElementNodes.find {
-                        node.element.namespace == it.element.asNamespace
-                    }
+        for ((canonicalName, nodes) in injectScopeNodeMap) {
+            if (canonicalName in types) continue
 
-                    if (parent == null) {
-                        val fqn = node.element.canonicalName.value
-                        ctx.debugLog(TAG, "Element was ignored due to it having no direct parent: $fqn")
-                    }
-                }
-
-                continue
-            }
-
-            val file = FileSpec
-                .builder(ctx.generatedClassOf(node.element))
-                .addType(create(node, ctx))
-                .apply(onEachFile)
-                .build()
-
-            add(file)
+            add(fileSpec(ctx.declarationsClassOf(canonicalName)) {
+                nodes.forEach { it.block(this) }
+                onEachFile()
+            })
         }
     }
-}
-
-private fun create(node: CreateElementNode, ctx: GenContext): TypeSpec {
-    val asNamespace = node.element.asNamespace
-    val spec = node.block()
-
-    for (it in ctx.createElementNodes) {
-        if (it.element.namespace != asNamespace) continue
-
-        spec.addType(create(it, ctx))
-    }
-
-    for (it in ctx.onElementNodes) {
-        if (it.element != node.element) continue
-
-        it.block(spec)
-    }
-
-    return spec.build()
 }

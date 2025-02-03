@@ -3,7 +3,6 @@ package org.cufy.mmrpc.gen.kotlin
 import com.squareup.kotlinpoet.ClassName
 import org.cufy.mmrpc.CanonicalName
 import org.cufy.mmrpc.ElementDefinition
-import org.cufy.mmrpc.Namespace
 
 class GenContext(
     val elements: Set<ElementDefinition>,
@@ -37,22 +36,20 @@ class GenContext(
     /**
      * All the elements each associated with itself as a namespace.
      */
-    val elementsNS = elements.associateBy { it.asNamespace }
+    val elementsMap = elements.associateBy { it.canonicalName }
 
     /**
      * The namespaces of all the elements excluding namespaces
      * that representing elements.
      */
-    val rootsNS = elements.asSequence()
-        .filterNot { it.isAnonymous }
-        .flatMap { it.namespace.collect() }
-        .minus(elementsNS.keys)
-        .plus(Namespace.Toplevel)
+    val roots = elements.asSequence()
+        .flatMap { it.namespace?.collect().orEmpty() }
+        .minus(elementsMap.keys)
         .toSet()
 
     val failures = mutableListOf<GenException>()
 
-    val createElementNodes = mutableListOf<CreateElementNode>()
-
-    val onElementNodes = mutableListOf<OnElementNode>()
+    val createTypeNodes = mutableListOf<CreateTypeNode>()
+    val injectTypeNodes = mutableListOf<InjectTypeNode>()
+    val injectScopeNodes = mutableListOf<InjectScopeNode>()
 }

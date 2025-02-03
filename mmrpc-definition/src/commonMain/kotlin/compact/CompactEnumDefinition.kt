@@ -4,28 +4,25 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.cufy.mmrpc.*
 
+@Suppress("PropertyName")
 @Serializable
 @SerialName("enum")
 data class CompactEnumDefinition(
-    @SerialName("canonical_name")
-    override val canonicalName: CanonicalName,
+    override val canonical_name: CanonicalName,
     override val description: String = "",
     override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
-    @SerialName("enum_type.ref")
-    val enumType: CanonicalName,
-    @SerialName("enum_entries.ref")
-    val enumEntries: List<CanonicalName>,
+
+    val type_ref: CanonicalName,
+    val entries_ref: List<CanonicalName>,
 ) : CompactElementDefinition
 
 fun EnumDefinition.toCompact(strip: Boolean = false): CompactEnumDefinition {
     return CompactEnumDefinition(
-        canonicalName = this.canonicalName,
+        canonical_name = this.canonicalName,
         description = if (strip) "" else this.description,
-        metadata = this.metadata
-            .map { it.toCompact(strip) },
-        enumType = this.enumType.canonicalName,
-        enumEntries = this.enumEntries
-            .map { it.canonicalName }
+        metadata = this.metadata.map { it.toCompact(strip) },
+        type_ref = this.type.canonicalName,
+        entries_ref = this.entries.map { it.canonicalName }
     )
 }
 
@@ -34,23 +31,22 @@ fun CompactEnumDefinition.inflate(
 ): () -> EnumDefinition? {
     return it@{
         EnumDefinition(
-            name = this.name,
-            namespace = this.namespace,
+            canonicalName = this.canonical_name,
             description = this.description,
             metadata = this.metadata.map {
                 it.inflate(onLookup)() ?: return@it null
             },
-            enumType = this.enumType.let {
+            type = this.type_ref.let {
                 val item = onLookup(it) ?: return@it null
                 require(item is TypeDefinition) {
-                    "enum_type.ref must point to a TypeDefinition"
+                    "<enum>.type_ref must point to a TypeDefinition"
                 }
                 item
             },
-            enumEntries = this.enumEntries.map {
+            entries = this.entries_ref.map {
                 val item = onLookup(it) ?: return@it null
                 require(item is ConstDefinition) {
-                    "enum_entries.ref must point to a ConstDefinition"
+                    "<enum>.entries_ref must point to a ConstDefinition"
                 }
                 item
             },

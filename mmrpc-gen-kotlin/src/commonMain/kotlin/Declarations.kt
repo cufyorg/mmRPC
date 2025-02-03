@@ -1,6 +1,8 @@
 package org.cufy.mmrpc.gen.kotlin
 
+import com.squareup.kotlinpoet.MemberSpecHolder
 import com.squareup.kotlinpoet.TypeSpec
+import org.cufy.mmrpc.CanonicalName
 import org.cufy.mmrpc.ElementDefinition
 
 enum class GenFeature {
@@ -21,14 +23,14 @@ enum class GenFeature {
     NO_BUILTIN,
 
     /**
-     * Generate field definition object classes.
+     * Generate field name constant properties.
      */
-    GEN_FIELD_OBJECTS,
+    GEN_FIELD_NAME_PROPERTIES,
 
     /**
-     * Generate endpoint definition object classes.
+     * Generate const value constant properties.
      */
-    GEN_ENDPOINT_OBJECTS,
+    GEN_CONST_VALUE_PROPERTIES,
 
     /**
      * Keep original type class names.
@@ -45,30 +47,6 @@ enum class GenFeature {
      */
     KEEP_FIELD_PROPERTY_NAMES,
 }
-
-val GenContext.featureKotlinxSerialization
-    get() = GenFeature.KOTLINX_SERIALIZATION in features
-
-val GenContext.featureDebug
-    get() = GenFeature.DEBUG in features
-
-val GenContext.featureNoBuiltin
-    get() = GenFeature.NO_BUILTIN in features
-
-val GenContext.featureGenFieldObjects
-    get() = GenFeature.GEN_FIELD_OBJECTS in features
-
-val GenContext.featureGenEndpointObjects
-    get() = GenFeature.GEN_ENDPOINT_OBJECTS in features
-
-val GenContext.featureKeepTypeClassNames
-    get() = GenFeature.KEEP_TYPE_CLASS_NAMES in features
-
-val GenContext.featureKeepFaultClassNames
-    get() = GenFeature.KEEP_FAULT_CLASS_NAMES in features
-
-val GenContext.featureKeepFieldPropertyNames
-    get() = GenFeature.KEEP_FIELD_PROPERTY_NAMES in features
 
 enum class GenPackaging {
     /**
@@ -93,15 +71,41 @@ data class GenFailure(
     val group: String,
     val tag: String,
     val message: String,
-    val element: ElementDefinition,
+    val element: ElementDefinition?,
 )
 
-data class CreateElementNode(
-    val element: ElementDefinition,
+data class CreateTypeNode(
+    val canonicalName: CanonicalName,
     val block: () -> TypeSpec.Builder,
 )
 
-data class OnElementNode(
-    val element: ElementDefinition?,
+data class InjectTypeNode(
+    val canonicalName: CanonicalName,
     val block: TypeSpec.Builder.() -> Unit,
 )
+
+data class InjectScopeNode(
+    val canonicalName: CanonicalName?,
+    val block: MemberSpecHolder.Builder<*>.() -> Unit,
+)
+
+enum class InterStrategy {
+    DATA_OBJECT,
+    DATA_CLASS,
+}
+
+enum class StructStrategy {
+    DATA_OBJECT,
+    DATA_CLASS,
+}
+
+enum class TupleStrategy {
+    DATA_OBJECT,
+    DATA_CLASS,
+}
+
+enum class UnionStrategy {
+    DATA_OBJECT,
+    SEALED_INTERFACE,
+    WRAPPER_SEALED_INTERFACE,
+}

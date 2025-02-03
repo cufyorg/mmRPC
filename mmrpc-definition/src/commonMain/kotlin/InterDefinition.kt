@@ -24,45 +24,41 @@ import kotlin.jvm.JvmName
 @Serializable
 @SerialName("inter")
 data class InterDefinition(
-    override val name: String = ANONYMOUS_NAME,
-    override val namespace: Namespace = Namespace.Toplevel,
+    override val canonicalName: CanonicalName,
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
-    @SerialName("inter_types")
-    val interTypes: List<StructDefinition>,
-) : TypeDefinition() {
-    companion object {
-        const val ANONYMOUS_NAME = "(anonymous&)"
-    }
 
+    val types: List<StructDefinition>,
+) : TypeDefinition() {
     override fun collectChildren() = sequence {
         yieldAll(metadata.asSequence().flatMap { it.collect() })
-        yieldAll(interTypes.asSequence().flatMap { it.collect() })
+        yieldAll(types.asSequence().flatMap { it.collect() })
     }
 }
 
 open class InterDefinitionBuilder :
     StructDefinitionSetDomainContainer,
     ElementDefinitionBuilder() {
-    override var name = InterDefinition.ANONYMOUS_NAME
+    protected open val types = mutableListOf<Unnamed<StructDefinition>>()
 
-    protected open val interTypesUnnamed = mutableListOf<Unnamed<StructDefinition>>()
+////////////////////////////////////////
 
     @Suppress("INAPPLICABLE_JVM_NAME")
     @JvmName("unaryPlusUnnamedStructDefinition")
     override operator fun Unnamed<StructDefinition>.unaryPlus() {
-        interTypesUnnamed += this
+        types += this
     }
 
+////////////////////////////////////////
+
     override fun build(): InterDefinition {
-        val asNamespace = this.namespace.value + this.name
+        val canonicalName = CanonicalName(this.namespace, this.name)
         return InterDefinition(
-            name = this.name,
-            namespace = this.namespace.value,
+            canonicalName = canonicalName,
             description = this.description,
             metadata = this.metadata.toList(),
-            interTypes = this.interTypesUnnamed.mapIndexed { i, it ->
-                it.get(asNamespace, name = "type$i")
+            types = this.types.mapIndexed { i, it ->
+                it.get(canonicalName, name = "type$i")
             },
         )
     }
@@ -75,7 +71,7 @@ fun inter(
     return Unnamed { namespace, name ->
         InterDefinitionBuilder()
             .also { it.name = name ?: return@also }
-            .also { it.namespace *= namespace }
+            .also { it.namespace = namespace }
             .apply(block)
             .build()
     }

@@ -23,41 +23,32 @@ import kotlinx.serialization.Serializable
 @Serializable
 @SerialName("const")
 data class ConstDefinition(
-    override val name: String = ANONYMOUS_NAME,
-    override val namespace: Namespace = Namespace.Toplevel,
+    override val canonicalName: CanonicalName,
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
-    @SerialName("const_type")
-    val constType: TypeDefinition,
-    @SerialName("const_value")
-    val constValue: Literal,
-) : ElementDefinition() {
-    companion object {
-        const val ANONYMOUS_NAME = "(anonymous<const>)"
-    }
 
+    val type: TypeDefinition,
+    val value: Literal,
+) : ElementDefinition() {
     override fun collectChildren() = sequence {
         yieldAll(metadata.asSequence().flatMap { it.collect() })
-        yieldAll(constType.collect())
+        yieldAll(type.collect())
     }
 }
 
 open class ConstDefinitionBuilder :
     ElementDefinitionBuilder() {
-    override var name = ConstDefinition.ANONYMOUS_NAME
-
     open val type = DomainProperty<TypeDefinition>()
     open lateinit var value: Literal
 
     override fun build(): ConstDefinition {
-        val asNamespace = this.namespace.value + this.name
+        val canonicalName = CanonicalName(this.namespace, this.name)
         return ConstDefinition(
-            name = this.name,
-            namespace = this.namespace.value,
+            canonicalName = canonicalName,
             description = this.description,
             metadata = this.metadata.toList(),
-            constType = this.type.value.get(asNamespace, name = "type"),
-            constValue = this.value,
+            type = this.type.value.get(canonicalName, name = "type"),
+            value = this.value,
         )
     }
 }
@@ -69,7 +60,7 @@ internal fun const(
     return Unnamed { namespace, name ->
         ConstDefinitionBuilder()
             .also { it.name = name ?: return@also }
-            .also { it.namespace *= namespace }
+            .also { it.namespace = namespace }
             .apply(block)
             .build()
     }

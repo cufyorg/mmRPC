@@ -17,7 +17,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation(project(":mmrpc-core"))
+                implementation(project(":mmrpc-runtime"))
 
                 implementation(kotlin("stdlib"))
                 implementation(libs.kotlin.serialization.core)

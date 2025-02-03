@@ -23,7 +23,7 @@ fun SpecSheet.toCompact(strip: Boolean = false): CompactSpecSheet {
     return CompactSpecSheet(
         elements = collectChildren()
             .map { it.toCompact(strip) }
-            .sortedBy { it.canonicalName.value }
+            .sortedBy { it.canonical_name.value }
             .toSet()
     )
 }
@@ -33,7 +33,7 @@ fun CompactSpecSheet.inflate(): SpecSheet {
     val requested = mutableListOf<CanonicalName>()
 
     for (element in this.elements) {
-        inflated[element.canonicalName] = element.inflate {
+        inflated[element.canonical_name] = element.inflate {
             requested += it
             inflated[it]?.invoke()
         }

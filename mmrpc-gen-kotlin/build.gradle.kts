@@ -12,10 +12,11 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation(project(":mmrpc-core"))
+                implementation(project(":mmrpc-runtime"))
                 implementation(project(":mmrpc-definition"))
 
                 implementation(kotlin("stdlib"))
+                implementation(kotlin("reflect"))
                 implementation(libs.kotlin.serialization.core)
 
                 implementation(libs.kotlinpoet)

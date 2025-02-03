@@ -7,90 +7,87 @@ import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.header.internals.RecordHeader
 import org.cufy.jose.JWKSet
+import org.cufy.jose.JWT
 import org.cufy.jose.sign
-import org.cufy.jose.toJWT
-import org.cufy.json.*
-import org.cufy.mmrpc.KafkaEndpointInfo
+import org.cufy.json.json
+import org.cufy.json.serializeToJsonString
+import org.cufy.json.set
+import org.cufy.mmrpc.Comm
 import org.cufy.mmrpc.RoutineObject
-import org.cufy.mmrpc.StructObject
 
-suspend inline fun <reified I : StructObject> KafkaProducer<String, String>.emit(
+suspend inline fun <reified I : Any> KafkaProducer<String, String>.emit(
     routine: RoutineObject<I, *>,
     input: I,
+    key: String? = null,
 ) {
-    val endpoints = routine.__info__.endpoints
-        .filterIsInstance<KafkaEndpointInfo>()
-
-    require(endpoints.isNotEmpty()) {
-        "Routine does not have any Kafka endpoints"
+    require(Comm.Kafka in routine.comm) {
+        "Routine does not support Kafka communication channel"
     }
 
-    val keyString = generateKey(routine, input)
-    val valueString = input.serializeToJsonString()
-    val headers = mapOf("Content-Type" to "application/json")
+    val value = input.serializeToJsonString()
+    val headers = mapOf(
+        "Content-Type" to "application/json",
+    )
 
-    for (endpoint in endpoints) {
-        val record = ProducerRecord(
-            /* topic = */  endpoint.topic.value,
-            /* partition = */ null,
-            /* timestamp = */ null,
-            /* key = */ keyString,
-            /* value = */ valueString,
-            /* headers = */ headers.entries.map {
-                RecordHeader(it.key, it.value.encodeToByteArray())
-            }
-        )
-
-        withContext(Dispatchers.IO) {
-            send(record)
+    val record = ProducerRecord(
+        /* topic = */ routine.canonicalName.value,
+        /* partition = */ null,
+        /* timestamp = */ null,
+        /* key = */ key,
+        /* value = */ value,
+        /* headers = */ headers.entries.map {
+            RecordHeader(it.key, it.value.encodeToByteArray())
         }
+    )
+
+    withContext(Dispatchers.IO) {
+        send(record)
     }
 }
 
-suspend inline fun <reified I : StructObject> KafkaProducer<String, String>.emit(
+suspend inline fun <reified I : Any> KafkaProducer<String, String>.emit(
     routine: RoutineObject<I, *>,
     input: I,
-    jwks: JWKSet,
-    iss: String? = null,
+    key: String? = null,
+    iss: String,
+    alg: String,
     aud: List<String> = emptyList(),
+    jwks: JWKSet,
 ) {
-    val endpoints = routine.__info__.endpoints
-        .filterIsInstance<KafkaEndpointInfo>()
-
-    require(endpoints.isNotEmpty()) {
-        "Routine does not have any Kafka endpoints"
+    require(Comm.Kafka in routine.comm) {
+        "Routine does not support Kafka communication channel"
     }
 
-    val headers = mapOf("Content-Type" to "application/jwt")
-    val keyString = generateKey(routine, input)
-    val valueString = when {
-        iss == null && aud.isEmpty() -> input.serializeToJsonString()
-        else -> JsonObject {
-            if (iss != null) set("iss", iss)
-            if (aud.size == 1) set("aud", aud.first())
-            if (aud.isNotEmpty()) set("aud", JsonArray(aud.map { it.json }))
-            putAll(input.serializeToJsonObject())
-        }.encodeToString()
-    }
+    val topic = routine.canonicalName.value
+    val value = input.serializeToJsonString()
+    val token = JWT {
+        header["alg"] = alg
 
-    for (endpoint in endpoints) {
-        val valueCompactJWS = valueString
-            .toJWT { set("topic", endpoint.topic.value) }
-            .sign(jwks)
+        payload["topic"] = topic
+        payload["iss"] = iss
+        payload["v_hash"] = calculateHashClaim(alg, value)
 
-        val record = ProducerRecord(
-            /* topic = */  endpoint.topic.value,
-            /* partition = */ null,
-            /* timestamp = */ null,
-            /* key = */ keyString,
-            /* value = */ valueCompactJWS.value,
-            /* headers = */ headers.entries.map {
-                RecordHeader(it.key, it.value.encodeToByteArray())
-            }
-        )
+        if (aud.size == 1) payload["aud"] = aud.first()
+        if (aud.size > 1) payload["aud"] = JsonArray(aud.map { it.json })
+    }.sign(jwks)
 
-        withContext(Dispatchers.IO) {
-            send(record)
+    val headers = mapOf(
+        "Content-Type" to "application/json",
+        "Authorization" to "Sig ${token.value}",
+    )
+
+    val record = ProducerRecord(
+        /* topic = */ topic,
+        /* partition = */ null,
+        /* timestamp = */ null,
+        /* key = */ key,
+        /* value = */ value,
+        /* headers = */ headers.entries.map {
+            RecordHeader(it.key, it.value.encodeToByteArray())
         }
+    )
+
+    withContext(Dispatchers.IO) {
+        send(record)
     }
 }

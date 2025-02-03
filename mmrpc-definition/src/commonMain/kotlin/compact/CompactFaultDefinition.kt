@@ -9,18 +9,16 @@ import org.cufy.mmrpc.FaultDefinition
 @Serializable
 @SerialName("fault")
 data class CompactFaultDefinition(
-    @SerialName("canonical_name")
-    override val canonicalName: CanonicalName,
+    override val canonical_name: CanonicalName,
     override val description: String = "",
     override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
 ) : CompactElementDefinition
 
 fun FaultDefinition.toCompact(strip: Boolean = false): CompactFaultDefinition {
     return CompactFaultDefinition(
-        canonicalName = this.canonicalName,
+        canonical_name = this.canonicalName,
         description = if (strip) "" else this.description,
-        metadata = this.metadata
-            .map { it.toCompact(strip) },
+        metadata = this.metadata.map { it.toCompact(strip) },
     )
 }
 
@@ -29,8 +27,7 @@ fun CompactFaultDefinition.inflate(
 ): () -> FaultDefinition? {
     return it@{
         FaultDefinition(
-            name = this.name,
-            namespace = this.namespace,
+            canonicalName = this.canonical_name,
             description = this.description,
             metadata = this.metadata.map {
                 it.inflate(onLookup)() ?: return@it null

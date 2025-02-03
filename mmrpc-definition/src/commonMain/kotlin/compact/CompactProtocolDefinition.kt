@@ -7,25 +7,23 @@ import org.cufy.mmrpc.ElementDefinition
 import org.cufy.mmrpc.ProtocolDefinition
 import org.cufy.mmrpc.RoutineDefinition
 
+@Suppress("PropertyName")
 @Serializable
 @SerialName("protocol")
 data class CompactProtocolDefinition(
-    @SerialName("canonical_name")
-    override val canonicalName: CanonicalName,
+    override val canonical_name: CanonicalName,
     override val description: String = "",
     override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
-    @SerialName("protocol_routines.ref")
-    val protocolRoutines: List<CanonicalName> = emptyList(),
+
+    val routines_ref: List<CanonicalName> = emptyList(),
 ) : CompactElementDefinition
 
 fun ProtocolDefinition.toCompact(strip: Boolean = false): CompactProtocolDefinition {
     return CompactProtocolDefinition(
-        canonicalName = this.canonicalName,
+        canonical_name = this.canonicalName,
         description = if (strip) "" else this.description,
-        metadata = this.metadata
-            .map { it.toCompact(strip) },
-        protocolRoutines = this.protocolRoutines
-            .map { it.canonicalName },
+        metadata = this.metadata.map { it.toCompact(strip) },
+        routines_ref = this.routines.map { it.canonicalName },
     )
 }
 
@@ -34,16 +32,15 @@ fun CompactProtocolDefinition.inflate(
 ): () -> ProtocolDefinition? {
     return it@{
         ProtocolDefinition(
-            name = this.name,
-            namespace = this.namespace,
+            canonicalName = this.canonical_name,
             description = this.description,
             metadata = this.metadata.map {
                 it.inflate(onLookup)() ?: return@it null
             },
-            protocolRoutines = this.protocolRoutines.map {
+            routines = this.routines_ref.map {
                 val item = onLookup(it) ?: return@it null
                 require(item is RoutineDefinition) {
-                    "protocol_routines.ref must point to a RoutineDefinition"
+                    "<protocol>.routines_ref must point to a RoutineDefinition"
                 }
                 item
             },

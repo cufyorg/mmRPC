@@ -7,25 +7,23 @@ import org.cufy.mmrpc.ElementDefinition
 import org.cufy.mmrpc.TupleDefinition
 import org.cufy.mmrpc.TypeDefinition
 
+@Suppress("PropertyName")
 @Serializable
 @SerialName("tuple")
 data class CompactTupleDefinition(
-    @SerialName("canonical_name")
-    override val canonicalName: CanonicalName,
+    override val canonical_name: CanonicalName,
     override val description: String = "",
     override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
-    @SerialName("tuple_types.ref")
-    val tupleTypes: List<CanonicalName> = emptyList(),
+
+    val types_ref: List<CanonicalName> = emptyList(),
 ) : CompactElementDefinition
 
 fun TupleDefinition.toCompact(strip: Boolean = false): CompactTupleDefinition {
     return CompactTupleDefinition(
-        canonicalName = this.canonicalName,
+        canonical_name = this.canonicalName,
         description = if (strip) "" else this.description,
-        metadata = this.metadata
-            .map { it.toCompact(strip) },
-        tupleTypes = this.tupleTypes
-            .map { it.canonicalName },
+        metadata = this.metadata.map { it.toCompact(strip) },
+        types_ref = this.types.map { it.canonicalName },
     )
 }
 
@@ -34,16 +32,15 @@ fun CompactTupleDefinition.inflate(
 ): () -> TupleDefinition? {
     return it@{
         TupleDefinition(
-            name = this.name,
-            namespace = this.namespace,
+            canonicalName = this.canonical_name,
             description = this.description,
             metadata = this.metadata.map {
                 it.inflate(onLookup)() ?: return@it null
             },
-            tupleTypes = this.tupleTypes.map {
+            types = this.types_ref.map {
                 val item = onLookup(it) ?: return@it null
                 require(item is TypeDefinition) {
-                    "tuple_types.ref must point to a TypeDefinition"
+                    "<tuple>.types_ref must point to a TypeDefinition"
                 }
                 item
             },

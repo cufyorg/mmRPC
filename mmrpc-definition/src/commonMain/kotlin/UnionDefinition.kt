@@ -24,50 +24,40 @@ import kotlin.jvm.JvmName
 @Serializable
 @SerialName("union")
 data class UnionDefinition(
-    override val name: String = ANONYMOUS_NAME,
-    override val namespace: Namespace = Namespace.Toplevel,
+    override val canonicalName: CanonicalName,
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
-    @SerialName("union_discriminator")
-    val unionDiscriminator: String = "type",
-    @SerialName("union_types")
-    val unionTypes: List<StructDefinition>,
-) : TypeDefinition() {
-    companion object {
-        const val ANONYMOUS_NAME = "(anonymous|)"
-    }
 
+    val discriminator: String = "type",
+    val types: List<StructDefinition>,
+) : TypeDefinition() {
     override fun collectChildren() = sequence {
         yieldAll(metadata.asSequence().flatMap { it.collect() })
-        yieldAll(unionTypes.asSequence().flatMap { it.collect() })
+        yieldAll(types.asSequence().flatMap { it.collect() })
     }
 }
 
 open class UnionDefinitionBuilder :
     StructDefinitionSetDomainContainer,
     ElementDefinitionBuilder() {
-    override var name = UnionDefinition.ANONYMOUS_NAME
-
     open var discriminator: String = "type"
-
-    protected open val unionTypesUnnamed = mutableListOf<Unnamed<StructDefinition>>()
+    protected open val types = mutableListOf<Unnamed<StructDefinition>>()
 
     @Suppress("INAPPLICABLE_JVM_NAME")
     @JvmName("unaryPlusUnnamedStructDefinition")
     override operator fun Unnamed<StructDefinition>.unaryPlus() {
-        unionTypesUnnamed += this
+        types += this
     }
 
     override fun build(): UnionDefinition {
-        val asNamespace = this.namespace.value + this.name
+        val canonicalName = CanonicalName(this.namespace, this.name)
         return UnionDefinition(
-            name = this.name,
-            namespace = this.namespace.value,
+            canonicalName = canonicalName,
             description = this.description,
             metadata = this.metadata.toList(),
-            unionDiscriminator = this.discriminator,
-            unionTypes = this.unionTypesUnnamed.mapIndexed { i, it ->
-                it.get(asNamespace, name = "type$i")
+            discriminator = this.discriminator,
+            types = this.types.mapIndexed { i, it ->
+                it.get(canonicalName, name = "type$i")
             },
         )
     }
@@ -80,7 +70,7 @@ fun union(
     return Unnamed { namespace, name ->
         UnionDefinitionBuilder()
             .also { it.name = name ?: return@also }
-            .also { it.namespace *= namespace }
+            .also { it.namespace = namespace }
             .apply(block)
             .build()
     }

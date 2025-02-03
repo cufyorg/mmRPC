@@ -24,121 +24,97 @@ import kotlin.jvm.JvmName
 @Serializable
 @SerialName("routine")
 data class RoutineDefinition(
-    override val name: String = ANONYMOUS_NAME,
-    override val namespace: Namespace = Namespace.Toplevel,
+    override val canonicalName: CanonicalName,
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
-    @SerialName("routine_endpoints")
-    val routineEndpoints: List<EndpointDefinition> = emptyList(),
-    @SerialName("routine_fault_union")
-    val routineFaultUnion: List<FaultDefinition> = emptyList(),
-    @SerialName("routine_input")
-    val routineInput: StructDefinition = StructDefinition.Empty,
-    @SerialName("routine_output")
-    val routineOutput: StructDefinition = StructDefinition.Empty,
-    /**
-     * How to calculate the event key.
-     *
-     * The key is calculated by taking the `md5` hash of
-     * the result of concatenating the string representation
-     * of each value in the key tuple with `;` as the separator.
-     *
-     * This is considered a suggestion and implementations can
-     * use other means for calculating the key other that
-     * the specified.
-     */
-    @SerialName("routine_key")
-    val routineKey: List<String> = emptyList(),
-) : ElementDefinition() {
-    companion object {
-        const val ANONYMOUS_NAME = "(anonymous<routine>)"
-    }
 
+    val comm: List<Comm> = emptyList(),
+    val faults: List<FaultDefinition> = emptyList(),
+    val input: StructDefinition,
+    val output: StructDefinition,
+) : ElementDefinition() {
     override fun collectChildren() = sequence {
         yieldAll(metadata.asSequence().flatMap { it.collect() })
-        yieldAll(routineEndpoints.asSequence().flatMap { it.collect() })
-        yieldAll(routineFaultUnion.asSequence().flatMap { it.collect() })
-        yieldAll(routineInput.collect())
-        yieldAll(routineOutput.collect())
+        yieldAll(faults.asSequence().flatMap { it.collect() })
+        yieldAll(input.collect())
+        yieldAll(output.collect())
     }
 }
 
 open class RoutineDefinitionBuilder :
-    EndpointDefinitionSetDomainContainer,
-    FaultDefinitionSetDomainContainer,
     ElementDefinitionBuilder() {
-    override var name = RoutineDefinition.ANONYMOUS_NAME
+    open val comm = mutableListOf<Comm>()
+    protected open val faults = mutableListOf<Unnamed<FaultDefinition>>()
+    protected open val input = mutableListOf<StructDefinitionBuilder.() -> Unit>()
+    protected open val output = mutableListOf<StructDefinitionBuilder.() -> Unit>()
 
-    open val key = mutableListOf<String>()
+////////////////////////////////////////
 
-    protected open val routineEndpointsUnnamed = mutableListOf<Unnamed<EndpointDefinition>>()
-    protected open val routineFaultUnionUnnamed = mutableListOf<Unnamed<FaultDefinition>>()
+    operator fun Comm.unaryPlus() {
+        comm += this
+    }
 
-    protected open val routineInputBlocks = mutableListOf<StructDefinitionBuilder.() -> Unit>()
-    protected open val routineOutputBlocks = mutableListOf<StructDefinitionBuilder.() -> Unit>()
+////////////////////////////////////////
 
     @Suppress("INAPPLICABLE_JVM_NAME")
-    @JvmName("unaryPlusUnnamedEndpointDefinition")
-    override operator fun Unnamed<EndpointDefinition>.unaryPlus() {
-        routineEndpointsUnnamed += this
+    operator fun Unnamed<FaultDefinition>.unaryPlus() {
+        faults += this
     }
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
-    @JvmName("unaryPlusUnnamedFaultDefinition")
-    override operator fun Unnamed<FaultDefinition>.unaryPlus() {
-        routineFaultUnionUnnamed += this
+    @JvmName("unaryPlusIterableUnnamedFaultDefinition")
+    operator fun Iterable<Unnamed<FaultDefinition>>.unaryPlus() {
+        for (it in this) +it
     }
 
-    @Marker0
-    open fun key(vararg n: String) {
-        key += n
+    @JvmName("unaryPlusFaultDefinition")
+    operator fun FaultDefinition.unaryPlus() {
+        +Unnamed(this)
     }
+
+    @JvmName("unaryPlusIterableFaultDefinition")
+    operator fun Iterable<FaultDefinition>.unaryPlus() {
+        for (it in this) +Unnamed(it)
+    }
+
+////////////////////////////////////////
 
     @Marker0
     open fun input(block: StructDefinitionBuilder.() -> Unit) {
-        routineInputBlocks += block
+        input += block
     }
 
     @Marker0
     open fun output(block: StructDefinitionBuilder.() -> Unit) {
-        routineOutputBlocks += block
+        output += block
     }
 
+////////////////////////////////////////
+
     override fun build(): RoutineDefinition {
-        val asNamespace = this.namespace.value + this.name
+        val canonicalName = CanonicalName(this.namespace, this.name)
         return RoutineDefinition(
-            name = this.name,
-            namespace = this.namespace.value,
+            canonicalName = canonicalName,
             description = this.description,
             metadata = this.metadata.toList(),
-            routineEndpoints = this.routineEndpointsUnnamed.mapIndexed { i, it ->
-                it.get(asNamespace, name = "endpoint$i")
+            comm = this.comm.toList(),
+            faults = this.faults.mapIndexed { i, it ->
+                it.get(canonicalName, name = "fault$i")
             },
-            routineFaultUnion = this.routineFaultUnionUnnamed.mapIndexed { i, it ->
-                it.get(asNamespace, name = "fault$i")
-            },
-            routineInput = this.routineInputBlocks.let { blocks ->
+            input = this.input.let { blocks ->
                 StructDefinitionBuilder()
                     .also { it.name = "Input" }
-                    .also { it.namespace *= asNamespace }
+                    .also { it.namespace = canonicalName }
                     .apply { for (it in blocks) it() }
                     .build()
             },
-            routineOutput = this.routineOutputBlocks.let { blocks ->
+            output = this.output.let { blocks ->
                 StructDefinitionBuilder()
                     .also { it.name = "Output" }
-                    .also { it.namespace *= asNamespace }
+                    .also { it.namespace = canonicalName }
                     .apply { for (it in blocks) it() }
                     .build()
             },
-            routineKey = this.key.toList(),
-        ).also { built ->
-            for (k in built.routineKey) {
-                if (built.routineInput.structFields.none { it.name == k }) {
-                    error("Routine key item is not in defined input fields: $k")
-                }
-            }
-        }
+        )
     }
 }
 

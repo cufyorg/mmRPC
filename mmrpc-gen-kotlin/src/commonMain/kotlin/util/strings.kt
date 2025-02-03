@@ -1,9 +1,5 @@
 package org.cufy.mmrpc.gen.kotlin.util
 
-internal fun String.furtherEscape(): String {
-    return replace(":", "_")
-}
-
 internal fun xth(position: Int): String {
     return when (position + 1) {
         1 -> "first"

@@ -6,24 +6,23 @@ import org.cufy.mmrpc.CanonicalName
 import org.cufy.mmrpc.ElementDefinition
 import org.cufy.mmrpc.ScalarDefinition
 
+@Suppress("PropertyName")
 @Serializable
 @SerialName("scalar")
 data class CompactScalarDefinition(
-    @SerialName("canonical_name")
-    override val canonicalName: CanonicalName,
+    override val canonical_name: CanonicalName,
     override val description: String = "",
     override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
-    @SerialName("scalar_type.ref")
-    val scalarType: CanonicalName? = null,
+
+    val type_ref: CanonicalName? = null,
 ) : CompactElementDefinition
 
 fun ScalarDefinition.toCompact(strip: Boolean = false): CompactScalarDefinition {
     return CompactScalarDefinition(
-        canonicalName = this.canonicalName,
+        canonical_name = this.canonicalName,
         description = if (strip) "" else this.description,
-        metadata = this.metadata
-            .map { it.toCompact(strip) },
-        scalarType = this.scalarType?.canonicalName,
+        metadata = this.metadata.map { it.toCompact(strip) },
+        type_ref = this.type?.canonicalName,
     )
 }
 
@@ -32,16 +31,15 @@ fun CompactScalarDefinition.inflate(
 ): () -> ScalarDefinition? {
     return it@{
         ScalarDefinition(
-            name = this.name,
-            namespace = this.namespace,
+            canonicalName = this.canonical_name,
             description = this.description,
             metadata = this.metadata.map {
                 it.inflate(onLookup)() ?: return@it null
             },
-            scalarType = this.scalarType?.let {
+            type = this.type_ref?.let {
                 val item = onLookup(it) ?: return@it null
                 require(item is ScalarDefinition) {
-                    "scalar_type.ref must point to a ScalarDefinition"
+                    "<scalar>.type_ref must point to a ScalarDefinition"
                 }
                 item
             }

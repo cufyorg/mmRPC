@@ -5,9 +5,12 @@ import io.ktor.server.application.*
 import io.ktor.server.response.*
 import org.cufy.json.JsonObject
 import org.cufy.json.set
-import org.cufy.mmrpc.*
+import org.cufy.mmrpc.CanonicalName
+import org.cufy.mmrpc.FaultException
+import org.cufy.mmrpc.FaultObject
+import org.cufy.mmrpc.RoutineObject
 
-suspend inline fun <reified O : StructObject> ApplicationCall.respond(
+suspend inline fun <reified O : Any> ApplicationCall.respond(
     routine: RoutineObject<*, O>,
     output: O,
     status: HttpStatusCode = HttpStatusCode.OK,
@@ -16,40 +19,37 @@ suspend inline fun <reified O : StructObject> ApplicationCall.respond(
 }
 
 suspend inline fun ApplicationCall.respond(
+    routine: RoutineObject<*, *>,
     fault: FaultException,
     message: String? = fault.message,
     status: HttpStatusCode = HttpStatusCode.BadRequest,
 ) {
-    val json = JsonObject {
+    respond(status, JsonObject {
         this["type"] = fault.canonicalName.value
         this["message"] = message
-    }
-
-    respond(status, json)
+    })
 }
 
 suspend inline fun ApplicationCall.respond(
+    routine: RoutineObject<*, *>,
     fault: FaultObject,
     message: String? = null,
     status: HttpStatusCode = HttpStatusCode.BadRequest,
 ) {
-    val json = JsonObject {
-        this["type"] = fault.__info__.canonicalName.value
+    respond(status, JsonObject {
+        this["type"] = fault.canonicalName.value
         this["message"] = message
-    }
-
-    respond(status, json)
+    })
 }
 
 suspend inline fun ApplicationCall.respond(
-    fault: FaultInfo,
+    routine: RoutineObject<*, *>,
+    fault: CanonicalName,
     message: String? = null,
     status: HttpStatusCode = HttpStatusCode.BadRequest,
 ) {
-    val json = JsonObject {
-        this["type"] = fault.canonicalName.value
+    respond(status, JsonObject {
+        this["type"] = fault.value
         this["message"] = message
-    }
-
-    respond(status, json)
+    })
 }

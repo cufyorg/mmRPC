@@ -7,24 +7,23 @@ import org.cufy.mmrpc.ElementDefinition
 import org.cufy.mmrpc.OptionalDefinition
 import org.cufy.mmrpc.TypeDefinition
 
+@Suppress("PropertyName")
 @Serializable
 @SerialName("optional")
 data class CompactOptionalDefinition(
-    @SerialName("canonical_name")
-    override val canonicalName: CanonicalName,
+    override val canonical_name: CanonicalName,
     override val description: String = "",
     override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
-    @SerialName("optional_type.ref")
-    val optionalType: CanonicalName,
+
+    val type_ref: CanonicalName,
 ) : CompactElementDefinition
 
 fun OptionalDefinition.toCompact(strip: Boolean = false): CompactOptionalDefinition {
     return CompactOptionalDefinition(
-        canonicalName = this.canonicalName,
+        canonical_name = this.canonicalName,
         description = if (strip) "" else this.description,
-        metadata = this.metadata
-            .map { it.toCompact(strip) },
-        optionalType = this.optionalType.canonicalName,
+        metadata = this.metadata.map { it.toCompact(strip) },
+        type_ref = this.type.canonicalName,
     )
 }
 
@@ -33,16 +32,15 @@ fun CompactOptionalDefinition.inflate(
 ): () -> OptionalDefinition? {
     return it@{
         OptionalDefinition(
-            name = this.name,
-            namespace = this.namespace,
+            canonicalName = this.canonical_name,
             description = this.description,
             metadata = this.metadata.map {
                 it.inflate(onLookup)() ?: return@it null
             },
-            optionalType = this.optionalType.let {
+            type = this.type_ref.let {
                 val item = onLookup(it) ?: return@it null
                 require(item is TypeDefinition) {
-                    "optional_type.ref must point to a TypeDefinition"
+                    "<optional>.type_ref must point to a TypeDefinition"
                 }
                 item
             }

@@ -7,25 +7,23 @@ import org.cufy.mmrpc.ElementDefinition
 import org.cufy.mmrpc.FieldDefinition
 import org.cufy.mmrpc.MetadataDefinition
 
+@Suppress("PropertyName")
 @Serializable
 @SerialName("metadata")
 data class CompactMetadataDefinition(
-    @SerialName("canonical_name")
-    override val canonicalName: CanonicalName,
+    override val canonical_name: CanonicalName,
     override val description: String = "",
     override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
-    @SerialName("metadata_fields.ref")
-    val metadataFields: List<CanonicalName> = emptyList(),
+
+    val fields_ref: List<CanonicalName> = emptyList(),
 ) : CompactElementDefinition
 
 fun MetadataDefinition.toCompact(strip: Boolean = false): CompactMetadataDefinition {
     return CompactMetadataDefinition(
-        canonicalName = this.canonicalName,
+        canonical_name = this.canonicalName,
         description = if (strip) "" else this.description,
-        metadata = this.metadata
-            .map { it.toCompact(strip) },
-        metadataFields = this.metadataFields
-            .map { it.canonicalName }
+        metadata = this.metadata.map { it.toCompact(strip) },
+        fields_ref = this.fields.map { it.canonicalName }
     )
 }
 
@@ -34,16 +32,15 @@ fun CompactMetadataDefinition.inflate(
 ): () -> MetadataDefinition? {
     return it@{
         MetadataDefinition(
-            name = this.name,
-            namespace = this.namespace,
+            canonicalName = this.canonical_name,
             description = this.description,
             metadata = this.metadata.map {
                 it.inflate(onLookup)() ?: return@it null
             },
-            metadataFields = this.metadataFields.map {
+            fields = this.fields_ref.map {
                 val item = onLookup(it) ?: return@it null
                 require(item is FieldDefinition) {
-                    "metadata_fields.ref must point to a FieldDefinition"
+                    "<metadata>.fields_ref must point to a FieldDefinition"
                 }
                 item
             },

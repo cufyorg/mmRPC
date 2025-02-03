@@ -23,37 +23,29 @@ import kotlinx.serialization.Serializable
 @Serializable
 @SerialName("optional")
 data class OptionalDefinition(
-    override val name: String = ANONYMOUS_NAME,
-    override val namespace: Namespace = Namespace.Toplevel,
+    override val canonicalName: CanonicalName,
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
-    @SerialName("optional_type")
-    val optionalType: TypeDefinition,
-) : TypeDefinition() {
-    companion object {
-        const val ANONYMOUS_NAME = "(anonymous?)"
-    }
 
+    val type: TypeDefinition,
+) : TypeDefinition() {
     override fun collectChildren() = sequence {
         yieldAll(metadata.asSequence().flatMap { it.collect() })
-        yieldAll(optionalType.collect())
+        yieldAll(type.collect())
     }
 }
 
 open class OptionalDefinitionBuilder :
     ElementDefinitionBuilder() {
-    override var name = OptionalDefinition.ANONYMOUS_NAME
-
     open val type = DomainProperty<TypeDefinition>()
 
     override fun build(): OptionalDefinition {
-        val asNamespace = this.namespace.value + this.name
+        val canonicalName = CanonicalName(this.namespace, this.name)
         return OptionalDefinition(
-            name = this.name,
-            namespace = this.namespace.value,
+            canonicalName = canonicalName,
             description = this.description,
             metadata = this.metadata.toList(),
-            optionalType = this.type.value.get(asNamespace, name = "type"),
+            type = this.type.value.get(canonicalName, name = "type"),
         )
     }
 }
@@ -65,7 +57,7 @@ internal fun optional(
     return Unnamed { namespace, name ->
         OptionalDefinitionBuilder()
             .also { it.name = name ?: return@also }
-            .also { it.namespace *= namespace }
+            .also { it.namespace = namespace }
             .apply(block)
             .build()
     }

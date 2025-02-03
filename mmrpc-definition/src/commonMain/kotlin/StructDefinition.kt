@@ -24,46 +24,41 @@ import kotlin.jvm.JvmName
 @Serializable
 @SerialName("struct")
 data class StructDefinition(
-    override val name: String = ANONYMOUS_NAME,
-    override val namespace: Namespace = Namespace.Toplevel,
+    override val canonicalName: CanonicalName,
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
-    @SerialName("struct_fields")
-    val structFields: List<FieldDefinition> = emptyList(),
-) : TypeDefinition() {
-    companion object {
-        const val ANONYMOUS_NAME = "(anonymous{})"
-        val Empty = StructDefinition()
-    }
 
+    val fields: List<FieldDefinition> = emptyList(),
+) : TypeDefinition() {
     override fun collectChildren() = sequence {
         yieldAll(metadata.asSequence().flatMap { it.collect() })
-        yieldAll(structFields.asSequence().flatMap { it.collect() })
+        yieldAll(fields.asSequence().flatMap { it.collect() })
     }
 }
 
 open class StructDefinitionBuilder :
     FieldDefinitionSetDomainContainer,
     ElementDefinitionBuilder() {
-    override var name = StructDefinition.ANONYMOUS_NAME
+    protected open var fields = mutableListOf<Unnamed<FieldDefinition>>()
 
-    protected open var structFieldsUnnamed = mutableListOf<Unnamed<FieldDefinition>>()
+////////////////////////////////////////
 
     @Suppress("INAPPLICABLE_JVM_NAME")
     @JvmName("unaryPlusUnnamedFieldDefinition")
     override operator fun Unnamed<FieldDefinition>.unaryPlus() {
-        structFieldsUnnamed += this
+        fields += this
     }
 
+////////////////////////////////////////
+
     override fun build(): StructDefinition {
-        val asNamespace = this.namespace.value + this.name
+        val canonicalName = CanonicalName(this.namespace, this.name)
         return StructDefinition(
-            name = this.name,
-            namespace = this.namespace.value,
+            canonicalName = canonicalName,
             description = this.description,
             metadata = this.metadata.toList(),
-            structFields = this.structFieldsUnnamed.mapIndexed { i, it ->
-                it.get(asNamespace, name = "field$i")
+            fields = this.fields.mapIndexed { i, it ->
+                it.get(canonicalName, name = "field$i")
             },
         )
     }
@@ -76,7 +71,7 @@ fun struct(
     return Unnamed { namespace, name ->
         StructDefinitionBuilder()
             .also { it.name = name ?: return@also }
-            .also { it.namespace *= namespace }
+            .also { it.namespace = namespace }
             .apply(block)
             .build()
     }

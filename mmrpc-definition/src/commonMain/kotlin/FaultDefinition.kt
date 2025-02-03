@@ -23,15 +23,10 @@ import kotlinx.serialization.Serializable
 @Serializable
 @SerialName("fault")
 data class FaultDefinition(
-    override val name: String = ANONYMOUS_NAME,
-    override val namespace: Namespace = Namespace.Toplevel,
+    override val canonicalName: CanonicalName,
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
 ) : ElementDefinition() {
-    companion object {
-        const val ANONYMOUS_NAME = "(anonymous<fault>)"
-    }
-
     override fun collectChildren() = sequence {
         yieldAll(metadata.asSequence().flatMap { it.collect() })
     }
@@ -39,12 +34,10 @@ data class FaultDefinition(
 
 open class FaultDefinitionBuilder :
     ElementDefinitionBuilder() {
-    override var name = FaultDefinition.ANONYMOUS_NAME
-
     override fun build(): FaultDefinition {
+        val canonicalName = CanonicalName(this.namespace, this.name)
         return FaultDefinition(
-            name = this.name,
-            namespace = this.namespace.value,
+            canonicalName = canonicalName,
             description = this.description,
             metadata = this.metadata.toList(),
         )
@@ -58,7 +51,7 @@ fun fault(
     return Unnamed { namespace, name ->
         FaultDefinitionBuilder()
             .also { it.name = name ?: return@also }
-            .also { it.namespace *= namespace }
+            .also { it.namespace = namespace }
             .apply(block)
             .build()
     }

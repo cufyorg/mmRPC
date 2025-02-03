@@ -9,9 +9,9 @@ plugins {
 
 gradlePlugin {
     plugins {
-        create("MMRPCPlugin") {
+        create("MmrpcPlugin") {
             id = "org.cufy.mmrpc"
-            implementationClass = "org.cufy.mmrpc.gradle.MMRPCPlugin"
+            implementationClass = "org.cufy.mmrpc.gradle.MmrpcPlugin"
             displayName = "Code generators for mmRPC schema files"
             description = "Code generators for mmRPC schema files"
             // tags.set(listOf("kotlin"))
@@ -20,7 +20,7 @@ gradlePlugin {
 }
 
 dependencies {
-    implementation(project(":mmrpc-core"))
+    implementation(project(":mmrpc-runtime"))
     implementation(project(":mmrpc-definition"))
     implementation(project(":mmrpc-gen-kotlin"))
 

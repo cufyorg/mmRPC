@@ -1,24 +1,22 @@
 package org.cufy.mmrpc.compact
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.cufy.mmrpc.CanonicalName
 import org.cufy.mmrpc.ElementDefinition
 import org.cufy.mmrpc.MetadataDefinition
 import org.cufy.mmrpc.MetadataDefinitionUsage
 
+@Suppress("PropertyName")
 @Serializable
 data class CompactMetadataDefinitionUsage(
-    @SerialName("definition.ref")
-    val definition: CanonicalName,
+    val definition_ref: CanonicalName,
     val fields: List<CompactFieldDefinitionUsage>,
 )
 
 fun MetadataDefinitionUsage.toCompact(strip: Boolean = false): CompactMetadataDefinitionUsage {
     return CompactMetadataDefinitionUsage(
-        definition = this.definition.canonicalName,
-        fields = this.fields
-            .map { it.toCompact(strip) }
+        definition_ref = this.definition.canonicalName,
+        fields = this.fields.map { it.toCompact(strip) }
     )
 }
 
@@ -27,10 +25,10 @@ fun CompactMetadataDefinitionUsage.inflate(
 ): () -> MetadataDefinitionUsage? {
     return it@{
         MetadataDefinitionUsage(
-            definition = this.definition.let {
+            definition = this.definition_ref.let {
                 val item = onLookup(it) ?: return@it null
                 require(item is MetadataDefinition) {
-                    "definition.ref must point to a  MetadataDefinition"
+                    "<metadata-usage>.definition_ref must point to a MetadataDefinition"
                 }
                 item
             },

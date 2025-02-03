@@ -22,45 +22,37 @@ import kotlin.jvm.JvmName
 @Serializable
 @SerialName("metadata")
 data class MetadataDefinition(
-    override val name: String = ANONYMOUS_NAME,
-    override val namespace: Namespace = Namespace.Toplevel,
+    override val canonicalName: CanonicalName,
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
-    @SerialName("metadata_fields")
-    val metadataFields: List<FieldDefinition> = emptyList(),
-) : ElementDefinition() {
-    companion object {
-        const val ANONYMOUS_NAME = "(anonymous@)"
-    }
 
+    val fields: List<FieldDefinition> = emptyList(),
+) : ElementDefinition() {
     override fun collectChildren() = sequence {
         yieldAll(metadata.asSequence().flatMap { it.collect() })
-        yieldAll(metadataFields.asSequence().flatMap { it.collect() })
+        yieldAll(fields.asSequence().flatMap { it.collect() })
     }
 }
 
 open class MetadataDefinitionBuilder :
     FieldDefinitionSetDomainContainer,
     ElementDefinitionBuilder() {
-    override var name = MetadataDefinition.ANONYMOUS_NAME
-
-    protected open var metadataFieldsUnnamed = mutableListOf<Unnamed<FieldDefinition>>()
+    protected open var fields = mutableListOf<Unnamed<FieldDefinition>>()
 
     @Suppress("INAPPLICABLE_JVM_NAME")
     @JvmName("unaryPlusUnnamedFieldDefinition")
     override operator fun Unnamed<FieldDefinition>.unaryPlus() {
-        metadataFieldsUnnamed += this
+        fields += this
     }
 
     override fun build(): MetadataDefinition {
-        val asNamespace = this.namespace.value + this.name
+        val canonicalName = CanonicalName(this.namespace, this.name)
         return MetadataDefinition(
-            name = this.name,
-            namespace = this.namespace.value,
+            canonicalName = canonicalName,
             description = this.description,
             metadata = this.metadata.toList(),
-            metadataFields = this.metadataFieldsUnnamed.mapIndexed { i, it ->
-                it.get(asNamespace, name = "field$i")
+            fields = this.fields.mapIndexed { i, it ->
+                it.get(canonicalName, name = "field$i")
             },
         )
     }
@@ -73,7 +65,7 @@ fun metadata(
     return Unnamed { namespace, name ->
         MetadataDefinitionBuilder()
             .also { it.name = name ?: return@also }
-            .also { it.namespace *= namespace }
+            .also { it.namespace = namespace }
             .apply(block)
             .build()
     }

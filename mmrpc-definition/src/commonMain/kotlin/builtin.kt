@@ -50,17 +50,7 @@ object builtin : NamespaceObject() {
     object prop : NamespaceObject(this)
 
     /**
-     * Namespace to be used for defining builtin hydration props.
-     */
-    object hydration : NamespaceObject(this)
-
-    /**
      * Namespace to be used for defining builtin serialization objects.
      */
     object serial : NamespaceObject(this)
-
-    /**
-     * Namespace to be used for defining builtin tokens.
-     */
-    object token : NamespaceObject(this)
 }

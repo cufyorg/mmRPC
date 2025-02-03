@@ -1,21 +1,18 @@
 package org.cufy.mmrpc.compact
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.cufy.mmrpc.*
 
+@Suppress("PropertyName")
 @Serializable
 sealed interface CompactElementDefinition {
-    @SerialName("canonical_name")
-    val canonicalName: CanonicalName
+    val canonical_name: CanonicalName
 
     val description: String
     val metadata: List<CompactMetadataDefinitionUsage>
 
-    val name get() = canonicalName.name
-    val namespace get() = canonicalName.namespace
-
-    val isAnonymous get() = namespace.isAnonymous || Namespace.isAnonymousSegment(name)
+    val name get() = canonical_name.name
+    val namespace get() = canonical_name.namespace
 }
 
 fun ElementDefinition.toCompact(strip: Boolean = false): CompactElementDefinition {
@@ -25,11 +22,7 @@ fun ElementDefinition.toCompact(strip: Boolean = false): CompactElementDefinitio
         is EnumDefinition -> toCompact(strip)
         is FaultDefinition -> toCompact(strip)
         is FieldDefinition -> toCompact(strip)
-        is HttpEndpointDefinition -> toCompact(strip)
-        is IframeEndpointDefinition -> toCompact(strip)
         is InterDefinition -> toCompact(strip)
-        is KafkaEndpointDefinition -> toCompact(strip)
-        is KafkaPublicationEndpointDefinition -> toCompact(strip)
         is MetadataDefinition -> toCompact(strip)
         is OptionalDefinition -> toCompact(strip)
         is ProtocolDefinition -> toCompact(strip)
@@ -50,11 +43,7 @@ fun CompactElementDefinition.inflate(
         is CompactEnumDefinition -> inflate(onLookup)
         is CompactFaultDefinition -> inflate(onLookup)
         is CompactFieldDefinition -> inflate(onLookup)
-        is CompactHttpEndpointDefinition -> inflate(onLookup)
-        is CompactIframeEndpointDefinition -> inflate(onLookup)
         is CompactInterDefinition -> inflate(onLookup)
-        is CompactKafkaEndpointDefinition -> inflate(onLookup)
-        is CompactKafkaPublicationEndpointDefinition -> inflate(onLookup)
         is CompactMetadataDefinition -> inflate(onLookup)
         is CompactOptionalDefinition -> inflate(onLookup)
         is CompactProtocolDefinition -> inflate(onLookup)

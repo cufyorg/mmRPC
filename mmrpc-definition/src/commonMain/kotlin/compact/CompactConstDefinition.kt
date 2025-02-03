@@ -4,27 +4,25 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.cufy.mmrpc.*
 
+@Suppress("PropertyName")
 @Serializable
 @SerialName("const")
 data class CompactConstDefinition(
-    @SerialName("canonical_name")
-    override val canonicalName: CanonicalName,
+    override val canonical_name: CanonicalName,
     override val description: String = "",
     override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
-    @SerialName("const_type.ref")
-    val constType: CanonicalName,
-    @SerialName("const_value")
-    val constValue: Literal,
+
+    val type_ref: CanonicalName,
+    val value: Literal,
 ) : CompactElementDefinition
 
 fun ConstDefinition.toCompact(strip: Boolean = false): CompactConstDefinition {
     return CompactConstDefinition(
-        canonicalName = this.canonicalName,
+        canonical_name = this.canonicalName,
         description = if (strip) "" else this.description,
-        metadata = this.metadata
-            .map { it.toCompact(strip) },
-        constType = this.constType.canonicalName,
-        constValue = this.constValue,
+        metadata = this.metadata.map { it.toCompact(strip) },
+        type_ref = this.type.canonicalName,
+        value = this.value,
     )
 }
 
@@ -33,20 +31,19 @@ fun CompactConstDefinition.inflate(
 ): () -> ConstDefinition? {
     return it@{
         ConstDefinition(
-            name = this.name,
-            namespace = this.namespace,
+            canonicalName = this.canonical_name,
             description = this.description,
             metadata = this.metadata.map {
                 it.inflate(onLookup)() ?: return@it null
             },
-            constType = this.constType.let {
+            type = this.type_ref.let {
                 val item = onLookup(it) ?: return@it null
                 require(item is TypeDefinition) {
-                    "const_type.ref must point to a TypeDefinition"
+                    "<const>.type_ref must point to a TypeDefinition"
                 }
                 item
             },
-            constValue = this.constValue,
+            value = this.value,
         )
     }
 }

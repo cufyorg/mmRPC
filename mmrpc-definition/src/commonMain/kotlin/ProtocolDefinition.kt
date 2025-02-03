@@ -24,45 +24,64 @@ import kotlin.jvm.JvmName
 @Serializable
 @SerialName("protocol")
 data class ProtocolDefinition(
-    override val name: String = ANONYMOUS_NAME,
-    override val namespace: Namespace = Namespace.Toplevel,
+    override val canonicalName: CanonicalName,
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
-    @SerialName("protocol_routines")
-    val protocolRoutines: List<RoutineDefinition> = emptyList(),
-) : ElementDefinition() {
-    companion object {
-        const val ANONYMOUS_NAME = "(anonymous<protocol>)"
-    }
 
+    val routines: List<RoutineDefinition> = emptyList(),
+) : ElementDefinition() {
     override fun collectChildren() = sequence {
         yieldAll(metadata.asSequence().flatMap { it.collect() })
-        yieldAll(protocolRoutines.asSequence().flatMap { it.collect() })
+        yieldAll(routines.asSequence().flatMap { it.collect() })
     }
 }
 
 open class ProtocolDefinitionBuilder :
-    RoutineDefinitionSetDomainContainer,
     ElementDefinitionBuilder() {
-    override var name = ProtocolDefinition.ANONYMOUS_NAME
+    protected open val routines = mutableListOf<Unnamed<RoutineDefinition>>()
 
-    protected open val protocolRoutinesUnnamed = mutableListOf<Unnamed<RoutineDefinition>>()
+////////////////////////////////////////
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
     @JvmName("unaryPlusUnnamedRoutineDefinition")
-    override operator fun Unnamed<RoutineDefinition>.unaryPlus() {
-        protocolRoutinesUnnamed += this
+    operator fun Unnamed<RoutineDefinition>.unaryPlus() {
+        routines += this
     }
 
+    @JvmName("unaryPlusIterableUnnamedRoutineDefinition")
+    operator fun Iterable<Unnamed<RoutineDefinition>>.unaryPlus() {
+        for (it in this) +it
+    }
+
+    @JvmName("unaryPlusRoutineDefinition")
+    operator fun RoutineDefinition.unaryPlus() {
+        +Unnamed(this)
+    }
+
+    @JvmName("unaryPlusIterableRoutineDefinition")
+    operator fun Iterable<RoutineDefinition>.unaryPlus() {
+        for (it in this) +Unnamed(it)
+    }
+
+    operator fun String.invoke(block: RoutineDefinitionBuilder.() -> Unit) {
+        +Unnamed { namespace, _ ->
+            RoutineDefinitionBuilder()
+                .also { it.name = this }
+                .also { it.namespace = namespace }
+                .apply(block)
+                .build()
+        }
+    }
+
+////////////////////////////////////////
+
     override fun build(): ProtocolDefinition {
-        val asNamespace = this.namespace.value + this.name
+        val canonicalName = CanonicalName(this.namespace, this.name)
         return ProtocolDefinition(
-            namespace = this.namespace.value,
-            name = this.name,
+            canonicalName = canonicalName,
             description = this.description,
             metadata = this.metadata.toList(),
-            protocolRoutines = this.protocolRoutinesUnnamed.mapIndexed { i, it ->
-                it.get(asNamespace, name = "routine$i")
+            routines = this.routines.mapIndexed { i, it ->
+                it.get(canonicalName, name = "routine$i")
             }
         )
     }
@@ -75,7 +94,7 @@ fun protocol(
     return Unnamed { namespace, name ->
         ProtocolDefinitionBuilder()
             .also { it.name = name ?: return@also }
-            .also { it.namespace *= namespace }
+            .also { it.namespace = namespace }
             .apply(block)
             .build()
     }

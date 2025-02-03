@@ -3,9 +3,8 @@ package org.cufy.mmrpc.server
 import org.cufy.kaftor.KafkaEvent
 import org.cufy.kaftor.commit
 import org.cufy.mmrpc.RoutineObject
-import org.cufy.mmrpc.StructObject
 
-suspend inline fun <reified O : StructObject> KafkaEvent.commit(
+suspend inline fun <reified O : Any> KafkaEvent.commit(
     routine: RoutineObject<*, O>,
     output: O,
 ) {
