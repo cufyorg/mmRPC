@@ -9,6 +9,14 @@ import kotlin.jvm.JvmInline
 @JvmInline
 @Serializable
 value class CompactSpecSheet(val elements: Set<CompactElementDefinition> = emptySet()) {
+    companion object {
+        fun Iterable<CompactElementDefinition>.toCompactSpecSheet() = CompactSpecSheet(this)
+        fun Sequence<CompactElementDefinition>.toCompactSpecSheet() = CompactSpecSheet(asIterable())
+    }
+
+    constructor(vararg elements: CompactElementDefinition) : this(elements.toSet())
+    constructor(elements: Iterable<CompactElementDefinition>) : this(elements.toSet())
+
     operator fun plus(element: CompactElementDefinition) =
         CompactSpecSheet(this.elements + element)
 

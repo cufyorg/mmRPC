@@ -26,6 +26,9 @@ import kotlinx.serialization.encoding.Encoder
 @Serializable(SpecSheet.Serializer::class)
 class SpecSheet {
     companion object {
+        fun Iterable<ElementDefinition>.toSpecSheet() = SpecSheet(this)
+        fun Sequence<ElementDefinition>.toSpecSheet() = SpecSheet(asIterable())
+
         internal fun create0(elements: Set<ElementDefinition>): SpecSheet {
             return SpecSheet().also { it.elements = elements }
         }
