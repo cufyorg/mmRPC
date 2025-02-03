@@ -6,27 +6,43 @@ with the `auth-scheme` being the literal `Sig` and the value being
 a JWS signed by a trusted key of the entity.
 
 The means for obtaining or verifying the key used for signing
-the jwt is out of the scope of this specification.
+the JWT is out of the scope of this specification.
 
-- `topic` claim:
+#### Inclusion of `typ` header:
 
-The jwt should include the claim `topic` which should be the
-topic the jwt was dispatched to.
+The JWT **MAY** include the header `type` which is expected
+to have one of: `jwt`, `application/jwt`, `sig+jwt` and `application/sig+jwt`
 
-- `iss` claim:
+#### Inclusion of `topic` claim:
 
-The jwt should include the claim `iss` which should be the
+The JWT **MAY** include the claim `topic` which **SHOULD** be the
+topic the JWT was dispatched to.
+
+#### Inclusion of `iss` claim:
+
+The JWT **SHOULD** include the claim `iss` which **SHOULD** be the
 id of the entity.
 
-- `aud` claim:
+#### Inclusion of `aud` claim:
 
-The jwt should include the claim `aud` which should include
+The JWT **MAY** include the claim `aud` which **SHOULD** include
 a previously agreed upon name or uri of the recipient. If no
-explicit recipient is targeted, this claim should be omitted.
+explicit recipient is targeted, this claim **SHOULD** be omitted.
 
-- `v_hash` claim:
+> It is up to the recipient to specify if `aud` is required or not.
 
-The JWT should include the claim `v_hash` with its value being
+#### Inclusion of other standard headers and claims:
+
+The JWT **MAY** include other standard headers and claims (e.g. `nbf` and `exp`)
+and the recipient **SHOULD** validate them.
+
+#### Inclusion of other non-standard headers and claims:
+
+The JWT **MAY** include other non-standard headers and claims.
+
+#### Inclusion of `v_hash` claim:
+
+The JWT **SHOULD** include the claim `v_hash` with its value being
 the base64url encoding of the left-most half of the hash of
 the octets of the ASCII representation of the event value,
 where the hash algorithm used is the hash algorithm used in
