@@ -50,23 +50,6 @@ class SpecSheet {
     var elements: Set<ElementDefinition> = emptySet()
         private set
 
-    /**
-     * A set of all the namespaces with direct elements.
-     *
-     * > Namespaces with no direct elements and namespaces
-     * > representing an element are excluded.
-     */
-    val namespaces by lazy {
-        val excludes = elements.asSequence()
-            .map { it.canonicalName }
-            .toSet()
-
-        elements.asSequence()
-            .map { it.namespace }
-            .minus(excludes)
-            .toSet()
-    }
-
     constructor()
 
     constructor(vararg elements: ElementDefinition) {
@@ -95,7 +78,7 @@ class SpecSheet {
         "SpecSheet(${this.elements.joinToString(", ")})"
 
     operator fun plus(element: ElementDefinition) =
-        if (element in this.elements) this else create0(this.elements + element)
+        SpecSheet(this.elements + element)
 
     operator fun plus(elements: Iterable<ElementDefinition>) =
         SpecSheet(this.elements + elements)
@@ -104,7 +87,7 @@ class SpecSheet {
         SpecSheet(this.elements + specSheet.elements)
 
     operator fun minus(element: ElementDefinition) =
-        if (element !in this.elements) this else create0(this.elements - element)
+        create0(this.elements - element)
 
     operator fun minus(elements: Iterable<ElementDefinition>) =
         @Suppress("ConvertArgumentToSet")
