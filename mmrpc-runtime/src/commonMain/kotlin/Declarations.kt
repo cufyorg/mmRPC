@@ -19,12 +19,12 @@ value class Comm(val value: String) {
         /**
          * Indicates that the communication can be performed over HTTP.
          */
-        val Http = Comm("http")
+        val Http = Comm("Http")
 
         /**
          * Indicates that the communication can be performed over the Kafka.
          */
-        val Kafka = Comm("kafka")
+        val Kafka = Comm("Kafka")
 
         /**
          * Indicates that message direction is client-to-server.
