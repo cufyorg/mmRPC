@@ -278,6 +278,7 @@ open class MmrpcKotlinGenerateSourcesTask : DefaultTask() {
         val elements = buildSet {
             if (GenFeature.NO_BUILTIN !in features.get()) {
                 this += builtin.Any
+                this += builtin.Void
                 this += builtin.NULL
                 this += builtin.String
                 this += builtin.Boolean
