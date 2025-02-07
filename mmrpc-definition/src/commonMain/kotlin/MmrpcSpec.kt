@@ -8,5 +8,5 @@ data class MmrpcSpec(
     val name: String,
     val version: String,
     val sections: List<CanonicalName>,
-    val elements: Set<CompactElementDefinition>,
+    val elements: List<CompactElementDefinition>,
 )
