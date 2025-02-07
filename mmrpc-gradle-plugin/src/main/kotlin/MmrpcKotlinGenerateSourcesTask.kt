@@ -276,23 +276,8 @@ open class MmrpcKotlinGenerateSourcesTask : DefaultTask() {
         }
 
         val elements = buildSet {
-            if (GenFeature.NO_BUILTIN !in features.get()) {
-                this += builtin.Any
-                this += builtin.Void
-                this += builtin.NULL
-                this += builtin.String
-                this += builtin.Boolean
-                this += builtin.TRUE
-                this += builtin.FALSE
-                this += builtin.Int32
-                this += builtin.UInt32
-                this += builtin.Int64
-                this += builtin.UInt64
-                this += builtin.Float32
-                this += builtin.Float64
-                this += builtin.Deprecated
-                this += builtin.Experimental
-            }
+            if (GenFeature.NO_BUILTIN !in features.get())
+                addAll(builtin.elements)
 
             addAll(specSheet.elements)
         }

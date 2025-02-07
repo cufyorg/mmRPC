@@ -40,6 +40,26 @@ object builtin : NamespaceObject() {
     val Experimental__message by prop(String)
     val Experimental by metadata(Experimental__message)
 
+    val elements = listOf(
+        Any,
+        Void,
+        NULL,
+        String,
+        Boolean,
+        TRUE,
+        FALSE,
+        Int32,
+        UInt32,
+        Int64,
+        UInt64,
+        Float32,
+        Float64,
+        Deprecated__message,
+        Deprecated,
+        Experimental__message,
+        Experimental,
+    )
+
     /**
      * Namespace to be used for defining builtin faults.
      */
