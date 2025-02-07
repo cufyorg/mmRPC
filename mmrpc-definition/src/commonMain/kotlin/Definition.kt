@@ -16,6 +16,7 @@
 package org.cufy.mmrpc
 
 import kotlinx.serialization.Serializable
+import org.cufy.mmrpc.builtin.elements
 
 @Serializable
 sealed class ElementDefinition {
@@ -26,6 +27,7 @@ sealed class ElementDefinition {
     val name by lazy { canonicalName.name }
     val namespace by lazy { canonicalName.namespace }
 
+    fun isBuiltin() = elements.any { it.canonicalName == canonicalName }
     fun collect() = sequenceOf(this) + collectChildren()
 
     abstract fun collectChildren(): Sequence<ElementDefinition>

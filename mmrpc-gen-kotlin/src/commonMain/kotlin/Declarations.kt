@@ -18,11 +18,6 @@ enum class GenFeature {
     DEBUG,
 
     /**
-     * Don't implicitly add builtin elements.
-     */
-    NO_BUILTIN,
-
-    /**
      * Generate field name constant properties.
      */
     GEN_FIELD_NAME_PROPERTIES,

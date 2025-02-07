@@ -7,7 +7,7 @@ import org.cufy.mmrpc.RoutineDefinition
 import org.cufy.mmrpc.gen.kotlin.GenRange
 
 fun collectIgnored(
-    elements: Set<ElementDefinition>,
+    elements: List<ElementDefinition>,
     includeRange: GenRange,
 ): Set<CanonicalName> {
     if (includeRange == GenRange.EVERYTHING) return emptySet()

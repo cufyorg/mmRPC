@@ -97,7 +97,6 @@ open class MmrpcExtension {
 
         // @formatter:off
         fun debug() { features += GenFeature.DEBUG }
-        fun noBuiltin() { features += GenFeature.NO_BUILTIN }
         fun kotlinxSerialization() { features += GenFeature.KOTLINX_SERIALIZATION }
 
         fun keepTypeClassNames() { features += GenFeature.KEEP_TYPE_CLASS_NAMES }

@@ -7,7 +7,7 @@ import kotlinx.serialization.json.Json
 import org.cufy.mmrpc.CanonicalName
 import org.cufy.mmrpc.MmrpcSpec
 import org.cufy.mmrpc.builtin
-import org.cufy.mmrpc.compact.CompactSpecSheet
+import org.cufy.mmrpc.compact.CompactElementDefinition
 import org.cufy.mmrpc.compact.inflate
 import org.cufy.mmrpc.gen.kotlin.*
 import org.cufy.mmrpc.gen.kotlin.common.signatureOf
@@ -229,7 +229,7 @@ open class MmrpcKotlinGenerateSourcesTask : DefaultTask() {
             }.filter { it.isFile }.files
         }
 
-        var compactSpecSheet = CompactSpecSheet()
+        val compactElements = mutableListOf<CompactElementDefinition>()
 
         for (file in filesGotten) {
             val source = try {
@@ -248,7 +248,7 @@ open class MmrpcKotlinGenerateSourcesTask : DefaultTask() {
                         continue
                     }
 
-                    compactSpecSheet += spec.elements
+                    compactElements += spec.elements
                 }
 
                 "yaml", "yml" -> {
@@ -259,7 +259,7 @@ open class MmrpcKotlinGenerateSourcesTask : DefaultTask() {
                         continue
                     }
 
-                    compactSpecSheet += spec.elements
+                    compactElements += spec.elements
                 }
 
                 else -> {
@@ -268,18 +268,15 @@ open class MmrpcKotlinGenerateSourcesTask : DefaultTask() {
             }
         }
 
-        val specSheet = try {
-            compactSpecSheet.inflate()
+        val elements = try {
+            compactElements.asSequence()
+                .inflate(builtin.elements)
+                .flatMap { it.collect() }
+                .distinctBy { it.canonicalName }
+                .toList()
         } catch (e: Exception) {
             val message = "$name: schema inflation failure: ${e.message}"
             throw TaskInstantiationException(message, e)
-        }
-
-        val elements = buildSet {
-            if (GenFeature.NO_BUILTIN !in features.get())
-                addAll(builtin.elements)
-
-            addAll(specSheet.elements)
         }
 
         val genContext = GenContext(

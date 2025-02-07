@@ -5,7 +5,7 @@ import org.cufy.mmrpc.CanonicalName
 import org.cufy.mmrpc.ElementDefinition
 
 class GenContext(
-    val elements: Set<ElementDefinition>,
+    val elements: List<ElementDefinition>,
     val ignore: Set<CanonicalName>,
 
     //
