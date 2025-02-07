@@ -20,7 +20,7 @@ fun MetadataDefinitionUsage.toCompact(): CompactMetadataDefinitionUsage {
     )
 }
 
-fun CompactMetadataDefinitionUsage.inflate(
+fun CompactMetadataDefinitionUsage.inflateOrNull(
     onLookup: (CanonicalName) -> ElementDefinition?,
 ): () -> MetadataDefinitionUsage? {
     return it@{
@@ -33,7 +33,7 @@ fun CompactMetadataDefinitionUsage.inflate(
                 item
             },
             fields = this.fields.map {
-                it.inflate(onLookup)() ?: return@it null
+                it.inflateOrNull(onLookup)() ?: return@it null
             }
         )
     }

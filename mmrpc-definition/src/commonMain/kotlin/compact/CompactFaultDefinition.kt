@@ -22,16 +22,14 @@ fun FaultDefinition.toCompact(): CompactFaultDefinition {
     )
 }
 
-fun CompactFaultDefinition.inflate(
+fun CompactFaultDefinition.inflateOrNull(
     onLookup: (CanonicalName) -> ElementDefinition?,
-): () -> FaultDefinition? {
-    return it@{
-        FaultDefinition(
-            canonicalName = this.canonical_name,
-            description = this.description,
-            metadata = this.metadata.map {
-                it.inflate(onLookup)() ?: return@it null
-            },
-        )
-    }
+): FaultDefinition? {
+    return FaultDefinition(
+        canonicalName = this.canonical_name,
+        description = this.description,
+        metadata = this.metadata.map {
+            it.inflateOrNull(onLookup)() ?: return null
+        },
+    )
 }

@@ -27,23 +27,21 @@ fun TupleDefinition.toCompact(): CompactTupleDefinition {
     )
 }
 
-fun CompactTupleDefinition.inflate(
+fun CompactTupleDefinition.inflateOrNull(
     onLookup: (CanonicalName) -> ElementDefinition?,
-): () -> TupleDefinition? {
-    return it@{
-        TupleDefinition(
-            canonicalName = this.canonical_name,
-            description = this.description,
-            metadata = this.metadata.map {
-                it.inflate(onLookup)() ?: return@it null
-            },
-            types = this.types_ref.map {
-                val item = onLookup(it) ?: return@it null
-                require(item is TypeDefinition) {
-                    "<tuple>.types_ref must point to a TypeDefinition"
-                }
-                item
-            },
-        )
-    }
+): TupleDefinition? {
+    return TupleDefinition(
+        canonicalName = this.canonical_name,
+        description = this.description,
+        metadata = this.metadata.map {
+            it.inflateOrNull(onLookup)() ?: return null
+        },
+        types = this.types_ref.map {
+            val item = onLookup(it) ?: return null
+            require(item is TypeDefinition) {
+                "<tuple>.types_ref must point to a TypeDefinition"
+            }
+            item
+        },
+    )
 }

@@ -26,24 +26,22 @@ fun FieldDefinition.toCompact(): CompactFieldDefinition {
     )
 }
 
-fun CompactFieldDefinition.inflate(
+fun CompactFieldDefinition.inflateOrNull(
     onLookup: (CanonicalName) -> ElementDefinition?,
-): () -> FieldDefinition? {
-    return it@{
-        FieldDefinition(
-            canonicalName = this.canonical_name,
-            description = this.description,
-            metadata = this.metadata.map {
-                it.inflate(onLookup)() ?: return@it null
-            },
-            type = this.type_ref.let {
-                val item = onLookup(it) ?: return@it null
-                require(item is TypeDefinition) {
-                    "<field>.type_ref must point to a TypeDefinition"
-                }
-                item
-            },
-            default = this.default
-        )
-    }
+): FieldDefinition? {
+    return FieldDefinition(
+        canonicalName = this.canonical_name,
+        description = this.description,
+        metadata = this.metadata.map {
+            it.inflateOrNull(onLookup)() ?: return null
+        },
+        type = this.type_ref.let {
+            val item = onLookup(it) ?: return null
+            require(item is TypeDefinition) {
+                "<field>.type_ref must point to a TypeDefinition"
+            }
+            item
+        },
+        default = this.default
+    )
 }

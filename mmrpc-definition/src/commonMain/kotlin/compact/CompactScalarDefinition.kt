@@ -26,23 +26,21 @@ fun ScalarDefinition.toCompact(): CompactScalarDefinition {
     )
 }
 
-fun CompactScalarDefinition.inflate(
+fun CompactScalarDefinition.inflateOrNull(
     onLookup: (CanonicalName) -> ElementDefinition?,
-): () -> ScalarDefinition? {
-    return it@{
-        ScalarDefinition(
-            canonicalName = this.canonical_name,
-            description = this.description,
-            metadata = this.metadata.map {
-                it.inflate(onLookup)() ?: return@it null
-            },
-            type = this.type_ref?.let {
-                val item = onLookup(it) ?: return@it null
-                require(item is ScalarDefinition) {
-                    "<scalar>.type_ref must point to a ScalarDefinition"
-                }
-                item
+): ScalarDefinition? {
+    return ScalarDefinition(
+        canonicalName = this.canonical_name,
+        description = this.description,
+        metadata = this.metadata.map {
+            it.inflateOrNull(onLookup)() ?: return null
+        },
+        type = this.type_ref?.let {
+            val item = onLookup(it) ?: return null
+            require(item is ScalarDefinition) {
+                "<scalar>.type_ref must point to a ScalarDefinition"
             }
-        )
-    }
+            item
+        }
+    )
 }

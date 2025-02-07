@@ -17,7 +17,7 @@ fun FieldDefinitionUsage.toCompact(): CompactFieldDefinitionUsage {
     )
 }
 
-fun CompactFieldDefinitionUsage.inflate(
+fun CompactFieldDefinitionUsage.inflateOrNull(
     onLookup: (CanonicalName) -> ElementDefinition?,
 ): () -> FieldDefinitionUsage? {
     return it@{

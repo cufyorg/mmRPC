@@ -30,38 +30,36 @@ fun RoutineDefinition.toCompact(): CompactRoutineDefinition {
     )
 }
 
-fun CompactRoutineDefinition.inflate(
+fun CompactRoutineDefinition.inflateOrNull(
     onLookup: (CanonicalName) -> ElementDefinition?,
-): () -> RoutineDefinition? {
-    return it@{
-        RoutineDefinition(
-            canonicalName = this.canonical_name,
-            description = this.description,
-            metadata = this.metadata.map {
-                it.inflate(onLookup)() ?: return@it null
-            },
-            comm = this.comm,
-            faults = this.faults_ref.map {
-                val item = onLookup(it) ?: return@it null
-                require(item is FaultDefinition) {
-                    "<routine>.fault_ref must point to a FaultDefinition"
-                }
-                item
-            },
-            input = this.input_ref.let {
-                val item = onLookup(it) ?: return@it null
-                require(item is StructDefinition) {
-                    "<routine>.input_ref must point to a StructDefinition"
-                }
-                item
-            },
-            output = this.output_ref.let {
-                val item = onLookup(it) ?: return@it null
-                require(item is StructDefinition) {
-                    "<routine>.output_ref must point to a StructDefinition"
-                }
-                item
-            },
-        )
-    }
+): RoutineDefinition? {
+    return RoutineDefinition(
+        canonicalName = this.canonical_name,
+        description = this.description,
+        metadata = this.metadata.map {
+            it.inflateOrNull(onLookup)() ?: return null
+        },
+        comm = this.comm,
+        faults = this.faults_ref.map {
+            val item = onLookup(it) ?: return null
+            require(item is FaultDefinition) {
+                "<routine>.fault_ref must point to a FaultDefinition"
+            }
+            item
+        },
+        input = this.input_ref.let {
+            val item = onLookup(it) ?: return null
+            require(item is StructDefinition) {
+                "<routine>.input_ref must point to a StructDefinition"
+            }
+            item
+        },
+        output = this.output_ref.let {
+            val item = onLookup(it) ?: return null
+            require(item is StructDefinition) {
+                "<routine>.output_ref must point to a StructDefinition"
+            }
+            item
+        },
+    )
 }

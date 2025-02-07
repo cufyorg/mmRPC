@@ -27,23 +27,21 @@ fun StructDefinition.toCompact(): CompactStructDefinition {
     )
 }
 
-fun CompactStructDefinition.inflate(
+fun CompactStructDefinition.inflateOrNull(
     onLookup: (CanonicalName) -> ElementDefinition?,
-): () -> StructDefinition? {
-    return it@{
-        StructDefinition(
-            canonicalName = this.canonical_name,
-            description = this.description,
-            metadata = this.metadata.map {
-                it.inflate(onLookup)() ?: return@it null
-            },
-            fields = this.fields_ref.map {
-                val item = onLookup(it) ?: return@it null
-                require(item is FieldDefinition) {
-                    "<struct>.fields_ref must point to a FieldDefinition"
-                }
-                item
-            },
-        )
-    }
+): StructDefinition? {
+    return StructDefinition(
+        canonicalName = this.canonical_name,
+        description = this.description,
+        metadata = this.metadata.map {
+            it.inflateOrNull(onLookup)() ?: return null
+        },
+        fields = this.fields_ref.map {
+            val item = onLookup(it) ?: return null
+            require(item is FieldDefinition) {
+                "<struct>.fields_ref must point to a FieldDefinition"
+            }
+            item
+        },
+    )
 }

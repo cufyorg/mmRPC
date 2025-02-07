@@ -29,24 +29,22 @@ fun UnionDefinition.toCompact(): CompactUnionDefinition {
     )
 }
 
-fun CompactUnionDefinition.inflate(
+fun CompactUnionDefinition.inflateOrNull(
     onLookup: (CanonicalName) -> ElementDefinition?,
-): () -> UnionDefinition? {
-    return it@{
-        UnionDefinition(
-            canonicalName = this.canonical_name,
-            description = this.description,
-            metadata = this.metadata.map {
-                it.inflate(onLookup)() ?: return@it null
-            },
-            discriminator = this.discriminator,
-            types = this.types_ref.map {
-                val item = onLookup(it) ?: return@it null
-                require(item is StructDefinition) {
-                    "<union>.types_ref must point to a StructDefinition"
-                }
-                item
-            },
-        )
-    }
+): UnionDefinition? {
+    return UnionDefinition(
+        canonicalName = this.canonical_name,
+        description = this.description,
+        metadata = this.metadata.map {
+            it.inflateOrNull(onLookup)() ?: return null
+        },
+        discriminator = this.discriminator,
+        types = this.types_ref.map {
+            val item = onLookup(it) ?: return null
+            require(item is StructDefinition) {
+                "<union>.types_ref must point to a StructDefinition"
+            }
+            item
+        },
+    )
 }

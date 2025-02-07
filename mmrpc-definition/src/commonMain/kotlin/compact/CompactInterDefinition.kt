@@ -27,23 +27,21 @@ fun InterDefinition.toCompact(): CompactInterDefinition {
     )
 }
 
-fun CompactInterDefinition.inflate(
+fun CompactInterDefinition.inflateOrNull(
     onLookup: (CanonicalName) -> ElementDefinition?,
-): () -> InterDefinition? {
-    return it@{
-        InterDefinition(
-            canonicalName = this.canonical_name,
-            description = this.description,
-            metadata = this.metadata.map {
-                it.inflate(onLookup)() ?: return@it null
-            },
-            types = this.types_ref.map {
-                val item = onLookup(it) ?: return@it null
-                require(item is StructDefinition) {
-                    "<inter>.types_ref must point to a StructDefinition"
-                }
-                item
-            },
-        )
-    }
+): InterDefinition? {
+    return InterDefinition(
+        canonicalName = this.canonical_name,
+        description = this.description,
+        metadata = this.metadata.map {
+            it.inflateOrNull(onLookup)() ?: return null
+        },
+        types = this.types_ref.map {
+            val item = onLookup(it) ?: return null
+            require(item is StructDefinition) {
+                "<inter>.types_ref must point to a StructDefinition"
+            }
+            item
+        },
+    )
 }

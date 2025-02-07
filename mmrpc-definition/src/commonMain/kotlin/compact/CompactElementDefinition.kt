@@ -34,23 +34,23 @@ fun ElementDefinition.toCompact(): CompactElementDefinition {
     }
 }
 
-fun CompactElementDefinition.inflate(
+fun CompactElementDefinition.inflateOrNull(
     onLookup: (CanonicalName) -> ElementDefinition?,
-): () -> ElementDefinition? {
+): ElementDefinition? {
     return when (this) {
-        is CompactArrayDefinition -> inflate(onLookup)
-        is CompactConstDefinition -> inflate(onLookup)
-        is CompactEnumDefinition -> inflate(onLookup)
-        is CompactFaultDefinition -> inflate(onLookup)
-        is CompactFieldDefinition -> inflate(onLookup)
-        is CompactInterDefinition -> inflate(onLookup)
-        is CompactMetadataDefinition -> inflate(onLookup)
-        is CompactOptionalDefinition -> inflate(onLookup)
-        is CompactProtocolDefinition -> inflate(onLookup)
-        is CompactRoutineDefinition -> inflate(onLookup)
-        is CompactScalarDefinition -> inflate(onLookup)
-        is CompactStructDefinition -> inflate(onLookup)
-        is CompactTupleDefinition -> inflate(onLookup)
-        is CompactUnionDefinition -> inflate(onLookup)
+        is CompactArrayDefinition -> inflateOrNull(onLookup)
+        is CompactConstDefinition -> inflateOrNull(onLookup)
+        is CompactEnumDefinition -> inflateOrNull(onLookup)
+        is CompactFaultDefinition -> inflateOrNull(onLookup)
+        is CompactFieldDefinition -> inflateOrNull(onLookup)
+        is CompactInterDefinition -> inflateOrNull(onLookup)
+        is CompactMetadataDefinition -> inflateOrNull(onLookup)
+        is CompactOptionalDefinition -> inflateOrNull(onLookup)
+        is CompactProtocolDefinition -> inflateOrNull(onLookup)
+        is CompactRoutineDefinition -> inflateOrNull(onLookup)
+        is CompactScalarDefinition -> inflateOrNull(onLookup)
+        is CompactStructDefinition -> inflateOrNull(onLookup)
+        is CompactTupleDefinition -> inflateOrNull(onLookup)
+        is CompactUnionDefinition -> inflateOrNull(onLookup)
     }
 }

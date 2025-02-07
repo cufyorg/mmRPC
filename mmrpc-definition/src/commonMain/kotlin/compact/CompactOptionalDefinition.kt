@@ -27,23 +27,21 @@ fun OptionalDefinition.toCompact(): CompactOptionalDefinition {
     )
 }
 
-fun CompactOptionalDefinition.inflate(
+fun CompactOptionalDefinition.inflateOrNull(
     onLookup: (CanonicalName) -> ElementDefinition?,
-): () -> OptionalDefinition? {
-    return it@{
-        OptionalDefinition(
-            canonicalName = this.canonical_name,
-            description = this.description,
-            metadata = this.metadata.map {
-                it.inflate(onLookup)() ?: return@it null
-            },
-            type = this.type_ref.let {
-                val item = onLookup(it) ?: return@it null
-                require(item is TypeDefinition) {
-                    "<optional>.type_ref must point to a TypeDefinition"
-                }
-                item
+): OptionalDefinition? {
+    return OptionalDefinition(
+        canonicalName = this.canonical_name,
+        description = this.description,
+        metadata = this.metadata.map {
+            it.inflateOrNull(onLookup)() ?: return null
+        },
+        type = this.type_ref.let {
+            val item = onLookup(it) ?: return null
+            require(item is TypeDefinition) {
+                "<optional>.type_ref must point to a TypeDefinition"
             }
-        )
-    }
+            item
+        }
+    )
 }

@@ -27,23 +27,21 @@ fun MetadataDefinition.toCompact(): CompactMetadataDefinition {
     )
 }
 
-fun CompactMetadataDefinition.inflate(
+fun CompactMetadataDefinition.inflateOrNull(
     onLookup: (CanonicalName) -> ElementDefinition?,
-): () -> MetadataDefinition? {
-    return it@{
-        MetadataDefinition(
-            canonicalName = this.canonical_name,
-            description = this.description,
-            metadata = this.metadata.map {
-                it.inflate(onLookup)() ?: return@it null
-            },
-            fields = this.fields_ref.map {
-                val item = onLookup(it) ?: return@it null
-                require(item is FieldDefinition) {
-                    "<metadata>.fields_ref must point to a FieldDefinition"
-                }
-                item
-            },
-        )
-    }
+): MetadataDefinition? {
+    return MetadataDefinition(
+        canonicalName = this.canonical_name,
+        description = this.description,
+        metadata = this.metadata.map {
+            it.inflateOrNull(onLookup)() ?: return null
+        },
+        fields = this.fields_ref.map {
+            val item = onLookup(it) ?: return null
+            require(item is FieldDefinition) {
+                "<metadata>.fields_ref must point to a FieldDefinition"
+            }
+            item
+        },
+    )
 }

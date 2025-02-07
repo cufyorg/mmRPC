@@ -26,30 +26,28 @@ fun EnumDefinition.toCompact(): CompactEnumDefinition {
     )
 }
 
-fun CompactEnumDefinition.inflate(
+fun CompactEnumDefinition.inflateOrNull(
     onLookup: (CanonicalName) -> ElementDefinition?,
-): () -> EnumDefinition? {
-    return it@{
-        EnumDefinition(
-            canonicalName = this.canonical_name,
-            description = this.description,
-            metadata = this.metadata.map {
-                it.inflate(onLookup)() ?: return@it null
-            },
-            type = this.type_ref.let {
-                val item = onLookup(it) ?: return@it null
-                require(item is TypeDefinition) {
-                    "<enum>.type_ref must point to a TypeDefinition"
-                }
-                item
-            },
-            entries = this.entries_ref.map {
-                val item = onLookup(it) ?: return@it null
-                require(item is ConstDefinition) {
-                    "<enum>.entries_ref must point to a ConstDefinition"
-                }
-                item
-            },
-        )
-    }
+): EnumDefinition? {
+    return EnumDefinition(
+        canonicalName = this.canonical_name,
+        description = this.description,
+        metadata = this.metadata.map {
+            it.inflateOrNull(onLookup)() ?: return null
+        },
+        type = this.type_ref.let {
+            val item = onLookup(it) ?: return null
+            require(item is TypeDefinition) {
+                "<enum>.type_ref must point to a TypeDefinition"
+            }
+            item
+        },
+        entries = this.entries_ref.map {
+            val item = onLookup(it) ?: return null
+            require(item is ConstDefinition) {
+                "<enum>.entries_ref must point to a ConstDefinition"
+            }
+            item
+        },
+    )
 }

@@ -26,24 +26,22 @@ fun ConstDefinition.toCompact(): CompactConstDefinition {
     )
 }
 
-fun CompactConstDefinition.inflate(
+fun CompactConstDefinition.inflateOrNull(
     onLookup: (CanonicalName) -> ElementDefinition?,
-): () -> ConstDefinition? {
-    return it@{
-        ConstDefinition(
-            canonicalName = this.canonical_name,
-            description = this.description,
-            metadata = this.metadata.map {
-                it.inflate(onLookup)() ?: return@it null
-            },
-            type = this.type_ref.let {
-                val item = onLookup(it) ?: return@it null
-                require(item is TypeDefinition) {
-                    "<const>.type_ref must point to a TypeDefinition"
-                }
-                item
-            },
-            value = this.value,
-        )
-    }
+): ConstDefinition? {
+    return ConstDefinition(
+        canonicalName = this.canonical_name,
+        description = this.description,
+        metadata = this.metadata.map {
+            it.inflateOrNull(onLookup)() ?: return null
+        },
+        type = this.type_ref.let {
+            val item = onLookup(it) ?: return null
+            require(item is TypeDefinition) {
+                "<const>.type_ref must point to a TypeDefinition"
+            }
+            item
+        },
+        value = this.value,
+    )
 }

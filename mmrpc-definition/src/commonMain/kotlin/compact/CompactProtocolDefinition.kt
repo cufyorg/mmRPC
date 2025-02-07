@@ -27,23 +27,21 @@ fun ProtocolDefinition.toCompact(): CompactProtocolDefinition {
     )
 }
 
-fun CompactProtocolDefinition.inflate(
+fun CompactProtocolDefinition.inflateOrNull(
     onLookup: (CanonicalName) -> ElementDefinition?,
-): () -> ProtocolDefinition? {
-    return it@{
-        ProtocolDefinition(
-            canonicalName = this.canonical_name,
-            description = this.description,
-            metadata = this.metadata.map {
-                it.inflate(onLookup)() ?: return@it null
-            },
-            routines = this.routines_ref.map {
-                val item = onLookup(it) ?: return@it null
-                require(item is RoutineDefinition) {
-                    "<protocol>.routines_ref must point to a RoutineDefinition"
-                }
-                item
-            },
-        )
-    }
+): ProtocolDefinition? {
+    return ProtocolDefinition(
+        canonicalName = this.canonical_name,
+        description = this.description,
+        metadata = this.metadata.map {
+            it.inflateOrNull(onLookup)() ?: return null
+        },
+        routines = this.routines_ref.map {
+            val item = onLookup(it) ?: return null
+            require(item is RoutineDefinition) {
+                "<protocol>.routines_ref must point to a RoutineDefinition"
+            }
+            item
+        },
+    )
 }

@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 import org.cufy.mmrpc.CanonicalName
 import org.cufy.mmrpc.ElementDefinition
 import org.cufy.mmrpc.SpecSheet
+import kotlin.js.JsName
 import kotlin.jvm.JvmInline
 
 @JvmInline
@@ -58,32 +59,47 @@ fun SpecSheet.toCompact(): CompactSpecSheet {
 }
 
 fun CompactSpecSheet.inflate(): SpecSheet {
-    val inflated = mutableMapOf<CanonicalName, () -> ElementDefinition?>()
+    @JsName("a")
+    data class LazyInflate(
+        @JsName("c")
+        var compact: CompactElementDefinition? = null,
+        @JsName("b")
+        var element: ElementDefinition? = null,
+    )
+
+    val lazyMap = this.elements.associate { it.canonical_name to LazyInflate(it) }
     val requested = mutableListOf<CanonicalName>()
 
-    for (element in this.elements) {
-        inflated[element.canonical_name] = element.inflate {
-            requested += it
-            inflated[it]?.invoke()
+    fun LazyInflate.tryInflate(): ElementDefinition? {
+        fun onLookup(canonicalName: CanonicalName): ElementDefinition? {
+            requested += canonicalName
+            return lazyMap[canonicalName]?.tryInflate()
         }
+
+        if (this.element != null) return this.element
+        val inflated = compact?.inflateOrNull(::onLookup) ?: return null
+        this.element = inflated
+        return inflated
     }
 
-    val output = inflated.mapValues { it.value() }
+    for (it in lazyMap)
+        it.value.tryInflate()
+
     val failed = buildList {
-        addAll(requested.filter { it !in output })
-        addAll(output.asSequence().filter { it.value == null }.map { it.key }.toList())
+        for (it in requested) if (it !in lazyMap) add(it)
+        for (it in lazyMap) if (it.value.element == null) add(it.key)
     }
 
     if (failed.isNotEmpty()) {
         error(buildString {
             append("Inflation failed: failed to inflate the following definitions: ")
-            for (canonicalName in failed) {
+            for (it in failed) {
                 appendLine()
                 append("- ")
-                append(canonicalName.value)
+                append(it.value)
             }
         })
     }
 
-    return SpecSheet(output.map { it.value as ElementDefinition })
+    return SpecSheet(lazyMap.map { it.value.element!! })
 }
