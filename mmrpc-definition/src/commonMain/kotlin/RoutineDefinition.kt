@@ -101,14 +101,16 @@ open class RoutineDefinitionBuilder :
                 it.get(canonicalName, name = "fault$i")
             },
             input = this.input.let { blocks ->
-                StructDefinitionBuilder()
+                if (blocks.isEmpty()) builtin.Void
+                else StructDefinitionBuilder()
                     .also { it.name = "Input" }
                     .also { it.namespace = canonicalName }
                     .apply { for (it in blocks) it() }
                     .build()
             },
             output = this.output.let { blocks ->
-                StructDefinitionBuilder()
+                if (blocks.isEmpty()) builtin.Void
+                else StructDefinitionBuilder()
                     .also { it.name = "Output" }
                     .also { it.namespace = canonicalName }
                     .apply { for (it in blocks) it() }

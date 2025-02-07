@@ -134,6 +134,9 @@ private fun GenScope.createLiteralOfTuple(element: TupleDefinition, literal: Tup
 // ===================={ StructLiteral }==================== //
 
 private fun GenScope.createLiteralOfStruct(element: StructDefinition, literal: StructLiteral): CodeBlock {
+    if (element.canonicalName == builtin.Void.canonicalName)
+        return CodeBlock.of("%T", Unit::class)
+
     when (calculateStructStrategy(element)) {
         StructStrategy.DATA_OBJECT ->
             return CodeBlock.of("%T", generatedClassOf(element.canonicalName))

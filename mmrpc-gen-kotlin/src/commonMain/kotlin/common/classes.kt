@@ -27,8 +27,14 @@ fun GenScope.classOf(element: TypeDefinition): TypeName {
             else -> ANY
         }
 
-        is UnionDefinition,
         is StructDefinition,
+        -> when {
+            element.canonicalName == builtin.Void.canonicalName -> Unit::class.asClassName()
+            hasGeneratedClass(element) -> generatedClassOf(element.canonicalName)
+            else -> ANY
+        }
+
+        is UnionDefinition,
         is EnumDefinition,
         is InterDefinition,
         is TupleDefinition,

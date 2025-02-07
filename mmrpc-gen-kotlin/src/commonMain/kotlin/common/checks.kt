@@ -20,6 +20,10 @@ fun GenScope.hasGeneratedClass(element: ElementDefinition): Boolean {
         if (isNative(element) || isUserdefined(element))
             return false
     }
+    if (element is StructDefinition) {
+        if (element.canonicalName == builtin.Void.canonicalName)
+            return false
+    }
     val parent = ctx.elementsMap[element.namespace] ?: return true
     return hasGeneratedClass(parent)
 }
