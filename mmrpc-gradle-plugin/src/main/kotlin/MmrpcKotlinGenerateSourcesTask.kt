@@ -314,6 +314,7 @@ open class MmrpcKotlinGenerateSourcesTask : DefaultTask() {
         )
 
         try {
+            ArrayDefinitionGen(genContext).apply()
             ConstDefinitionGen(genContext).apply()
             EnumDefinitionGen(genContext).apply()
             FaultDefinitionGen(genContext).apply()
