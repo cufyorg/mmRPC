@@ -1,5 +1,7 @@
 package org.cufy.mmrpc.gen.kotlin.gen
 
+import com.squareup.kotlinpoet.LIST
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import org.cufy.mmrpc.ArrayDefinition
 import org.cufy.mmrpc.gen.kotlin.GenContext
 import org.cufy.mmrpc.gen.kotlin.GenScope
@@ -33,7 +35,7 @@ class ArrayDefinitionGen(override val ctx: GenContext) : GenScope() {
         */
 
         injectFile(element.namespace) {
-            addTypeAlias(typealiasSpec(asClassName(element), classOf(element.type)))
+            addTypeAlias(typealiasSpec(asClassName(element), LIST.parameterizedBy(classOf(element.type))))
         }
     }
 }
