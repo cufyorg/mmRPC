@@ -51,5 +51,6 @@ class GenContext(
 
     val createTypeNodes = mutableListOf<CreateTypeNode>()
     val injectTypeNodes = mutableListOf<InjectTypeNode>()
+    val injectFileNodes = mutableListOf<InjectFileNode>()
     val injectScopeNodes = mutableListOf<InjectScopeNode>()
 }

@@ -17,7 +17,10 @@ fun GenScope.classOf(element: TypeDefinition): TypeName {
         -> classOf(element.type).copy(nullable = true)
 
         is ArrayDefinition,
-        -> LIST.parameterizedBy(classOf(element.type))
+        -> when {
+            hasGeneratedClass(element) -> generatedClassOf(element.canonicalName)
+            else -> LIST.parameterizedBy(classOf(element.type))
+        }
 
         is ScalarDefinition,
         -> when {

@@ -8,7 +8,11 @@ import org.cufy.mmrpc.gen.kotlin.GenScope
  */
 @Marker3
 fun GenScope.hasGeneratedClass(element: ElementDefinition): Boolean {
-    if (element is ArrayDefinition) return false
+    if (element is ArrayDefinition) {
+        if (!element.name[0].isUpperCase()) return false
+        if (element.namespace !in ctx.roots) return false
+        return true
+    }
     if (element is OptionalDefinition) return false
     if (element is FieldDefinition) return false
     if (element is ConstDefinition) return false

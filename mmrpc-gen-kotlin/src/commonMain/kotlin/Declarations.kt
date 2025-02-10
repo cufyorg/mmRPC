@@ -1,5 +1,6 @@
 package org.cufy.mmrpc.gen.kotlin
 
+import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.MemberSpecHolder
 import com.squareup.kotlinpoet.TypeSpec
 import org.cufy.mmrpc.CanonicalName
@@ -77,6 +78,11 @@ data class CreateTypeNode(
 data class InjectTypeNode(
     val canonicalName: CanonicalName,
     val block: TypeSpec.Builder.() -> Unit,
+)
+
+data class InjectFileNode(
+    val canonicalName: CanonicalName,
+    val block: FileSpec.Builder.() -> Unit,
 )
 
 data class InjectScopeNode(

@@ -76,3 +76,9 @@ fun companionObjectSpec(block: TypeSpec.Builder.() -> Unit = {}): TypeSpec {
 fun fileSpec(className: ClassName, block: FileSpec.Builder.() -> Unit = {}): FileSpec {
     return FileSpec.builder(className).apply(block).build()
 }
+
+// TypeAliasSpec.builder
+
+fun typealiasSpec(name: String, type: TypeName, block: TypeAliasSpec.Builder.() -> Unit = {}): TypeAliasSpec {
+    return TypeAliasSpec.builder(name, type).apply(block).build()
+}

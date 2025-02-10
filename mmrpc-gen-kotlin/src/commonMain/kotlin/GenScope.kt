@@ -1,5 +1,6 @@
 package org.cufy.mmrpc.gen.kotlin
 
+import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.MemberSpecHolder
 import com.squareup.kotlinpoet.TypeSpec
 import org.cufy.mmrpc.CanonicalName
@@ -40,6 +41,11 @@ abstract class GenScope {
     @Marker3
     fun injectType(canonicalName: CanonicalName, block: TypeSpec.Builder.() -> Unit) {
         ctx.injectTypeNodes += InjectTypeNode(canonicalName, block)
+    }
+
+    @Marker3
+    fun injectFile(canonicalName: CanonicalName, block: FileSpec.Builder.() -> Unit) {
+        ctx.injectFileNodes += InjectFileNode(canonicalName, block)
     }
 
     @Marker3

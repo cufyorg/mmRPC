@@ -18,6 +18,8 @@ internal fun generateFileSpecSet__SUB_PACKAGES(
     onEachFile: FileSpec.Builder.() -> Unit,
 ): List<FileSpec> {
     val types = ctx.createTypeNodes.map { it.canonicalName }
+    val files = ctx.injectFileNodes.map { it.canonicalName } +
+            (ctx.injectScopeNodes.map { it.canonicalName } - types.toSet())
 
     val createTypeNodeMap = ctx.createTypeNodes
         .groupBy { node ->
@@ -26,6 +28,8 @@ internal fun generateFileSpecSet__SUB_PACKAGES(
                 .maxOrNull()
         }
     val injectTypeNodeMap = ctx.injectTypeNodes
+        .groupBy { it.canonicalName }
+    val injectFileNodeMap = ctx.injectFileNodes
         .groupBy { it.canonicalName }
     val injectScopeNodeMap = ctx.injectScopeNodes
         .groupBy { it.canonicalName }
@@ -38,19 +42,19 @@ internal fun generateFileSpecSet__SUB_PACKAGES(
     fun createTypeSpec(node: CreateTypeNode): TypeSpec {
         val spec = node.block()
 
-        createTypeNodeMap[node.canonicalName].orEmpty()
-            .forEach { spec.addType(createTypeSpec(it)) }
-        injectTypeNodeMap[node.canonicalName].orEmpty()
-            .forEach { it.block(spec) }
+        createTypeNodeMap[node.canonicalName]
+            ?.forEach { spec.addType(createTypeSpec(it)) }
+        injectTypeNodeMap[node.canonicalName]
+            ?.forEach { it.block(spec) }
 
         if (!injectScopeNodeMap[node.canonicalName].isNullOrEmpty()) {
             if (spec.fetchKind() == TypeSpec.Kind.OBJECT) {
-                injectScopeNodeMap[node.canonicalName].orEmpty()
-                    .forEach { it.block(spec) }
+                injectScopeNodeMap[node.canonicalName]
+                    ?.forEach { it.block(spec) }
             } else {
                 spec.addType(companionObjectSpec {
-                    injectScopeNodeMap[node.canonicalName].orEmpty()
-                        .forEach { it.block(this) }
+                    injectScopeNodeMap[node.canonicalName]
+                        ?.forEach { it.block(this) }
                 })
             }
         }
@@ -66,11 +70,12 @@ internal fun generateFileSpecSet__SUB_PACKAGES(
             })
         }
 
-        for ((canonicalName, nodes) in injectScopeNodeMap) {
-            if (canonicalName in types) continue
-
+        for (canonicalName in files) {
             add(fileSpec(ctx.declarationsClassOf(canonicalName)) {
-                nodes.forEach { it.block(this) }
+                injectFileNodeMap[canonicalName]
+                    ?.forEach { it.block(this) }
+                injectScopeNodeMap[canonicalName]
+                    ?.forEach { it.block(this) }
                 onEachFile()
             })
         }
