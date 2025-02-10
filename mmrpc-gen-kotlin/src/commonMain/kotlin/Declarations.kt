@@ -81,7 +81,7 @@ data class InjectTypeNode(
 )
 
 data class InjectFileNode(
-    val canonicalName: CanonicalName,
+    val canonicalName: CanonicalName?,
     val block: FileSpec.Builder.() -> Unit,
 )
 

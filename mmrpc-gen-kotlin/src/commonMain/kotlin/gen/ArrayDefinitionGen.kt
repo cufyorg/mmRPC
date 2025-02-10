@@ -32,7 +32,7 @@ class ArrayDefinitionGen(override val ctx: GenContext) : GenScope() {
         }
         */
 
-        injectFile(element.canonicalName) {
+        injectFile(element.namespace) {
             addTypeAlias(typealiasSpec(asClassName(element), classOf(element.type)))
         }
     }

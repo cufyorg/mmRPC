@@ -44,7 +44,7 @@ abstract class GenScope {
     }
 
     @Marker3
-    fun injectFile(canonicalName: CanonicalName, block: FileSpec.Builder.() -> Unit) {
+    fun injectFile(canonicalName: CanonicalName?, block: FileSpec.Builder.() -> Unit) {
         ctx.injectFileNodes += InjectFileNode(canonicalName, block)
     }
 
