@@ -72,16 +72,12 @@ internal fun prop(
 fun prop(
     type: TypeDefinition,
     block: FieldDefinitionBuilder.() -> Unit = {},
-): Unnamed<FieldDefinition> {
-    return prop { this.type *= type; block() }
-}
+) = prop { this.type *= type; block() }
 
 @Marker2
 fun prop(
     type: Unnamed<TypeDefinition>,
     block: FieldDefinitionBuilder.() -> Unit = {},
-): Unnamed<FieldDefinition> {
-    return prop { this.type *= type; block() }
-}
+) = prop { this.type *= type; block() }
 
 ////////////////////////////////////////

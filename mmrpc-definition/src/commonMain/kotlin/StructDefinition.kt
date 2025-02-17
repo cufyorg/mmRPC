@@ -86,16 +86,12 @@ val struct = struct()
 fun struct(
     vararg fields: FieldDefinition,
     block: StructDefinitionBuilder.() -> Unit = {},
-): Unnamed<StructDefinition> {
-    return struct { +fields.asList(); block() }
-}
+) = struct { +fields.asList(); block() }
 
 @Marker2
 fun struct(
     vararg fields: Unnamed<FieldDefinition>,
     block: StructDefinitionBuilder.() -> Unit = {},
-): Unnamed<StructDefinition> {
-    return struct { +fields.asList(); block() }
-}
+) = struct { +fields.asList(); block() }
 
 ////////////////////////////////////////

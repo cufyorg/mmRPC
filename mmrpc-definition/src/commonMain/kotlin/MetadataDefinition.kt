@@ -80,16 +80,12 @@ val metadata = metadata()
 fun metadata(
     vararg fields: FieldDefinition,
     block: MetadataDefinitionBuilder.() -> Unit = {},
-): Unnamed<MetadataDefinition> {
-    return metadata { +fields.asList(); block() }
-}
+) = metadata { +fields.asList(); block() }
 
 @Marker2
 fun metadata(
     vararg fields: Unnamed<FieldDefinition>,
     block: MetadataDefinitionBuilder.() -> Unit = {},
-): Unnamed<MetadataDefinition> {
-    return metadata { +fields.asList(); block() }
-}
+) = metadata { +fields.asList(); block() }
 
 ////////////////////////////////////////

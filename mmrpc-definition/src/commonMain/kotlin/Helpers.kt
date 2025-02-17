@@ -100,33 +100,31 @@ interface FieldDefinitionSetDomainContainer {
         for (it in this) +Unnamed(it)
     }
 
-    operator fun String.invoke(
-        type: TypeDefinition,
+////////////////////////////////////////
+
+    private operator fun String.invoke(
         block: FieldDefinitionBuilder.() -> Unit = {},
     ) {
         +Unnamed { namespace, _ ->
             FieldDefinitionBuilder()
                 .also { it.name = this }
                 .also { it.namespace = namespace }
-                .also { it.type *= type }
                 .apply(block)
                 .build()
         }
     }
 
+////////////////////////////////////////
+
+    operator fun String.invoke(
+        type: TypeDefinition,
+        block: FieldDefinitionBuilder.() -> Unit = {},
+    ) = this { this.type *= type; block() }
+
     operator fun String.invoke(
         type: Unnamed<TypeDefinition>,
         block: FieldDefinitionBuilder.() -> Unit = {},
-    ) {
-        +Unnamed { namespace, _ ->
-            FieldDefinitionBuilder()
-                .also { it.name = this }
-                .also { it.namespace = namespace }
-                .also { it.type *= type }
-                .apply(block)
-                .build()
-        }
-    }
+    ) = this { this.type *= type; block() }
 }
 
 ////////////////////////////////////////

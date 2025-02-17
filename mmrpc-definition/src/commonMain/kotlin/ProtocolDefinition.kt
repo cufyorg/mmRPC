@@ -109,16 +109,12 @@ val protocol = protocol()
 fun protocol(
     vararg routines: RoutineDefinition,
     block: ProtocolDefinitionBuilder.() -> Unit = {},
-): Unnamed<ProtocolDefinition> {
-    return protocol { +routines.asList(); block() }
-}
+) = protocol { +routines.asList(); block() }
 
 @Marker2
 fun protocol(
     vararg routines: Unnamed<RoutineDefinition>,
     block: ProtocolDefinitionBuilder.() -> Unit = {},
-): Unnamed<ProtocolDefinition> {
-    return protocol { +routines.asList(); block() }
-}
+) = protocol { +routines.asList(); block() }
 
 ////////////////////////////////////////

@@ -69,17 +69,13 @@ internal fun optional(
 fun optional(
     type: TypeDefinition,
     block: OptionalDefinitionBuilder.() -> Unit = {},
-): Unnamed<OptionalDefinition> {
-    return optional { this.type *= type; block() }
-}
+) = optional { this.type *= type; block() }
 
 @Marker2
 fun optional(
     type: Unnamed<TypeDefinition>,
     block: OptionalDefinitionBuilder.() -> Unit = {},
-): Unnamed<OptionalDefinition> {
-    return optional { this.type *= type; block() }
-}
+) = optional { this.type *= type; block() }
 
 ////////////////////////////////////////
 

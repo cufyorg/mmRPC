@@ -101,26 +101,20 @@ internal fun enum(
 fun enum(
     type: TypeDefinition,
     block: EnumDefinitionBuilder.() -> Unit = {},
-): Unnamed<EnumDefinition> {
-    return enum { this.type *= type; block() }
-}
+) = enum { this.type *= type; block() }
 
 @Marker2
 fun enum(
     type: TypeDefinition,
     vararg entries: ConstDefinition,
     block: EnumDefinitionBuilder.() -> Unit = {},
-): Unnamed<EnumDefinition> {
-    return enum { this.type *= type; +entries.asList(); block() }
-}
+) = enum { this.type *= type; +entries.asList(); block() }
 
 @Marker2
 fun enum(
     type: TypeDefinition,
     vararg entries: Unnamed<ConstDefinition>,
     block: EnumDefinitionBuilder.() -> Unit = {},
-): Unnamed<EnumDefinition> {
-    return enum { this.type *= type; +entries.asList(); block() }
-}
+) = enum { this.type *= type; +entries.asList(); block() }
 
 ////////////////////////////////////////

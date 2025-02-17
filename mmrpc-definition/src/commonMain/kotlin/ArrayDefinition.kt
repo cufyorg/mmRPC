@@ -69,17 +69,13 @@ internal fun array(
 fun array(
     type: TypeDefinition,
     block: ArrayDefinitionBuilder.() -> Unit = {},
-): Unnamed<ArrayDefinition> {
-    return array { this.type *= type; block() }
-}
+) = array { this.type *= type; block() }
 
 @Marker2
 fun array(
     type: Unnamed<TypeDefinition>,
     block: ArrayDefinitionBuilder.() -> Unit = {},
-): Unnamed<ArrayDefinition> {
-    return array { this.type *= type; block() }
-}
+) = array { this.type *= type; block() }
 
 ////////////////////////////////////////
 

@@ -83,16 +83,12 @@ fun inter(
 fun inter(
     vararg types: StructDefinition,
     block: InterDefinitionBuilder.() -> Unit = {},
-): Unnamed<InterDefinition> {
-    return inter { +types.asList(); block() }
-}
+) = inter { +types.asList(); block() }
 
 @Marker2
 fun inter(
     vararg types: Unnamed<StructDefinition>,
     block: InterDefinitionBuilder.() -> Unit = {},
-): Unnamed<InterDefinition> {
-    return inter { +types.asList(); block() }
-}
+) = inter { +types.asList(); block() }
 
 ////////////////////////////////////////

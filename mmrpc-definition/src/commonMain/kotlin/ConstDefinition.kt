@@ -73,26 +73,14 @@ fun const(
     type: TypeDefinition,
     value: Literal = null.literal,
     block: ConstDefinitionBuilder.() -> Unit = {}
-): Unnamed<ConstDefinition> {
-    return const {
-        this.type *= type
-        this.value = value
-        block()
-    }
-}
+) = const { this.type *= type; this.value = value; block() }
 
 @Marker2
 fun const(
     type: Unnamed<TypeDefinition>,
     value: Literal = null.literal,
     block: ConstDefinitionBuilder.() -> Unit = {}
-): Unnamed<ConstDefinition> {
-    return const {
-        this.type *= type
-        this.value = value
-        block()
-    }
-}
+) = const { this.type *= type; this.value = value; block() }
 
 ////////////////////////////////////////
 
@@ -100,84 +88,42 @@ fun const(
 fun const(
     value: NullLiteral,
     block: ConstDefinitionBuilder.() -> Unit = {}
-): Unnamed<ConstDefinition> {
-    return const {
-        this.type *= builtin.Any.optional
-        this.value = value
-        block()
-    }
-}
+) = const(builtin.Any.optional, value, block)
 
 @Marker2
 fun const(
     value: BooleanLiteral,
     block: ConstDefinitionBuilder.() -> Unit = {}
-): Unnamed<ConstDefinition> {
-    return const {
-        this.type *= builtin.Boolean
-        this.value = value
-        block()
-    }
-}
+) = const(builtin.Boolean, value, block)
 
 @Marker2
 fun const(
     value: IntLiteral,
     block: ConstDefinitionBuilder.() -> Unit = {}
-): Unnamed<ConstDefinition> {
-    return const {
-        this.type *= builtin.Int64
-        this.value = value
-        block()
-    }
-}
+) = const(builtin.Int64, value, block)
 
 @Marker2
 fun const(
     value: FloatLiteral,
     block: ConstDefinitionBuilder.() -> Unit = {}
-): Unnamed<ConstDefinition> {
-    return const {
-        this.type *= builtin.Float64
-        this.value = value
-        block()
-    }
-}
+) = const(builtin.Float64, value, block)
 
 @Marker2
 fun const(
     value: StringLiteral,
     block: ConstDefinitionBuilder.() -> Unit = {}
-): Unnamed<ConstDefinition> {
-    return const {
-        this.type *= builtin.String
-        this.value = value
-        block()
-    }
-}
+) = const(builtin.String, value, block)
 
 @Marker2
 fun const(
     value: TupleLiteral,
     block: ConstDefinitionBuilder.() -> Unit = {}
-): Unnamed<ConstDefinition> {
-    return const {
-        this.type *= tuple
-        this.value = value
-        block()
-    }
-}
+) = const(tuple, value, block)
 
 @Marker2
 fun const(
     value: StructLiteral,
     block: ConstDefinitionBuilder.() -> Unit = {}
-): Unnamed<ConstDefinition> {
-    return const {
-        this.type *= struct
-        this.value = value
-        block()
-    }
-}
+) = const(struct, value, block)
 
 ////////////////////////////////////////

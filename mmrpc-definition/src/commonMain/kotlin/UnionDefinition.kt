@@ -82,16 +82,12 @@ fun union(
 fun union(
     vararg types: StructDefinition,
     block: UnionDefinitionBuilder.() -> Unit = {},
-): Unnamed<UnionDefinition> {
-    return union { +types.asList(); block() }
-}
+) = union { +types.asList(); block() }
 
 @Marker2
 fun union(
     vararg types: Unnamed<StructDefinition>,
     block: UnionDefinitionBuilder.() -> Unit = {},
-): Unnamed<UnionDefinition> {
-    return union { +types.asList(); block() }
-}
+) = union { +types.asList(); block() }
 
 ////////////////////////////////////////

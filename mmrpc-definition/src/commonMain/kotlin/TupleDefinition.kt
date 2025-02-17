@@ -100,16 +100,12 @@ val tuple = tuple()
 fun tuple(
     vararg types: TypeDefinition,
     block: TupleDefinitionBuilder.() -> Unit = {},
-): Unnamed<TupleDefinition> {
-    return tuple { +types.asList(); block() }
-}
+) = tuple { +types.asList(); block() }
 
 @Marker2
 fun tuple(
     vararg types: Unnamed<TypeDefinition>,
     block: TupleDefinitionBuilder.() -> Unit = {},
-): Unnamed<TupleDefinition> {
-    return tuple { +types.asList(); block() }
-}
+) = tuple { +types.asList(); block() }
 
 ////////////////////////////////////////
