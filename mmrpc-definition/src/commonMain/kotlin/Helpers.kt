@@ -78,6 +78,32 @@ interface StructDefinitionSetDomainContainer {
     operator fun Iterable<StructDefinition>.unaryPlus() {
         for (it in this) +Unnamed(it)
     }
+
+////////////////////////////////////////
+
+    operator fun String.invoke(
+        block: StructDefinitionBuilder.() -> Unit = {},
+    ) {
+        +Unnamed { namespace, _ ->
+            StructDefinitionBuilder()
+                .also { it.name = this }
+                .also { it.namespace = namespace }
+                .apply(block)
+                .build()
+        }
+    }
+
+////////////////////////////////////////
+
+    operator fun String.invoke(
+        vararg fields: FieldDefinition,
+        block: StructDefinitionBuilder.() -> Unit = {},
+    ) = this { +fields.asList(); block() }
+
+    operator fun String.invoke(
+        vararg fields: Unnamed<FieldDefinition>,
+        block: StructDefinitionBuilder.() -> Unit = {},
+    ) = this { +fields.asList(); block() }
 }
 
 @Marker3

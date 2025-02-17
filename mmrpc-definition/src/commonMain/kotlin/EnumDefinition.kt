@@ -68,6 +68,71 @@ open class EnumDefinitionBuilder :
 
 ////////////////////////////////////////
 
+    private operator fun String.invoke(
+        block: ConstDefinitionBuilder.() -> Unit = {}
+    ) {
+        +Unnamed { namespace, _ ->
+            ConstDefinitionBuilder()
+                .also { it.name = this }
+                .also { it.namespace = namespace }
+                .apply(block)
+                .build()
+        }
+    }
+
+////////////////////////////////////////
+
+    operator fun String.invoke(
+        type: TypeDefinition,
+        value: Literal = null.literal,
+        block: ConstDefinitionBuilder.() -> Unit = {}
+    ) = this { this.type *= type; this.value = value; block() }
+
+    operator fun String.invoke(
+        type: Unnamed<TypeDefinition>,
+        value: Literal = null.literal,
+        block: ConstDefinitionBuilder.() -> Unit = {}
+    ) = this { this.type *= type; this.value = value; block(); }
+
+////////////////////////////////////////
+
+    operator fun String.invoke(
+        value: NullLiteral,
+        block: ConstDefinitionBuilder.() -> Unit = {}
+    ) = this(builtin.Any.optional, value, block)
+
+    operator fun String.invoke(
+        value: BooleanLiteral,
+        block: ConstDefinitionBuilder.() -> Unit = {}
+    ) = this(builtin.Boolean, value, block)
+
+    operator fun String.invoke(
+        value: IntLiteral,
+        block: ConstDefinitionBuilder.() -> Unit = {}
+    ) = this(builtin.Int64, value, block)
+
+    operator fun String.invoke(
+        value: FloatLiteral,
+        block: ConstDefinitionBuilder.() -> Unit = {}
+    ) = this(builtin.Float64, value, block)
+
+    operator fun String.invoke(
+        value: StringLiteral,
+        block: ConstDefinitionBuilder.() -> Unit = {}
+    ) = this(builtin.String, value, block)
+
+    operator fun String.invoke(
+        value: TupleLiteral,
+        block: ConstDefinitionBuilder.() -> Unit = {}
+    ) = this(tuple, value, block)
+
+    operator fun String.invoke(
+        value: StructLiteral,
+        block: ConstDefinitionBuilder.() -> Unit = {}
+    ) = this(struct, value, block)
+
+////////////////////////////////////////
+
     override fun build(): EnumDefinition {
         val canonicalName = CanonicalName(this.namespace, this.name)
         return EnumDefinition(
