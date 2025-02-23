@@ -10,9 +10,7 @@ kotlin {
         withJava()
     }
     js(IR) {
-        browser {
-            binaries.library()
-        }
+        browser()
     }
     sourceSets {
         commonMain {
