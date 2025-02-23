@@ -39,11 +39,13 @@ value class Comm(val value: String) {
         /**
          * Requires confirmation of the identity of a client.
          */
+        @Deprecated("Use a custom Comm constant instead.")
         val SameClient = Comm("SameClient")
 
         /**
          * Requires confirmation of the identity of a software.
          */
+        @Deprecated("Use a custom Comm constant instead.")
         val SameSoftware = Comm("SameSoftware")
 
         /**
@@ -51,11 +53,13 @@ value class Comm(val value: String) {
          * and confirmation of consent from a subject to the
          * same client.
          */
+        @Deprecated("Use a custom Comm constant instead.")
         val SameSubject = Comm("SameSubject")
 
         /**
          * Requires confirmation of the identity of the service.
          */
+        @Deprecated("Use a custom Comm constant instead.")
         val SameService = Comm("SameService")
     }
 }
