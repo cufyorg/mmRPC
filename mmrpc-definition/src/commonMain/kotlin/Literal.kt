@@ -112,7 +112,19 @@ data class TupleLiteral(val value: List<Literal>) : Literal {
 }
 
 @Marker2
+val List<Literal>.literal get() = TupleLiteral(this)
+
+@Marker2
+@get:JvmName("literalOrNull")
+val List<Literal>?.literal get() = this?.literal ?: null.literal
+
+@Marker2
+@Deprecated("Use tupleOf(...) or .literal instead", ReplaceWith("tupleOf(*value)"))
 fun literal(vararg value: Literal) =
+    TupleLiteral(value.asList())
+
+@Marker2
+fun tupleOf(vararg value: Literal) =
     TupleLiteral(value.asList())
 
 @Serializable
@@ -127,5 +139,17 @@ data class StructLiteral(val value: Map<String, Literal>) : Literal {
 }
 
 @Marker2
+val Map<String, Literal>.literal get() = StructLiteral(this)
+
+@Marker2
+@get:JvmName("literalOrNull")
+val Map<String, Literal>?.literal get() = this?.literal ?: null.literal
+
+@Marker2
+@Deprecated("Use structOf(...) or .literal instead", ReplaceWith("structOf(*value)"))
 fun literal(vararg value: Pair<String, Literal>) =
+    StructLiteral(value.toMap())
+
+@Marker2
+fun structOf(vararg value: Pair<String, Literal>) =
     StructLiteral(value.toMap())
