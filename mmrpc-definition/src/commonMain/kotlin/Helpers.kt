@@ -17,6 +17,7 @@
 
 package org.cufy.mmrpc
 
+import org.intellij.lang.annotations.Language
 import kotlin.jvm.JvmName
 
 ////////////////////////////////////////
@@ -159,11 +160,13 @@ interface FieldDefinitionSetDomainContainer {
 abstract class ElementDefinitionBuilder {
     lateinit var name: String
     open var namespace: CanonicalName? = null
+
+    @Language("markdown")
     open var description = ""
 
     protected open val metadata = mutableListOf<MetadataDefinitionUsage>()
 
-    open operator fun String.unaryPlus() {
+    open operator fun @receiver:Language("markdown") String.unaryPlus() {
         description += this.trimIndent()
     }
 
