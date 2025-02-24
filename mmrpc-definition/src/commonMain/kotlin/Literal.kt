@@ -111,21 +111,13 @@ data class TupleLiteral(val value: List<Literal>) : Literal {
         }
 }
 
-@Marker2
-val List<Literal>.literal get() = TupleLiteral(this)
+fun List<Literal>.toTupleLiteral() = TupleLiteral(this)
+fun emptyTupleLiteral() = TupleLiteral(emptyList())
+fun tupleLiteralOf(vararg value: Literal) = TupleLiteral(value.asList())
 
 @Marker2
-@get:JvmName("literalOrNull")
-val List<Literal>?.literal get() = this?.literal ?: null.literal
-
-@Marker2
-@Deprecated("Use tupleOf(...) or .literal instead", ReplaceWith("tupleOf(*value)"))
-fun literal(vararg value: Literal) =
-    TupleLiteral(value.asList())
-
-@Marker2
-fun tupleOf(vararg value: Literal) =
-    TupleLiteral(value.asList())
+@Deprecated("Use tupleLiteralOf(...) instead", ReplaceWith("tupleLiteralOf(*value)"))
+fun literal(vararg value: Literal) = TupleLiteral(value.asList())
 
 @Serializable
 @SerialName("struct")
@@ -138,18 +130,10 @@ data class StructLiteral(val value: Map<String, Literal>) : Literal {
         }
 }
 
-@Marker2
-val Map<String, Literal>.literal get() = StructLiteral(this)
+fun Map<String, Literal>.toStructLiteral() = StructLiteral(this)
+fun emptyStructLiteral() = StructLiteral(emptyMap())
+fun structLiteralOf(vararg value: Pair<String, Literal>) = StructLiteral(value.toMap())
 
 @Marker2
-@get:JvmName("literalOrNull")
-val Map<String, Literal>?.literal get() = this?.literal ?: null.literal
-
-@Marker2
-@Deprecated("Use structOf(...) or .literal instead", ReplaceWith("structOf(*value)"))
-fun literal(vararg value: Pair<String, Literal>) =
-    StructLiteral(value.toMap())
-
-@Marker2
-fun structOf(vararg value: Pair<String, Literal>) =
-    StructLiteral(value.toMap())
+@Deprecated("Use structLiteralOf(...) instead", ReplaceWith("structLiteralOf(*value)"))
+fun literal(vararg value: Pair<String, Literal>) = StructLiteral(value.toMap())
