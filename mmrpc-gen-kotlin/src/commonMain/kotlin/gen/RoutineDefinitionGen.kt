@@ -75,11 +75,11 @@ data class RoutineDefinitionGen(override val ctx: GenContext) : GenScope() {
                 })
                 addProperty(propertySpec("typeI", KType::class) {
                     addModifiers(KModifier.OVERRIDE)
-                    initializer("typeOf<%T>", classOf(element.input))
+                    initializer("kotlin.reflect.typeOf<%T>()", classOf(element.input))
                 })
                 addProperty(propertySpec("typeO", KType::class) {
                     addModifiers(KModifier.OVERRIDE)
-                    initializer("typeOf<%T>", classOf(element.output))
+                    initializer("kotlin.reflect.typeOf<%T>()", classOf(element.output))
                 })
 
                 addKdoc(createKDoc(element))
