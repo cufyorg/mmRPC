@@ -2,6 +2,7 @@ package org.cufy.mmrpc
 
 import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmInline
+import kotlin.reflect.KType
 
 interface FaultObject {
     val canonicalName: CanonicalName
@@ -10,6 +11,8 @@ interface FaultObject {
 interface RoutineObject<I : Any, O : Any> {
     val canonicalName: CanonicalName
     val comm: Set<Comm>
+    val typeI: KType
+    val typeO: KType
 }
 
 @JvmInline

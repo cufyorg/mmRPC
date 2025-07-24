@@ -3,19 +3,22 @@ package org.cufy.mmrpc.server
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
+import io.ktor.util.reflect.*
 import org.cufy.json.JsonObject
 import org.cufy.json.set
 import org.cufy.mmrpc.CanonicalName
 import org.cufy.mmrpc.FaultException
 import org.cufy.mmrpc.FaultObject
 import org.cufy.mmrpc.RoutineObject
+import kotlin.reflect.jvm.jvmErasure
 
-suspend inline fun <reified O : Any> ApplicationCall.respond(
+suspend fun <O : Any> ApplicationCall.respond(
     routine: RoutineObject<*, O>,
     output: O,
     status: HttpStatusCode = HttpStatusCode.OK,
 ) {
-    respond(status, output)
+    response.status(status)
+    respond(output, TypeInfo(routine.typeO.jvmErasure, routine.typeO))
 }
 
 suspend inline fun ApplicationCall.respond(

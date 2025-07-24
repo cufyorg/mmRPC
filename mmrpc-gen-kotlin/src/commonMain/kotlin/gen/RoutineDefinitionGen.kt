@@ -12,6 +12,7 @@ import org.cufy.mmrpc.gen.kotlin.GenScope
 import org.cufy.mmrpc.gen.kotlin.common.*
 import org.cufy.mmrpc.gen.kotlin.util.createCallSingleVararg
 import org.cufy.mmrpc.gen.kotlin.util.propertySpec
+import kotlin.reflect.KType
 
 data class RoutineDefinitionGen(override val ctx: GenContext) : GenScope() {
     override fun apply() {
@@ -35,6 +36,9 @@ data class RoutineDefinitionGen(override val ctx: GenContext) : GenScope() {
                 const val CANONICAL_NAME = "<canonical-name>"
 
                 override val canonicalName = CanonicalName(CANONICAL_NAME)
+                override val comm = setOf(<comm>)
+                override val typeI = typeOf<I>()
+                override val typeO = typeOf<O>()
             }
         }
          */
@@ -68,6 +72,14 @@ data class RoutineDefinitionGen(override val ctx: GenContext) : GenScope() {
                             }
                         )
                     )
+                })
+                addProperty(propertySpec("typeI", KType::class) {
+                    addModifiers(KModifier.OVERRIDE)
+                    initializer("typeOf<%T>", classOf(element.input))
+                })
+                addProperty(propertySpec("typeO", KType::class) {
+                    addModifiers(KModifier.OVERRIDE)
+                    initializer("typeOf<%T>", classOf(element.output))
                 })
 
                 addKdoc(createKDoc(element))
