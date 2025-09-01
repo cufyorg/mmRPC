@@ -1,8 +1,18 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+
 plugins {
     `maven-publish`
 
     kotlin("multiplatform")
     kotlin("plugin.serialization")
+}
+
+kotlin {
+    compilerOptions {
+        apiVersion = KotlinVersion.KOTLIN_2_0
+        languageVersion = KotlinVersion.KOTLIN_2_0
+        coreLibrariesVersion = KotlinVersion.KOTLIN_2_0.version
+    }
 }
 
 kotlin {
