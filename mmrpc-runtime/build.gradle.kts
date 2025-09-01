@@ -30,7 +30,7 @@ kotlin {
         }
         commonTest {
             dependencies {
-                implementation(kotlin("test"))
+                implementation(kotlin("test", "2.0.0"))
             }
         }
     }

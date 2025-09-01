@@ -24,7 +24,7 @@ kotlin {
                 implementation(project(":mmrpc-definition"))
 
                 implementation(kotlin("stdlib"))
-                implementation(kotlin("reflect"))
+                implementation(kotlin("reflect", "2.0.0"))
                 implementation(libs.kotlin.serialization.json)
 
                 implementation(libs.kotlinpoet)
