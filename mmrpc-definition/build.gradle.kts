@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+
 plugins {
     `maven-publish`
 
@@ -6,21 +8,19 @@ plugins {
 }
 
 kotlin {
-    jvm {
-        withJava()
-    }
-    js(IR) {
-        browser()
-    }
+    jvm()
+    js { browser { binaries.library() } }
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs { browser { binaries.library() } }
     sourceSets {
         commonMain {
             dependencies {
                 implementation(project(":mmrpc-runtime"))
 
                 implementation(kotlin("stdlib"))
-                implementation(libs.kotlin.serialization.core)
+                implementation(libs.kotlin.serialization.json)
 
-                compileOnly("org.jetbrains:annotations:26.0.2")
+                api("org.jetbrains:annotations:26.0.2")
             }
         }
         commonTest {

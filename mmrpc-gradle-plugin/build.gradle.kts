@@ -25,7 +25,6 @@ dependencies {
     implementation(project(":mmrpc-gen-kotlin"))
 
     implementation(kotlin("stdlib"))
-    implementation(libs.kotlin.serialization.core)
     implementation(libs.kotlin.serialization.json)
 
     api(libs.kotlin.gradle.plugin)

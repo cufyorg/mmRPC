@@ -6,9 +6,7 @@ plugins {
 }
 
 kotlin {
-    jvm {
-        withJava()
-    }
+    jvm()
     sourceSets {
         commonMain {
             dependencies {
@@ -17,7 +15,7 @@ kotlin {
 
                 implementation(kotlin("stdlib"))
                 implementation(kotlin("reflect"))
-                implementation(libs.kotlin.serialization.core)
+                implementation(libs.kotlin.serialization.json)
 
                 implementation(libs.kotlinpoet)
 

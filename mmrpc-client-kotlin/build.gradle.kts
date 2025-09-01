@@ -6,9 +6,7 @@ plugins {
 }
 
 kotlin {
-    jvm {
-        withJava()
-    }
+    jvm()
     sourceSets {
         commonMain {
             dependencies {
@@ -16,7 +14,6 @@ kotlin {
                 implementation(project(":mmrpc-definition"))
 
                 implementation(kotlin("stdlib"))
-                implementation(libs.kotlin.serialization.core)
                 implementation(libs.kotlin.serialization.json)
 
                 implementation(libs.ktor.client.core)
