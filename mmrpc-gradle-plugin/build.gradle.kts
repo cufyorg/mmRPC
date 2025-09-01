@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+
 plugins {
     `maven-publish`
     `java-gradle-plugin`
@@ -16,6 +18,14 @@ gradlePlugin {
             description = "Code generators for mmRPC schema files"
             // tags.set(listOf("kotlin"))
         }
+    }
+}
+
+kotlin {
+    compilerOptions {
+        apiVersion = KotlinVersion.KOTLIN_2_0
+        languageVersion = KotlinVersion.KOTLIN_2_0
+        coreLibrariesVersion = KotlinVersion.KOTLIN_2_0.version
     }
 }
 
