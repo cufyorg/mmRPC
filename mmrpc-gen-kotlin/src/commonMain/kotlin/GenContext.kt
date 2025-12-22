@@ -29,10 +29,7 @@ class GenContext(
     // userdefined classes
     val userdefinedScalarClasses: Map<CanonicalName, ClassName>,
     val userdefinedMetadataClasses: Map<CanonicalName, ClassName>,
-) : GenScope() {
-    override val ctx: GenContext = this
-    override fun apply() {}
-
+) {
     /**
      * All the elements each associated with itself as a namespace.
      */

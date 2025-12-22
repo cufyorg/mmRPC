@@ -2,10 +2,11 @@ package org.cufy.mmrpc.gen.kotlin.common
 
 import com.squareup.kotlinpoet.CodeBlock
 import org.cufy.mmrpc.*
-import org.cufy.mmrpc.gen.kotlin.GenScope
+import org.cufy.mmrpc.gen.kotlin.GenContext
 
 @Marker3
-fun GenScope.createKDoc(element: ElementDefinition): CodeBlock {
+context(ctx: GenContext)
+fun createKDoc(element: ElementDefinition): CodeBlock {
     return CodeBlock.Builder().apply {
         add(buildString {
             append("### ")
@@ -22,7 +23,8 @@ fun GenScope.createKDoc(element: ElementDefinition): CodeBlock {
 }
 
 @Marker3
-fun GenScope.createKDocShort(element: ElementDefinition): CodeBlock {
+context(ctx: GenContext)
+fun createKDocShort(element: ElementDefinition): CodeBlock {
     if (hasGeneratedClass(element))
         return CodeBlock.of("@see [%L]", generatedClassOf(element.canonicalName))
 

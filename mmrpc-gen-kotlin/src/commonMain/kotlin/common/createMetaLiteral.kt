@@ -2,7 +2,7 @@ package org.cufy.mmrpc.gen.kotlin.common
 
 import com.squareup.kotlinpoet.CodeBlock
 import org.cufy.mmrpc.*
-import org.cufy.mmrpc.gen.kotlin.GenScope
+import org.cufy.mmrpc.gen.kotlin.GenContext
 import org.cufy.mmrpc.gen.kotlin.util.createCallSingleVararg
 
 private const val TAG = "createMetadataLiteral.kt"
@@ -15,7 +15,8 @@ private const val TAG = "createMetadataLiteral.kt"
  * > Remember: annotations does not support null values.
  */
 @Marker3
-fun GenScope.createMetaLiteral(element: ConstDefinition): CodeBlock {
+context(ctx: GenContext)
+fun createMetaLiteral(element: ConstDefinition): CodeBlock {
     return createMetaLiteral(element.type, element.value)
 }
 
@@ -27,7 +28,8 @@ fun GenScope.createMetaLiteral(element: ConstDefinition): CodeBlock {
  * > Remember: annotations does not support null values.
  */
 @Marker3
-fun GenScope.createMetaLiteral(element: TypeDefinition, literal: Literal): CodeBlock {
+context(ctx: GenContext)
+fun createMetaLiteral(element: TypeDefinition, literal: Literal): CodeBlock {
     return when (element) {
         is ArrayDefinition -> when (literal) {
             is TupleLiteral -> createMetadataLiteralOfArray(element, literal)
@@ -47,7 +49,8 @@ fun GenScope.createMetaLiteral(element: TypeDefinition, literal: Literal): CodeB
 
 // ===================={    Literal    }==================== //
 
-private fun GenScope.createMetadataLiteralOfScalar(element: ScalarDefinition, value: Literal): CodeBlock {
+context(ctx: GenContext)
+private fun createMetadataLiteralOfScalar(element: ScalarDefinition, value: Literal): CodeBlock {
     return when (value) {
         is NullLiteral -> fail(TAG, element) { "illegal value: $value" }
         is BooleanLiteral -> CodeBlock.of("%L", value.value)
@@ -59,7 +62,8 @@ private fun GenScope.createMetadataLiteralOfScalar(element: ScalarDefinition, va
     }
 }
 
-private fun GenScope.createMetadataLiteralOfEnum(element: EnumDefinition, literal: Literal): CodeBlock {
+context(ctx: GenContext)
+private fun createMetadataLiteralOfEnum(element: EnumDefinition, literal: Literal): CodeBlock {
     // find an entry with the same value presented
     val winner = element.entries.firstOrNull { it.value == literal }
     winner ?: fail(TAG, element) { "illegal value: $literal (enum entry not found)" }
@@ -70,7 +74,8 @@ private fun GenScope.createMetadataLiteralOfEnum(element: EnumDefinition, litera
 
 // ===================={ TupleLiteral  }==================== //
 
-private fun GenScope.createMetadataLiteralOfArray(element: ArrayDefinition, literal: TupleLiteral): CodeBlock {
+context(ctx: GenContext)
+private fun createMetadataLiteralOfArray(element: ArrayDefinition, literal: TupleLiteral): CodeBlock {
     return createCallSingleVararg(
         function = CodeBlock.of("arrayOf"),
         literal.value.map { createMetaLiteral(element.type, it) }

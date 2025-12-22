@@ -13,8 +13,8 @@ import org.cufy.mmrpc.gen.kotlin.util.fileSpec
 private const val TAG = "generateFileSpecSet__SUB_PACKAGES"
 
 @Suppress("FunctionName")
+context(ctx: GenContext)
 internal fun generateFileSpecSet__SUB_PACKAGES(
-    ctx: GenContext,
     onEachFile: FileSpec.Builder.() -> Unit,
 ): List<FileSpec> {
     val types = ctx.createTypeNodes.map { it.canonicalName }
@@ -34,9 +34,9 @@ internal fun generateFileSpecSet__SUB_PACKAGES(
     val injectScopeNodeMap = ctx.injectScopeNodes
         .groupBy { it.canonicalName }
 
-    ctx.debug {
+    debug {
         for (cn in injectTypeNodeMap.keys) if (cn !in types)
-            ctx.debugLog(TAG, "Element was ignored due to it having no direct parent: $cn")
+            debugLog(TAG, "Element was ignored due to it having no direct parent: $cn")
     }
 
     fun createTypeSpec(node: CreateTypeNode): TypeSpec {
@@ -64,14 +64,14 @@ internal fun generateFileSpecSet__SUB_PACKAGES(
 
     return buildList {
         for (node in createTypeNodeMap[null].orEmpty()) {
-            add(fileSpec(ctx.generatedClassOf(node.canonicalName)) {
+            add(fileSpec(generatedClassOf(node.canonicalName)) {
                 addType(createTypeSpec(node))
                 onEachFile()
             })
         }
 
         for (canonicalName in files) {
-            add(fileSpec(ctx.declarationsClassOf(canonicalName)) {
+            add(fileSpec(declarationsClassOf(canonicalName)) {
                 injectFileNodeMap[canonicalName]
                     ?.forEach { it.block(this) }
                 injectScopeNodeMap[canonicalName]

@@ -6,7 +6,8 @@ import org.cufy.mmrpc.gen.kotlin.*
 private const val TAG = "strategy.kt"
 
 @Marker3
-fun GenScope.calculateInterStrategy(element: InterDefinition): InterStrategy {
+context(ctx: GenContext)
+fun calculateInterStrategy(element: InterDefinition): InterStrategy {
     debugRequireGeneratedClass(TAG, element)
 
     if (element.types.all { it.fields.isEmpty() })
@@ -16,7 +17,8 @@ fun GenScope.calculateInterStrategy(element: InterDefinition): InterStrategy {
 }
 
 @Marker3
-fun GenScope.calculateStructStrategy(element: StructDefinition): StructStrategy {
+context(ctx: GenContext)
+fun calculateStructStrategy(element: StructDefinition): StructStrategy {
     debugRequireGeneratedClass(TAG, element)
 
     if (element.fields.isEmpty())
@@ -26,7 +28,8 @@ fun GenScope.calculateStructStrategy(element: StructDefinition): StructStrategy 
 }
 
 @Marker3
-fun GenScope.calculateTupleStrategy(element: TupleDefinition): TupleStrategy {
+context(ctx: GenContext)
+fun calculateTupleStrategy(element: TupleDefinition): TupleStrategy {
     debugRequireGeneratedClass(TAG, element)
 
     if (element.types.isEmpty())
@@ -36,7 +39,8 @@ fun GenScope.calculateTupleStrategy(element: TupleDefinition): TupleStrategy {
 }
 
 @Marker3
-fun GenScope.calculateUnionStrategy(element: UnionDefinition): UnionStrategy {
+context(ctx: GenContext)
+fun calculateUnionStrategy(element: UnionDefinition): UnionStrategy {
     debugRequireGeneratedClass(TAG, element)
 
     if (element.types.isEmpty()) return UnionStrategy.DATA_OBJECT

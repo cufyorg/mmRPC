@@ -314,19 +314,21 @@ open class MmrpcKotlinGenerateSourcesTask : DefaultTask() {
         )
 
         try {
-            ArrayDefinitionGen(genContext).apply()
-            ConstDefinitionGen(genContext).apply()
-            EnumDefinitionGen(genContext).apply()
-            FaultDefinitionGen(genContext).apply()
-            ProtocolDefinitionGen(genContext).apply()
-            RoutineDefinitionGen(genContext).apply()
-            FieldDefinitionGen(genContext).apply()
-            InterDefinitionGen(genContext).apply()
-            MetadataDefinitionGen(genContext).apply()
-            ScalarDefinitionGen(genContext).apply()
-            StructDefinitionGen(genContext).apply()
-            TupleDefinitionGen(genContext).apply()
-            UnionDefinitionGen(genContext).apply()
+            genContext.run {
+                consumeArrayDefinition()
+                consumeConstDefinition()
+                consumeEnumDefinition()
+                consumeFaultDefinition()
+                consumeProtocolDefinition()
+                consumeRoutineDefinition()
+                consumeFieldDefinition()
+                consumeInterDefinition()
+                consumeMetadataDefinition()
+                consumeScalarDefinition()
+                consumeStructDefinition()
+                consumeTupleDefinition()
+                consumeUnionDefinition()
+            }
         } catch (e: Exception) {
             val message = "$name: fetal code generation failure: ${e.message}"
             throw TaskInstantiationException(message, e)
@@ -335,7 +337,6 @@ open class MmrpcKotlinGenerateSourcesTask : DefaultTask() {
         genContext.failures.forEach { e ->
             val message = buildString {
                 append("$name: ")
-                append("${e.failure.group}: ")
                 append("${e.failure.tag}: ")
                 append(e.failure.message)
                 append(" (element: ${e.failure.element?.let { signatureOf(it) }})")
@@ -345,12 +346,14 @@ open class MmrpcKotlinGenerateSourcesTask : DefaultTask() {
         }
 
         val fileSpecSet = try {
-            generateFileSpecSet(genContext) {
-                addFileComment("This is an automatically generated file.\n")
-                addFileComment("Modification to this file WILL be lost everytime\n")
-                addFileComment("the code generation task is executed\n\n")
-                addFileComment("This file was generated with mmrpc-gen-kotlin via\n")
-                addFileComment("gradle plugin: org.cufy.mmrpc version: ${Mmrpc.VERSION}\n")
+            genContext.run {
+                generateFileSpecSet {
+                    addFileComment("This is an automatically generated file.\n")
+                    addFileComment("Modification to this file WILL be lost everytime\n")
+                    addFileComment("the code generation task is executed\n\n")
+                    addFileComment("This file was generated with mmrpc-gen-kotlin via\n")
+                    addFileComment("gradle plugin: org.cufy.mmrpc version: ${Mmrpc.VERSION}\n")
+                }
             }
         } catch (e: Exception) {
             val message = "$name: fetal code generation failure: ${e.message}"

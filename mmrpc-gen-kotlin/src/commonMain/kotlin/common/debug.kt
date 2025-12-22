@@ -3,23 +3,26 @@ package org.cufy.mmrpc.gen.kotlin.common
 import org.cufy.mmrpc.CanonicalName
 import org.cufy.mmrpc.ElementDefinition
 import org.cufy.mmrpc.Marker3
+import org.cufy.mmrpc.gen.kotlin.GenContext
 import org.cufy.mmrpc.gen.kotlin.GenFeature
-import org.cufy.mmrpc.gen.kotlin.GenScope
 
 @Marker3
-inline fun GenScope.debug(block: () -> Unit) {
+context(ctx: GenContext)
+inline fun debug(block: () -> Unit) {
     if (GenFeature.DEBUG in ctx.features)
         block()
 }
 
 @Marker3
-fun GenScope.debugRequireGeneratedClass(tag: String, element: ElementDefinition) {
+context(ctx: GenContext)
+fun debugRequireGeneratedClass(tag: String, element: ElementDefinition) {
     if (GenFeature.DEBUG in ctx.features && !hasGeneratedClass(element))
         fail(tag, element) { "elements are required to have generated class" }
 }
 
 @Marker3
-fun GenScope.debugRequireGeneratedClass(tag: String, canonicalName: CanonicalName) {
+context(ctx: GenContext)
+fun debugRequireGeneratedClass(tag: String, canonicalName: CanonicalName) {
     if (GenFeature.DEBUG in ctx.features) {
         val element = ctx.elements.find { it.canonicalName == canonicalName }
 
@@ -28,7 +31,8 @@ fun GenScope.debugRequireGeneratedClass(tag: String, canonicalName: CanonicalNam
     }
 }
 
-fun GenScope.debugLog(tag: String, msg: String) {
+context(ctx: GenContext)
+fun debugLog(tag: String, msg: String) {
     if (GenFeature.DEBUG !in ctx.features) return
 
     println("mmRPG: $tag: $msg".colored(fg = 36, bg = 40))

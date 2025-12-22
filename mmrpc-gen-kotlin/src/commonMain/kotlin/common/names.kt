@@ -4,15 +4,16 @@ import net.pearx.kasechange.toCamelCase
 import net.pearx.kasechange.toPascalCase
 import net.pearx.kasechange.toScreamingSnakeCase
 import org.cufy.mmrpc.*
+import org.cufy.mmrpc.gen.kotlin.GenContext
 import org.cufy.mmrpc.gen.kotlin.GenFeature
-import org.cufy.mmrpc.gen.kotlin.GenScope
 
 /**
  * Assuming [element] is a member of some enum,
  * this is the name of the generated entry by [element].
  */
 @Marker3
-fun GenScope.asEnumEntryName(element: ConstDefinition): String {
+context(ctx: GenContext)
+fun asEnumEntryName(element: ConstDefinition): String {
     return element.name.toPascalCase()
 }
 
@@ -21,7 +22,8 @@ fun GenScope.asEnumEntryName(element: ConstDefinition): String {
  * this is the name of the generated entry by [element].
  */
 @Marker3
-fun GenScope.asUnionWrapperEntryName(element: ElementDefinition): String {
+context(ctx: GenContext)
+fun asUnionWrapperEntryName(element: ElementDefinition): String {
     if (GenFeature.KEEP_TYPE_CLASS_NAMES in ctx.features)
         return element.name
 
@@ -32,7 +34,8 @@ fun GenScope.asUnionWrapperEntryName(element: ElementDefinition): String {
  * Return the name of the property generated from [element]'s name (assuming it has one).
  */
 @Marker3
-fun GenScope.asNamePropertyName(element: FieldDefinition): String {
+context(ctx: GenContext)
+fun asNamePropertyName(element: FieldDefinition): String {
     return element.name.toScreamingSnakeCase()
 }
 
@@ -40,7 +43,8 @@ fun GenScope.asNamePropertyName(element: FieldDefinition): String {
  * Return the name of the property generated from [element] (assuming it has one).
  */
 @Marker3
-fun GenScope.asPropertyName(element: FieldDefinition): String {
+context(ctx: GenContext)
+fun asPropertyName(element: FieldDefinition): String {
     if (GenFeature.KEEP_FIELD_PROPERTY_NAMES in ctx.features)
         return element.name
 
@@ -51,7 +55,8 @@ fun GenScope.asPropertyName(element: FieldDefinition): String {
  * Return the name of the property generated from [element] (assuming it has one).
  */
 @Marker3
-fun GenScope.asPropertyName(element: ConstDefinition): String {
+context(ctx: GenContext)
+fun asPropertyName(element: ConstDefinition): String {
     return element.name.toScreamingSnakeCase()
 }
 
@@ -59,7 +64,8 @@ fun GenScope.asPropertyName(element: ConstDefinition): String {
  * Return the name of the generated class (assuming it has one) of [element].
  */
 @Marker3
-fun GenScope.asClassName(element: ElementDefinition): String {
+context(ctx: GenContext)
+fun asClassName(element: ElementDefinition): String {
     ctx.classNames[element.canonicalName]?.let { return it }
 
     if (element is ProtocolDefinition) {

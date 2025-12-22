@@ -23,6 +23,7 @@ gradlePlugin {
 
 kotlin {
     compilerOptions {
+        freeCompilerArgs.add("-Xcontext-parameters")
         apiVersion = KotlinVersion.KOTLIN_2_0
         languageVersion = KotlinVersion.KOTLIN_2_0
         coreLibrariesVersion = KotlinVersion.KOTLIN_2_0.version

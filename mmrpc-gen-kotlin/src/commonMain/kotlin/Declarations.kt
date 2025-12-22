@@ -64,7 +64,6 @@ open class GenException(
 ) : Exception(failure.message, cause)
 
 data class GenFailure(
-    val group: String,
     val tag: String,
     val message: String,
     val element: ElementDefinition?,

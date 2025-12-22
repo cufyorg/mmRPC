@@ -3,13 +3,14 @@ package org.cufy.mmrpc.gen.kotlin.common
 import com.squareup.kotlinpoet.ClassName
 import org.cufy.mmrpc.CanonicalName
 import org.cufy.mmrpc.Marker3
+import org.cufy.mmrpc.gen.kotlin.GenContext
 import org.cufy.mmrpc.gen.kotlin.GenPackaging
-import org.cufy.mmrpc.gen.kotlin.GenScope
 
 private const val TAG = "generated.kt"
 
 @Marker3
-fun GenScope.declarationsClassOf(canonicalName: CanonicalName?): ClassName {
+context(ctx: GenContext)
+fun declarationsClassOf(canonicalName: CanonicalName?): ClassName {
 //    debug { if (namespace !in ctx.rootsNS) fail(TAG) { "generatedClassOf($namespace): namespace is not in rootsNS" } }
 
     when (ctx.packaging) {
@@ -30,7 +31,8 @@ fun GenScope.declarationsClassOf(canonicalName: CanonicalName?): ClassName {
  * return the kotlin-poet classname of said generated class.
  */
 @Marker3
-fun GenScope.generatedClassOf(canonicalName: CanonicalName): ClassName {
+context(ctx: GenContext)
+fun generatedClassOf(canonicalName: CanonicalName): ClassName {
     debugRequireGeneratedClass(TAG, canonicalName)
 
     when (ctx.packaging) {
@@ -58,7 +60,8 @@ fun GenScope.generatedClassOf(canonicalName: CanonicalName): ClassName {
  * return the package of said generated class.
  */
 @Marker3
-fun GenScope.generatedPackageOf(canonicalName: CanonicalName): String {
+context(ctx: GenContext)
+fun generatedPackageOf(canonicalName: CanonicalName): String {
     debugRequireGeneratedClass(TAG, canonicalName)
 
     when (ctx.packaging) {
@@ -77,7 +80,8 @@ fun GenScope.generatedPackageOf(canonicalName: CanonicalName): String {
  * Return the namespace of the top most element the given [canonicalName] is on.
  */
 @Marker3
-private fun GenScope.rootNSOf(canonicalName: CanonicalName): CanonicalName? {
+context(ctx: GenContext)
+private fun rootNSOf(canonicalName: CanonicalName): CanonicalName? {
     var pkg = canonicalName.namespace
 
     while (pkg !in ctx.roots)

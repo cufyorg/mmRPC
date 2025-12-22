@@ -1,13 +1,14 @@
 package org.cufy.mmrpc.gen.kotlin.common
 
 import org.cufy.mmrpc.*
-import org.cufy.mmrpc.gen.kotlin.GenScope
+import org.cufy.mmrpc.gen.kotlin.GenContext
 
 /**
  * Return true, if the given [element] is supposed to have a generated class.
  */
 @Marker3
-fun GenScope.hasGeneratedClass(element: ElementDefinition): Boolean {
+context(ctx: GenContext)
+fun hasGeneratedClass(element: ElementDefinition): Boolean {
     if (element is ArrayDefinition) {
         if (!element.name[0].isUpperCase()) return false
         if (element.namespace !in ctx.roots) return false
@@ -37,7 +38,8 @@ fun GenScope.hasGeneratedClass(element: ElementDefinition): Boolean {
  * when a value with [it][element] as its type was generated.
  */
 @Marker3
-fun GenScope.isCompileConst(element: TypeDefinition): Boolean {
+context(ctx: GenContext)
+fun isCompileConst(element: TypeDefinition): Boolean {
     return element is ScalarDefinition && isNative(element)
 }
 
@@ -46,7 +48,8 @@ fun GenScope.isCompileConst(element: TypeDefinition): Boolean {
  * native (mapped to a native kotlin class) by the user.
  */
 @Marker3
-fun GenScope.isNative(element: ScalarDefinition): Boolean {
+context(ctx: GenContext)
+fun isNative(element: ScalarDefinition): Boolean {
     return element.canonicalName in ctx.nativeScalarClasses
 }
 
@@ -55,7 +58,8 @@ fun GenScope.isNative(element: ScalarDefinition): Boolean {
  * native (mapped to a native kotlin class) by the user.
  */
 @Marker3
-fun GenScope.isNative(element: MetadataDefinition): Boolean {
+context(ctx: GenContext)
+fun isNative(element: MetadataDefinition): Boolean {
     return element.canonicalName in ctx.nativeMetadataClasses
 }
 
@@ -64,7 +68,8 @@ fun GenScope.isNative(element: MetadataDefinition): Boolean {
  * native (fully inlined) by the user.
  */
 @Marker3
-fun GenScope.isNative(element: ConstDefinition): Boolean {
+context(ctx: GenContext)
+fun isNative(element: ConstDefinition): Boolean {
     return element.canonicalName in ctx.nativeConstants
 }
 
@@ -73,7 +78,8 @@ fun GenScope.isNative(element: ConstDefinition): Boolean {
  * defined in user code by the user.
  */
 @Marker3
-fun GenScope.isUserdefined(element: ScalarDefinition): Boolean {
+context(ctx: GenContext)
+fun isUserdefined(element: ScalarDefinition): Boolean {
     return element.canonicalName in ctx.userdefinedScalarClasses
 }
 
@@ -82,6 +88,7 @@ fun GenScope.isUserdefined(element: ScalarDefinition): Boolean {
  * defined in user code by the user.
  */
 @Marker3
-fun GenScope.isUserdefined(element: MetadataDefinition): Boolean {
+context(ctx: GenContext)
+fun isUserdefined(element: MetadataDefinition): Boolean {
     return element.canonicalName in ctx.userdefinedMetadataClasses
 }

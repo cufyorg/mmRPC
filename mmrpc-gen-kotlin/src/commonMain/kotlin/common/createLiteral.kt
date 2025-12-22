@@ -13,7 +13,8 @@ private const val TAG = "createLiteral.kt"
  * returns the representation of the given [element].
  */
 @Marker3
-fun GenScope.createLiteral(element: ConstDefinition): CodeBlock {
+context(ctx: GenContext)
+fun createLiteral(element: ConstDefinition): CodeBlock {
     return createLiteral(element.type, element.value)
 }
 
@@ -23,7 +24,8 @@ fun GenScope.createLiteral(element: ConstDefinition): CodeBlock {
  * in the given type [element].
  */
 @Marker3
-fun GenScope.createLiteral(element: TypeDefinition, literal: Literal): CodeBlock {
+context(ctx: GenContext)
+fun createLiteral(element: TypeDefinition, literal: Literal): CodeBlock {
     return when (element) {
         is OptionalDefinition -> createLiteralOfOptional(element, literal)
         is ArrayDefinition -> when (literal) {
@@ -57,7 +59,8 @@ fun GenScope.createLiteral(element: TypeDefinition, literal: Literal): CodeBlock
 
 // ===================={    Literal    }==================== //
 
-private fun GenScope.createLiteralOfScalar(element: ScalarDefinition, literal: Literal): CodeBlock {
+context(ctx: GenContext)
+private fun createLiteralOfScalar(element: ScalarDefinition, literal: Literal): CodeBlock {
     val valueCode = when (literal) {
         is BooleanLiteral -> CodeBlock.of("%L", literal.value)
         is IntLiteral -> CodeBlock.of("%L", literal.value)
@@ -83,7 +86,8 @@ private fun GenScope.createLiteralOfScalar(element: ScalarDefinition, literal: L
     }
 }
 
-private fun GenScope.createLiteralOfEnum(element: EnumDefinition, literal: Literal): CodeBlock {
+context(ctx: GenContext)
+private fun createLiteralOfEnum(element: EnumDefinition, literal: Literal): CodeBlock {
     // find an entry with the same value presented
     val winner = element.entries.firstOrNull { it.value == literal }
     winner ?: fail(TAG, element) { "illegal value: $literal (enum entry not found)" }
@@ -92,7 +96,8 @@ private fun GenScope.createLiteralOfEnum(element: EnumDefinition, literal: Liter
     return CodeBlock.of("%T.%L", generatedClassOf(element.canonicalName), asEnumEntryName(winner))
 }
 
-private fun GenScope.createLiteralOfOptional(element: OptionalDefinition, literal: Literal): CodeBlock {
+context(ctx: GenContext)
+private fun createLiteralOfOptional(element: OptionalDefinition, literal: Literal): CodeBlock {
     return when (literal) {
         is NullLiteral -> CodeBlock.of("null")
         else -> createLiteral(element.type, literal)
@@ -101,14 +106,16 @@ private fun GenScope.createLiteralOfOptional(element: OptionalDefinition, litera
 
 // ===================={ TupleLiteral  }==================== //
 
-private fun GenScope.createLiteralOfArray(element: ArrayDefinition, literal: TupleLiteral): CodeBlock {
+context(ctx: GenContext)
+private fun createLiteralOfArray(element: ArrayDefinition, literal: TupleLiteral): CodeBlock {
     return createCallSingleVararg(
         function = CodeBlock.of("listOf"),
         literal.value.map { createLiteral(element.type, it) }
     )
 }
 
-private fun GenScope.createLiteralOfTuple(element: TupleDefinition, literal: TupleLiteral): CodeBlock {
+context(ctx: GenContext)
+private fun createLiteralOfTuple(element: TupleDefinition, literal: TupleLiteral): CodeBlock {
     when (calculateTupleStrategy(element)) {
         TupleStrategy.DATA_OBJECT ->
             return CodeBlock.of("%T", generatedClassOf(element.canonicalName))
@@ -133,7 +140,8 @@ private fun GenScope.createLiteralOfTuple(element: TupleDefinition, literal: Tup
 
 // ===================={ StructLiteral }==================== //
 
-private fun GenScope.createLiteralOfStruct(element: StructDefinition, literal: StructLiteral): CodeBlock {
+context(ctx: GenContext)
+private fun createLiteralOfStruct(element: StructDefinition, literal: StructLiteral): CodeBlock {
     if (element.canonicalName == builtin.Void.canonicalName)
         return CodeBlock.of("%T", Unit::class)
 
@@ -159,7 +167,8 @@ private fun GenScope.createLiteralOfStruct(element: StructDefinition, literal: S
     }
 }
 
-private fun GenScope.createLiteralOfInter(element: InterDefinition, literal: StructLiteral): CodeBlock {
+context(ctx: GenContext)
+private fun createLiteralOfInter(element: InterDefinition, literal: StructLiteral): CodeBlock {
     when (calculateInterStrategy(element)) {
         InterStrategy.DATA_OBJECT ->
             return CodeBlock.of("%T", generatedClassOf(element.canonicalName))
@@ -186,7 +195,8 @@ private fun GenScope.createLiteralOfInter(element: InterDefinition, literal: Str
     }
 }
 
-private fun GenScope.createLiteralOfUnion(element: UnionDefinition, literal: StructLiteral): CodeBlock {
+context(ctx: GenContext)
+private fun createLiteralOfUnion(element: UnionDefinition, literal: StructLiteral): CodeBlock {
     when (calculateUnionStrategy(element)) {
         UnionStrategy.DATA_OBJECT ->
             fail(TAG, element) { "illegal value: $literal (empty union type)" }
