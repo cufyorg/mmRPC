@@ -14,7 +14,7 @@ context(ctx: GenContext)
 fun consumeFaultDefinition() {
     for (element in ctx.elements) {
         if (element !is FaultDefinition) continue
-        if (!hasGeneratedClass(element)) continue
+        if (!element.hasGeneratedClass()) continue
         if (element.canonicalName in ctx.ignore) continue
 
         failBoundary {
@@ -38,7 +38,7 @@ private fun applyCreateDataObject(element: FaultDefinition) {
      */
 
     createType(element.canonicalName) {
-        objectBuilder(asClassName(element)).apply {
+        objectBuilder(element.nameOfClass()).apply {
             addModifiers(KModifier.DATA)
             addSuperinterface(FaultObject::class)
 
@@ -51,7 +51,7 @@ private fun applyCreateDataObject(element: FaultDefinition) {
                 initializer("%T(CANONICAL_NAME)", CanonicalName::class)
             })
 
-            addKdoc(createKDoc(element))
+            addKdoc(createKdocCode(element))
             addAnnotations(createAnnotationSet(element.metadata))
         }
     }

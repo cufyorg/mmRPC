@@ -27,27 +27,27 @@ fun declarationsClassOf(canonicalName: CanonicalName?): ClassName {
 }
 
 /**
- * Assuming the given [canonicalName] has a generated class,
+ * Assuming the given [this] has a generated class,
  * return the kotlin-poet classname of said generated class.
  */
 @Marker3
 context(ctx: GenContext)
-fun generatedClassOf(canonicalName: CanonicalName): ClassName {
-    debugRequireGeneratedClass(TAG, canonicalName)
+fun CanonicalName.generatedClassName(): ClassName {
+    debugRequireGeneratedClass(TAG, this)
 
     when (ctx.packaging) {
         GenPackaging.SUB_PACKAGES -> {
-            val ns = rootNSOf(canonicalName)
+            val ns = resolveRoot()
             val nsv = ns?.value.orEmpty()
             val pkg = when {
                 ctx.packageName.isEmpty() -> nsv
                 else -> "${ctx.packageName}.$nsv"
             }
-            val names = canonicalName.collect()
+            val names = collect()
                 .drop(ns?.segmentsCount() ?: 0)
                 .map { ctx.elementsMap[it] }
                 .filterNotNull() // ??? why would this happen? it is possible to have nulls yet unexpected
-                .map { asClassName(it) }
+                .map { it.nameOfClass() }
                 .toList()
 
             return ClassName(pkg, names)
@@ -56,17 +56,17 @@ fun generatedClassOf(canonicalName: CanonicalName): ClassName {
 }
 
 /**
- * Assuming the given [canonicalName] has a generated class,
+ * Assuming the given [this] has a generated class,
  * return the package of said generated class.
  */
 @Marker3
 context(ctx: GenContext)
-fun generatedPackageOf(canonicalName: CanonicalName): String {
-    debugRequireGeneratedClass(TAG, canonicalName)
+fun CanonicalName.generatedPackageName(): String {
+    debugRequireGeneratedClass(TAG, this)
 
     when (ctx.packaging) {
         GenPackaging.SUB_PACKAGES -> {
-            val ns = rootNSOf(canonicalName)
+            val ns = resolveRoot()
             val nsv = ns?.value.orEmpty()
             return when {
                 ctx.packageName.isEmpty() -> nsv
@@ -74,18 +74,4 @@ fun generatedPackageOf(canonicalName: CanonicalName): String {
             }
         }
     }
-}
-
-/**
- * Return the namespace of the top most element the given [canonicalName] is on.
- */
-@Marker3
-context(ctx: GenContext)
-private fun rootNSOf(canonicalName: CanonicalName): CanonicalName? {
-    var pkg = canonicalName.namespace
-
-    while (pkg !in ctx.roots)
-        pkg = pkg?.namespace ?: return null
-
-    return pkg
 }

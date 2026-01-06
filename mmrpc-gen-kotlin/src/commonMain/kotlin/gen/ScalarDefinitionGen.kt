@@ -12,7 +12,7 @@ context(ctx: GenContext)
 fun consumeScalarDefinition() {
     for (element in ctx.elements) {
         if (element !is ScalarDefinition) continue
-        if (!hasGeneratedClass(element)) continue
+        if (!element.hasGeneratedClass()) continue
         if (element.canonicalName in ctx.ignore) continue
 
         failBoundary {
@@ -35,18 +35,18 @@ private fun applyCreateValueClass(element: ScalarDefinition) {
      */
 
     createType(element.canonicalName) {
-        classBuilder(asClassName(element)).apply {
+        classBuilder(element.nameOfClass()).apply {
             addModifiers(KModifier.VALUE)
             addAnnotation(JvmInline::class)
 
             primaryConstructor(constructorSpec {
-                addParameter("value", primitiveClassOf(element))
+                addParameter("value", element.primitiveTypeName())
             })
-            addProperty(propertySpec("value", primitiveClassOf(element)) {
+            addProperty(propertySpec("value", element.primitiveTypeName()) {
                 initializer("value")
             })
 
-            addKdoc(createKDoc(element))
+            addKdoc(createKdocCode(element))
             addAnnotations(createAnnotationSet(element.metadata))
             addAnnotations(createSerializableAnnotationSet())
             addAnnotations(createSerialNameAnnotationSet(element.canonicalName.value))

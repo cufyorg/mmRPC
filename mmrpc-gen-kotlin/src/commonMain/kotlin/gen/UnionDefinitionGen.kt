@@ -15,11 +15,11 @@ context(ctx: GenContext)
 fun consumeUnionDefinition() {
     for (element in ctx.elements) {
         if (element !is UnionDefinition) continue
-        if (!hasGeneratedClass(element)) continue
+        if (!element.hasGeneratedClass()) continue
         if (element.canonicalName in ctx.ignore) continue
 
         failBoundary {
-            when (calculateUnionStrategy(element)) {
+            when (element.calculateStrategy()) {
                 UnionStrategy.DATA_OBJECT
                 -> applyCreateDataObject(element)
 
@@ -46,10 +46,10 @@ private fun applyCreateDataObject(element: UnionDefinition) {
      */
 
     createType(element.canonicalName) {
-        objectBuilder(asClassName(element)).apply {
+        objectBuilder(element.nameOfClass()).apply {
             addModifiers(KModifier.DATA)
 
-            addKdoc(createKDoc(element))
+            addKdoc(createKdocCode(element))
             addAnnotations(createAnnotationSet(element.metadata))
             addAnnotations(createSerializableAnnotationSet())
             addAnnotations(createSerialNameAnnotationSet(element.canonicalName.value))
@@ -70,10 +70,10 @@ private fun applyCreateSealedInterface(element: UnionDefinition) {
      */
 
     createType(element.canonicalName) {
-        interfaceBuilder(asClassName(element)).apply {
+        interfaceBuilder(element.nameOfClass()).apply {
             addModifiers(KModifier.SEALED)
 
-            addKdoc(createKDoc(element))
+            addKdoc(createKdocCode(element))
             addAnnotations(createAnnotationSet(element.metadata))
             addAnnotations(createSerializableAnnotationSet())
             addAnnotations(createSerialNameAnnotationSet(element.canonicalName.value))
@@ -82,7 +82,7 @@ private fun applyCreateSealedInterface(element: UnionDefinition) {
 
     for (subtype in element.types) {
         injectType(subtype.canonicalName) {
-            addSuperinterface(generatedClassOf(element.canonicalName))
+            addSuperinterface(element.canonicalName.generatedClassName())
         }
     }
 }
@@ -90,30 +90,30 @@ private fun applyCreateSealedInterface(element: UnionDefinition) {
 context(ctx: GenContext)
 private fun applyCreateWrapperSealedInterface(element: UnionDefinition) {
     createType(element.canonicalName) {
-        interfaceBuilder(asClassName(element)).apply {
+        interfaceBuilder(element.nameOfClass()).apply {
             addModifiers(KModifier.SEALED)
 
             addTypes(element.types.map {
-                classSpec(asUnionWrapperEntryName(it)) {
+                classSpec(it.nameOfUnionWrapperEntry()) {
                     addModifiers(KModifier.VALUE)
                     addAnnotation(JvmInline::class)
-                    addSuperinterface(generatedClassOf(element.canonicalName))
+                    addSuperinterface(element.canonicalName.generatedClassName())
 
                     primaryConstructor(constructorSpec {
-                        addParameter("value", classOf(it))
+                        addParameter("value", it.typeName())
                     })
-                    addProperty(propertySpec("value", classOf(it)) {
+                    addProperty(propertySpec("value", it.typeName()) {
                         initializer("value")
                     })
 
-                    addKdoc(createKDocShort(it))
+                    addKdoc(createShortKdocCode(it))
                     addAnnotations(createAnnotationSet(it.metadata))
                     addAnnotations(createSerializableAnnotationSet())
                     addAnnotations(createSerialNameAnnotationSet(it.canonicalName.value))
                 }
             })
 
-            addKdoc(createKDoc(element))
+            addKdoc(createKdocCode(element))
             addAnnotations(createAnnotationSet(element.metadata))
             addAnnotations(createSerializableAnnotationSet())
             addAnnotations(createSerialNameAnnotationSet(element.canonicalName.value))

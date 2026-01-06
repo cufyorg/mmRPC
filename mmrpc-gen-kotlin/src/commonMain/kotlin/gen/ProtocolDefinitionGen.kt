@@ -10,7 +10,7 @@ context(ctx: GenContext)
 fun consumeProtocolDefinition() {
     for (element in ctx.elements) {
         if (element !is ProtocolDefinition) continue
-        if (!hasGeneratedClass(element)) continue
+        if (!element.hasGeneratedClass()) continue
         if (element.canonicalName in ctx.ignore) continue
 
         failBoundary {
@@ -29,10 +29,10 @@ private fun applyCreateDataObject(element: ProtocolDefinition) {
     }
     */
     createType(element.canonicalName) {
-        objectBuilder(asClassName(element)).apply {
+        objectBuilder(element.nameOfClass()).apply {
             addModifiers(KModifier.DATA)
 
-            addKdoc(createKDoc(element))
+            addKdoc(createKdocCode(element))
             addAnnotations(createAnnotationSet(element.metadata))
         }
     }

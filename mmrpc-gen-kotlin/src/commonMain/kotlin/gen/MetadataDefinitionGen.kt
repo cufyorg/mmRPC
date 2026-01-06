@@ -12,7 +12,7 @@ context(ctx: GenContext)
 fun consumeMetadataDefinition() {
     for (element in ctx.elements) {
         if (element !is MetadataDefinition) continue
-        if (!hasGeneratedClass(element)) continue
+        if (!element.hasGeneratedClass()) continue
         if (element.canonicalName in ctx.ignore) continue
 
         failBoundary {
@@ -38,28 +38,28 @@ private fun applyCreateAnnotationClass(element: MetadataDefinition) {
      */
 
     createType(element.canonicalName) {
-        annotationBuilder(asClassName(element)).apply {
+        annotationBuilder(element.nameOfClass()).apply {
             primaryConstructor(constructorSpec {
                 addParameters(element.fields.map {
-                    parameterSpec(asPropertyName(it), metaClassOf(it.type)) {
+                    parameterSpec(it.nameOfProperty(), it.type.metaTypeName()) {
                         val default = it.default
 
                         if (default != null) {
-                            defaultValue(createMetaLiteral(it.type, default))
+                            defaultValue(createMetaLiteralCode(it.type, default))
                         }
                     }
                 })
             })
             addProperties(element.fields.map {
-                propertySpec(asPropertyName(it), metaClassOf(it.type)) {
-                    initializer(asPropertyName(it))
+                propertySpec(it.nameOfProperty(), it.type.metaTypeName()) {
+                    initializer(it.nameOfProperty())
 
-                    addKdoc(createKDocShort(it))
+                    addKdoc(createShortKdocCode(it))
                     addAnnotations(createAnnotationSet(it.metadata))
                 }
             })
 
-            addKdoc(createKDoc(element))
+            addKdoc(createKdocCode(element))
             addAnnotations(createAnnotationSet(element.metadata))
         }
     }

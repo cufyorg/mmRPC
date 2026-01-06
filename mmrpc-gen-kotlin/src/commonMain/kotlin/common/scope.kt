@@ -3,9 +3,7 @@ package org.cufy.mmrpc.gen.kotlin.common
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.MemberSpecHolder
 import com.squareup.kotlinpoet.TypeSpec
-import org.cufy.mmrpc.CanonicalName
-import org.cufy.mmrpc.ElementDefinition
-import org.cufy.mmrpc.Marker3
+import org.cufy.mmrpc.*
 import org.cufy.mmrpc.gen.kotlin.*
 
 @Marker3
@@ -52,4 +50,51 @@ fun injectFile(canonicalName: CanonicalName?, block: FileSpec.Builder.() -> Unit
 context(ctx: GenContext)
 fun injectScope(canonicalName: CanonicalName?, block: MemberSpecHolder.Builder<*>.() -> Unit) {
     ctx.injectScopeNodes += InjectScopeNode(canonicalName, block)
+}
+
+@Marker3
+context(ctx: GenContext)
+fun CanonicalName.resolveElement(): ElementDefinition? =
+    ctx.elements.find { it.canonicalName == this }
+
+@Marker3
+context(ctx: GenContext)
+fun CanonicalName.resolveRoot(): CanonicalName? {
+    // Return the namespace of the top most element this element is on.
+
+    var pkg = namespace
+
+    while (pkg !in ctx.roots)
+        pkg = pkg?.namespace ?: return null
+
+    return pkg
+}
+
+@Marker3
+context(ctx: GenContext)
+fun ElementDefinition.resolveParent(): ElementDefinition? =
+    ctx.elementsMap[namespace]
+
+/**
+ * Return a human-readable name of the given [this].
+ */
+fun ElementDefinition.humanSignature(): String {
+    val discriminator = when (this) {
+        is ArrayDefinition -> "array"
+        is EnumDefinition -> "enum"
+        is ConstDefinition -> "const"
+        is FaultDefinition -> "fault"
+        is FieldDefinition -> "field"
+        is InterDefinition -> "inter"
+        is MetadataDefinition -> "metadata"
+        is OptionalDefinition -> "optional"
+        is ProtocolDefinition -> "protocol"
+        is RoutineDefinition -> "routine"
+        is ScalarDefinition -> "scalar"
+        is StructDefinition -> "struct"
+        is TupleDefinition -> "tuple"
+        is UnionDefinition -> "union"
+    }
+
+    return "$discriminator ${canonicalName.value}"
 }

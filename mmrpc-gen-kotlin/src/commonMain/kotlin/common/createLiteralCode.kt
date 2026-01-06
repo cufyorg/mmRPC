@@ -6,17 +6,7 @@ import org.cufy.mmrpc.gen.kotlin.*
 import org.cufy.mmrpc.gen.kotlin.util.createCall
 import org.cufy.mmrpc.gen.kotlin.util.createCallSingleVararg
 
-private const val TAG = "createLiteral.kt"
-
-/**
- * Returns a code block that, when executed,
- * returns the representation of the given [element].
- */
-@Marker3
-context(ctx: GenContext)
-fun createLiteral(element: ConstDefinition): CodeBlock {
-    return createLiteral(element.type, element.value)
-}
+private const val TAG = "createLiteralCode.kt"
 
 /**
  * Returns a code block that, when executed,
@@ -25,33 +15,33 @@ fun createLiteral(element: ConstDefinition): CodeBlock {
  */
 @Marker3
 context(ctx: GenContext)
-fun createLiteral(element: TypeDefinition, literal: Literal): CodeBlock {
+fun createLiteralCode(element: TypeDefinition, literal: Literal): CodeBlock {
     return when (element) {
-        is OptionalDefinition -> createLiteralOfOptional(element, literal)
+        is OptionalDefinition -> createLiteralCodeOfOptional(element, literal)
         is ArrayDefinition -> when (literal) {
-            is TupleLiteral -> createLiteralOfArray(element, literal)
+            is TupleLiteral -> createLiteralCodeOfArray(element, literal)
             else -> fail(TAG, element) { "illegal value: $literal" }
         }
 
-        is EnumDefinition -> createLiteralOfEnum(element, literal)
-        is ScalarDefinition -> createLiteralOfScalar(element, literal)
+        is EnumDefinition -> createLiteralCodeOfEnum(element, literal)
+        is ScalarDefinition -> createLiteralCodeOfScalar(element, literal)
         is TupleDefinition -> when (literal) {
-            is TupleLiteral -> createLiteralOfTuple(element, literal)
+            is TupleLiteral -> createLiteralCodeOfTuple(element, literal)
             else -> fail(TAG, element) { "illegal value: $literal" }
         }
 
         is StructDefinition -> when (literal) {
-            is StructLiteral -> createLiteralOfStruct(element, literal)
+            is StructLiteral -> createLiteralCodeOfStruct(element, literal)
             else -> fail(TAG, element) { "illegal value: $literal" }
         }
 
         is InterDefinition -> when (literal) {
-            is StructLiteral -> createLiteralOfInter(element, literal)
+            is StructLiteral -> createLiteralCodeOfInter(element, literal)
             else -> fail(TAG, element) { "illegal value: $literal" }
         }
 
         is UnionDefinition -> when (literal) {
-            is StructLiteral -> createLiteralOfUnion(element, literal)
+            is StructLiteral -> createLiteralCodeOfUnion(element, literal)
             else -> fail(TAG, element) { "illegal value: $literal" }
         }
     }
@@ -60,7 +50,7 @@ fun createLiteral(element: TypeDefinition, literal: Literal): CodeBlock {
 // ===================={    Literal    }==================== //
 
 context(ctx: GenContext)
-private fun createLiteralOfScalar(element: ScalarDefinition, literal: Literal): CodeBlock {
+private fun createLiteralCodeOfScalar(element: ScalarDefinition, literal: Literal): CodeBlock {
     val valueCode = when (literal) {
         is BooleanLiteral -> CodeBlock.of("%L", literal.value)
         is IntLiteral -> CodeBlock.of("%L", literal.value)
@@ -72,14 +62,14 @@ private fun createLiteralOfScalar(element: ScalarDefinition, literal: Literal): 
     }
 
     return when {
-        isNative(element) ->
+        element.isNative() ->
             valueCode
 
-        isUserdefined(element) ->
-            CodeBlock.of("%T(%L)", userdefinedClassOf(element), valueCode)
+        element.isUserdefined() ->
+            CodeBlock.of("%T(%L)", element.userdefinedTypeName(), valueCode)
 
-        hasGeneratedClass(element) ->
-            CodeBlock.of("%T(%L)", generatedClassOf(element.canonicalName), valueCode)
+        element.hasGeneratedClass() ->
+            CodeBlock.of("%T(%L)", element.canonicalName.generatedClassName(), valueCode)
 
         else ->
             fail(TAG, element) { "element not supported" }
@@ -87,38 +77,38 @@ private fun createLiteralOfScalar(element: ScalarDefinition, literal: Literal): 
 }
 
 context(ctx: GenContext)
-private fun createLiteralOfEnum(element: EnumDefinition, literal: Literal): CodeBlock {
+private fun createLiteralCodeOfEnum(element: EnumDefinition, literal: Literal): CodeBlock {
     // find an entry with the same value presented
     val winner = element.entries.firstOrNull { it.value == literal }
     winner ?: fail(TAG, element) { "illegal value: $literal (enum entry not found)" }
 
     // create a reference to that entry
-    return CodeBlock.of("%T.%L", generatedClassOf(element.canonicalName), asEnumEntryName(winner))
+    return CodeBlock.of("%T.%L", element.canonicalName.generatedClassName(), winner.nameOfEnumEntry())
 }
 
 context(ctx: GenContext)
-private fun createLiteralOfOptional(element: OptionalDefinition, literal: Literal): CodeBlock {
+private fun createLiteralCodeOfOptional(element: OptionalDefinition, literal: Literal): CodeBlock {
     return when (literal) {
         is NullLiteral -> CodeBlock.of("null")
-        else -> createLiteral(element.type, literal)
+        else -> createLiteralCode(element.type, literal)
     }
 }
 
 // ===================={ TupleLiteral  }==================== //
 
 context(ctx: GenContext)
-private fun createLiteralOfArray(element: ArrayDefinition, literal: TupleLiteral): CodeBlock {
+private fun createLiteralCodeOfArray(element: ArrayDefinition, literal: TupleLiteral): CodeBlock {
     return createCallSingleVararg(
         function = CodeBlock.of("listOf"),
-        literal.value.map { createLiteral(element.type, it) }
+        literal.value.map { createLiteralCode(element.type, it) }
     )
 }
 
 context(ctx: GenContext)
-private fun createLiteralOfTuple(element: TupleDefinition, literal: TupleLiteral): CodeBlock {
-    when (calculateTupleStrategy(element)) {
+private fun createLiteralCodeOfTuple(element: TupleDefinition, literal: TupleLiteral): CodeBlock {
+    when (element.calculateStrategy()) {
         TupleStrategy.DATA_OBJECT ->
-            return CodeBlock.of("%T", generatedClassOf(element.canonicalName))
+            return CodeBlock.of("%T", element.canonicalName.generatedClassName())
 
         TupleStrategy.DATA_CLASS -> {
             fun typeOf(position: Int): TypeDefinition {
@@ -129,9 +119,9 @@ private fun createLiteralOfTuple(element: TupleDefinition, literal: TupleLiteral
             }
 
             return createCallSingleVararg(
-                function = CodeBlock.of("%T", generatedClassOf(element.canonicalName)),
+                function = CodeBlock.of("%T", element.canonicalName.generatedClassName()),
                 literal.value.mapIndexed { position, it ->
-                    createLiteral(typeOf(position), it)
+                    createLiteralCode(typeOf(position), it)
                 }
             )
         }
@@ -141,13 +131,13 @@ private fun createLiteralOfTuple(element: TupleDefinition, literal: TupleLiteral
 // ===================={ StructLiteral }==================== //
 
 context(ctx: GenContext)
-private fun createLiteralOfStruct(element: StructDefinition, literal: StructLiteral): CodeBlock {
+private fun createLiteralCodeOfStruct(element: StructDefinition, literal: StructLiteral): CodeBlock {
     if (element.canonicalName == builtin.Void.canonicalName)
         return CodeBlock.of("%T", Unit::class)
 
-    when (calculateStructStrategy(element)) {
+    when (element.calculateStrategy()) {
         StructStrategy.DATA_OBJECT ->
-            return CodeBlock.of("%T", generatedClassOf(element.canonicalName))
+            return CodeBlock.of("%T", element.canonicalName.generatedClassName())
 
         StructStrategy.DATA_CLASS -> {
             fun fieldOfOrThrow(name: String): FieldDefinition {
@@ -157,10 +147,10 @@ private fun createLiteralOfStruct(element: StructDefinition, literal: StructLite
             }
 
             return createCall(
-                function = CodeBlock.of("%T", generatedClassOf(element.canonicalName)),
+                function = CodeBlock.of("%T", element.canonicalName.generatedClassName()),
                 literal.value.entries.associate { (name, value) ->
                     val field = fieldOfOrThrow(name)
-                    asPropertyName(field) to createLiteral(field.type, value)
+                    field.nameOfProperty() to createLiteralCode(field.type, value)
                 }
             )
         }
@@ -168,10 +158,10 @@ private fun createLiteralOfStruct(element: StructDefinition, literal: StructLite
 }
 
 context(ctx: GenContext)
-private fun createLiteralOfInter(element: InterDefinition, literal: StructLiteral): CodeBlock {
-    when (calculateInterStrategy(element)) {
+private fun createLiteralCodeOfInter(element: InterDefinition, literal: StructLiteral): CodeBlock {
+    when (element.calculateStrategy()) {
         InterStrategy.DATA_OBJECT ->
-            return CodeBlock.of("%T", generatedClassOf(element.canonicalName))
+            return CodeBlock.of("%T", element.canonicalName.generatedClassName())
 
         InterStrategy.DATA_CLASS -> {
             fun fieldOfOrThrow(name: String): FieldDefinition {
@@ -185,10 +175,10 @@ private fun createLiteralOfInter(element: InterDefinition, literal: StructLitera
             }
 
             return createCall(
-                function = CodeBlock.of("%T", generatedClassOf(element.canonicalName)),
+                function = CodeBlock.of("%T", element.canonicalName.generatedClassName()),
                 literal.value.entries.associate { (name, value) ->
                     val field = fieldOfOrThrow(name)
-                    asPropertyName(field) to createLiteral(field.type, value)
+                    field.nameOfProperty() to createLiteralCode(field.type, value)
                 }
             )
         }
@@ -196,14 +186,14 @@ private fun createLiteralOfInter(element: InterDefinition, literal: StructLitera
 }
 
 context(ctx: GenContext)
-private fun createLiteralOfUnion(element: UnionDefinition, literal: StructLiteral): CodeBlock {
-    when (calculateUnionStrategy(element)) {
+private fun createLiteralCodeOfUnion(element: UnionDefinition, literal: StructLiteral): CodeBlock {
+    when (element.calculateStrategy()) {
         UnionStrategy.DATA_OBJECT ->
             fail(TAG, element) { "illegal value: $literal (empty union type)" }
 
         UnionStrategy.SEALED_INTERFACE -> {
             if (element.types.size == 1)
-                return createLiteralOfStruct(element.types.single(), literal)
+                return createLiteralCodeOfStruct(element.types.single(), literal)
 
             // extracting the discriminator from `literal`
             val canonicalNameLiteral = literal.value[element.discriminator]
@@ -219,7 +209,7 @@ private fun createLiteralOfUnion(element: UnionDefinition, literal: StructLitera
             winner ?: fail(TAG, element) { "illegal value: $literal (unknown discriminator value)" }
 
             // delegating literal creation to the found struct
-            return createLiteralOfStruct(winner, literal)
+            return createLiteralCodeOfStruct(winner, literal)
         }
 
         UnionStrategy.WRAPPER_SEALED_INTERFACE -> {

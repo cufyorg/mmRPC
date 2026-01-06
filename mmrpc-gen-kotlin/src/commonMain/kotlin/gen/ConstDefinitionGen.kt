@@ -33,13 +33,13 @@ private fun applyCreateProperty(element: ConstDefinition) {
     */
 
     injectScope(element.namespace) {
-        addProperty(propertySpec(asPropertyName(element), classOf(element.type)) {
-            if (isCompileConst(element.type))
+        addProperty(propertySpec(element.nameOfProperty(), element.type.typeName()) {
+            if (element.type.isCompileConst())
                 addModifiers(KModifier.CONST)
 
-            initializer(createLiteral(element))
+            initializer(createLiteralCode(element.type, element.value))
 
-            addKdoc(createKDoc(element))
+            addKdoc(createKdocCode(element))
             addAnnotations(createAnnotationSet(element.metadata))
         })
     }

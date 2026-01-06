@@ -7,10 +7,10 @@ private const val TAG = "strategy.kt"
 
 @Marker3
 context(ctx: GenContext)
-fun calculateInterStrategy(element: InterDefinition): InterStrategy {
-    debugRequireGeneratedClass(TAG, element)
+fun InterDefinition.calculateStrategy(): InterStrategy {
+    debugRequireGeneratedClass(TAG, this)
 
-    if (element.types.all { it.fields.isEmpty() })
+    if (types.all { it.fields.isEmpty() })
         return InterStrategy.DATA_OBJECT
 
     return InterStrategy.DATA_CLASS
@@ -18,10 +18,10 @@ fun calculateInterStrategy(element: InterDefinition): InterStrategy {
 
 @Marker3
 context(ctx: GenContext)
-fun calculateStructStrategy(element: StructDefinition): StructStrategy {
-    debugRequireGeneratedClass(TAG, element)
+fun StructDefinition.calculateStrategy(): StructStrategy {
+    debugRequireGeneratedClass(TAG, this)
 
-    if (element.fields.isEmpty())
+    if (fields.isEmpty())
         return StructStrategy.DATA_OBJECT
 
     return StructStrategy.DATA_CLASS
@@ -29,10 +29,10 @@ fun calculateStructStrategy(element: StructDefinition): StructStrategy {
 
 @Marker3
 context(ctx: GenContext)
-fun calculateTupleStrategy(element: TupleDefinition): TupleStrategy {
-    debugRequireGeneratedClass(TAG, element)
+fun TupleDefinition.calculateStrategy(): TupleStrategy {
+    debugRequireGeneratedClass(TAG, this)
 
-    if (element.types.isEmpty())
+    if (types.isEmpty())
         return TupleStrategy.DATA_OBJECT
 
     return TupleStrategy.DATA_CLASS
@@ -40,15 +40,15 @@ fun calculateTupleStrategy(element: TupleDefinition): TupleStrategy {
 
 @Marker3
 context(ctx: GenContext)
-fun calculateUnionStrategy(element: UnionDefinition): UnionStrategy {
-    debugRequireGeneratedClass(TAG, element)
+fun UnionDefinition.calculateStrategy(): UnionStrategy {
+    debugRequireGeneratedClass(TAG, this)
 
-    if (element.types.isEmpty()) return UnionStrategy.DATA_OBJECT
+    if (types.isEmpty()) return UnionStrategy.DATA_OBJECT
 
-    val pkg = generatedPackageOf(element.canonicalName)
+    val pkg = canonicalName.generatedPackageName()
 
-    for (it in element.types) {
-        if (pkg != generatedPackageOf(it.canonicalName))
+    for (it in types) {
+        if (pkg != it.canonicalName.generatedPackageName())
             return UnionStrategy.WRAPPER_SEALED_INTERFACE
     }
 

@@ -34,11 +34,11 @@ private fun applyCreateNameProperty(element: FieldDefinition) {
     */
 
     injectScope(element.namespace) {
-        addProperty(propertySpec(asNamePropertyName(element), STRING) {
+        addProperty(propertySpec(element.nameOfNameProperty(), STRING) {
             addModifiers(KModifier.CONST)
             initializer("%S", element.name)
 
-            addKdoc(createKDoc(element))
+            addKdoc(createKdocCode(element))
             addAnnotations(createAnnotationSet(element.metadata))
         })
     }

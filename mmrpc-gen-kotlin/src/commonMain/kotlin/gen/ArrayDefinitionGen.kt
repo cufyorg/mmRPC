@@ -11,7 +11,7 @@ context(ctx: GenContext)
 fun consumeArrayDefinition() {
     for (element in ctx.elements) {
         if (element !is ArrayDefinition) continue
-        if (!hasGeneratedClass(element)) continue
+        if (!element.hasGeneratedClass()) continue
         if (element.canonicalName in ctx.ignore) continue
 
         failBoundary {
@@ -31,8 +31,8 @@ private fun applyCreateTypealias(element: ArrayDefinition) {
     */
 
     injectFile(element.namespace) {
-        addTypeAlias(typealiasSpec(asClassName(element), LIST.parameterizedBy(classOf(element.type))) {
-            addKdoc(createKDoc(element))
+        addTypeAlias(typealiasSpec(element.nameOfClass(), LIST.parameterizedBy(element.type.typeName())) {
+            addKdoc(createKdocCode(element))
             addAnnotations(createAnnotationSet(element.metadata))
         })
     }

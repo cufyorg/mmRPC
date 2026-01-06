@@ -43,12 +43,12 @@ context(ctx: GenContext)
 fun createAnnotationSet(metadata: List<MetadataDefinitionUsage>): List<AnnotationSpec> {
     return buildList {
         for (it in metadata) {
-            add(annotationSpec(classOf(it.definition)) {
+            add(annotationSpec(it.definition.typeName()) {
                 for (usage in it.fields) {
                     addMember(
                         format = "%L = %L",
-                        asPropertyName(usage.definition),
-                        createMetaLiteral(
+                        usage.definition.nameOfProperty(),
+                        createMetaLiteralCode(
                             usage.definition.type,
                             usage.value
                         ),

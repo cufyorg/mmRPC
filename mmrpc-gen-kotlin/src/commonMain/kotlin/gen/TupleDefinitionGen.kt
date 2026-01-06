@@ -16,11 +16,11 @@ context(ctx: GenContext)
 fun consumeTupleDefinition() {
     for (element in ctx.elements) {
         if (element !is TupleDefinition) continue
-        if (!hasGeneratedClass(element)) continue
+        if (!element.hasGeneratedClass()) continue
         if (element.canonicalName in ctx.ignore) continue
 
         failBoundary {
-            when (calculateTupleStrategy(element)) {
+            when (element.calculateStrategy()) {
                 TupleStrategy.DATA_OBJECT
                 -> applyCreateDataObject(element)
 
@@ -44,10 +44,10 @@ private fun applyCreateDataObject(element: TupleDefinition) {
      */
 
     createType(element.canonicalName) {
-        objectBuilder(asClassName(element)).apply {
+        objectBuilder(element.nameOfClass()).apply {
             addModifiers(KModifier.DATA)
 
-            addKdoc(createKDoc(element))
+            addKdoc(createKdocCode(element))
             addAnnotations(createAnnotationSet(element.metadata))
             addAnnotations(createSerializableAnnotationSet())
             addAnnotations(createSerialNameAnnotationSet(element.canonicalName.value))
@@ -75,25 +75,25 @@ private fun applyCreateDataClass(element: TupleDefinition) {
      */
 
     createType(element.canonicalName) {
-        classBuilder(asClassName(element)).apply {
+        classBuilder(element.nameOfClass()).apply {
             addModifiers(KModifier.DATA)
 
             primaryConstructor(constructorSpec {
                 addParameters(element.types.mapIndexed { position, type ->
-                    parameterSpec(xth(position), classOf(type))
+                    parameterSpec(xth(position), type.typeName())
                 })
             })
             addProperties(element.types.mapIndexed { position, type ->
-                propertySpec(xth(position), classOf(type)) {
+                propertySpec(xth(position), type.typeName()) {
                     initializer(xth(position))
 
-                    addKdoc(createKDocShort(type))
+                    addKdoc(createShortKdocCode(type))
                     addAnnotations(createAnnotationSet(type.metadata))
                     addAnnotations(createSerialNameAnnotationSet(type.name))
                 }
             })
 
-            addKdoc(createKDoc(element))
+            addKdoc(createKdocCode(element))
             addAnnotations(createAnnotationSet(element.metadata))
             addAnnotations(createSerializableAnnotationSet())
             addAnnotations(createSerialNameAnnotationSet(element.canonicalName.value))

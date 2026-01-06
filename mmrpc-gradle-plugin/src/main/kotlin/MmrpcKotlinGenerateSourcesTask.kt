@@ -10,7 +10,7 @@ import org.cufy.mmrpc.builtin
 import org.cufy.mmrpc.compact.CompactElementDefinition
 import org.cufy.mmrpc.compact.inflate
 import org.cufy.mmrpc.gen.kotlin.*
-import org.cufy.mmrpc.gen.kotlin.common.signatureOf
+import org.cufy.mmrpc.gen.kotlin.common.humanSignature
 import org.cufy.mmrpc.gen.kotlin.gen.*
 import org.cufy.mmrpc.gradle.util.addToKotlinSourceSet
 import org.cufy.mmrpc.gradle.util.collectIgnored
@@ -339,7 +339,7 @@ open class MmrpcKotlinGenerateSourcesTask : DefaultTask() {
                 append("$name: ")
                 append("${e.failure.tag}: ")
                 append(e.failure.message)
-                append(" (element: ${e.failure.element?.let { signatureOf(it) }})")
+                append(" (element: ${e.failure.element?.let { it.humanSignature() }})")
             }
 
             logger.error(message, e)

@@ -4,91 +4,91 @@ import org.cufy.mmrpc.*
 import org.cufy.mmrpc.gen.kotlin.GenContext
 
 /**
- * Return true, if the given [element] is supposed to have a generated class.
+ * Return true, if the given [this] is supposed to have a generated class.
  */
 @Marker3
 context(ctx: GenContext)
-fun hasGeneratedClass(element: ElementDefinition): Boolean {
-    if (element is ArrayDefinition) {
-        if (!element.name[0].isUpperCase()) return false
-        if (element.namespace !in ctx.roots) return false
+fun ElementDefinition.hasGeneratedClass(): Boolean {
+    if (this is ArrayDefinition) {
+        if (!name[0].isUpperCase()) return false
+        if (namespace !in ctx.roots) return false
         return true
     }
-    if (element is OptionalDefinition) return false
-    if (element is FieldDefinition) return false
-    if (element is ConstDefinition) return false
-    if (element is ScalarDefinition) {
-        if (isNative(element) || isUserdefined(element))
+    if (this is OptionalDefinition) return false
+    if (this is FieldDefinition) return false
+    if (this is ConstDefinition) return false
+    if (this is ScalarDefinition) {
+        if (isNative() || isUserdefined())
             return false
     }
-    if (element is MetadataDefinition) {
-        if (isNative(element) || isUserdefined(element))
+    if (this is MetadataDefinition) {
+        if (isNative() || isUserdefined())
             return false
     }
-    if (element is StructDefinition) {
-        if (element.canonicalName == builtin.Void.canonicalName)
+    if (this is StructDefinition) {
+        if (canonicalName == builtin.Void.canonicalName)
             return false
     }
-    val parent = ctx.elementsMap[element.namespace] ?: return true
-    return hasGeneratedClass(parent)
+    val parent = resolveParent() ?: return true
+    return parent.hasGeneratedClass()
 }
 
 /**
- * Return true, if the given type [element] can have `const` modifier
- * when a value with [it][element] as its type was generated.
+ * Return true, if the given type [this] can have `const` modifier
+ * when a value with [this] as its type was generated.
  */
 @Marker3
 context(ctx: GenContext)
-fun isCompileConst(element: TypeDefinition): Boolean {
-    return element is ScalarDefinition && isNative(element)
+fun TypeDefinition.isCompileConst(): Boolean {
+    return this is ScalarDefinition && isNative()
 }
 
 /**
- * Return true, if the given [element] was declared
+ * Return true, if the given [this] was declared
  * native (mapped to a native kotlin class) by the user.
  */
 @Marker3
 context(ctx: GenContext)
-fun isNative(element: ScalarDefinition): Boolean {
-    return element.canonicalName in ctx.nativeScalarClasses
+fun ScalarDefinition.isNative(): Boolean {
+    return canonicalName in ctx.nativeScalarClasses
 }
 
 /**
- * Return true, if the given [element] was declared
+ * Return true, if the given [this] was declared
  * native (mapped to a native kotlin class) by the user.
  */
 @Marker3
 context(ctx: GenContext)
-fun isNative(element: MetadataDefinition): Boolean {
-    return element.canonicalName in ctx.nativeMetadataClasses
+fun MetadataDefinition.isNative(): Boolean {
+    return canonicalName in ctx.nativeMetadataClasses
 }
 
 /**
- * Return true, if the given [element] was declared
+ * Return true, if the given [this] was declared
  * native (fully inlined) by the user.
  */
 @Marker3
 context(ctx: GenContext)
-fun isNative(element: ConstDefinition): Boolean {
-    return element.canonicalName in ctx.nativeConstants
+fun ConstDefinition.isNative(): Boolean {
+    return canonicalName in ctx.nativeConstants
 }
 
 /**
- * Return true, if the given [element] was declared
+ * Return true, if the given [this] was declared
  * defined in user code by the user.
  */
 @Marker3
 context(ctx: GenContext)
-fun isUserdefined(element: ScalarDefinition): Boolean {
-    return element.canonicalName in ctx.userdefinedScalarClasses
+fun ScalarDefinition.isUserdefined(): Boolean {
+    return canonicalName in ctx.userdefinedScalarClasses
 }
 
 /**
- * Return true, if the given [element] was declared
+ * Return true, if the given [this] was declared
  * defined in user code by the user.
  */
 @Marker3
 context(ctx: GenContext)
-fun isUserdefined(element: MetadataDefinition): Boolean {
-    return element.canonicalName in ctx.userdefinedMetadataClasses
+fun MetadataDefinition.isUserdefined(): Boolean {
+    return canonicalName in ctx.userdefinedMetadataClasses
 }

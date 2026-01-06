@@ -15,11 +15,11 @@ context(ctx: GenContext)
 fun consumeStructDefinition() {
     for (element in ctx.elements) {
         if (element !is StructDefinition) continue
-        if (!hasGeneratedClass(element)) continue
+        if (!element.hasGeneratedClass()) continue
         if (element.canonicalName in ctx.ignore) continue
 
         failBoundary {
-            when (calculateStructStrategy(element)) {
+            when (element.calculateStrategy()) {
                 StructStrategy.DATA_OBJECT
                 -> applyCreateDataObject(element)
 
@@ -43,10 +43,10 @@ private fun applyCreateDataObject(element: StructDefinition) {
      */
 
     createType(element.canonicalName) {
-        objectBuilder(asClassName(element)).apply {
+        objectBuilder(element.nameOfClass()).apply {
             addModifiers(KModifier.DATA)
 
-            addKdoc(createKDoc(element))
+            addKdoc(createKdocCode(element))
             addAnnotations(createAnnotationSet(element.metadata))
             addAnnotations(createSerializableAnnotationSet())
             addAnnotations(createSerialNameAnnotationSet(element.canonicalName.value))
@@ -74,31 +74,31 @@ private fun applyCreateDataClass(element: StructDefinition) {
      */
 
     createType(element.canonicalName) {
-        classBuilder(asClassName(element)).apply {
+        classBuilder(element.nameOfClass()).apply {
             addModifiers(KModifier.DATA)
 
             primaryConstructor(constructorSpec {
                 addParameters(element.fields.map {
-                    parameterSpec(asPropertyName(it), classOf(it.type)) {
+                    parameterSpec(it.nameOfProperty(), it.type.typeName()) {
                         val default = it.default
 
                         if (default != null) {
-                            defaultValue(createLiteral(it.type, default))
+                            defaultValue(createLiteralCode(it.type, default))
                         }
                     }
                 })
             })
             addProperties(element.fields.map {
-                propertySpec(asPropertyName(it), classOf(it.type)) {
-                    initializer(asPropertyName(it))
+                propertySpec(it.nameOfProperty(), it.type.typeName()) {
+                    initializer(it.nameOfProperty())
 
-                    addKdoc(createKDocShort(it))
+                    addKdoc(createShortKdocCode(it))
                     addAnnotations(createAnnotationSet(it.metadata))
                     addAnnotations(createSerialNameAnnotationSet(it.name))
                 }
             })
 
-            addKdoc(createKDoc(element))
+            addKdoc(createKdocCode(element))
             addAnnotations(createAnnotationSet(element.metadata))
             addAnnotations(createSerializableAnnotationSet())
             addAnnotations(createSerialNameAnnotationSet(element.canonicalName.value))

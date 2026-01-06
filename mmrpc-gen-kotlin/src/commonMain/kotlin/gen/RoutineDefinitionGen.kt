@@ -17,7 +17,7 @@ context(ctx: GenContext)
 fun consumeRoutineDefinition() {
     for (element in ctx.elements) {
         if (element !is RoutineDefinition) continue
-        if (!hasGeneratedClass(element)) continue
+        if (!element.hasGeneratedClass()) continue
         if (element.canonicalName in ctx.ignore) continue
 
         failBoundary {
@@ -45,12 +45,12 @@ private fun applyCreateDataObject(element: RoutineDefinition) {
 
     val superinterface = RoutineObject::class.asClassName()
         .parameterizedBy(
-            /* I */ classOf(element.input),
-            /* O */ classOf(element.output),
+            /* I */ element.input.typeName(),
+            /* O */ element.output.typeName(),
         )
 
     createType(element.canonicalName) {
-        objectBuilder(asClassName(element)).apply {
+        objectBuilder(element.nameOfClass()).apply {
             addModifiers(KModifier.DATA)
             addSuperinterface(superinterface)
 
@@ -75,14 +75,14 @@ private fun applyCreateDataObject(element: RoutineDefinition) {
             })
             addProperty(propertySpec("typeI", KType::class) {
                 addModifiers(KModifier.OVERRIDE)
-                initializer("kotlin.reflect.typeOf<%T>()", classOf(element.input))
+                initializer("kotlin.reflect.typeOf<%T>()", element.input.typeName())
             })
             addProperty(propertySpec("typeO", KType::class) {
                 addModifiers(KModifier.OVERRIDE)
-                initializer("kotlin.reflect.typeOf<%T>()", classOf(element.output))
+                initializer("kotlin.reflect.typeOf<%T>()", element.output.typeName())
             })
 
-            addKdoc(createKDoc(element))
+            addKdoc(createKdocCode(element))
             addAnnotations(createAnnotationSet(element.metadata))
         }
     }

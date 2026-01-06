@@ -13,7 +13,7 @@ context(ctx: GenContext)
 fun consumeEnumDefinition() {
     for (element in ctx.elements) {
         if (element !is EnumDefinition) continue
-        if (!hasGeneratedClass(element)) continue
+        if (!element.hasGeneratedClass()) continue
         if (element.canonicalName in ctx.ignore) continue
 
         failBoundary {
@@ -43,25 +43,25 @@ private fun applyCreateEnumClass(element: EnumDefinition) {
     */
 
     createType(element.canonicalName) {
-        enumBuilder(asClassName(element)).apply {
+        enumBuilder(element.nameOfClass()).apply {
             primaryConstructor(constructorSpec {
-                addParameter("value", classOf(element.type))
+                addParameter("value", element.type.typeName())
             })
-            addProperty(propertySpec("value", classOf(element.type)) {
+            addProperty(propertySpec("value", element.type.typeName()) {
                 initializer("%L", "value")
             })
 
             element.entries.forEach {
-                addEnumConstant(asEnumEntryName(it), anonymousClassSpec {
-                    addSuperclassConstructorParameter(createLiteral(it))
+                addEnumConstant(it.nameOfEnumEntry(), anonymousClassSpec {
+                    addSuperclassConstructorParameter(createLiteralCode(it.type, it.value))
 
-                    addKdoc(createKDocShort(it))
+                    addKdoc(createShortKdocCode(it))
                     addAnnotations(createAnnotationSet(it.metadata))
                     addAnnotations(createSerialNameAnnotationSet(CodeBlock.of(it.value.contentToString())))
                 })
             }
 
-            addKdoc(createKDoc(element))
+            addKdoc(createKdocCode(element))
             addAnnotations(createAnnotationSet(element.metadata))
             addAnnotations(createSerializableAnnotationSet())
             addAnnotations(createSerialNameAnnotationSet(element.canonicalName.value))

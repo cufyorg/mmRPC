@@ -5,7 +5,7 @@ import com.squareup.kotlinpoet.TypeSpec
 import org.cufy.mmrpc.gen.kotlin.common.debug
 import org.cufy.mmrpc.gen.kotlin.common.debugLog
 import org.cufy.mmrpc.gen.kotlin.common.declarationsClassOf
-import org.cufy.mmrpc.gen.kotlin.common.generatedClassOf
+import org.cufy.mmrpc.gen.kotlin.common.generatedClassName
 import org.cufy.mmrpc.gen.kotlin.util.companionObjectSpec
 import org.cufy.mmrpc.gen.kotlin.util.fetchKind
 import org.cufy.mmrpc.gen.kotlin.util.fileSpec
@@ -64,7 +64,7 @@ internal fun generateFileSpecSet__SUB_PACKAGES(
 
     return buildList {
         for (node in createTypeNodeMap[null].orEmpty()) {
-            add(fileSpec(generatedClassOf(node.canonicalName)) {
+            add(fileSpec(node.canonicalName.generatedClassName()) {
                 addType(createTypeSpec(node))
                 onEachFile()
             })

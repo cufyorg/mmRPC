@@ -8,82 +8,82 @@ import org.cufy.mmrpc.gen.kotlin.GenContext
 import org.cufy.mmrpc.gen.kotlin.GenFeature
 
 /**
- * Assuming [element] is a member of some enum,
- * this is the name of the generated entry by [element].
+ * Assuming [this] is a member of some enum,
+ * this is the name of the generated entry by [this].
  */
 @Marker3
 context(ctx: GenContext)
-fun asEnumEntryName(element: ConstDefinition): String {
-    return element.name.toPascalCase()
+fun ConstDefinition.nameOfEnumEntry(): String {
+    return name.toPascalCase()
 }
 
 /**
- * Assuming [element] is a member of some union,
- * this is the name of the generated entry by [element].
+ * Assuming [this] is a member of some union,
+ * this is the name of the generated entry by [this].
  */
 @Marker3
 context(ctx: GenContext)
-fun asUnionWrapperEntryName(element: ElementDefinition): String {
+fun ElementDefinition.nameOfUnionWrapperEntry(): String {
     if (GenFeature.KEEP_TYPE_CLASS_NAMES in ctx.features)
-        return element.name
+        return name
 
-    return element.name.toPascalCase()
+    return name.toPascalCase()
 }
 
 /**
- * Return the name of the property generated from [element]'s name (assuming it has one).
+ * Return the name of the property generated from [this]'s name (assuming it has one).
  */
 @Marker3
 context(ctx: GenContext)
-fun asNamePropertyName(element: FieldDefinition): String {
-    return element.name.toScreamingSnakeCase()
+fun FieldDefinition.nameOfNameProperty(): String {
+    return name.toScreamingSnakeCase()
 }
 
 /**
- * Return the name of the property generated from [element] (assuming it has one).
+ * Return the name of the property generated from [this] (assuming it has one).
  */
 @Marker3
 context(ctx: GenContext)
-fun asPropertyName(element: FieldDefinition): String {
+fun FieldDefinition.nameOfProperty(): String {
     if (GenFeature.KEEP_FIELD_PROPERTY_NAMES in ctx.features)
-        return element.name
+        return name
 
-    return element.name.toCamelCase()
+    return name.toCamelCase()
 }
 
 /**
- * Return the name of the property generated from [element] (assuming it has one).
+ * Return the name of the property generated from [this] (assuming it has one).
  */
 @Marker3
 context(ctx: GenContext)
-fun asPropertyName(element: ConstDefinition): String {
-    return element.name.toScreamingSnakeCase()
+fun ConstDefinition.nameOfProperty(): String {
+    return name.toScreamingSnakeCase()
 }
 
 /**
- * Return the name of the generated class (assuming it has one) of [element].
+ * Return the name of the generated class (assuming it has one) of [this].
  */
 @Marker3
 context(ctx: GenContext)
-fun asClassName(element: ElementDefinition): String {
-    ctx.classNames[element.canonicalName]?.let { return it }
+fun ElementDefinition.nameOfClass(): String {
+    ctx.classNames[canonicalName]?.let { return it }
 
-    if (element is ProtocolDefinition) {
-        return element.name.toPascalCase()
+    if (this is ProtocolDefinition) {
+        return name.toPascalCase()
             .plus(ctx.protocolSuffix)
     }
 
-    if (element is TypeDefinition) {
+    if (this is TypeDefinition) {
         if (GenFeature.KEEP_TYPE_CLASS_NAMES in ctx.features)
-            return element.name
+            return name
     }
 
-    if (element is FaultDefinition) {
+    if (this is FaultDefinition) {
         if (GenFeature.KEEP_FAULT_CLASS_NAMES in ctx.features)
-            return element.name
+            return name
 
-        return element.name.toScreamingSnakeCase()
+        return name.toScreamingSnakeCase()
     }
 
-    return element.name.toPascalCase()
+    return name.toPascalCase()
 }

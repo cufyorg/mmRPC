@@ -16,7 +16,7 @@ inline fun debug(block: () -> Unit) {
 @Marker3
 context(ctx: GenContext)
 fun debugRequireGeneratedClass(tag: String, element: ElementDefinition) {
-    if (GenFeature.DEBUG in ctx.features && !hasGeneratedClass(element))
+    if (GenFeature.DEBUG in ctx.features && !element.hasGeneratedClass())
         fail(tag, element) { "elements are required to have generated class" }
 }
 
@@ -24,9 +24,9 @@ fun debugRequireGeneratedClass(tag: String, element: ElementDefinition) {
 context(ctx: GenContext)
 fun debugRequireGeneratedClass(tag: String, canonicalName: CanonicalName) {
     if (GenFeature.DEBUG in ctx.features) {
-        val element = ctx.elements.find { it.canonicalName == canonicalName }
+        val element = canonicalName.resolveElement()
 
-        if (element == null || !hasGeneratedClass(element))
+        if (element == null || !element.hasGeneratedClass())
             fail(tag, element) { "elements are required to have generated class" }
     }
 }
