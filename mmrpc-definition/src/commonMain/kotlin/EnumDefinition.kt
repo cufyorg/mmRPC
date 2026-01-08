@@ -38,10 +38,10 @@ data class EnumDefinition(
     }
 }
 
-open class EnumDefinitionBuilder :
+class EnumDefinitionBuilder :
     ElementDefinitionBuilder() {
-    open val type = DomainProperty<TypeDefinition>()
-    protected open val entries = mutableListOf<Unnamed<ConstDefinition>>()
+    val type = DomainProperty<TypeDefinition>()
+    private val entries = mutableListOf<Unnamed<ConstDefinition>>()
 
 ////////////////////////////////////////
 

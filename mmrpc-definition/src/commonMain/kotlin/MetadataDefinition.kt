@@ -34,10 +34,10 @@ data class MetadataDefinition(
     }
 }
 
-open class MetadataDefinitionBuilder :
+class MetadataDefinitionBuilder :
     FieldDefinitionSetDomainContainer,
     ElementDefinitionBuilder() {
-    protected open var fields = mutableListOf<Unnamed<FieldDefinition>>()
+    private var fields = mutableListOf<Unnamed<FieldDefinition>>()
 
     @Suppress("INAPPLICABLE_JVM_NAME")
     @JvmName("unaryPlusUnnamedFieldDefinition")

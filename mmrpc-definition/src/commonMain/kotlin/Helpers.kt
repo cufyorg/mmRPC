@@ -22,7 +22,7 @@ import kotlin.jvm.JvmName
 
 ////////////////////////////////////////
 
-open class DomainProperty<T> {
+class DomainProperty<T> {
     lateinit var value: Unnamed<T>
 
     operator fun timesAssign(value: T) {
@@ -34,7 +34,7 @@ open class DomainProperty<T> {
     }
 }
 
-open class OptionalDomainProperty<T> {
+class OptionalDomainProperty<T> {
     var value: Unnamed<T>? = null
 
     operator fun timesAssign(value: T) {
@@ -46,7 +46,7 @@ open class OptionalDomainProperty<T> {
     }
 }
 
-open class OptionalLiteralDomainProperty {
+class OptionalLiteralDomainProperty {
     var value: Literal? = null
 
     operator fun timesAssign(value: Literal) {
@@ -157,16 +157,16 @@ interface FieldDefinitionSetDomainContainer {
 ////////////////////////////////////////
 
 @Marker3
-abstract class ElementDefinitionBuilder {
+sealed class ElementDefinitionBuilder {
     lateinit var name: String
-    open var namespace: CanonicalName? = null
+    var namespace: CanonicalName? = null
 
     @Language("markdown")
-    open var description = ""
+    var description = ""
 
-    protected open val metadata = mutableListOf<MetadataDefinitionUsage>()
+    protected val metadata = mutableListOf<MetadataDefinitionUsage>()
 
-    open operator fun @receiver:Language("markdown") String.unaryPlus() {
+    operator fun @receiver:Language("markdown") String.unaryPlus() {
         description += this.trimIndent()
     }
 

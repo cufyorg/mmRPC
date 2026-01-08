@@ -36,10 +36,10 @@ data class StructDefinition(
     }
 }
 
-open class StructDefinitionBuilder :
+class StructDefinitionBuilder :
     FieldDefinitionSetDomainContainer,
     ElementDefinitionBuilder() {
-    protected open var fields = mutableListOf<Unnamed<FieldDefinition>>()
+    private var fields = mutableListOf<Unnamed<FieldDefinition>>()
 
 ////////////////////////////////////////
 

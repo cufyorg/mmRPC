@@ -36,10 +36,10 @@ data class InterDefinition(
     }
 }
 
-open class InterDefinitionBuilder :
+class InterDefinitionBuilder :
     StructDefinitionSetDomainContainer,
     ElementDefinitionBuilder() {
-    protected open val types = mutableListOf<Unnamed<StructDefinition>>()
+    private val types = mutableListOf<Unnamed<StructDefinition>>()
 
 ////////////////////////////////////////
 

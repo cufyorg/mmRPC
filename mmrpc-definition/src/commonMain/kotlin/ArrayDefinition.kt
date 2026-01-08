@@ -35,9 +35,9 @@ data class ArrayDefinition(
     }
 }
 
-open class ArrayDefinitionBuilder :
+class ArrayDefinitionBuilder :
     ElementDefinitionBuilder() {
-    open val type = DomainProperty<TypeDefinition>()
+    val type = DomainProperty<TypeDefinition>()
 
     override fun build(): ArrayDefinition {
         val canonicalName = CanonicalName(this.namespace, this.name)

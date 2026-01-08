@@ -37,11 +37,11 @@ data class FieldDefinition(
     }
 }
 
-open class FieldDefinitionBuilder :
+class FieldDefinitionBuilder :
     ElementDefinitionBuilder() {
-    open val type = DomainProperty<TypeDefinition>()
-    open val default = OptionalLiteralDomainProperty()
-    open var key: String? = null
+    val type = DomainProperty<TypeDefinition>()
+    val default = OptionalLiteralDomainProperty()
+    var key: String? = null
 
     override fun build(): FieldDefinition {
         val canonicalName = CanonicalName(this.namespace, this.name)

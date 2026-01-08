@@ -37,11 +37,11 @@ data class UnionDefinition(
     }
 }
 
-open class UnionDefinitionBuilder :
+class UnionDefinitionBuilder :
     StructDefinitionSetDomainContainer,
     ElementDefinitionBuilder() {
-    open var discriminator: String = "type"
-    protected open val types = mutableListOf<Unnamed<StructDefinition>>()
+    var discriminator: String = "type"
+    private val types = mutableListOf<Unnamed<StructDefinition>>()
 
     @Suppress("INAPPLICABLE_JVM_NAME")
     @JvmName("unaryPlusUnnamedStructDefinition")

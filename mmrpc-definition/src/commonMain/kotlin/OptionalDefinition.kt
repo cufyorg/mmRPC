@@ -35,9 +35,9 @@ data class OptionalDefinition(
     }
 }
 
-open class OptionalDefinitionBuilder :
+class OptionalDefinitionBuilder :
     ElementDefinitionBuilder() {
-    open val type = DomainProperty<TypeDefinition>()
+    val type = DomainProperty<TypeDefinition>()
 
     override fun build(): OptionalDefinition {
         val canonicalName = CanonicalName(this.namespace, this.name)

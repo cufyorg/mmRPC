@@ -36,10 +36,10 @@ data class ConstDefinition(
     }
 }
 
-open class ConstDefinitionBuilder :
+class ConstDefinitionBuilder :
     ElementDefinitionBuilder() {
-    open val type = DomainProperty<TypeDefinition>()
-    open lateinit var value: Literal
+    val type = DomainProperty<TypeDefinition>()
+    lateinit var value: Literal
 
     override fun build(): ConstDefinition {
         val canonicalName = CanonicalName(this.namespace, this.name)

@@ -41,12 +41,12 @@ data class RoutineDefinition(
     }
 }
 
-open class RoutineDefinitionBuilder :
+class RoutineDefinitionBuilder :
     ElementDefinitionBuilder() {
-    open val comm = mutableListOf<Comm>()
-    protected open val faults = mutableListOf<Unnamed<FaultDefinition>>()
-    protected open val input = mutableListOf<StructDefinitionBuilder.() -> Unit>()
-    protected open val output = mutableListOf<StructDefinitionBuilder.() -> Unit>()
+    val comm = mutableListOf<Comm>()
+    private val faults = mutableListOf<Unnamed<FaultDefinition>>()
+    private val input = mutableListOf<StructDefinitionBuilder.() -> Unit>()
+    private val output = mutableListOf<StructDefinitionBuilder.() -> Unit>()
 
 ////////////////////////////////////////
 
@@ -79,12 +79,12 @@ open class RoutineDefinitionBuilder :
 ////////////////////////////////////////
 
     @Marker0
-    open fun input(block: StructDefinitionBuilder.() -> Unit) {
+    fun input(block: StructDefinitionBuilder.() -> Unit) {
         input += block
     }
 
     @Marker0
-    open fun output(block: StructDefinitionBuilder.() -> Unit) {
+    fun output(block: StructDefinitionBuilder.() -> Unit) {
         output += block
     }
 

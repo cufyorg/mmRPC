@@ -29,7 +29,7 @@ data class FieldDefinitionUsage(
     }
 }
 
-open class FieldDefinitionUsageBuilder {
+class FieldDefinitionUsageBuilder {
     lateinit var definition: FieldDefinition
     lateinit var value: Literal
 

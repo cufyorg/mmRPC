@@ -31,9 +31,9 @@ data class MetadataDefinitionUsage(
     }
 }
 
-open class MetadataDefinitionUsageBuilder {
+class MetadataDefinitionUsageBuilder {
     lateinit var definition: MetadataDefinition
-    protected open val fields = mutableListOf<FieldDefinitionUsage>()
+    private val fields = mutableListOf<FieldDefinitionUsage>()
 
     @JvmName("unaryPlusFieldDefinitionUsage")
     operator fun FieldDefinitionUsage.unaryPlus() {

@@ -32,7 +32,7 @@ data class FaultDefinition(
     }
 }
 
-open class FaultDefinitionBuilder :
+class FaultDefinitionBuilder :
     ElementDefinitionBuilder() {
     override fun build(): FaultDefinition {
         val canonicalName = CanonicalName(this.namespace, this.name)

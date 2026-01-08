@@ -36,9 +36,9 @@ data class ProtocolDefinition(
     }
 }
 
-open class ProtocolDefinitionBuilder :
+class ProtocolDefinitionBuilder :
     ElementDefinitionBuilder() {
-    protected open val routines = mutableListOf<Unnamed<RoutineDefinition>>()
+    private val routines = mutableListOf<Unnamed<RoutineDefinition>>()
 
 ////////////////////////////////////////
 

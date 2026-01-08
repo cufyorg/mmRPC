@@ -35,9 +35,9 @@ data class ScalarDefinition(
     }
 }
 
-open class ScalarDefinitionBuilder :
+class ScalarDefinitionBuilder :
     ElementDefinitionBuilder() {
-    open val type = OptionalDomainProperty<ScalarDefinition>()
+    val type = OptionalDomainProperty<ScalarDefinition>()
 
     override fun build(): ScalarDefinition {
         val canonicalName = CanonicalName(this.namespace, this.name)

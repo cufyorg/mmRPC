@@ -36,9 +36,9 @@ data class TupleDefinition(
     }
 }
 
-open class TupleDefinitionBuilder :
+class TupleDefinitionBuilder :
     ElementDefinitionBuilder() {
-    protected open val types = mutableListOf<Unnamed<TypeDefinition>>()
+    private val types = mutableListOf<Unnamed<TypeDefinition>>()
 
 ////////////////////////////////////////
 
