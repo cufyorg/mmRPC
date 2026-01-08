@@ -27,6 +27,7 @@ data class FieldDefinition(
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
 
+    val key: String? = null,
     val type: TypeDefinition,
     val default: Literal? = null,
 ) : ElementDefinition() {
@@ -40,6 +41,7 @@ open class FieldDefinitionBuilder :
     ElementDefinitionBuilder() {
     open val type = DomainProperty<TypeDefinition>()
     open val default = OptionalLiteralDomainProperty()
+    open var key: String? = null
 
     override fun build(): FieldDefinition {
         val canonicalName = CanonicalName(this.namespace, this.name)
@@ -47,6 +49,7 @@ open class FieldDefinitionBuilder :
             canonicalName = canonicalName,
             description = this.description,
             metadata = this.metadata.toList(),
+            key = this.key,
             type = this.type.value.get(canonicalName, name = "type"),
             default = this.default.value,
         )
@@ -79,5 +82,29 @@ fun prop(
     type: Unnamed<TypeDefinition>,
     block: FieldDefinitionBuilder.() -> Unit = {},
 ) = prop { this.type *= type; block() }
+
+////////////////////////////////////////
+
+@Marker2
+fun prop(
+    key: String,
+    type: TypeDefinition,
+    block: FieldDefinitionBuilder.() -> Unit = {},
+) = prop {
+    this.key = key
+    this.type *= type
+    block()
+}
+
+@Marker2
+fun prop(
+    key: String,
+    type: Unnamed<TypeDefinition>,
+    block: FieldDefinitionBuilder.() -> Unit = {},
+) = prop {
+    this.key = key
+    this.type *= type
+    block()
+}
 
 ////////////////////////////////////////

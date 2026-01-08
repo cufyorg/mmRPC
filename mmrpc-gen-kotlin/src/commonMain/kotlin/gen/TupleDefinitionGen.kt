@@ -50,7 +50,7 @@ private fun applyCreateDataObject(element: TupleDefinition) {
             addKdoc(createKdocCode(element))
             addAnnotations(createAnnotationSet(element.metadata))
             addAnnotations(createSerializableAnnotationSet())
-            addAnnotations(createSerialNameAnnotationSet(element.canonicalName.value))
+            addAnnotations(createSerialNameAnnotationSet(element.typeSerialName()))
         }
     }
 }
@@ -68,7 +68,7 @@ private fun applyCreateDataClass(element: TupleDefinition) {
                 <property-kdoc>
                 [ @<property-metadata> ]
                 @SerialName("<property-name>")
-                val <property-name>: <property-type>,
+                val <property-position>: <property-type>,
             ]
         )
     }
@@ -89,14 +89,14 @@ private fun applyCreateDataClass(element: TupleDefinition) {
 
                     addKdoc(createShortKdocCode(type))
                     addAnnotations(createAnnotationSet(type.metadata))
-                    addAnnotations(createSerialNameAnnotationSet(type.name))
+                    addAnnotations(createSerialNameAnnotationSet(position.toString()))
                 }
             })
 
             addKdoc(createKdocCode(element))
             addAnnotations(createAnnotationSet(element.metadata))
             addAnnotations(createSerializableAnnotationSet())
-            addAnnotations(createSerialNameAnnotationSet(element.canonicalName.value))
+            addAnnotations(createSerialNameAnnotationSet(element.typeSerialName()))
         }
     }
 }

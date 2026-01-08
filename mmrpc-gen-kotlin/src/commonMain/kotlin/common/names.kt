@@ -45,6 +45,8 @@ fun FieldDefinition.nameOfNameProperty(): String {
 @Marker3
 context(ctx: GenContext)
 fun FieldDefinition.nameOfProperty(): String {
+    key?.let { return it }
+
     if (GenFeature.KEEP_FIELD_PROPERTY_NAMES in ctx.features)
         return name
 

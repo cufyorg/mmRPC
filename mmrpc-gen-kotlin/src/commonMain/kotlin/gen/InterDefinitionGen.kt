@@ -39,7 +39,7 @@ private fun applyCreateDataObject(element: InterDefinition) {
             addKdoc(createKdocCode(element))
             addAnnotations(createAnnotationSet(element.metadata))
             addAnnotations(createSerializableAnnotationSet())
-            addAnnotations(createSerialNameAnnotationSet(element.canonicalName.value))
+            addAnnotations(createSerialNameAnnotationSet(element.typeSerialName()))
         }
     }
 }
@@ -86,14 +86,14 @@ private fun applyCreateDataClass(element: InterDefinition) {
 
                     addKdoc(createShortKdocCode(it))
                     addAnnotations(createAnnotationSet(it.metadata))
-                    addAnnotations(createSerialNameAnnotationSet(it.name))
+                    addAnnotations(createSerialNameAnnotationSet(it.propertySerialName()))
                 }
             })
 
             addKdoc(createKdocCode(element))
             addAnnotations(createAnnotationSet(element.metadata))
             addAnnotations(createSerializableAnnotationSet())
-            addAnnotations(createSerialNameAnnotationSet(element.canonicalName.value))
+            addAnnotations(createSerialNameAnnotationSet(element.typeSerialName()))
         }
     }
 }

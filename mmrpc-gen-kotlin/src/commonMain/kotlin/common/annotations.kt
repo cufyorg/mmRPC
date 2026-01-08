@@ -1,7 +1,6 @@
 package org.cufy.mmrpc.gen.kotlin.common
 
 import com.squareup.kotlinpoet.AnnotationSpec
-import com.squareup.kotlinpoet.CodeBlock
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.cufy.mmrpc.Marker3
@@ -23,16 +22,10 @@ fun createSerializableAnnotationSet(): Set<AnnotationSpec> {
 @Marker3
 context(ctx: GenContext)
 fun createSerialNameAnnotationSet(serialName: String): Set<AnnotationSpec> {
-    return createSerialNameAnnotationSet(CodeBlock.of("%S", serialName))
-}
-
-@Marker3
-context(ctx: GenContext)
-fun createSerialNameAnnotationSet(serialName: CodeBlock): Set<AnnotationSpec> {
     return buildSet {
         if (GenFeature.KOTLINX_SERIALIZATION in ctx.features) {
             add(annotationSpec(SerialName::class) {
-                addMember("value = %L", serialName)
+                addMember("value = \"%S\"", serialName)
             })
         }
     }

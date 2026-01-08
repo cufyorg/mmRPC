@@ -52,7 +52,7 @@ private fun applyCreateDataObject(element: UnionDefinition) {
             addKdoc(createKdocCode(element))
             addAnnotations(createAnnotationSet(element.metadata))
             addAnnotations(createSerializableAnnotationSet())
-            addAnnotations(createSerialNameAnnotationSet(element.canonicalName.value))
+            addAnnotations(createSerialNameAnnotationSet(element.typeSerialName()))
         }
     }
 }
@@ -76,7 +76,7 @@ private fun applyCreateSealedInterface(element: UnionDefinition) {
             addKdoc(createKdocCode(element))
             addAnnotations(createAnnotationSet(element.metadata))
             addAnnotations(createSerializableAnnotationSet())
-            addAnnotations(createSerialNameAnnotationSet(element.canonicalName.value))
+            addAnnotations(createSerialNameAnnotationSet(element.typeSerialName()))
         }
     }
 
@@ -109,14 +109,14 @@ private fun applyCreateWrapperSealedInterface(element: UnionDefinition) {
                     addKdoc(createShortKdocCode(it))
                     addAnnotations(createAnnotationSet(it.metadata))
                     addAnnotations(createSerializableAnnotationSet())
-                    addAnnotations(createSerialNameAnnotationSet(it.canonicalName.value))
+                    addAnnotations(createSerialNameAnnotationSet(it.typeSerialName()))
                 }
             })
 
             addKdoc(createKdocCode(element))
             addAnnotations(createAnnotationSet(element.metadata))
             addAnnotations(createSerializableAnnotationSet())
-            addAnnotations(createSerialNameAnnotationSet(element.canonicalName.value))
+            addAnnotations(createSerialNameAnnotationSet(element.typeSerialName()))
         }
     }
 }

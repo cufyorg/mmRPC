@@ -1,6 +1,5 @@
 package org.cufy.mmrpc.gen.kotlin.gen
 
-import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.TypeSpec.Companion.enumBuilder
 import org.cufy.mmrpc.EnumDefinition
 import org.cufy.mmrpc.gen.kotlin.GenContext
@@ -57,14 +56,14 @@ private fun applyCreateEnumClass(element: EnumDefinition) {
 
                     addKdoc(createShortKdocCode(it))
                     addAnnotations(createAnnotationSet(it.metadata))
-                    addAnnotations(createSerialNameAnnotationSet(CodeBlock.of(it.value.contentToString())))
+                    addAnnotations(createSerialNameAnnotationSet(it.enumEntrySerialName()))
                 })
             }
 
             addKdoc(createKdocCode(element))
             addAnnotations(createAnnotationSet(element.metadata))
             addAnnotations(createSerializableAnnotationSet())
-            addAnnotations(createSerialNameAnnotationSet(element.canonicalName.value))
+            addAnnotations(createSerialNameAnnotationSet(element.typeSerialName()))
         }
     }
 }

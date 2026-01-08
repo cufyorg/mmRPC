@@ -12,6 +12,7 @@ data class CompactFieldDefinition(
     override val description: String = "",
     override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
 
+    val key: String? = null,
     val type_ref: CanonicalName,
     val default: Literal? = null,
 ) : CompactElementDefinition
@@ -21,6 +22,7 @@ fun FieldDefinition.toCompact(): CompactFieldDefinition {
         canonical_name = this.canonicalName,
         description = this.description,
         metadata = this.metadata.map { it.toCompact() },
+        key = this.key,
         type_ref = this.type.canonicalName,
         default = this.default,
     )
@@ -35,6 +37,7 @@ fun CompactFieldDefinition.inflateOrNull(
         metadata = this.metadata.map {
             it.inflateOrNull(onLookup)() ?: return null
         },
+        key = this.key,
         type = this.type_ref.let {
             val item = onLookup(it) ?: return null
             require(item is TypeDefinition) {

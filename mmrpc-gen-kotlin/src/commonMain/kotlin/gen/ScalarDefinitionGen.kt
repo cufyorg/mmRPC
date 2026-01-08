@@ -49,7 +49,7 @@ private fun applyCreateValueClass(element: ScalarDefinition) {
             addKdoc(createKdocCode(element))
             addAnnotations(createAnnotationSet(element.metadata))
             addAnnotations(createSerializableAnnotationSet())
-            addAnnotations(createSerialNameAnnotationSet(element.canonicalName.value))
+            addAnnotations(createSerialNameAnnotationSet(element.typeSerialName()))
         }
     }
 }

@@ -17,7 +17,6 @@ inline fun failBoundary(block: () -> Unit) {
 }
 
 @Marker3
-context(ctx: GenContext)
 fun fail(tag: String, definition: ElementDefinition? = null, message: () -> String): Nothing {
     val failure = GenFailure(
         tag = tag,
