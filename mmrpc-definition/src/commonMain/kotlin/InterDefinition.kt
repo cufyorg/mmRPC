@@ -29,12 +29,7 @@ data class InterDefinition(
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
 
     val types: List<StructDefinition>,
-) : TypeDefinition() {
-    override fun collectChildren() = sequence {
-        yieldAll(metadata.asSequence().flatMap { it.collect() })
-        yieldAll(types.asSequence().flatMap { it.collect() })
-    }
-}
+) : TypeDefinition()
 
 class InterDefinitionBuilder :
     StructDefinitionSetDomainContainer,

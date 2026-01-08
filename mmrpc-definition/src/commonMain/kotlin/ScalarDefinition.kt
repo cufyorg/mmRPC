@@ -28,12 +28,7 @@ data class ScalarDefinition(
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
 
     val type: ScalarDefinition? = null,
-) : TypeDefinition() {
-    override fun collectChildren() = sequence {
-        yieldAll(metadata.asSequence().flatMap { it.collect() })
-        type?.let { yieldAll(it.collect()) }
-    }
-}
+) : TypeDefinition()
 
 class ScalarDefinitionBuilder :
     ElementDefinitionBuilder() {

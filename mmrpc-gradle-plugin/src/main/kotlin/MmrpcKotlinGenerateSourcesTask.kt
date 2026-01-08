@@ -7,6 +7,7 @@ import kotlinx.serialization.json.Json
 import org.cufy.mmrpc.CanonicalName
 import org.cufy.mmrpc.MmrpcSpec
 import org.cufy.mmrpc.builtin
+import org.cufy.mmrpc.collect
 import org.cufy.mmrpc.compact.CompactElementDefinition
 import org.cufy.mmrpc.compact.inflate
 import org.cufy.mmrpc.gen.kotlin.*

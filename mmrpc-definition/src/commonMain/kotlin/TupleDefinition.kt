@@ -29,12 +29,7 @@ data class TupleDefinition(
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
 
     val types: List<TypeDefinition> = emptyList(),
-) : TypeDefinition() {
-    override fun collectChildren() = sequence {
-        yieldAll(metadata.asSequence().flatMap { it.collect() })
-        yieldAll(types.asSequence().flatMap { it.collect() })
-    }
-}
+) : TypeDefinition()
 
 class TupleDefinitionBuilder :
     ElementDefinitionBuilder() {

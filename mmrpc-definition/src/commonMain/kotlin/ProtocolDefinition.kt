@@ -29,12 +29,7 @@ data class ProtocolDefinition(
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
 
     val routines: List<RoutineDefinition> = emptyList(),
-) : ElementDefinition() {
-    override fun collectChildren() = sequence {
-        yieldAll(metadata.asSequence().flatMap { it.collect() })
-        yieldAll(routines.asSequence().flatMap { it.collect() })
-    }
-}
+) : ElementDefinition()
 
 class ProtocolDefinitionBuilder :
     ElementDefinitionBuilder() {

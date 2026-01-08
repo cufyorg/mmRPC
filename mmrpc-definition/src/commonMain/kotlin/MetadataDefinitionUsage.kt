@@ -24,12 +24,7 @@ import kotlin.jvm.JvmName
 data class MetadataDefinitionUsage(
     val definition: MetadataDefinition,
     val fields: List<FieldDefinitionUsage>,
-) {
-    fun collect() = sequence {
-        yieldAll(definition.collect())
-        yieldAll(fields.asSequence().flatMap { it.collect() })
-    }
-}
+)
 
 class MetadataDefinitionUsageBuilder {
     lateinit var definition: MetadataDefinition

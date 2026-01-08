@@ -32,14 +32,7 @@ data class RoutineDefinition(
     val faults: List<FaultDefinition> = emptyList(),
     val input: StructDefinition,
     val output: StructDefinition,
-) : ElementDefinition() {
-    override fun collectChildren() = sequence {
-        yieldAll(metadata.asSequence().flatMap { it.collect() })
-        yieldAll(faults.asSequence().flatMap { it.collect() })
-        yieldAll(input.collect())
-        yieldAll(output.collect())
-    }
-}
+) : ElementDefinition()
 
 class RoutineDefinitionBuilder :
     ElementDefinitionBuilder() {

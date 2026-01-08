@@ -74,4 +74,8 @@ object builtin : NamespaceObject() {
      * Namespace to be used for defining builtin serialization objects.
      */
     object serial : NamespaceObject(this)
+
+    fun ElementDefinition.isBuiltin(): Boolean {
+        return elements.any { it.canonicalName == canonicalName }
+    }
 }

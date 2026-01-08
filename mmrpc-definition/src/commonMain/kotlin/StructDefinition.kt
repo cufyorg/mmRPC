@@ -29,12 +29,7 @@ data class StructDefinition(
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
 
     val fields: List<FieldDefinition> = emptyList(),
-) : TypeDefinition() {
-    override fun collectChildren() = sequence {
-        yieldAll(metadata.asSequence().flatMap { it.collect() })
-        yieldAll(fields.asSequence().flatMap { it.collect() })
-    }
-}
+) : TypeDefinition()
 
 class StructDefinitionBuilder :
     FieldDefinitionSetDomainContainer,

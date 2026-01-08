@@ -30,12 +30,7 @@ data class UnionDefinition(
 
     val discriminator: String = "type",
     val types: List<StructDefinition>,
-) : TypeDefinition() {
-    override fun collectChildren() = sequence {
-        yieldAll(metadata.asSequence().flatMap { it.collect() })
-        yieldAll(types.asSequence().flatMap { it.collect() })
-    }
-}
+) : TypeDefinition()
 
 class UnionDefinitionBuilder :
     StructDefinitionSetDomainContainer,

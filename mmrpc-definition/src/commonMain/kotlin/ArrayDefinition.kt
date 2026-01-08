@@ -28,12 +28,7 @@ data class ArrayDefinition(
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
 
     val type: TypeDefinition,
-) : TypeDefinition() {
-    override fun collectChildren() = sequence {
-        yieldAll(metadata.asSequence().flatMap { it.collect() })
-        yieldAll(type.collect())
-    }
-}
+) : TypeDefinition()
 
 class ArrayDefinitionBuilder :
     ElementDefinitionBuilder() {

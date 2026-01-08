@@ -27,12 +27,7 @@ data class MetadataDefinition(
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
 
     val fields: List<FieldDefinition> = emptyList(),
-) : ElementDefinition() {
-    override fun collectChildren() = sequence {
-        yieldAll(metadata.asSequence().flatMap { it.collect() })
-        yieldAll(fields.asSequence().flatMap { it.collect() })
-    }
-}
+) : ElementDefinition()
 
 class MetadataDefinitionBuilder :
     FieldDefinitionSetDomainContainer,

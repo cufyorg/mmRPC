@@ -26,11 +26,7 @@ data class FaultDefinition(
     override val canonicalName: CanonicalName,
     override val description: String = "",
     override val metadata: List<MetadataDefinitionUsage> = emptyList(),
-) : ElementDefinition() {
-    override fun collectChildren() = sequence {
-        yieldAll(metadata.asSequence().flatMap { it.collect() })
-    }
-}
+) : ElementDefinition()
 
 class FaultDefinitionBuilder :
     ElementDefinitionBuilder() {

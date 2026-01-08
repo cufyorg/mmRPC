@@ -30,13 +30,7 @@ data class EnumDefinition(
 
     val type: TypeDefinition,
     val entries: List<ConstDefinition>,
-) : TypeDefinition() {
-    override fun collectChildren() = sequence {
-        yieldAll(metadata.asSequence().flatMap { it.collect() })
-        yieldAll(type.collect())
-        yieldAll(entries.asSequence().flatMap { it.collect() })
-    }
-}
+) : TypeDefinition()
 
 class EnumDefinitionBuilder :
     ElementDefinitionBuilder() {

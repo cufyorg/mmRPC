@@ -30,12 +30,7 @@ data class FieldDefinition(
     val key: String? = null,
     val type: TypeDefinition,
     val default: Literal? = null,
-) : ElementDefinition() {
-    override fun collectChildren() = sequence {
-        yieldAll(metadata.asSequence().flatMap { it.collect() })
-        yieldAll(type.collect())
-    }
-}
+) : ElementDefinition()
 
 class FieldDefinitionBuilder :
     ElementDefinitionBuilder() {

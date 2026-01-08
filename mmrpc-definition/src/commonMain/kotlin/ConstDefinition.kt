@@ -29,12 +29,7 @@ data class ConstDefinition(
 
     val type: TypeDefinition,
     val value: Literal,
-) : ElementDefinition() {
-    override fun collectChildren() = sequence {
-        yieldAll(metadata.asSequence().flatMap { it.collect() })
-        yieldAll(type.collect())
-    }
-}
+) : ElementDefinition()
 
 class ConstDefinitionBuilder :
     ElementDefinitionBuilder() {

@@ -23,11 +23,7 @@ import kotlinx.serialization.Serializable
 data class FieldDefinitionUsage(
     val definition: FieldDefinition,
     val value: Literal,
-) {
-    fun collect() = sequence {
-        yieldAll(definition.collect())
-    }
-}
+)
 
 class FieldDefinitionUsageBuilder {
     lateinit var definition: FieldDefinition
