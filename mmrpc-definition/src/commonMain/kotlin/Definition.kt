@@ -110,6 +110,16 @@ data class ArrayDefinition(
 ) : TypeDefinition()
 
 @Serializable
+@SerialName("map")
+data class MapDefinition(
+    override val canonicalName: CanonicalName,
+    override val description: String = "",
+    override val metadata: List<MetadataUsage> = emptyList(),
+
+    val type: TypeDefinition,
+) : TypeDefinition()
+
+@Serializable
 @SerialName("enum")
 data class EnumDefinition(
     override val canonicalName: CanonicalName,

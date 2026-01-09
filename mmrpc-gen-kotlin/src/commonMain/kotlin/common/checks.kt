@@ -14,6 +14,11 @@ fun ElementDefinition.hasGeneratedClass(): Boolean {
         if (namespace !in ctx.roots) return false
         return true
     }
+    if (this is MapDefinition) {
+        if (!name[0].isUpperCase()) return false
+        if (namespace !in ctx.roots) return false
+        return true
+    }
     if (this is OptionalDefinition) return false
     if (this is FieldDefinition) return false
     if (this is ConstDefinition) return false

@@ -317,6 +317,7 @@ open class MmrpcKotlinGenerateSourcesTask : DefaultTask() {
         try {
             genContext.run {
                 consumeArrayDefinition()
+                consumeMapDefinition()
                 consumeConstDefinition()
                 consumeEnumDefinition()
                 consumeFaultDefinition()

@@ -26,6 +26,7 @@ fun createMetaLiteralCode(element: TypeDefinition, literal: Literal): CodeBlock 
         is ScalarDefinition -> createMetaLiteralCodeOfScalar(element, literal)
         is EnumDefinition -> createMetaLiteralCodeOfEnum(element, literal)
 
+        is MapDefinition -> fail(TAG, element) { "element not supported" }
         is OptionalDefinition -> fail(TAG, element) { "element not supported" }
         is StructDefinition -> fail(TAG, element) { "element not supported" }
         is TupleDefinition -> fail(TAG, element) { "element not supported" }

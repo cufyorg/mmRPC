@@ -25,7 +25,7 @@ fun createSerialNameAnnotationSet(serialName: String): Set<AnnotationSpec> {
     return buildSet {
         if (GenFeature.KOTLINX_SERIALIZATION in ctx.features) {
             add(annotationSpec(SerialName::class) {
-                addMember("value = \"%S\"", serialName)
+                addMember("value = %S", serialName)
             })
         }
     }

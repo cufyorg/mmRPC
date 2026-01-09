@@ -16,6 +16,7 @@ fun TypeDefinition.typeSerialName(): String {
         -> canonicalName.value
 
         is ArrayDefinition,
+        is MapDefinition,
         is OptionalDefinition,
         -> fail(TAG, this) { "Cannot produce serial name for element" }
     }

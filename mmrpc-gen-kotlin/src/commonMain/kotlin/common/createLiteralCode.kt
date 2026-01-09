@@ -23,6 +23,11 @@ fun createLiteralCode(element: TypeDefinition, literal: Literal): CodeBlock {
             else -> fail(TAG, element) { "illegal value: $literal" }
         }
 
+        is MapDefinition -> when (literal) {
+            is StructLiteral -> createLiteralCodeOfMap(element, literal)
+            else -> fail(TAG, element) { "illegal value: $literal" }
+        }
+
         is EnumDefinition -> createLiteralCodeOfEnum(element, literal)
         is ScalarDefinition -> createLiteralCodeOfScalar(element, literal)
         is TupleDefinition -> when (literal) {
@@ -101,6 +106,16 @@ private fun createLiteralCodeOfArray(element: ArrayDefinition, literal: TupleLit
     return createCallSingleVararg(
         function = CodeBlock.of("listOf"),
         literal.value.map { createLiteralCode(element.type, it) }
+    )
+}
+
+context(ctx: GenContext)
+private fun createLiteralCodeOfMap(element: MapDefinition, literal: StructLiteral): CodeBlock {
+    return createCallSingleVararg(
+        function = CodeBlock.of("mapOf"),
+        literal.value.map { (key, value) ->
+            CodeBlock.of("%S to %L", key, createLiteralCode(element.type, value))
+        }
     )
 }
 

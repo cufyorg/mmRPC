@@ -80,6 +80,7 @@ fun ElementDefinition.resolveParent(): ElementDefinition? =
 fun ElementDefinition.humanSignature(): String {
     val discriminator = when (this) {
         is ArrayDefinition -> "array"
+        is MapDefinition -> "map"
         is EnumDefinition -> "enum"
         is ConstDefinition -> "const"
         is FaultDefinition -> "fault"

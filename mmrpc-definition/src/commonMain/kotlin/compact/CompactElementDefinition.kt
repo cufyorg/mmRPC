@@ -19,6 +19,7 @@ sealed interface CompactElementDefinition {
 fun ElementDefinition.toCompact(): CompactElementDefinition {
     return when (this) {
         is ArrayDefinition -> toCompact()
+        is MapDefinition -> toCompact()
         is ConstDefinition -> toCompact()
         is EnumDefinition -> toCompact()
         is FaultDefinition -> toCompact()
@@ -44,6 +45,7 @@ fun CompactElementDefinition.strip(): CompactElementDefinition {
         is CompactProtocolDefinition -> copy(description = "")
         is CompactRoutineDefinition -> copy(description = "")
         is CompactArrayDefinition -> copy(description = "")
+        is CompactMapDefinition -> copy(description = "")
         is CompactEnumDefinition -> copy(description = "")
         is CompactInterDefinition -> copy(description = "")
         is CompactOptionalDefinition -> copy(description = "")
@@ -59,6 +61,7 @@ fun CompactElementDefinition.inflateOrNull(
 ): ElementDefinition? {
     return when (this) {
         is CompactArrayDefinition -> inflateOrNull(onLookup)
+        is CompactMapDefinition -> inflateOrNull(onLookup)
         is CompactConstDefinition -> inflateOrNull(onLookup)
         is CompactEnumDefinition -> inflateOrNull(onLookup)
         is CompactFaultDefinition -> inflateOrNull(onLookup)

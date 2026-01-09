@@ -23,6 +23,12 @@ fun TypeDefinition.typeName(): TypeName {
             else -> LIST.parameterizedBy(type.typeName())
         }
 
+        is MapDefinition,
+        -> when {
+            hasGeneratedClass() -> canonicalName.generatedClassName()
+            else -> MAP.parameterizedBy(STRING, type.typeName())
+        }
+
         is ScalarDefinition,
         -> when {
             isUserdefined() -> userdefinedTypeName()
@@ -76,6 +82,7 @@ fun TypeDefinition.metaTypeName(): TypeName {
         is EnumDefinition,
         -> canonicalName.generatedClassName()
 
+        is MapDefinition,
         is OptionalDefinition,
         is UnionDefinition,
         is StructDefinition,

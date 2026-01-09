@@ -55,6 +55,11 @@ private fun ElementDefinition.collectChildren(): Sequence<ElementDefinition> {
             yieldAll(type.collect())
         }
 
+        is MapDefinition -> sequence {
+            yieldAll(metadata.asSequence().flatMap { it.collect() })
+            yieldAll(type.collect())
+        }
+
         is EnumDefinition -> sequence {
             yieldAll(metadata.asSequence().flatMap { it.collect() })
             yieldAll(type.collect())
