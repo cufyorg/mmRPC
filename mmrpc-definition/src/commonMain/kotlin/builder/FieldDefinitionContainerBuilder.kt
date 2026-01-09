@@ -1,6 +1,7 @@
 package org.cufy.mmrpc.builder
 
 import org.cufy.mmrpc.*
+import kotlin.jvm.JvmName
 
 ////////////////////////////////////////
 
@@ -16,6 +17,7 @@ operator fun Unnamed<FieldDefinition>.unaryPlus() {
     ctx.addFieldDefinition(this)
 }
 
+@JvmName("Iterable_Unnamed_FieldDefinition_unaryPlus")
 context(ctx: FieldDefinitionContainerBuilder)
 operator fun Iterable<Unnamed<FieldDefinition>>.unaryPlus() {
     for (it in this) +it

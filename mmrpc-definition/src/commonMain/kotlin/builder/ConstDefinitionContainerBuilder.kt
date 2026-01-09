@@ -1,6 +1,7 @@
 package org.cufy.mmrpc.builder
 
 import org.cufy.mmrpc.*
+import kotlin.jvm.JvmName
 
 ////////////////////////////////////////
 
@@ -16,6 +17,7 @@ operator fun Unnamed<ConstDefinition>.unaryPlus() {
     ctx.addConstDefinition(this)
 }
 
+@JvmName("Iterable_Unnamed_ConstDefinition_unaryPlus")
 context(ctx: ConstDefinitionContainerBuilder)
 operator fun Iterable<Unnamed<ConstDefinition>>.unaryPlus() {
     for (it in this) +it

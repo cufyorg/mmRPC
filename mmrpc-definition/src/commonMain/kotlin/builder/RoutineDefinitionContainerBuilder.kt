@@ -3,6 +3,7 @@ package org.cufy.mmrpc.builder
 import org.cufy.mmrpc.Marker2
 import org.cufy.mmrpc.RoutineDefinition
 import org.cufy.mmrpc.Unnamed
+import kotlin.jvm.JvmName
 
 ////////////////////////////////////////
 
@@ -18,6 +19,7 @@ operator fun Unnamed<RoutineDefinition>.unaryPlus() {
     ctx.addRoutineDefinition(this)
 }
 
+@JvmName("Iterable_Unnamed_RoutineDefinition_unaryPlus")
 context(ctx: RoutineDefinitionContainerBuilder)
 operator fun Iterable<Unnamed<RoutineDefinition>>.unaryPlus() {
     for (it in this) +it

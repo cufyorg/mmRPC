@@ -1,5 +1,6 @@
 package org.cufy.mmrpc
 
+import kotlin.jvm.JvmName
 import kotlin.reflect.KProperty0
 
 ////////////////////////////////////////
@@ -17,6 +18,7 @@ fun <T : Any> KProperty0<Box<T>>.getOrThrow(): T =
 operator fun <T : Any> Box<T>.timesAssign(value: T) =
     run { this.value = value }
 
+@JvmName("Box_Unnamed_T_timesAssign")
 operator fun <T> Box<Unnamed<T>>.timesAssign(value: T) =
     run { this.value = Unnamed(value) }
 

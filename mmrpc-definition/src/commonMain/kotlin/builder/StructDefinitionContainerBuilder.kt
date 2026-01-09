@@ -5,6 +5,7 @@ import org.cufy.mmrpc.Marker2
 import org.cufy.mmrpc.StructDefinition
 import org.cufy.mmrpc.Unnamed
 import org.cufy.mmrpc.internal.VARARG_VARIANTS_DEPRECATED_MSG
+import kotlin.jvm.JvmName
 
 ////////////////////////////////////////
 
@@ -20,6 +21,7 @@ operator fun Unnamed<StructDefinition>.unaryPlus() {
     ctx.addStructDefinition(this)
 }
 
+@JvmName("Iterable_Unnamed_StructDefinition_unaryPlus")
 context(ctx: StructDefinitionContainerBuilder)
 operator fun Iterable<Unnamed<StructDefinition>>.unaryPlus() {
     for (it in this) +it
