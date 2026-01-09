@@ -2,47 +2,41 @@ package org.cufy.mmrpc
 
 import kotlin.reflect.KProperty
 
-fun interface UnnamedBlock<out T> {
-    operator fun invoke(ns: CanonicalName, name: String?): T
+interface Unnamed<out T> {
+    fun get(ns: CanonicalName?, name: String?): T
 }
 
-class Unnamed<out T>(private val block: UnnamedBlock<T>) {
-    constructor(block: (CanonicalName) -> T) : this({ ns, _ -> block(ns) })
-    constructor(value: T) : this({ _, _ -> value })
-
-    fun get(namespace: CanonicalName) =
-        block(namespace, name = null)
-
-    fun get(namespace: CanonicalName, name: String) =
-        block(namespace, name)
-
-    fun get(obj: NamespaceObject) =
-        block(obj.canonicalName, name = null)
-
-    fun get(obj: NamespaceObject, name: String) =
-        block(obj.canonicalName, name)
-
-    private val values = mutableMapOf<Pair<CanonicalName, String?>, T>()
-
-    operator fun getValue(namespace: CanonicalName, property: KProperty<*>): T {
-        return values.getOrPut(namespace to property.name) {
-            val splits = property.name.split("__")
-            val ns = namespace + splits.dropLast(1)
-            val n = splits.last()
-            block(ns, n)
+fun <T> Unnamed(value: T): Unnamed<T> {
+    return object : Unnamed<T> {
+        override fun get(ns: CanonicalName?, name: String?): T {
+            return value
         }
     }
+}
 
-    operator fun getValue(obj: NamespaceObject, property: KProperty<*>): T {
-        return values.getOrPut(obj.canonicalName to property.name) {
-            val splits = property.name.split("__")
-            val ns = obj.canonicalName + splits.dropLast(1)
-            val n = splits.last()
-            block(ns, n)
+fun <T> Unnamed(block: (ns: CanonicalName?, name: String?) -> T): Unnamed<T> {
+    val cache = mutableMapOf<Pair<CanonicalName?, String?>, T>()
+    return object : Unnamed<T> {
+        override fun get(ns: CanonicalName?, name: String?): T {
+            return cache.getOrPut(ns to name) {
+                block(ns, name)
+            }
         }
     }
+}
 
-    operator fun provideDelegate(thisRef: Any?, property: KProperty<*>): Unnamed<T> {
-        return Unnamed { namespace, name -> block(namespace, name) }
-    }
+fun <T> Unnamed<T>.get(obj: NamespaceObject, name: String?) = get(obj.canonicalName, name)
+
+operator fun <T> Unnamed<T>.getValue(obj: NamespaceObject, property: KProperty<*>): T {
+    val splits = property.name.split("__")
+    val ns = obj.canonicalName + splits.dropLast(1)
+    val n = splits.last()
+    return get(ns, n)
+}
+
+operator fun <T> Unnamed<T>.getValue(obj: Any?, property: KProperty<*>): T {
+    val splits = property.name.split("__")
+    val ns = CanonicalName(splits.dropLast(1))
+    val n = splits.last()
+    return get(ns, n)
 }

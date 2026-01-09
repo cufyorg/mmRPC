@@ -15,6 +15,8 @@
  */
 package org.cufy.mmrpc
 
+import org.cufy.mmrpc.builder.*
+
 /**
  * Namespace to be used for defining builtins.
  */
@@ -75,7 +77,7 @@ object builtin : NamespaceObject() {
      */
     object serial : NamespaceObject(this)
 
-    fun ElementDefinition.isBuiltin(): Boolean {
+    operator fun contains(canonicalName: CanonicalName): Boolean {
         return elements.any { it.canonicalName == canonicalName }
     }
 }

@@ -4,7 +4,7 @@ import com.squareup.kotlinpoet.AnnotationSpec
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.cufy.mmrpc.Marker3
-import org.cufy.mmrpc.MetadataDefinitionUsage
+import org.cufy.mmrpc.MetadataUsage
 import org.cufy.mmrpc.gen.kotlin.GenContext
 import org.cufy.mmrpc.gen.kotlin.GenFeature
 import org.cufy.mmrpc.gen.kotlin.util.annotationSpec
@@ -33,7 +33,7 @@ fun createSerialNameAnnotationSet(serialName: String): Set<AnnotationSpec> {
 
 @Marker3
 context(ctx: GenContext)
-fun createAnnotationSet(metadata: List<MetadataDefinitionUsage>): List<AnnotationSpec> {
+fun createAnnotationSet(metadata: List<MetadataUsage>): List<AnnotationSpec> {
     return buildList {
         for (it in metadata) {
             add(annotationSpec(it.definition.typeName()) {

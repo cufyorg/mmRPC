@@ -10,7 +10,7 @@ import org.cufy.mmrpc.*
 data class CompactFieldDefinition(
     override val canonical_name: CanonicalName,
     override val description: String = "",
-    override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
+    override val metadata: List<CompactMetadataUsage> = emptyList(),
 
     val key: String? = null,
     val type_ref: CanonicalName,

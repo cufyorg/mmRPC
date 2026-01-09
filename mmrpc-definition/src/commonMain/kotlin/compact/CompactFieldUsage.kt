@@ -5,23 +5,23 @@ import org.cufy.mmrpc.*
 
 @Suppress("PropertyName")
 @Serializable
-data class CompactFieldDefinitionUsage(
+data class CompactFieldUsage(
     val definition_ref: CanonicalName,
     val value: Literal,
 )
 
-fun FieldDefinitionUsage.toCompact(): CompactFieldDefinitionUsage {
-    return CompactFieldDefinitionUsage(
+fun FieldUsage.toCompact(): CompactFieldUsage {
+    return CompactFieldUsage(
         definition_ref = this.definition.canonicalName,
         value = this.value,
     )
 }
 
-fun CompactFieldDefinitionUsage.inflateOrNull(
+fun CompactFieldUsage.inflateOrNull(
     onLookup: (CanonicalName) -> ElementDefinition?,
-): () -> FieldDefinitionUsage? {
+): () -> FieldUsage? {
     return it@{
-        FieldDefinitionUsage(
+        FieldUsage(
             definition = this.definition_ref.let {
                 val item = onLookup(it) ?: return@it null
                 require(item is FieldDefinition) {

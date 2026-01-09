@@ -10,7 +10,7 @@ import org.cufy.mmrpc.*
 data class CompactRoutineDefinition(
     override val canonical_name: CanonicalName,
     override val description: String = "",
-    override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
+    override val metadata: List<CompactMetadataUsage> = emptyList(),
 
     val comm: List<Comm> = emptyList(),
     val faults_ref: List<CanonicalName> = emptyList(),

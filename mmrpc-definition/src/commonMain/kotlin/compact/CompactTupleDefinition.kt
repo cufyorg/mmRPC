@@ -13,7 +13,7 @@ import org.cufy.mmrpc.TypeDefinition
 data class CompactTupleDefinition(
     override val canonical_name: CanonicalName,
     override val description: String = "",
-    override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
+    override val metadata: List<CompactMetadataUsage> = emptyList(),
 
     val types_ref: List<CanonicalName> = emptyList(),
 ) : CompactElementDefinition

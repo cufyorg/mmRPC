@@ -10,12 +10,10 @@ sealed interface CompactElementDefinition {
     val canonical_name: CanonicalName
 
     val description: String
-    val metadata: List<CompactMetadataDefinitionUsage>
+    val metadata: List<CompactMetadataUsage>
 
     val name get() = canonical_name.name
     val namespace get() = canonical_name.namespace
-
-    fun isBuiltin() = builtin.elements.any { it.canonicalName == canonical_name }
 }
 
 fun ElementDefinition.toCompact(): CompactElementDefinition {

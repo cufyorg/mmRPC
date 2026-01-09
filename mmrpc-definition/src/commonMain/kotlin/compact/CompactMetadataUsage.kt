@@ -4,27 +4,27 @@ import kotlinx.serialization.Serializable
 import org.cufy.mmrpc.CanonicalName
 import org.cufy.mmrpc.ElementDefinition
 import org.cufy.mmrpc.MetadataDefinition
-import org.cufy.mmrpc.MetadataDefinitionUsage
+import org.cufy.mmrpc.MetadataUsage
 
 @Suppress("PropertyName")
 @Serializable
-data class CompactMetadataDefinitionUsage(
+data class CompactMetadataUsage(
     val definition_ref: CanonicalName,
-    val fields: List<CompactFieldDefinitionUsage>,
+    val fields: List<CompactFieldUsage>,
 )
 
-fun MetadataDefinitionUsage.toCompact(): CompactMetadataDefinitionUsage {
-    return CompactMetadataDefinitionUsage(
+fun MetadataUsage.toCompact(): CompactMetadataUsage {
+    return CompactMetadataUsage(
         definition_ref = this.definition.canonicalName,
         fields = this.fields.map { it.toCompact() }
     )
 }
 
-fun CompactMetadataDefinitionUsage.inflateOrNull(
+fun CompactMetadataUsage.inflateOrNull(
     onLookup: (CanonicalName) -> ElementDefinition?,
-): () -> MetadataDefinitionUsage? {
+): () -> MetadataUsage? {
     return it@{
-        MetadataDefinitionUsage(
+        MetadataUsage(
             definition = this.definition_ref.let {
                 val item = onLookup(it) ?: return@it null
                 require(item is MetadataDefinition) {

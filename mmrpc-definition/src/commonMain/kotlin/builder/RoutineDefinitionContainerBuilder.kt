@@ -1,0 +1,51 @@
+package org.cufy.mmrpc.builder
+
+import org.cufy.mmrpc.Marker2
+import org.cufy.mmrpc.RoutineDefinition
+import org.cufy.mmrpc.Unnamed
+
+////////////////////////////////////////
+
+@Marker2
+interface RoutineDefinitionContainerBuilder {
+    fun addRoutineDefinition(value: Unnamed<RoutineDefinition>)
+}
+
+////////////////////////////////////////
+
+context(ctx: RoutineDefinitionContainerBuilder)
+operator fun Unnamed<RoutineDefinition>.unaryPlus() {
+    ctx.addRoutineDefinition(this)
+}
+
+context(ctx: RoutineDefinitionContainerBuilder)
+operator fun Iterable<Unnamed<RoutineDefinition>>.unaryPlus() {
+    for (it in this) +it
+}
+
+context(ctx: RoutineDefinitionContainerBuilder)
+operator fun RoutineDefinition.unaryPlus() {
+    +Unnamed(this)
+}
+
+context(ctx: RoutineDefinitionContainerBuilder)
+operator fun Iterable<RoutineDefinition>.unaryPlus() {
+    for (it in this) +Unnamed(it)
+}
+
+////////////////////////////////////////
+
+context(ctx: RoutineDefinitionContainerBuilder)
+operator fun String.invoke(
+    block: RoutineDefinitionBlock
+) {
+    +Unnamed { ns, _ ->
+        RoutineDefinitionBuilder()
+            .also { it.name = this }
+            .also { it.namespace = ns }
+            .apply(block)
+            .build()
+    }
+}
+
+////////////////////////////////////////

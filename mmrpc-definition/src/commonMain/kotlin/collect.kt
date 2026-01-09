@@ -4,13 +4,13 @@ fun ElementDefinition.collect(): Sequence<ElementDefinition> {
     return sequenceOf(this) + collectChildren()
 }
 
-fun FieldDefinitionUsage.collect(): Sequence<ElementDefinition> {
+fun FieldUsage.collect(): Sequence<ElementDefinition> {
     return sequence {
         yieldAll(definition.collect())
     }
 }
 
-fun MetadataDefinitionUsage.collect(): Sequence<ElementDefinition> {
+fun MetadataUsage.collect(): Sequence<ElementDefinition> {
     return sequence {
         yieldAll(definition.collect())
         yieldAll(fields.asSequence().flatMap { it.collect() })

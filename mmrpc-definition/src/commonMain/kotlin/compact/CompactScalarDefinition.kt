@@ -12,7 +12,7 @@ import org.cufy.mmrpc.ScalarDefinition
 data class CompactScalarDefinition(
     override val canonical_name: CanonicalName,
     override val description: String = "",
-    override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
+    override val metadata: List<CompactMetadataUsage> = emptyList(),
 
     val type_ref: CanonicalName? = null,
 ) : CompactElementDefinition

@@ -11,7 +11,7 @@ import org.cufy.mmrpc.FaultDefinition
 data class CompactFaultDefinition(
     override val canonical_name: CanonicalName,
     override val description: String = "",
-    override val metadata: List<CompactMetadataDefinitionUsage> = emptyList(),
+    override val metadata: List<CompactMetadataUsage> = emptyList(),
 ) : CompactElementDefinition
 
 fun FaultDefinition.toCompact(): CompactFaultDefinition {
