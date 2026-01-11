@@ -9,7 +9,7 @@ import org.cufy.mmrpc.TypeDefinition
 
 @Suppress("PropertyName")
 @Serializable
-@SerialName("array")
+@SerialName("map")
 data class CompactMapDefinition(
     override val canonical_name: CanonicalName,
     override val description: String = "",
