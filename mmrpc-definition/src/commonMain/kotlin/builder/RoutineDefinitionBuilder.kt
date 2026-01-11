@@ -10,22 +10,31 @@ typealias RoutineDefinitionBlock = context(RoutineDefinitionBuilder) () -> Unit
 class RoutineDefinitionBuilder :
     FaultDefinitionContainerBuilder,
     ElementDefinitionBuilder() {
-    val comm = mutableListOf<Comm>()
     val faults = mutableListOf<Unnamed<FaultDefinition>>()
-    internal val input = mutableListOf<context(StructDefinitionBuilder) () -> Unit>()
-    internal val output = mutableListOf<context(StructDefinitionBuilder) () -> Unit>()
+    var inputShape = Comm.Shape.Void
+    var outputShape = Comm.Shape.Void
+    val input = mutableListOf<context(StructDefinitionBuilder) () -> Unit>()
+    val output = mutableListOf<context(StructDefinitionBuilder) () -> Unit>()
 
     override fun addFaultDefinition(value: Unnamed<FaultDefinition>) {
         faults += value
     }
 
     fun build(): RoutineDefinition {
+        check(inputShape != Comm.Shape.Void || input.isEmpty()) {
+            "Injected input cannot be delivered when input shape is Void"
+        }
+        check(outputShape != Comm.Shape.Void || output.isEmpty()) {
+            "Injected output cannot be delivered when output shape is Void"
+        }
+
         val cn = buildCanonicalName()
         return RoutineDefinition(
             canonicalName = cn,
             description = this.description,
             metadata = this.metadata.toList(),
-            comm = this.comm.toList(),
+            comm = Comm.of(this.inputShape, this.outputShape)
+                ?: error("Cannot select Comm mode from input=$inputShape output=$outputShape"),
             faults = this.faults.mapIndexed { i, it ->
                 it.get(cn, name = "fault$i")
             },
@@ -49,20 +58,61 @@ class RoutineDefinitionBuilder :
     }
 }
 
+////////////////////////////////////////
+
+data object UnaryCommShapeKeyword
+
+@Marker0
+context(_: RoutineDefinitionBuilder)
+val unary get() = UnaryCommShapeKeyword
+
+@Marker0
 context(ctx: RoutineDefinitionBuilder)
-operator fun Comm.unaryPlus() {
-    ctx.comm += this
+infix fun UnaryCommShapeKeyword.input(block: StructDefinitionBlock) {
+    ctx.input += block
+    ctx.inputShape = Comm.Shape.Unary
 }
 
 @Marker0
 context(ctx: RoutineDefinitionBuilder)
-fun input(block: StructDefinitionBlock) {
+infix fun UnaryCommShapeKeyword.output(block: StructDefinitionBlock) {
+    ctx.output += block
+    ctx.outputShape = Comm.Shape.Unary
+}
+
+////////////////////////////////////////
+
+data object StreamCommShapeKeyword
+
+@Marker0
+context(_: RoutineDefinitionBuilder)
+val stream get() = StreamCommShapeKeyword
+
+@Marker0
+context(ctx: RoutineDefinitionBuilder)
+infix fun StreamCommShapeKeyword.input(block: StructDefinitionBlock) {
+    ctx.input += block
+    ctx.inputShape = Comm.Shape.Stream
+}
+
+@Marker0
+context(ctx: RoutineDefinitionBuilder)
+infix fun StreamCommShapeKeyword.output(block: StructDefinitionBlock) {
+    ctx.output += block
+    ctx.outputShape = Comm.Shape.Stream
+}
+
+////////////////////////////////////////
+
+@Marker0
+context(ctx: RoutineDefinitionBuilder)
+fun injectInput(block: StructDefinitionBlock) {
     ctx.input += block
 }
 
 @Marker0
 context(ctx: RoutineDefinitionBuilder)
-fun output(block: StructDefinitionBlock) {
+fun injectOutput(block: StructDefinitionBlock) {
     ctx.output += block
 }
 

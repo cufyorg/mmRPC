@@ -9,9 +9,9 @@ import kotlinx.serialization.json.JsonObject
 import org.cufy.json.asContentStringOrNull
 import org.cufy.json.serializeToJsonString
 import org.cufy.mmrpc.CanonicalName
-import org.cufy.mmrpc.Comm
 import org.cufy.mmrpc.FaultException
 import org.cufy.mmrpc.RoutineObject
+import org.cufy.mmrpc.isHttpSupported
 
 suspend inline fun <reified I : Any, reified O : Any> HttpClient.exec(
     routine: RoutineObject<I, O>,
@@ -19,7 +19,7 @@ suspend inline fun <reified I : Any, reified O : Any> HttpClient.exec(
     token: String? = null,
     baseurl: String?,
 ): O {
-    require(Comm.Http in routine.comm) {
+    require(routine.comm.isHttpSupported()) {
         "Routine does not support Http communication channel"
     }
 

@@ -12,7 +12,7 @@ data class CompactRoutineDefinition(
     override val description: String = "",
     override val metadata: List<CompactMetadataUsage> = emptyList(),
 
-    val comm: List<Comm> = emptyList(),
+    val comm: Comm,
     val faults_ref: List<CanonicalName> = emptyList(),
     val input_ref: CanonicalName,
     val output_ref: CanonicalName,

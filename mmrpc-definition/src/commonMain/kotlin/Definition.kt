@@ -88,7 +88,7 @@ data class RoutineDefinition(
     override val description: String = "",
     override val metadata: List<MetadataUsage> = emptyList(),
 
-    val comm: List<Comm> = emptyList(),
+    val comm: Comm,
     val faults: List<FaultDefinition> = emptyList(),
     val input: StructDefinition,
     val output: StructDefinition,

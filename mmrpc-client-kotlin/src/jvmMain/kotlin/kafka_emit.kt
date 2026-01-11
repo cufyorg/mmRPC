@@ -12,15 +12,15 @@ import org.cufy.jose.sign
 import org.cufy.json.json
 import org.cufy.json.serializeToJsonString
 import org.cufy.json.set
-import org.cufy.mmrpc.Comm
 import org.cufy.mmrpc.RoutineObject
+import org.cufy.mmrpc.isKafkaSupported
 
 suspend inline fun <reified I : Any> KafkaProducer<String, String>.emit(
     routine: RoutineObject<I, *>,
     input: I,
     key: String? = null,
 ) {
-    require(Comm.Kafka in routine.comm) {
+    require(routine.comm.isKafkaSupported()) {
         "Routine does not support Kafka communication channel"
     }
 
@@ -54,7 +54,7 @@ suspend inline fun <reified I : Any> KafkaProducer<String, String>.emit(
     aud: List<String> = emptyList(),
     jwks: JWKSet,
 ) {
-    require(Comm.Kafka in routine.comm) {
+    require(routine.comm.isKafkaSupported()) {
         "Routine does not support Kafka communication channel"
     }
 

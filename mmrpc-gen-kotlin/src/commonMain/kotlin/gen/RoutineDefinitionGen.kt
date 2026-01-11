@@ -1,15 +1,17 @@
 package org.cufy.mmrpc.gen.kotlin.gen
 
-import com.squareup.kotlinpoet.*
+import com.squareup.kotlinpoet.CodeBlock
+import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.TypeSpec.Companion.objectBuilder
+import com.squareup.kotlinpoet.asClassName
 import org.cufy.mmrpc.CanonicalName
 import org.cufy.mmrpc.Comm
 import org.cufy.mmrpc.RoutineDefinition
 import org.cufy.mmrpc.RoutineObject
 import org.cufy.mmrpc.gen.kotlin.GenContext
 import org.cufy.mmrpc.gen.kotlin.common.*
-import org.cufy.mmrpc.gen.kotlin.util.createCallSingleVararg
 import org.cufy.mmrpc.gen.kotlin.util.propertySpec
 import kotlin.reflect.KType
 
@@ -62,16 +64,9 @@ private fun applyCreateDataObject(element: RoutineDefinition) {
                 addModifiers(KModifier.OVERRIDE)
                 initializer("%T(CANONICAL_NAME)", CanonicalName::class)
             })
-            addProperty(propertySpec("comm", SET.parameterizedBy(Comm::class.asTypeName())) {
+            addProperty(propertySpec("comm", Comm::class) {
                 addModifiers(KModifier.OVERRIDE)
-                initializer(
-                    createCallSingleVararg(
-                        CodeBlock.of("setOf"),
-                        element.comm.map {
-                            CodeBlock.of("%T(%S)", Comm::class, it.value)
-                        }
-                    )
-                )
+                initializer(CodeBlock.of("%T.%L", Comm::class, element.comm.name))
             })
             addProperty(propertySpec("typeI", KType::class) {
                 addModifiers(KModifier.OVERRIDE)
