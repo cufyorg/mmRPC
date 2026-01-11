@@ -1,5 +1,6 @@
 package org.cufy.mmrpc.builder
 
+import org.cufy.mmrpc.Comm
 import org.cufy.mmrpc.Marker2
 import org.cufy.mmrpc.RoutineDefinition
 import org.cufy.mmrpc.Unnamed
@@ -47,6 +48,22 @@ operator fun String.invoke(
             .also { it.namespace = ns }
             .apply(block)
             .build()
+    }
+}
+
+context(ctx: RoutineDefinitionContainerBuilder)
+operator fun String.invoke(
+    comm: Comm,
+    block: RoutineDefinitionBlock
+) {
+    this {
+        contextOf().also {
+            it.inputShape = comm.inputShape()
+            it.inputShapeSet = true
+            it.outputShape = comm.outputShape()
+            it.outputShapeSet = true
+        }
+        block()
     }
 }
 

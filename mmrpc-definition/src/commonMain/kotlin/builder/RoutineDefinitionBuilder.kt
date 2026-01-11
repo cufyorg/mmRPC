@@ -11,10 +11,12 @@ class RoutineDefinitionBuilder :
     FaultDefinitionContainerBuilder,
     ElementDefinitionBuilder() {
     val faults = mutableListOf<Unnamed<FaultDefinition>>()
-    var inputShape = Comm.Shape.Void
-    var outputShape = Comm.Shape.Void
-    val input = mutableListOf<context(StructDefinitionBuilder) () -> Unit>()
-    val output = mutableListOf<context(StructDefinitionBuilder) () -> Unit>()
+    internal var inputShape = Comm.Shape.Void
+    internal var outputShape = Comm.Shape.Void
+    internal var inputShapeSet = false
+    internal var outputShapeSet = false
+    internal val input = mutableListOf<context(StructDefinitionBuilder) () -> Unit>()
+    internal val output = mutableListOf<context(StructDefinitionBuilder) () -> Unit>()
 
     override fun addFaultDefinition(value: Unnamed<FaultDefinition>) {
         faults += value
@@ -60,6 +62,27 @@ class RoutineDefinitionBuilder :
 
 ////////////////////////////////////////
 
+@Marker0
+context(ctx: RoutineDefinitionBuilder)
+operator fun Comm.unaryPlus() {
+    val inputShape = this.inputShape()
+    val outputShape = this.outputShape()
+
+    check(!ctx.inputShapeSet || ctx.inputShape == inputShape) {
+        "Input shape conflict: Shape was already set to ${ctx.inputShape}"
+    }
+    check(!ctx.outputShapeSet || ctx.outputShape == outputShape) {
+        "Output shape conflict: Shape was already set to ${ctx.outputShape}"
+    }
+
+    ctx.inputShape = inputShape
+    ctx.inputShapeSet = true
+    ctx.outputShape = outputShape
+    ctx.outputShapeSet = true
+}
+
+////////////////////////////////////////
+
 data object UnaryCommShapeKeyword
 
 @Marker0
@@ -69,15 +92,25 @@ val unary get() = UnaryCommShapeKeyword
 @Marker0
 context(ctx: RoutineDefinitionBuilder)
 infix fun UnaryCommShapeKeyword.input(block: StructDefinitionBlock) {
+    check(!ctx.inputShapeSet || ctx.inputShape == Comm.Shape.Unary) {
+        "Input shape conflict: Shape was already set to ${ctx.inputShape}"
+    }
+
     ctx.input += block
     ctx.inputShape = Comm.Shape.Unary
+    ctx.inputShapeSet = true
 }
 
 @Marker0
 context(ctx: RoutineDefinitionBuilder)
 infix fun UnaryCommShapeKeyword.output(block: StructDefinitionBlock) {
+    check(!ctx.outputShapeSet || ctx.outputShape == Comm.Shape.Unary) {
+        "Output shape conflict: Shape was already set to ${ctx.outputShape}"
+    }
+
     ctx.output += block
     ctx.outputShape = Comm.Shape.Unary
+    ctx.outputShapeSet = true
 }
 
 ////////////////////////////////////////
@@ -91,15 +124,25 @@ val stream get() = StreamCommShapeKeyword
 @Marker0
 context(ctx: RoutineDefinitionBuilder)
 infix fun StreamCommShapeKeyword.input(block: StructDefinitionBlock) {
+    check(!ctx.inputShapeSet || ctx.inputShape == Comm.Shape.Stream) {
+        "Input shape conflict: Shape was already set to ${ctx.inputShape}"
+    }
+
     ctx.input += block
     ctx.inputShape = Comm.Shape.Stream
+    ctx.inputShapeSet = true
 }
 
 @Marker0
 context(ctx: RoutineDefinitionBuilder)
 infix fun StreamCommShapeKeyword.output(block: StructDefinitionBlock) {
+    check(!ctx.outputShapeSet || ctx.outputShape == Comm.Shape.Stream) {
+        "Output shape conflict: Shape was already set to ${ctx.outputShape}"
+    }
+
     ctx.output += block
     ctx.outputShape = Comm.Shape.Stream
+    ctx.outputShapeSet = true
 }
 
 ////////////////////////////////////////
