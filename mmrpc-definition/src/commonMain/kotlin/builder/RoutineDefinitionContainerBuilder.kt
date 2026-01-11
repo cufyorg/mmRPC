@@ -57,12 +57,9 @@ operator fun String.invoke(
     block: RoutineDefinitionBlock
 ) {
     this {
-        contextOf().also {
-            it.inputShape = comm.inputShape()
-            it.inputShapeSet = true
-            it.outputShape = comm.outputShape()
-            it.outputShapeSet = true
-        }
+        contextOf()
+            .also { it.inputShape = comm.input }
+            .also { it.outputShape = comm.output }
         block()
     }
 }

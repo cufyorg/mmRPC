@@ -3,14 +3,14 @@ package org.cufy.mmrpc
 import kotlinx.serialization.Serializable
 
 @Serializable
-enum class Comm {
-    VoidVoid,
-    VoidUnary,
-    UnaryVoid,
-    UnaryUnary,
-    UnaryStream,
-    StreamUnary,
-    StreamStream;
+enum class Comm(val input: Shape, val output: Shape) {
+    VoidVoid(Shape.Void, Shape.Void),
+    VoidUnary(Shape.Void, Shape.Unary),
+    UnaryVoid(Shape.Unary, Shape.Void),
+    UnaryUnary(Shape.Unary, Shape.Unary),
+    UnaryStream(Shape.Unary, Shape.Stream),
+    StreamUnary(Shape.Stream, Shape.Unary),
+    StreamStream(Shape.Stream, Shape.Stream);
 
     enum class Shape {
         Void,
@@ -18,54 +18,30 @@ enum class Comm {
         Stream;
     }
 
-    fun inputShape() = when (this) {
-        VoidVoid,
-        VoidUnary,
-        -> Shape.Void
-
-        UnaryVoid,
-        UnaryUnary,
-        UnaryStream,
-        -> Shape.Unary
-
-        StreamUnary,
-        StreamStream,
-        -> Shape.Stream
-    }
-
-    fun outputShape() = when (this) {
-        VoidVoid,
-        UnaryVoid,
-        -> Shape.Void
-
-        VoidUnary,
-        UnaryUnary,
-        StreamUnary,
-        -> Shape.Unary
-
-        UnaryStream,
-        StreamStream,
-        -> Shape.Stream
-    }
-
     companion object {
-        fun of(req: Shape, res: Shape) = when (req) {
-            Shape.Void -> when (res) {
-                Shape.Void -> VoidVoid
+        fun of(input: Shape?, output: Shape?) = when (input) {
+            Shape.Void -> when (output) {
+                null, Shape.Void -> VoidVoid
                 Shape.Unary -> VoidUnary
-                else -> null
+                Shape.Stream -> null
             }
 
-            Shape.Unary -> when (res) {
-                Shape.Void -> UnaryVoid
+            Shape.Unary -> when (output) {
+                null, Shape.Void -> UnaryVoid
                 Shape.Unary -> UnaryUnary
                 Shape.Stream -> UnaryStream
             }
 
-            Shape.Stream -> when (res) {
-                Shape.Unary -> StreamUnary
+            Shape.Stream -> when (output) {
+                null, Shape.Unary -> StreamUnary
                 Shape.Stream -> StreamStream
-                else -> null
+                Shape.Void -> null
+            }
+
+            null -> when (output) {
+                null, Shape.Void -> VoidVoid
+                Shape.Unary -> VoidUnary
+                Shape.Stream -> UnaryStream
             }
         }
     }
