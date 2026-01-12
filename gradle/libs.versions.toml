@@ -3,7 +3,7 @@ kotlin = "2.2.10"
 kotlinx-serialization = "1.9.0"
 kotlinpoet = "2.2.0"
 
-java = "22"
+java = "17"
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
