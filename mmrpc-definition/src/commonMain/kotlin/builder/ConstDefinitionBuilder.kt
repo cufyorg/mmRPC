@@ -105,3 +105,17 @@ fun const(
 ) = const(struct, value, block)
 
 ////////////////////////////////////////
+
+@Marker2
+operator fun TypeDefinition.invoke(
+    value: Literal = null.literal,
+    block: ConstDefinitionBuilder.() -> Unit = {}
+) = const(this, value, block)
+
+@Marker2
+operator fun Unnamed<TypeDefinition>.invoke(
+    value: Literal = null.literal,
+    block: ConstDefinitionBuilder.() -> Unit = {}
+) = const(this, value, block)
+
+////////////////////////////////////////
