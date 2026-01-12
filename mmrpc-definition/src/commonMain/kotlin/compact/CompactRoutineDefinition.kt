@@ -37,7 +37,7 @@ fun CompactRoutineDefinition.inflateOrNull(
         canonicalName = this.canonical_name,
         description = this.description,
         metadata = this.metadata.map {
-            it.inflateOrNull(onLookup)() ?: return null
+            it.inflateOrNull(onLookup) ?: return null
         },
         comm = this.comm,
         faults = this.faults_ref.map {

@@ -36,7 +36,7 @@ fun CompactUnionDefinition.inflateOrNull(
         canonicalName = this.canonical_name,
         description = this.description,
         metadata = this.metadata.map {
-            it.inflateOrNull(onLookup)() ?: return null
+            it.inflateOrNull(onLookup) ?: return null
         },
         discriminator = this.discriminator,
         types = this.types_ref.map {

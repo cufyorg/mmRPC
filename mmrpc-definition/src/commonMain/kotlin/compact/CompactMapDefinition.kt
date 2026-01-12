@@ -34,7 +34,7 @@ fun CompactMapDefinition.inflateOrNull(
         canonicalName = this.canonical_name,
         description = this.description,
         metadata = this.metadata.map {
-            it.inflateOrNull(onLookup)() ?: return null
+            it.inflateOrNull(onLookup) ?: return null
         },
         type = this.type_ref.let {
             val item = onLookup(it) ?: return null

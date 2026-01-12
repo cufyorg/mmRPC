@@ -34,7 +34,7 @@ fun CompactMetadataDefinition.inflateOrNull(
         canonicalName = this.canonical_name,
         description = this.description,
         metadata = this.metadata.map {
-            it.inflateOrNull(onLookup)() ?: return null
+            it.inflateOrNull(onLookup) ?: return null
         },
         fields = this.fields_ref.map {
             val item = onLookup(it) ?: return null

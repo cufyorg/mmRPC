@@ -29,7 +29,7 @@ fun CompactFaultDefinition.inflateOrNull(
         canonicalName = this.canonical_name,
         description = this.description,
         metadata = this.metadata.map {
-            it.inflateOrNull(onLookup)() ?: return null
+            it.inflateOrNull(onLookup) ?: return null
         },
     )
 }

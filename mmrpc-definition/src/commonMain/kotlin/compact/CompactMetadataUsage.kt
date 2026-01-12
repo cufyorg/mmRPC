@@ -22,19 +22,17 @@ fun MetadataUsage.toCompact(): CompactMetadataUsage {
 
 fun CompactMetadataUsage.inflateOrNull(
     onLookup: (CanonicalName) -> ElementDefinition?,
-): () -> MetadataUsage? {
-    return it@{
-        MetadataUsage(
-            definition = this.definition_ref.let {
-                val item = onLookup(it) ?: return@it null
-                require(item is MetadataDefinition) {
-                    "<metadata-usage>.definition_ref must point to a MetadataDefinition"
-                }
-                item
-            },
-            fields = this.fields.map {
-                it.inflateOrNull(onLookup)() ?: return@it null
+): MetadataUsage? {
+    return MetadataUsage(
+        definition = this.definition_ref.let {
+            val item = onLookup(it) ?: return null
+            require(item is MetadataDefinition) {
+                "<metadata-usage>.definition_ref must point to a MetadataDefinition"
             }
-        )
-    }
+            item
+        },
+        fields = this.fields.map {
+            it.inflateOrNull(onLookup) ?: return null
+        }
+    )
 }
