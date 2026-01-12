@@ -49,6 +49,11 @@ fun createLiteralCode(element: TypeDefinition, literal: Literal): CodeBlock {
             is StructLiteral -> createLiteralCodeOfUnion(element, literal)
             else -> fail(TAG, element) { "illegal value: $literal" }
         }
+
+        is TraitDefinition -> when (literal) {
+            is StructLiteral -> createLiteralCodeOfTrait(element, literal)
+            else -> fail(TAG, element) { "illegal value: $literal" }
+        }
     }
 }
 
@@ -231,4 +236,28 @@ private fun createLiteralCodeOfUnion(element: UnionDefinition, literal: StructLi
             TODO("Union strategy not supported yet: wrapped-sealed-interface")
         }
     }
+}
+
+context(ctx: GenContext)
+private fun createLiteralCodeOfTrait(element: TraitDefinition, literal: StructLiteral): CodeBlock {
+    val structs = element.collectStructs()
+
+    if (structs.size == 1)
+        return createLiteralCodeOfStruct(structs.single(), literal)
+
+    // extracting the discriminator from `literal`
+    val canonicalNameLiteral = literal.value[element.discriminator]
+    canonicalNameLiteral ?: fail(TAG, element) { "illegal value: $literal (no discriminator)" }
+
+    if (canonicalNameLiteral !is StringLiteral)
+        fail(TAG, element) { "illegal value: $literal (non-string discriminator)" }
+
+    val canonicalNameValue = canonicalNameLiteral.value
+
+    // finding the suitable struct from the types of the union
+    val winner = structs.find { it.canonicalName.value == canonicalNameValue }
+    winner ?: fail(TAG, element) { "illegal value: $literal (unknown discriminator value)" }
+
+    // delegating literal creation to the found struct
+    return createLiteralCodeOfStruct(winner, literal)
 }

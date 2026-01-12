@@ -1,9 +1,6 @@
 package org.cufy.mmrpc.builder
 
-import org.cufy.mmrpc.FieldDefinition
-import org.cufy.mmrpc.Marker2
-import org.cufy.mmrpc.StructDefinition
-import org.cufy.mmrpc.Unnamed
+import org.cufy.mmrpc.*
 import org.cufy.mmrpc.internal.VARARG_VARIANTS_DEPRECATED_MSG
 
 ////////////////////////////////////////
@@ -13,8 +10,14 @@ typealias StructDefinitionBlock = context(StructDefinitionBuilder) () -> Unit
 @Marker2
 class StructDefinitionBuilder :
     FieldDefinitionContainerBuilder,
+    TraitDefinitionContainerBuilder,
     ElementDefinitionBuilder() {
+    val traits = mutableListOf<Unnamed<TraitDefinition>>()
     val fields = mutableListOf<Unnamed<FieldDefinition>>()
+
+    override fun addTraitDefinition(value: Unnamed<TraitDefinition>) {
+        traits += value
+    }
 
     override fun addFieldDefinition(value: Unnamed<FieldDefinition>) {
         fields += value
@@ -26,6 +29,9 @@ class StructDefinitionBuilder :
             canonicalName = cn,
             description = this.description,
             metadata = this.metadata.toList(),
+            traits = this.traits.mapIndexed { i, it ->
+                it.get(cn, name = "trait$i")
+            },
             fields = this.fields.mapIndexed { i, it ->
                 it.get(cn, name = "field$i")
             },

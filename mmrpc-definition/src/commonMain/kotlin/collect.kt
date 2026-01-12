@@ -81,8 +81,14 @@ private fun ElementDefinition.collectChildren(): Sequence<ElementDefinition> {
             type?.let { yieldAll(it.collect()) }
         }
 
+        is TraitDefinition -> sequence {
+            yieldAll(metadata.asSequence().flatMap { it.collect() })
+            yieldAll(fields.asSequence().flatMap { it.collect() })
+        }
+
         is StructDefinition -> sequence {
             yieldAll(metadata.asSequence().flatMap { it.collect() })
+            yieldAll(traits.asSequence().flatMap { it.collect() })
             yieldAll(fields.asSequence().flatMap { it.collect() })
         }
 

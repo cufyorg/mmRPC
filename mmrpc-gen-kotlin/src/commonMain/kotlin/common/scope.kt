@@ -91,10 +91,19 @@ fun ElementDefinition.humanSignature(): String {
         is ProtocolDefinition -> "protocol"
         is RoutineDefinition -> "routine"
         is ScalarDefinition -> "scalar"
+        is TraitDefinition -> "trait"
         is StructDefinition -> "struct"
         is TupleDefinition -> "tuple"
         is UnionDefinition -> "union"
     }
 
     return "$discriminator ${canonicalName.value}"
+}
+
+context(ctx: GenContext)
+fun TraitDefinition.collectStructs(): List<StructDefinition> {
+    return ctx.elements.asSequence()
+        .filterIsInstance<StructDefinition>()
+        .filter { this in it.traits }
+        .toList()
 }

@@ -13,6 +13,7 @@ fun TypeDefinition.typeSerialName(): String {
         is ScalarDefinition,
         is StructDefinition,
         is TupleDefinition,
+        is TraitDefinition,
         -> canonicalName.value
 
         is ArrayDefinition,

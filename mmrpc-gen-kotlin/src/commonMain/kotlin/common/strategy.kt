@@ -54,3 +54,22 @@ fun UnionDefinition.calculateStrategy(): UnionStrategy {
 
     return UnionStrategy.SEALED_INTERFACE
 }
+
+@Marker3
+context(ctx: GenContext)
+fun TraitDefinition.calculateStrategy(): TraitStrategy {
+    debugRequireGeneratedClass(TAG, this)
+
+    val structs = collectStructs()
+
+    if (structs.isEmpty()) return TraitStrategy.SEALED_INTERFACE
+
+    val pkg = canonicalName.generatedPackageName()
+
+    for (it in structs) {
+        if (pkg != it.canonicalName.generatedPackageName())
+            return TraitStrategy.INTERFACE
+    }
+
+    return TraitStrategy.SEALED_INTERFACE
+}

@@ -64,6 +64,12 @@ private fun applyCreateDataClass(element: StructDefinition) {
         @SerialName("<canonical-name>")
         data class <name>(
             [
+                <trait-property-kdoc>
+                [ @<trait-property-metadata> ]
+                @SerialName("<trait-property-name>")
+                override val <trait-property-name>: <trait-property-type> = <trait-property-default-value>,
+            ],
+            [
                 <property-kdoc>
                 [ @<property-metadata> ]
                 @SerialName("<property-name>")
@@ -76,8 +82,18 @@ private fun applyCreateDataClass(element: StructDefinition) {
     createType(element.canonicalName) {
         classBuilder(element.nameOfClass()).apply {
             addModifiers(KModifier.DATA)
+            addSuperinterfaces(element.traits.map { it.canonicalName.generatedClassName() })
 
             primaryConstructor(constructorSpec {
+                addParameters(element.traits.flatMap { it.fields }.distinct().map {
+                    parameterSpec(it.nameOfProperty(), it.type.typeName()) {
+                        val default = it.default
+
+                        if (default != null) {
+                            defaultValue(createLiteralCode(it.type, default))
+                        }
+                    }
+                })
                 addParameters(element.fields.map {
                     parameterSpec(it.nameOfProperty(), it.type.typeName()) {
                         val default = it.default
@@ -87,6 +103,17 @@ private fun applyCreateDataClass(element: StructDefinition) {
                         }
                     }
                 })
+            })
+            addProperties(element.traits.flatMap { it.fields }.distinct().map {
+                propertySpec(it.nameOfProperty(), it.type.typeName()) {
+                    addModifiers(KModifier.OVERRIDE)
+
+                    initializer(it.nameOfProperty())
+
+                    addKdoc(createShortKdocCode(it))
+                    addAnnotations(createAnnotationSet(it.metadata))
+                    addAnnotations(createSerialNameAnnotationSet(it.propertySerialName()))
+                }
             })
             addProperties(element.fields.map {
                 propertySpec(it.nameOfProperty(), it.type.typeName()) {

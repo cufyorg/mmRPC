@@ -48,6 +48,7 @@ fun TypeDefinition.typeName(): TypeName {
         is EnumDefinition,
         is InterDefinition,
         is TupleDefinition,
+        is TraitDefinition,
         -> when {
             hasGeneratedClass() -> canonicalName.generatedClassName()
             else -> ANY
@@ -88,6 +89,7 @@ fun TypeDefinition.metaTypeName(): TypeName {
         is StructDefinition,
         is InterDefinition,
         is TupleDefinition,
+        is TraitDefinition,
         -> fail(TAG, this) { "metaTypeOf: element not supported" }
     }
 }

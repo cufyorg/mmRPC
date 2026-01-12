@@ -327,6 +327,7 @@ open class MmrpcKotlinGenerateSourcesTask : DefaultTask() {
                 consumeInterDefinition()
                 consumeMetadataDefinition()
                 consumeScalarDefinition()
+                consumeTraitDefinition()
                 consumeStructDefinition()
                 consumeTupleDefinition()
                 consumeUnionDefinition()

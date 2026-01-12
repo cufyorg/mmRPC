@@ -161,12 +161,24 @@ data class ScalarDefinition(
 ) : TypeDefinition()
 
 @Serializable
+@SerialName("trait")
+data class TraitDefinition(
+    override val canonicalName: CanonicalName,
+    override val description: String = "",
+    override val metadata: List<MetadataUsage> = emptyList(),
+
+    val discriminator: String = "type",
+    val fields: List<FieldDefinition> = emptyList(),
+) : TypeDefinition()
+
+@Serializable
 @SerialName("struct")
 data class StructDefinition(
     override val canonicalName: CanonicalName,
     override val description: String = "",
     override val metadata: List<MetadataUsage> = emptyList(),
 
+    val traits: List<TraitDefinition> = emptyList(),
     val fields: List<FieldDefinition> = emptyList(),
 ) : TypeDefinition()
 

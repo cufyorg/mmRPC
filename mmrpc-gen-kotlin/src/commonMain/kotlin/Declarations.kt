@@ -109,3 +109,8 @@ enum class UnionStrategy {
     SEALED_INTERFACE,
     WRAPPER_SEALED_INTERFACE,
 }
+
+enum class TraitStrategy {
+    INTERFACE,
+    SEALED_INTERFACE,
+}
