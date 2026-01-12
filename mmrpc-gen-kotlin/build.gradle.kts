@@ -1,42 +1,19 @@
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
-
 plugins {
-    `maven-publish`
-
-    kotlin("multiplatform")
-    kotlin("plugin.serialization")
-}
-
-kotlin {
-    compilerOptions {
-        freeCompilerArgs.add("-Xcontext-parameters")
-        apiVersion = KotlinVersion.KOTLIN_2_0
-        languageVersion = KotlinVersion.KOTLIN_2_0
-        coreLibrariesVersion = KotlinVersion.KOTLIN_2_0.version
-    }
+    `shared-conventions`
 }
 
 kotlin {
     jvm()
-    sourceSets {
-        commonMain {
-            dependencies {
-                implementation(project(":mmrpc-runtime"))
-                implementation(project(":mmrpc-definition"))
+    sourceSets.commonMain.dependencies {
+        implementation(projects.mmrpcRuntime)
+        implementation(projects.mmrpcDefinition)
 
-                implementation(kotlin("stdlib"))
-                implementation(kotlin("reflect", "2.0.0"))
-                implementation(libs.kotlin.serialization.json)
+        implementation(kotlin("stdlib"))
+        implementation(kotlin("reflect", "2.0.0"))
+        implementation(libs.kotlin.serialization.json)
 
-                implementation(libs.kotlinpoet)
+        implementation(libs.kotlinpoet)
 
-                implementation(libs.pearx.kasechange)
-            }
-        }
-        commonTest {
-            dependencies {
-                implementation(kotlin("test"))
-            }
-        }
+        implementation(libs.pearx.kasechange)
     }
 }

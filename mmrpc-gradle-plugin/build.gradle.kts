@@ -1,12 +1,6 @@
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
-
 plugins {
-    `maven-publish`
     `java-gradle-plugin`
-
-    kotlin("jvm")
-    kotlin("plugin.serialization")
-    alias(libs.plugins.gradle.plugin.publish)
+    `gradle-plugin-conventions`
 }
 
 gradlePlugin {
@@ -21,19 +15,10 @@ gradlePlugin {
     }
 }
 
-kotlin {
-    compilerOptions {
-        freeCompilerArgs.add("-Xcontext-parameters")
-        apiVersion = KotlinVersion.KOTLIN_2_0
-        languageVersion = KotlinVersion.KOTLIN_2_0
-        coreLibrariesVersion = KotlinVersion.KOTLIN_2_0.version
-    }
-}
-
 dependencies {
-    implementation(project(":mmrpc-runtime"))
-    implementation(project(":mmrpc-definition"))
-    implementation(project(":mmrpc-gen-kotlin"))
+    implementation(projects.mmrpcRuntime)
+    implementation(projects.mmrpcDefinition)
+    implementation(projects.mmrpcGenKotlin)
 
     implementation(kotlin("stdlib"))
     implementation(libs.kotlin.serialization.json)

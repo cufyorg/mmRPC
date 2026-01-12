@@ -1,37 +1,20 @@
-import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
-
 plugins {
-    `maven-publish`
-
-    kotlin("multiplatform")
-    kotlin("plugin.serialization")
-}
-
-kotlin {
-    compilerOptions {
-        apiVersion = KotlinVersion.KOTLIN_2_0
-        languageVersion = KotlinVersion.KOTLIN_2_0
-        coreLibrariesVersion = KotlinVersion.KOTLIN_2_0.version
-    }
+    `shared-conventions`
 }
 
 kotlin {
     jvm()
-    js { browser { binaries.library() } }
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs { browser { binaries.library() } }
-    sourceSets {
-        commonMain {
-            dependencies {
-                implementation(kotlin("stdlib"))
-                implementation(libs.kotlin.serialization.json)
-            }
-        }
-        commonTest {
-            dependencies {
-                implementation(kotlin("test", "2.0.0"))
-            }
-        }
+    js {
+        browser()
+        nodejs()
+    }
+    @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+    wasmJs {
+        browser()
+        nodejs()
+    }
+    sourceSets.commonMain.dependencies {
+        implementation(kotlin("stdlib"))
+        implementation(libs.kotlin.serialization.json)
     }
 }

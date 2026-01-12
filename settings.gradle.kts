@@ -1,3 +1,6 @@
+rootProject.name = "mmrpc"
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 pluginManagement {
     repositories {
         mavenCentral()
@@ -5,11 +8,12 @@ pluginManagement {
     }
 }
 
-plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+        maven { url = uri("https://jitpack.io") }
+    }
 }
-
-rootProject.name = "mmrpc"
 
 // include directories that starts with "mmrpc-"
 for (file in rootDir.listFiles().orEmpty()) {

@@ -1,36 +1,24 @@
 plugins {
-    `maven-publish`
-
-    kotlin("multiplatform")
-    kotlin("plugin.serialization")
+    `shared-conventions`
 }
 
 kotlin {
     jvm()
-    sourceSets {
-        commonMain {
-            dependencies {
-                implementation(project(":mmrpc-runtime"))
-                implementation(project(":mmrpc-definition"))
+    sourceSets.commonMain.dependencies {
+        implementation(projects.mmrpcRuntime)
+        implementation(projects.mmrpcDefinition)
 
-                implementation(kotlin("stdlib"))
-                implementation(libs.kotlin.serialization.json)
+        implementation(kotlin("stdlib"))
+        implementation(libs.kotlin.serialization.json)
 
-                implementation(libs.ktor.server.core)
+        implementation(libs.ktor.server.core)
 
-                implementation(libs.kafka.clients)
-                implementation(libs.kafka.streams)
+        implementation(libs.kafka.clients)
+        implementation(libs.kafka.streams)
 
-                implementation(libs.kaftor)
-                implementation(libs.josekt)
-                implementation(libs.extkt.json)
-                implementation(libs.extkt.crypto)
-            }
-        }
-        commonTest {
-            dependencies {
-                implementation(kotlin("test"))
-            }
-        }
+        implementation(libs.kaftor)
+        implementation(libs.josekt)
+        implementation(libs.extkt.json)
+        implementation(libs.extkt.crypto)
     }
 }
