@@ -1,15 +1,14 @@
 package org.cufy.mmrpc.gradle
 
-import com.charleskorn.kaml.Yaml
 import com.squareup.kotlinpoet.ClassName
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 import org.cufy.mmrpc.CanonicalName
 import org.cufy.mmrpc.MmrpcSpec
 import org.cufy.mmrpc.builtin
 import org.cufy.mmrpc.collect
 import org.cufy.mmrpc.compact.CompactElementDefinition
 import org.cufy.mmrpc.compact.inflate
+import org.cufy.mmrpc.experimental.fromJsonString
+import org.cufy.mmrpc.experimental.fromYamlString
 import org.cufy.mmrpc.gen.kotlin.*
 import org.cufy.mmrpc.gen.kotlin.common.humanSignature
 import org.cufy.mmrpc.gen.kotlin.gen.*
@@ -243,7 +242,7 @@ open class MmrpcKotlinGenerateSourcesTask : DefaultTask() {
             when (file.extension) {
                 "json" -> {
                     val spec = try {
-                        Json.decodeFromString<MmrpcSpec>(source)
+                        MmrpcSpec.fromJsonString(source)
                     } catch (cause: Exception) {
                         this.logger.error("$name: Couldn't decode file: ${file.absolutePath}", cause)
                         continue
@@ -254,7 +253,7 @@ open class MmrpcKotlinGenerateSourcesTask : DefaultTask() {
 
                 "yaml", "yml" -> {
                     val spec = try {
-                        Yaml.default.decodeFromString<MmrpcSpec>(source)
+                        MmrpcSpec.fromYamlString(source)
                     } catch (cause: Exception) {
                         this.logger.error("$name: Couldn't decode file: ${file.absolutePath}", cause)
                         continue

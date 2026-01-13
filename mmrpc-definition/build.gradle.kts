@@ -20,5 +20,7 @@ kotlin {
         implementation(libs.kotlin.serialization.json)
 
         api(libs.jetbrains.annotations)
+
+        implementation(libs.charleskorn.kaml)
     }
 }
