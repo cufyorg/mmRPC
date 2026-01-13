@@ -19,29 +19,23 @@ enum class Comm(val input: Shape, val output: Shape) {
     }
 
     companion object {
-        fun of(input: Shape?, output: Shape?) = when (input) {
+        fun of(input: Shape, output: Shape) = when (input) {
             Shape.Void -> when (output) {
-                null, Shape.Void -> VoidVoid
+                Shape.Void -> VoidVoid
                 Shape.Unary -> VoidUnary
                 Shape.Stream -> null
             }
 
             Shape.Unary -> when (output) {
-                null, Shape.Void -> UnaryVoid
+                Shape.Void -> UnaryVoid
                 Shape.Unary -> UnaryUnary
                 Shape.Stream -> UnaryStream
             }
 
             Shape.Stream -> when (output) {
-                null, Shape.Unary -> StreamUnary
+                Shape.Unary -> StreamUnary
                 Shape.Stream -> StreamStream
                 Shape.Void -> null
-            }
-
-            null -> when (output) {
-                null, Shape.Void -> VoidVoid
-                Shape.Unary -> VoidUnary
-                Shape.Stream -> UnaryStream
             }
         }
     }

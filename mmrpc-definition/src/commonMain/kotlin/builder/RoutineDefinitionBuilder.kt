@@ -21,13 +21,17 @@ class RoutineDefinitionBuilder :
     }
 
     fun build(): RoutineDefinition {
-        val comm = Comm.of(this.inputShape, this.outputShape)
+        val inputShape = this.inputShape
+            ?: error("Input shape not specified")
+        val outputShape = this.outputShape
+            ?: error("Output shape not specified")
+        val comm = Comm.of(inputShape, outputShape)
             ?: error("Cannot get Comm from input=$inputShape output=$outputShape")
 
-        check(comm.input != Comm.Shape.Void || input.isEmpty()) {
+        check(comm.input != Comm.Shape.Void || this.input.isEmpty()) {
             "Injected input cannot be delivered when input shape is Void"
         }
-        check(comm.output != Comm.Shape.Void || output.isEmpty()) {
+        check(comm.output != Comm.Shape.Void || this.output.isEmpty()) {
             "Injected output cannot be delivered when output shape is Void"
         }
 
@@ -36,8 +40,7 @@ class RoutineDefinitionBuilder :
             canonicalName = cn,
             description = this.description,
             metadata = this.metadata.toList(),
-            comm = Comm.of(this.inputShape, this.outputShape)
-                ?: error("Cannot select Comm mode from input=$inputShape output=$outputShape"),
+            comm = comm,
             faults = this.faults.mapIndexed { i, it ->
                 it.get(cn, name = "fault$i")
             },
@@ -75,6 +78,68 @@ operator fun Comm.unaryPlus() {
 
     ctx.inputShape = this.input
     ctx.outputShape = this.output
+}
+
+////////////////////////////////////////
+
+@Marker0
+context(ctx: RoutineDefinitionBuilder)
+fun voidInput() {
+    check(ctx.inputShape == null || ctx.inputShape == Comm.Shape.Void) {
+        "Input shape conflict: Shape was already set to ${ctx.inputShape}"
+    }
+
+    ctx.inputShape = Comm.Shape.Void
+}
+
+@Marker0
+context(ctx: RoutineDefinitionBuilder)
+fun voidOutput() {
+    check(ctx.outputShape == null || ctx.outputShape == Comm.Shape.Void) {
+        "Output shape conflict: Shape was already set to ${ctx.outputShape}"
+    }
+
+    ctx.outputShape = Comm.Shape.Void
+}
+
+@Marker0
+context(ctx: RoutineDefinitionBuilder)
+fun unaryInput() {
+    check(ctx.inputShape == null || ctx.inputShape == Comm.Shape.Unary) {
+        "Input shape conflict: Shape was already set to ${ctx.inputShape}"
+    }
+
+    ctx.inputShape = Comm.Shape.Unary
+}
+
+@Marker0
+context(ctx: RoutineDefinitionBuilder)
+fun unaryOutput() {
+    check(ctx.outputShape == null || ctx.outputShape == Comm.Shape.Unary) {
+        "Output shape conflict: Shape was already set to ${ctx.outputShape}"
+    }
+
+    ctx.outputShape = Comm.Shape.Unary
+}
+
+@Marker0
+context(ctx: RoutineDefinitionBuilder)
+fun streamInput() {
+    check(ctx.inputShape == null || ctx.inputShape == Comm.Shape.Stream) {
+        "Input shape conflict: Shape was already set to ${ctx.inputShape}"
+    }
+
+    ctx.inputShape = Comm.Shape.Stream
+}
+
+@Marker0
+context(ctx: RoutineDefinitionBuilder)
+fun streamOutput() {
+    check(ctx.outputShape == null || ctx.outputShape == Comm.Shape.Stream) {
+        "Output shape conflict: Shape was already set to ${ctx.outputShape}"
+    }
+
+    ctx.outputShape = Comm.Shape.Stream
 }
 
 ////////////////////////////////////////
