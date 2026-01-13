@@ -21,7 +21,7 @@ context(ctx: GenContext)
 fun StructDefinition.calculateStrategy(): StructStrategy {
     debugRequireGeneratedClass(TAG, this)
 
-    if (fields.isEmpty())
+    if (fields.isEmpty() && fieldsInherited().isEmpty())
         return StructStrategy.DATA_OBJECT
 
     return StructStrategy.DATA_CLASS

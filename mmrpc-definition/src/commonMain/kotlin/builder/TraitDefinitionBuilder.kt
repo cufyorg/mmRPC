@@ -12,9 +12,15 @@ typealias TraitDefinitionBlock = context(TraitDefinitionBuilder) () -> Unit
 @Marker2
 class TraitDefinitionBuilder :
     FieldDefinitionContainerBuilder,
+    TraitDefinitionContainerBuilder,
     ElementDefinitionBuilder() {
     var discriminator: String = "type"
+    val traits = mutableListOf<Unnamed<TraitDefinition>>()
     val fields = mutableListOf<Unnamed<FieldDefinition>>()
+
+    override fun addTraitDefinition(value: Unnamed<TraitDefinition>) {
+        traits += value
+    }
 
     override fun addFieldDefinition(value: Unnamed<FieldDefinition>) {
         fields += value
@@ -27,6 +33,9 @@ class TraitDefinitionBuilder :
             description = this.description,
             metadata = this.metadata.toList(),
             discriminator = this.discriminator,
+            traits = this.traits.mapIndexed { i, it ->
+                it.get(cn, name = "trait$i")
+            },
             fields = this.fields.mapIndexed { i, it ->
                 it.get(cn, name = "field$i")
             },

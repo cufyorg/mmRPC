@@ -107,3 +107,9 @@ fun TraitDefinition.collectStructs(): List<StructDefinition> {
         .filter { this in it.traits }
         .toList()
 }
+
+fun StructDefinition.fieldsInherited() =
+    traits.flatMap { it.fieldsInherited() + it.fields }.distinct()
+
+fun TraitDefinition.fieldsInherited(): List<FieldDefinition> =
+    traits.flatMap { it.fieldsInherited() + it.fields }.distinct()

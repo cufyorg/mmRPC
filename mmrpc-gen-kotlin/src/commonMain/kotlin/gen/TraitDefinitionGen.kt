@@ -29,7 +29,7 @@ private fun applyCreateInterface(element: TraitDefinition) {
         [ @<metadata> ]
         @Serializable()
         @SerialName("<canonical-name>")
-        <maybe-sealed-modifier> interface <name> {
+        <maybe-sealed-modifier> interface <name> : <traits> {
             [
                 <property-kdoc>
                 [ @<property-metadata> ]
@@ -42,6 +42,8 @@ private fun applyCreateInterface(element: TraitDefinition) {
 
     createType(element.canonicalName) {
         interfaceBuilder(element.nameOfClass()).apply {
+            addSuperinterfaces(element.traits.map { it.canonicalName.generatedClassName() })
+
             if (element.calculateStrategy() == TraitStrategy.SEALED_INTERFACE)
                 addModifiers(KModifier.SEALED)
 

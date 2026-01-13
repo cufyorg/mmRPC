@@ -169,6 +169,7 @@ data class TraitDefinition(
     override val metadata: List<MetadataUsage> = emptyList(),
 
     val discriminator: String = "type",
+    val traits: List<TraitDefinition> = emptyList(),
     val fields: List<FieldDefinition> = emptyList(),
 ) : TypeDefinition()
 

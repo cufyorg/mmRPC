@@ -83,6 +83,7 @@ private fun ElementDefinition.collectChildren(): Sequence<ElementDefinition> {
 
         is TraitDefinition -> sequence {
             yieldAll(metadata.asSequence().flatMap { it.collect() })
+            yieldAll(traits.asSequence().flatMap { it.collect() })
             yieldAll(fields.asSequence().flatMap { it.collect() })
         }
 

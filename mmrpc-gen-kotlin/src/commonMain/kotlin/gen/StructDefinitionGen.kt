@@ -38,13 +38,14 @@ private fun applyCreateDataObject(element: StructDefinition) {
         [ @<metadata> ]
         @Serializable()
         @SerialName("<canonical-name>")
-        data object <name>
+        data object <name> : <traits>
     }
      */
 
     createType(element.canonicalName) {
         objectBuilder(element.nameOfClass()).apply {
             addModifiers(KModifier.DATA)
+            addSuperinterfaces(element.traits.map { it.canonicalName.generatedClassName() })
 
             addKdoc(createKdocCode(element))
             addAnnotations(createAnnotationSet(element.metadata))
@@ -75,7 +76,7 @@ private fun applyCreateDataClass(element: StructDefinition) {
                 @SerialName("<property-name>")
                 val <property-name>: <property-type> = <property-default-value>,
             ]
-        )
+        ) : <traits>
     }
      */
 
@@ -85,7 +86,7 @@ private fun applyCreateDataClass(element: StructDefinition) {
             addSuperinterfaces(element.traits.map { it.canonicalName.generatedClassName() })
 
             primaryConstructor(constructorSpec {
-                addParameters(element.traits.flatMap { it.fields }.distinct().map {
+                addParameters(element.fieldsInherited().map {
                     parameterSpec(it.nameOfProperty(), it.type.typeName()) {
                         val default = it.default
 
@@ -104,7 +105,7 @@ private fun applyCreateDataClass(element: StructDefinition) {
                     }
                 })
             })
-            addProperties(element.traits.flatMap { it.fields }.distinct().map {
+            addProperties(element.fieldsInherited().map {
                 propertySpec(it.nameOfProperty(), it.type.typeName()) {
                     addModifiers(KModifier.OVERRIDE)
 
