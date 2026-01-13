@@ -10,7 +10,7 @@ import kotlin.jvm.JvmName
 ////////////////////////////////////////
 
 @Marker2
-interface StructDefinitionContainerBuilder {
+fun interface StructDefinitionContainerBuilder {
     fun addStructDefinition(value: Unnamed<StructDefinition>)
 }
 

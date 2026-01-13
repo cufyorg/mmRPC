@@ -40,3 +40,15 @@ operator fun <T> Unnamed<T>.getValue(obj: Any?, property: KProperty<*>): T {
     val n = splits.last()
     return get(ns, n)
 }
+
+operator fun <T> List<Unnamed<T>>.getValue(obj: NamespaceObject, property: KProperty<*>): List<T> {
+    val splits = property.name.split("__")
+    val ns = obj.canonicalName + splits
+    return map { it.get(ns, name = null) }
+}
+
+operator fun <T> List<Unnamed<T>>.getValue(obj: Any?, property: KProperty<*>): List<T> {
+    val splits = property.name.split("__")
+    val ns = CanonicalName(splits)
+    return map { it.get(ns, name = null) }
+}

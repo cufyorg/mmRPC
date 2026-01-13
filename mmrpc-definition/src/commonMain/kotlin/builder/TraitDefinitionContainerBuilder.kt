@@ -8,7 +8,7 @@ import kotlin.jvm.JvmName
 ////////////////////////////////////////
 
 @Marker2
-interface TraitDefinitionContainerBuilder {
+fun interface TraitDefinitionContainerBuilder {
     fun addTraitDefinition(value: Unnamed<TraitDefinition>)
 }
 

@@ -6,7 +6,7 @@ import kotlin.jvm.JvmName
 ////////////////////////////////////////
 
 @Marker2
-interface FieldDefinitionContainerBuilder {
+fun interface FieldDefinitionContainerBuilder {
     fun addFieldDefinition(value: Unnamed<FieldDefinition>)
 }
 

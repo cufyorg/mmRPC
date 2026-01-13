@@ -6,7 +6,7 @@ import org.cufy.mmrpc.Marker2
 ////////////////////////////////////////
 
 @Marker2
-interface FieldUsageContainerBuilder {
+fun interface FieldUsageContainerBuilder {
     fun addFieldUsage(value: FieldUsage)
 }
 

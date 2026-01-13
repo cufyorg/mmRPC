@@ -6,7 +6,7 @@ import org.intellij.lang.annotations.Language
 ////////////////////////////////////////
 
 @Marker2
-interface MarkdownContainerBuilder {
+fun interface MarkdownContainerBuilder {
     fun addMarkdown(@Language("markdown") value: String)
 }
 

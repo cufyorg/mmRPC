@@ -8,7 +8,7 @@ import kotlin.jvm.JvmName
 ////////////////////////////////////////
 
 @Marker2
-interface TypeDefinitionContainerBuilder {
+fun interface TypeDefinitionContainerBuilder {
     fun addTypeDefinition(value: Unnamed<TypeDefinition>)
 }
 

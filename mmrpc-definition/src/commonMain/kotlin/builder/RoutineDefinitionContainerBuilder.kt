@@ -9,7 +9,7 @@ import kotlin.jvm.JvmName
 ////////////////////////////////////////
 
 @Marker2
-interface RoutineDefinitionContainerBuilder {
+fun interface RoutineDefinitionContainerBuilder {
     fun addRoutineDefinition(value: Unnamed<RoutineDefinition>)
 }
 

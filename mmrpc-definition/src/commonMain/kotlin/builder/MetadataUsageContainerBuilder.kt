@@ -8,7 +8,7 @@ import org.cufy.mmrpc.timesAssign
 ////////////////////////////////////////
 
 @Marker2
-interface MetadataUsageContainerBuilder {
+fun interface MetadataUsageContainerBuilder {
     fun addMetadataUsage(value: MetadataUsage)
 }
 

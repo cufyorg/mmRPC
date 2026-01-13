@@ -8,7 +8,7 @@ import kotlin.jvm.JvmName
 ////////////////////////////////////////
 
 @Marker2
-interface FaultDefinitionContainerBuilder {
+fun interface FaultDefinitionContainerBuilder {
     fun addFaultDefinition(value: Unnamed<FaultDefinition>)
 }
 

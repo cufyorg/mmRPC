@@ -6,7 +6,7 @@ import kotlin.jvm.JvmName
 ////////////////////////////////////////
 
 @Marker2
-interface ConstDefinitionContainerBuilder {
+fun interface ConstDefinitionContainerBuilder {
     fun addConstDefinition(value: Unnamed<ConstDefinition>)
 }
 
