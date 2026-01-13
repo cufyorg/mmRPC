@@ -80,6 +80,11 @@ object builtin : NamespaceObject() {
      */
     object serial : NamespaceObject(this)
 
+    /**
+     * Namespace to be used for defining extension traits.
+     */
+    object trait : NamespaceObject(this)
+
     operator fun contains(canonicalName: CanonicalName): Boolean {
         return elements.any { it.canonicalName == canonicalName }
     }
