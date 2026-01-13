@@ -43,7 +43,7 @@ object builtin : NamespaceObject() {
     val Experimental by metadata { +Experimental__message }
 
     val Contract__value by prop(String.array)
-    val Contract by metadata { +Contract__value }
+    val Contract by metadata { +Contract__value; repeated() }
 
     val elements = listOf(
         Any,

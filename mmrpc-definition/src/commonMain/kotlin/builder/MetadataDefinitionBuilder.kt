@@ -14,6 +14,7 @@ typealias MetadataDefinitionBlock = context(MetadataDefinitionBuilder) () -> Uni
 class MetadataDefinitionBuilder :
     FieldDefinitionContainerBuilder,
     ElementDefinitionBuilder() {
+    var repeated = false
     val fields = mutableListOf<Unnamed<FieldDefinition>>()
 
     override fun addFieldDefinition(value: Unnamed<FieldDefinition>) {
@@ -26,11 +27,17 @@ class MetadataDefinitionBuilder :
             canonicalName = cn,
             description = this.description,
             metadata = this.metadata.toList(),
+            repeated = this.repeated,
             fields = this.fields.mapIndexed { i, it ->
                 it.get(cn, name = "field$i")
             },
         )
     }
+}
+
+context(ctx: MetadataDefinitionBuilder)
+fun repeated() {
+    ctx.repeated = true
 }
 
 ////////////////////////////////////////

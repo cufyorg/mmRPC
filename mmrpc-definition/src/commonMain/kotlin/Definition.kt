@@ -68,6 +68,7 @@ data class MetadataDefinition(
     override val description: String = "",
     override val metadata: List<MetadataUsage> = emptyList(),
 
+    val repeated: Boolean = false,
     val fields: List<FieldDefinition> = emptyList(),
 ) : ElementDefinition()
 

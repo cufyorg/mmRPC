@@ -15,6 +15,7 @@ data class CompactMetadataDefinition(
     override val description: String = "",
     override val metadata: List<CompactMetadataUsage> = emptyList(),
 
+    val repeated: Boolean = false,
     val fields_ref: List<CanonicalName> = emptyList(),
 ) : CompactElementDefinition
 
@@ -23,6 +24,7 @@ fun MetadataDefinition.toCompact(): CompactMetadataDefinition {
         canonical_name = this.canonicalName,
         description = this.description,
         metadata = this.metadata.map { it.toCompact() },
+        repeated = this.repeated,
         fields_ref = this.fields.map { it.canonicalName }
     )
 }
@@ -36,6 +38,7 @@ fun CompactMetadataDefinition.inflateOrNull(
         metadata = this.metadata.map {
             it.inflateOrNull(onLookup) ?: return null
         },
+        repeated = this.repeated,
         fields = this.fields_ref.map {
             val item = onLookup(it) ?: return null
             require(item is FieldDefinition) {

@@ -27,6 +27,7 @@ private fun applyCreateAnnotationClass(element: MetadataDefinition) {
     <namespace> {
         <kdoc>
         [ @<metadata> ]
+        <maybe-repeatable-annotation>
         annotation class <name>(
             [
                 <property-kdoc>
@@ -61,6 +62,10 @@ private fun applyCreateAnnotationClass(element: MetadataDefinition) {
 
             addKdoc(createKdocCode(element))
             addAnnotations(createAnnotationSet(element.metadata))
+
+            if (element.repeated) {
+                addAnnotation(Repeatable::class)
+            }
         }
     }
 }
