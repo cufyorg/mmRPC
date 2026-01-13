@@ -35,6 +35,11 @@ class UnionDefinitionBuilder :
     }
 }
 
+context(ctx: UnionDefinitionBuilder)
+fun discriminator(value: String) {
+    ctx.discriminator = value
+}
+
 ////////////////////////////////////////
 
 @Marker2

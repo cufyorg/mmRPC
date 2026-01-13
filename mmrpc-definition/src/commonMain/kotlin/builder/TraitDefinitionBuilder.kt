@@ -34,6 +34,11 @@ class TraitDefinitionBuilder :
     }
 }
 
+context(ctx: TraitDefinitionBuilder)
+fun discriminator(value: String) {
+    ctx.discriminator = value
+}
+
 ////////////////////////////////////////
 
 @Marker2

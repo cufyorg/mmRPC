@@ -31,7 +31,9 @@ context(ctx: FieldDefinitionBuilder)
 val default get() = ctx.default
 
 context(ctx: FieldDefinitionBuilder)
-val key get() = ctx.key
+fun key(value: String) {
+    ctx.key = value
+}
 
 ////////////////////////////////////////
 
