@@ -16,7 +16,13 @@ fun consumeTraitDefinition() {
         if (element.canonicalName in ctx.ignore) continue
 
         failBoundary {
-            applyCreateInterface(element)
+            when (element.calculateStrategy()) {
+                TraitStrategy.INTERFACE
+                -> applyCreateInterface(element)
+
+                TraitStrategy.SEALED_INTERFACE
+                -> applyCreateSealedInterface(element)
+            }
         }
     }
 }
@@ -27,9 +33,7 @@ private fun applyCreateInterface(element: TraitDefinition) {
     <namespace> {
         <kdoc>
         [ @<metadata> ]
-        @Serializable()
-        @SerialName("<canonical-name>")
-        <maybe-sealed-modifier> interface <name> : <traits> {
+        interface <name> : <traits> {
             [
                 <property-kdoc>
                 [ @<property-metadata> ]
@@ -44,8 +48,43 @@ private fun applyCreateInterface(element: TraitDefinition) {
         interfaceBuilder(element.nameOfClass()).apply {
             addSuperinterfaces(element.traits.map { it.canonicalName.generatedClassName() })
 
-            if (element.calculateStrategy() == TraitStrategy.SEALED_INTERFACE)
-                addModifiers(KModifier.SEALED)
+            addProperties(element.fields.map {
+                propertySpec(it.nameOfProperty(), it.type.typeName()) {
+                    addKdoc(createShortKdocCode(it))
+                    addAnnotations(createAnnotationSet(it.metadata))
+                    addAnnotations(createSerialNameAnnotationSet(it.propertySerialName()))
+                }
+            })
+
+            addKdoc(createKdocCode(element))
+            addAnnotations(createAnnotationSet(element.metadata))
+        }
+    }
+}
+
+context(ctx: GenContext)
+private fun applyCreateSealedInterface(element: TraitDefinition) {
+    /*
+    <namespace> {
+        <kdoc>
+        [ @<metadata> ]
+        @Serializable()
+        @SerialName("<canonical-name>")
+        sealed interface <name> : <traits> {
+            [
+                <property-kdoc>
+                [ @<property-metadata> ]
+                @SerialName("<property-name>")
+                val <property-name>: <property-type>
+            ]
+        }
+    }
+     */
+
+    createType(element.canonicalName) {
+        interfaceBuilder(element.nameOfClass()).apply {
+            addModifiers(KModifier.SEALED)
+            addSuperinterfaces(element.traits.map { it.canonicalName.generatedClassName() })
 
             addProperties(element.fields.map {
                 propertySpec(it.nameOfProperty(), it.type.typeName()) {
