@@ -28,11 +28,14 @@ class RoutineDefinitionBuilder :
         val comm = Comm.of(inputShape, outputShape)
             ?: error("Cannot get Comm from input=$inputShape output=$outputShape")
 
-        check(comm.input != Comm.Shape.Void || this.input.isEmpty()) {
-            "Injected input cannot be delivered when input shape is Void"
+        if (comm.input == Comm.Shape.Void) {
+            check(this.input.isEmpty()) { "Input cannot be delivered when input shape is Void" }
         }
-        check(comm.output != Comm.Shape.Void || this.output.isEmpty()) {
-            "Injected output cannot be delivered when output shape is Void"
+        if (comm.output == Comm.Shape.Void) {
+            check(this.output.isEmpty()) { "Output cannot be delivered when output shape is Void" }
+        }
+        if (comm.input == Comm.Shape.Void || comm.output == Comm.Shape.Void) {
+            check(this.faults.isEmpty()) { "Faults cannot be delivered when input or output shape is Void" }
         }
 
         val cn = buildCanonicalName()
