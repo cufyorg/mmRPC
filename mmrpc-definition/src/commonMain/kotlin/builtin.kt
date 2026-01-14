@@ -66,6 +66,11 @@ object builtin : NamespaceObject() {
     )
 
     /**
+     * Namespace to be used for defining API-level vars.
+     */
+    object vars : NamespaceObject(this)
+
+    /**
      * Namespace to be used for defining builtin faults.
      */
     object fault : NamespaceObject(this)
@@ -84,6 +89,11 @@ object builtin : NamespaceObject() {
      * Namespace to be used for defining extension traits.
      */
     object trait : NamespaceObject(this)
+
+    /**
+     * Namespace to be used for defining protocols.
+     */
+    object comm : NamespaceObject(this)
 
     operator fun contains(canonicalName: CanonicalName): Boolean {
         return elements.any { it.canonicalName == canonicalName }
