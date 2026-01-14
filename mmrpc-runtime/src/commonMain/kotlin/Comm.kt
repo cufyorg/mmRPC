@@ -4,12 +4,17 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 enum class Comm(val input: Shape, val output: Shape) {
-    VoidVoid(Shape.Void, Shape.Void),
+    /** Event broadcasted from service to client. */
     VoidUnary(Shape.Void, Shape.Unary),
+    /** Event emitted from client to service. */
     UnaryVoid(Shape.Unary, Shape.Void),
+    /** Traditional single Request-Response */
     UnaryUnary(Shape.Unary, Shape.Unary),
+    /** Stream responses started by a single request */
     UnaryStream(Shape.Unary, Shape.Stream),
+    /** Stream requests finished by a single response */
     StreamUnary(Shape.Stream, Shape.Unary),
+    /** Bidi Streaming */
     StreamStream(Shape.Stream, Shape.Stream);
 
     enum class Shape {
@@ -21,7 +26,7 @@ enum class Comm(val input: Shape, val output: Shape) {
     companion object {
         fun of(input: Shape, output: Shape) = when (input) {
             Shape.Void -> when (output) {
-                Shape.Void -> VoidVoid
+                Shape.Void -> null
                 Shape.Unary -> VoidUnary
                 Shape.Stream -> null
             }
