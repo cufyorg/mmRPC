@@ -45,7 +45,7 @@ class RoutineDefinitionBuilder :
                 it.get(cn, name = "fault$i")
             },
             input = this.input.let { blocks ->
-                if (blocks.isEmpty()) builtin.Void
+                if (blocks.isEmpty()) builtin.Unit
                 else StructDefinitionBuilder()
                     .also { it.name = "Input" }
                     .also { it.namespace = cn }
@@ -53,7 +53,7 @@ class RoutineDefinitionBuilder :
                     .build()
             },
             output = this.output.let { blocks ->
-                if (blocks.isEmpty()) builtin.Void
+                if (blocks.isEmpty()) builtin.Unit
                 else StructDefinitionBuilder()
                     .also { it.name = "Output" }
                     .also { it.namespace = cn }

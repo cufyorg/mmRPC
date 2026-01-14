@@ -31,7 +31,7 @@ fun ElementDefinition.hasGeneratedClass(): Boolean {
             return false
     }
     if (this is StructDefinition) {
-        if (canonicalName == builtin.Void.canonicalName)
+        if (canonicalName == builtin.Unit.canonicalName)
             return false
     }
     val parent = resolveParent() ?: return true

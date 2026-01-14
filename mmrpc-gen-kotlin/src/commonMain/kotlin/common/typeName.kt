@@ -39,7 +39,7 @@ fun TypeDefinition.typeName(): TypeName {
 
         is StructDefinition,
         -> when {
-            canonicalName == builtin.Void.canonicalName -> Unit::class.asClassName()
+            canonicalName == builtin.Unit.canonicalName -> Unit::class.asClassName()
             hasGeneratedClass() -> canonicalName.generatedClassName()
             else -> ANY
         }

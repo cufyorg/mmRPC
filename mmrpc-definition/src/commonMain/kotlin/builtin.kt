@@ -23,7 +23,7 @@ import org.cufy.mmrpc.builder.*
 @Suppress("ClassName")
 object builtin : NamespaceObject() {
     val Any by scalar { +"Everything extends Any" }
-    val Void by struct { +"builtin void" }
+    val Unit by struct { +"builtin Unit" }
     val NULL by const(null.literal) { +"builtin null" }
     val String by scalar { +"builtin string" }
     val Boolean by scalar { +"builtin boolean" }
@@ -47,7 +47,7 @@ object builtin : NamespaceObject() {
 
     val elements = listOf(
         Any,
-        Void,
+        Unit,
         NULL,
         String,
         Boolean,

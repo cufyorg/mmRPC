@@ -152,7 +152,7 @@ private fun createLiteralCodeOfTuple(element: TupleDefinition, literal: TupleLit
 
 context(ctx: GenContext)
 private fun createLiteralCodeOfStruct(element: StructDefinition, literal: StructLiteral): CodeBlock {
-    if (element.canonicalName == builtin.Void.canonicalName)
+    if (element.canonicalName == builtin.Unit.canonicalName)
         return CodeBlock.of("%T", Unit::class)
 
     when (element.calculateStrategy()) {
