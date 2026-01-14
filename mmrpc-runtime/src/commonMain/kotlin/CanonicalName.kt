@@ -43,8 +43,8 @@ value class CanonicalName(val value: String) : Comparable<CanonicalName> {
     }
 
     companion object {
-        val SEGMENT_REGEXP = Regex("[A-Za-z][A-Za-z0-9_-]*")
-        val REGEXP = Regex("([A-Za-z][A-Za-z0-9_-]*)(\\.[A-Za-z][A-Za-z0-9_-]*)*")
+        val SEGMENT_REGEXP = Regex("-?[A-Za-z][A-Za-z0-9_]*")
+        val REGEXP = Regex("(-?[A-Za-z][A-Za-z0-9_]*)(\\.-?[A-Za-z][A-Za-z0-9_]*)*")
     }
 
     inline val name get() = value.substringAfterLast(".")
