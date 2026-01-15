@@ -1,7 +1,6 @@
 package org.cufy.mmrpc.gen.kotlin.gen
 
-import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.TypeSpec.Companion.objectBuilder
+import com.squareup.kotlinpoet.TypeSpec.Companion.interfaceBuilder
 import org.cufy.mmrpc.ProtocolDefinition
 import org.cufy.mmrpc.gen.kotlin.GenContext
 import org.cufy.mmrpc.gen.kotlin.common.*
@@ -14,24 +13,23 @@ fun consumeProtocolDefinition() {
         if (element.canonicalName in ctx.ignore) continue
 
         failBoundary {
-            applyCreateDataObject(element)
+            applyCreateInterface(element)
         }
     }
 }
 
 context(ctx: GenContext)
-private fun applyCreateDataObject(element: ProtocolDefinition) {
+private fun applyCreateInterface(element: ProtocolDefinition) {
     /*
     <namespace> {
         <kdoc>
         [ @<metadata> ]
-        data object <name>
+        interface <name> {
+        }
     }
     */
     createType(element.canonicalName) {
-        objectBuilder(element.nameOfClass()).apply {
-            addModifiers(KModifier.DATA)
-
+        interfaceBuilder(element.nameOfClass()).apply {
             addKdoc(createKdocCode(element))
             addAnnotations(createAnnotationSet(element.metadata))
         }

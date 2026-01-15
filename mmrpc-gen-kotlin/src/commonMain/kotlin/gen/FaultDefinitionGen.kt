@@ -2,12 +2,11 @@ package org.cufy.mmrpc.gen.kotlin.gen
 
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.STRING
-import com.squareup.kotlinpoet.TypeSpec.Companion.objectBuilder
-import org.cufy.mmrpc.CanonicalName
+import com.squareup.kotlinpoet.TypeSpec.Companion.classBuilder
 import org.cufy.mmrpc.FaultDefinition
-import org.cufy.mmrpc.FaultObject
 import org.cufy.mmrpc.gen.kotlin.GenContext
 import org.cufy.mmrpc.gen.kotlin.common.*
+import org.cufy.mmrpc.gen.kotlin.util.companionObjectSpec
 import org.cufy.mmrpc.gen.kotlin.util.propertySpec
 
 context(ctx: GenContext)
@@ -38,17 +37,14 @@ private fun applyCreateDataObject(element: FaultDefinition) {
      */
 
     createType(element.canonicalName) {
-        objectBuilder(element.nameOfClass()).apply {
-            addModifiers(KModifier.DATA)
-            addSuperinterface(FaultObject::class)
+        classBuilder(element.nameOfClass()).apply {
+            superclass(Exception::class)
 
-            addProperty(propertySpec("CANONICAL_NAME", STRING) {
-                addModifiers(KModifier.CONST)
-                initializer("%S", element.canonicalName.value)
-            })
-            addProperty(propertySpec("canonicalName", CanonicalName::class) {
-                addModifiers(KModifier.OVERRIDE)
-                initializer("%T(CANONICAL_NAME)", CanonicalName::class)
+            addType(companionObjectSpec {
+                addProperty(propertySpec("CANONICAL_NAME", STRING) {
+                    addModifiers(KModifier.CONST)
+                    initializer("%S", element.canonicalName.value)
+                })
             })
 
             addKdoc(createKdocCode(element))
