@@ -16,7 +16,6 @@ gradlePlugin {
 }
 
 dependencies {
-    implementation(projects.mmrpcRuntime)
     implementation(projects.mmrpcDefinition)
     implementation(projects.mmrpcGenKotlin)
 

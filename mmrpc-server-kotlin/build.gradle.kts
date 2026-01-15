@@ -5,7 +5,6 @@ plugins {
 kotlin {
     jvm()
     sourceSets.commonMain.dependencies {
-        implementation(projects.mmrpcRuntime)
         implementation(projects.mmrpcDefinition)
 
         implementation(kotlin("stdlib"))

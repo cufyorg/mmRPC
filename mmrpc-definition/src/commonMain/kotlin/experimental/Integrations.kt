@@ -1,5 +1,6 @@
-package org.cufy.mmrpc
+package org.cufy.mmrpc.experimental
 
+import org.cufy.mmrpc.Comm
 import org.cufy.mmrpc.Comm.*
 
 fun Comm.isGrpcSupported() = when (this) {

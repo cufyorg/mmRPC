@@ -14,8 +14,6 @@ kotlin {
         nodejs()
     }
     sourceSets.commonMain.dependencies {
-        implementation(projects.mmrpcRuntime)
-
         implementation(kotlin("stdlib"))
         implementation(libs.kotlin.serialization.json)
 
