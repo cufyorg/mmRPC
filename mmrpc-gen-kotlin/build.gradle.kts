@@ -10,6 +10,7 @@ kotlin {
         implementation(kotlin("stdlib"))
         implementation(kotlin("reflect", "2.0.0"))
         implementation(libs.kotlin.serialization.json)
+        implementation(libs.kotlin.coroutines.core)
 
         implementation(libs.kotlinpoet)
 
