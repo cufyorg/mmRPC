@@ -15,7 +15,6 @@ class GenContext(
 
     // names
     val classNames: Map<CanonicalName, String>,
-    val protocolSuffix: String,
 
     // scalar classes
     val defaultScalarClass: ClassName?,

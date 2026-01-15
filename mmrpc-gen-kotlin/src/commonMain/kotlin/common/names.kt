@@ -70,10 +70,8 @@ context(ctx: GenContext)
 fun ElementDefinition.nameOfClass(): String {
     ctx.classNames[canonicalName]?.let { return it }
 
-    if (this is ProtocolDefinition) {
+    if (this is ProtocolDefinition)
         return name.toPascalCase()
-            .plus(ctx.protocolSuffix)
-    }
 
     if (this is TypeDefinition) {
         if (GenFeature.KEEP_TYPE_CLASS_NAMES in ctx.features)

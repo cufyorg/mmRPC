@@ -30,7 +30,6 @@ object Mmrpc {
         // names
 
         val DEFAULT_CLASS_NAMES = emptyMap<String, String>()
-        const val DEFAULT_PROTOCOL_SUFFIX = "Protocol"
 
         // scalar classes
 

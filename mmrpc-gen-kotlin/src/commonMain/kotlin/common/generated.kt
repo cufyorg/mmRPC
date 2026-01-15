@@ -45,8 +45,7 @@ fun CanonicalName.generatedClassName(): ClassName {
             }
             val names = collect()
                 .drop(ns?.segmentsCount() ?: 0)
-                .map { ctx.elementsMap[it] }
-                .filterNotNull() // ??? why would this happen? it is possible to have nulls yet unexpected
+                .map { it.resolveElement()!! }
                 .map { it.nameOfClass() }
                 .toList()
 

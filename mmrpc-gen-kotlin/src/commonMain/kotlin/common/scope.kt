@@ -53,26 +53,26 @@ fun injectScope(canonicalName: CanonicalName?, block: MemberSpecHolder.Builder<*
 
 @Marker3
 context(ctx: GenContext)
-fun CanonicalName.resolveElement(): ElementDefinition? =
-    ctx.elements.find { it.canonicalName == this }
-
-@Marker3
-context(ctx: GenContext)
 fun CanonicalName.resolveRoot(): CanonicalName? {
     // Return the namespace of the top most element this element is on.
 
-    var pkg = namespace
+    var pkg = namespace ?: return null
 
     while (pkg !in ctx.roots)
-        pkg = pkg?.namespace ?: return null
+        pkg = pkg.namespace ?: return null
 
     return pkg
 }
 
 @Marker3
 context(ctx: GenContext)
+fun CanonicalName.resolveElement(): ElementDefinition? =
+    ctx.elementsMap[this]
+
+@Marker3
+context(ctx: GenContext)
 fun ElementDefinition.resolveParent(): ElementDefinition? =
-    ctx.elementsMap[namespace]
+    namespace?.resolveElement()
 
 /**
  * Return a human-readable name of the given [this].

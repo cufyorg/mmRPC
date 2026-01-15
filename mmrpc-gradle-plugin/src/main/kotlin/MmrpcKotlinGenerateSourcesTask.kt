@@ -127,7 +127,6 @@ open class MmrpcKotlinGenerateSourcesTask : DefaultTask() {
 
         // names
         this.classNames.convention(Mmrpc.Kotlin.DEFAULT_CLASS_NAMES)
-        this.protocolSuffix.convention(Mmrpc.Kotlin.DEFAULT_PROTOCOL_SUFFIX)
 
         // scalar classes
         this.defaultScalarClass.convention(Mmrpc.Kotlin.DEFAULT_DEFAULT_SCALAR_CLASS)
@@ -292,7 +291,6 @@ open class MmrpcKotlinGenerateSourcesTask : DefaultTask() {
             // names
             classNames = this.classNames.get().entries
                 .associate { CanonicalName(it.key) to it.value },
-            protocolSuffix = this.protocolSuffix.get(),
             // scalar classes
             defaultScalarClass = this.defaultScalarClass.get()
                 .let { ClassName.bestGuess(it) },
