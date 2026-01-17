@@ -66,11 +66,6 @@ private fun ElementDefinition.collectChildren(): Sequence<ElementDefinition> {
             yieldAll(entries.asSequence().flatMap { it.collect() })
         }
 
-        is InterDefinition -> sequence {
-            yieldAll(metadata.asSequence().flatMap { it.collect() })
-            yieldAll(types.asSequence().flatMap { it.collect() })
-        }
-
         is OptionalDefinition -> sequence {
             yieldAll(metadata.asSequence().flatMap { it.collect() })
             yieldAll(type.collect())

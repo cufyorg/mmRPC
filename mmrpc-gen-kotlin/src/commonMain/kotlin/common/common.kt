@@ -141,7 +141,6 @@ fun ElementDefinition.hasGeneratedClass(): Boolean {
 
         is FaultDefinition,
         is EnumDefinition,
-        is InterDefinition,
         is RoutineDefinition,
         is ProtocolDefinition,
         is TraitDefinition,
@@ -210,7 +209,6 @@ fun ElementDefinition.humanSignature(): String {
         is ConstDefinition -> "const"
         is FaultDefinition -> "fault"
         is FieldDefinition -> "field"
-        is InterDefinition -> "inter"
         is MetadataDefinition -> "metadata"
         is OptionalDefinition -> "optional"
         is ProtocolDefinition -> "protocol"
@@ -257,7 +255,6 @@ fun TypeDefinition.typeName(): TypeName {
 
         is UnionDefinition -> generatedClassName()
         is EnumDefinition -> generatedClassName()
-        is InterDefinition -> generatedClassName()
         is TupleDefinition -> generatedClassName()
         is TraitDefinition -> generatedClassName()
     }
@@ -283,7 +280,6 @@ fun TypeDefinition.metaTypeName(): TypeName {
         is OptionalDefinition,
         is UnionDefinition,
         is StructDefinition,
-        is InterDefinition,
         is TupleDefinition,
         is TraitDefinition,
         -> fail(this, "metaTypeOf: element not supported")
@@ -295,7 +291,6 @@ fun TypeDefinition.typeSerialName(): String {
     return when (this) {
         is EnumDefinition,
         is UnionDefinition,
-        is InterDefinition,
         is ScalarDefinition,
         is StructDefinition,
         is TupleDefinition,

@@ -132,16 +132,6 @@ data class EnumDefinition(
 ) : TypeDefinition()
 
 @Serializable
-@SerialName("inter")
-data class InterDefinition(
-    override val canonicalName: CanonicalName,
-    override val description: String = "",
-    override val metadata: List<MetadataUsage> = emptyList(),
-
-    val types: List<StructDefinition>,
-) : TypeDefinition()
-
-@Serializable
 @SerialName("optional")
 data class OptionalDefinition(
     override val canonicalName: CanonicalName,

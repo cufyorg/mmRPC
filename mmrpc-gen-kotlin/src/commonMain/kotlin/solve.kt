@@ -37,7 +37,6 @@ private fun initStage(): NodeList {
         doFaultDefinitionGen()
         doProtocolDefinitionGen()
         doRoutineDefinitionGen()
-        doInterDefinitionGen()
         doMetadataDefinitionGen()
         doScalarDefinitionGen()
         doTraitDefinitionGen()

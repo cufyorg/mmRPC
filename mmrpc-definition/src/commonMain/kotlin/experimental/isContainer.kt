@@ -8,7 +8,6 @@ fun ElementDefinition.isContainer(): Boolean {
         is ConstDefinition,
         is FaultDefinition,
         is FieldDefinition,
-        is InterDefinition,
         is MapDefinition,
         is OptionalDefinition,
         is ScalarDefinition,

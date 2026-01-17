@@ -118,11 +118,6 @@ data class ResultList(
 
 ////////////////////////////////////////
 
-enum class InterStrategy {
-    DATA_OBJECT,
-    DATA_CLASS,
-}
-
 enum class StructStrategy {
     DATA_OBJECT,
     DATA_CLASS,

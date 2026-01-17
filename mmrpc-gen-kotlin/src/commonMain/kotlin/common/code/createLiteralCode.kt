@@ -2,7 +2,10 @@ package org.cufy.mmrpc.gen.kotlin.common.code
 
 import com.squareup.kotlinpoet.CodeBlock
 import org.cufy.mmrpc.*
-import org.cufy.mmrpc.gen.kotlin.*
+import org.cufy.mmrpc.gen.kotlin.ContextScope
+import org.cufy.mmrpc.gen.kotlin.StructStrategy
+import org.cufy.mmrpc.gen.kotlin.TupleStrategy
+import org.cufy.mmrpc.gen.kotlin.UnionStrategy
 import org.cufy.mmrpc.gen.kotlin.common.model.*
 import org.cufy.mmrpc.gen.kotlin.context.Context
 import org.cufy.mmrpc.gen.kotlin.context.fail
@@ -38,11 +41,6 @@ fun createLiteralCode(element: TypeDefinition, literal: Literal): CodeBlock {
 
         is StructDefinition -> when (literal) {
             is StructLiteral -> createLiteralCodeOfStruct(element, literal)
-            else -> fail(element, "illegal value: $literal")
-        }
-
-        is InterDefinition -> when (literal) {
-            is StructLiteral -> createLiteralCodeOfInter(element, literal)
             else -> fail(element, "illegal value: $literal")
         }
 
@@ -163,35 +161,6 @@ private fun createLiteralCodeOfStruct(element: StructDefinition, literal: Struct
                 val field = element.fields.find { it.name == name }
                 field ?: fail(element, "illegal value: $literal (unknown field $name)")
                 return field
-            }
-
-            return createCall(
-                function = CodeBlock.of("%T", element.generatedClassName()),
-                literal.value.entries.associate { (name, value) ->
-                    val field = fieldOfOrThrow(name)
-                    field.nameOfProperty() to createLiteralCode(field.type, value)
-                }
-            )
-        }
-    }
-}
-
-@ContextScope
-context(ctx: Context)
-private fun createLiteralCodeOfInter(element: InterDefinition, literal: StructLiteral): CodeBlock {
-    when (element.calculateStrategy()) {
-        InterStrategy.DATA_OBJECT ->
-            return CodeBlock.of("%T", element.generatedClassName())
-
-        InterStrategy.DATA_CLASS -> {
-            fun fieldOfOrThrow(name: String): FieldDefinition {
-                for (it in element.types) {
-                    val field = it.fields.find { it.name == name }
-                    field ?: continue
-                    return field
-                }
-
-                fail(element, "illegal value: $literal (unknown field $name)")
             }
 
             return createCall(

@@ -32,7 +32,6 @@ fun createMetaLiteralCode(element: TypeDefinition, literal: Literal): CodeBlock 
         is OptionalDefinition,
         is StructDefinition,
         is TupleDefinition,
-        is InterDefinition,
         is UnionDefinition,
         is TraitDefinition,
         -> fail(element, "element not supported")
