@@ -101,6 +101,8 @@ open class MmrpcExtension {
         fun keepRoutineClassNames() { features += GenFeature.KEEP_ROUTINE_CLASS_NAMES }
         fun keepRoutineFunctionNames() { features += GenFeature.KEEP_ROUTINE_FUNCTION_NAMES }
         fun keepFieldPropertyNames() { features += GenFeature.KEEP_FIELD_PROPERTY_NAMES }
+        fun keepConstPropertyNames() { features += GenFeature.KEEP_CONST_PROPERTY_NAMES }
+        fun keepEnumEntryNames() { features += GenFeature.KEEP_ENUM_ENTRY_NAMES }
 
         fun packingSubPackages() { packaging = GenPackaging.SUB_PACKAGES }
         // @formatter:on

@@ -74,6 +74,16 @@ enum class GenFeature {
      * Keep original field property names.
      */
     KEEP_FIELD_PROPERTY_NAMES,
+
+    /**
+     * Keep original const property names.
+     */
+    KEEP_CONST_PROPERTY_NAMES,
+
+    /**
+     * Keep original enum entry names.
+     */
+    KEEP_ENUM_ENTRY_NAMES,
 }
 
 enum class GenPackaging {
