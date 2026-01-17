@@ -186,7 +186,7 @@ fun ElementDefinition.isGeneratingClass(): Boolean {
     if (parent != null) return parent.isGeneratingClass()
     if (this is RoutineDefinition) return false
 
-    if (this is ProtocolDefinition) {
+    if (this is ProtocolDefinition || this is FaultDefinition) {
         return GenFeature.GENERATE_PROTOCOLS in ctx.features
     }
 

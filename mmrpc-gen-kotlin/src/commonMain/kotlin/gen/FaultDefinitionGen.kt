@@ -30,7 +30,7 @@ private fun addExceptionClass(element: FaultDefinition) {
     <namespace> {
         <kdoc>
         [ @<metadata> ]
-        class <name>(message: String?, cause: Throwable?) :
+        class <name>(message: String? = null, cause: Throwable? = null) :
             FaultException(CANONICAL_NAME, message, cause) {
 
             constructor(cause: Throwable?) : this(null, cause)
