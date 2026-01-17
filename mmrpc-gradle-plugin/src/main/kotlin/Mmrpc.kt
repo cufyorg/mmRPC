@@ -20,7 +20,7 @@ object Mmrpc {
 
         //
 
-        val DEFAULT_PACKAGE_NAME: String? = null
+        const val DEFAULT_PACKAGE_NAME: String = ""
         val DEFAULT_PACKAGING = GenPackaging.SUB_PACKAGES
         val DEFAULT_FEATURES = emptySet<GenFeature>()
 

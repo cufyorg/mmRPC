@@ -45,7 +45,7 @@ open class MmrpcKotlinGenerateSourcesTask : DefaultTask() {
     //
 
     @Input
-    val packageName: Property<String?> =
+    val packageName: Property<String> =
         this.project.objects.property(String::class.java)
 
     @Input
@@ -266,7 +266,7 @@ open class MmrpcKotlinGenerateSourcesTask : DefaultTask() {
 
         val genContext = Context(
             elements = elements,
-            packageName = this.packageName.get(),
+            packageName = this.packageName.get().ifEmpty { null },
             packaging = this.packaging.get(),
             features = this.features.get(),
             classNames = this.classNames.get().entries
