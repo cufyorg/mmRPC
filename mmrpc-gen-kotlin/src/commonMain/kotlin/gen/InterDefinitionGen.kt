@@ -1,51 +1,60 @@
 package org.cufy.mmrpc.gen.kotlin.gen
 
 import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.TypeSpec.Companion.classBuilder
-import com.squareup.kotlinpoet.TypeSpec.Companion.objectBuilder
 import org.cufy.mmrpc.InterDefinition
-import org.cufy.mmrpc.gen.kotlin.GenContext
 import org.cufy.mmrpc.gen.kotlin.InterStrategy
-import org.cufy.mmrpc.gen.kotlin.common.*
-import org.cufy.mmrpc.gen.kotlin.util.constructorSpec
-import org.cufy.mmrpc.gen.kotlin.util.parameterSpec
-import org.cufy.mmrpc.gen.kotlin.util.propertySpec
+import org.cufy.mmrpc.gen.kotlin.common.code.createKdocCode
+import org.cufy.mmrpc.gen.kotlin.common.code.createLiteralCode
+import org.cufy.mmrpc.gen.kotlin.common.isGeneratingClass
+import org.cufy.mmrpc.gen.kotlin.common.model.*
+import org.cufy.mmrpc.gen.kotlin.common.nameOfClass
+import org.cufy.mmrpc.gen.kotlin.common.typeName
+import org.cufy.mmrpc.gen.kotlin.common.typeSerialName
+import org.cufy.mmrpc.gen.kotlin.context.*
+import org.cufy.mmrpc.gen.kotlin.util.*
 
-context(ctx: GenContext)
-fun consumeInterDefinition() {
+context(ctx: Context, _: FailScope, _: InitStage)
+fun doInterDefinitionGen() {
     for (element in ctx.elements) {
         if (element !is InterDefinition) continue
-        if (!element.hasGeneratedClass()) continue
-        if (element.canonicalName in ctx.ignore) continue
+        if (!element.isGeneratingClass()) continue
 
-        failBoundary {
+        catch(element) {
             when (element.calculateStrategy()) {
                 InterStrategy.DATA_OBJECT
-                -> applyCreateDataObject(element)
+                -> addDataObject(element)
 
                 InterStrategy.DATA_CLASS
-                -> applyCreateDataClass(element)
+                -> addDataClass(element)
             }
         }
     }
 }
 
-context(ctx: GenContext)
-private fun applyCreateDataObject(element: InterDefinition) {
-    createType(element.canonicalName) {
-        objectBuilder(element.nameOfClass()).apply {
+context(_: Context, _: InitStage)
+private fun addDataObject(element: InterDefinition) {
+    declareType(
+        target = element.namespace,
+        declares = listOf(element.canonicalName),
+    ) {
+        objectSpec(element.nameOfClass()) {
             addModifiers(KModifier.DATA)
 
             addKdoc(createKdocCode(element))
-            addAnnotations(createAnnotationSet(element.metadata))
-            addAnnotations(createSerializableAnnotationSet())
-            addAnnotations(createSerialNameAnnotationSet(element.typeSerialName()))
+            addAnnotation(createSerializable())
+            addAnnotation(createSerialName(element.typeSerialName()))
+
+            for (usage in element.metadata) {
+                addAnnotation(usage.annotationSpec())
+            }
+
+            applyOf(target = element.canonicalName)
         }
     }
 }
 
-context(ctx: GenContext)
-private fun applyCreateDataClass(element: InterDefinition) {
+context(_: Context, _: InitStage)
+private fun addDataClass(element: InterDefinition) {
     /*
     <namespace> {
         <kdoc>
@@ -63,37 +72,49 @@ private fun applyCreateDataClass(element: InterDefinition) {
     }
      */
 
-    val fields = element.types.flatMap { it.fields }.distinctBy { it.name }
+    val fields = element.types.flatMap { it.collectAllSupFields() }.distinctBy { it.name }
 
-    createType(element.canonicalName) {
-        classBuilder(element.nameOfClass()).apply {
+    declareType(
+        target = element.namespace,
+        declares = listOf(element.canonicalName),
+    ) {
+        classSpec(element.nameOfClass()) {
             addModifiers(KModifier.DATA)
 
             primaryConstructor(constructorSpec {
-                addParameters(fields.map {
-                    parameterSpec(it.nameOfProperty(), it.type.typeName()) {
-                        val default = it.default
+                for (field in fields) {
+                    addParameter(parameterSpec(field.nameOfProperty(), field.type.typeName()) {
+                        val default = field.default
 
                         if (default != null) {
-                            defaultValue(createLiteralCode(it.type, default))
+                            defaultValue(createLiteralCode(field.type, default))
                         }
-                    }
-                })
-            })
-            addProperties(fields.map {
-                propertySpec(it.nameOfProperty(), it.type.typeName()) {
-                    initializer(it.nameOfProperty())
-
-                    addKdoc(createShortKdocCode(it))
-                    addAnnotations(createAnnotationSet(it.metadata))
-                    addAnnotations(createSerialNameAnnotationSet(it.propertySerialName()))
+                    })
                 }
             })
 
+            for (field in fields) {
+                addProperty(propertySpec(field.nameOfProperty(), field.type.typeName()) {
+                    initializer(field.nameOfProperty())
+
+                    addKdoc(createKdocCode(field))
+                    addAnnotation(createSerialName(field.propertySerialName()))
+
+                    for (usage in field.metadata) {
+                        addAnnotation(usage.annotationSpec())
+                    }
+                })
+            }
+
             addKdoc(createKdocCode(element))
-            addAnnotations(createAnnotationSet(element.metadata))
-            addAnnotations(createSerializableAnnotationSet())
-            addAnnotations(createSerialNameAnnotationSet(element.typeSerialName()))
+            addAnnotation(createSerializable())
+            addAnnotation(createSerialName(element.typeSerialName()))
+
+            for (usage in element.metadata) {
+                addAnnotation(usage.annotationSpec())
+            }
+
+            applyOf(target = element.canonicalName)
         }
     }
 }

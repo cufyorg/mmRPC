@@ -1,29 +1,32 @@
 package org.cufy.mmrpc.gen.kotlin.gen
 
 import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.MemberSpecHolder
 import org.cufy.mmrpc.ConstDefinition
-import org.cufy.mmrpc.gen.kotlin.GenContext
-import org.cufy.mmrpc.gen.kotlin.GenFeature
-import org.cufy.mmrpc.gen.kotlin.common.*
+import org.cufy.mmrpc.gen.kotlin.common.code.createKdocCode
+import org.cufy.mmrpc.gen.kotlin.common.code.createLiteralCode
+import org.cufy.mmrpc.gen.kotlin.common.isCompileConst
+import org.cufy.mmrpc.gen.kotlin.common.model.annotationSpec
+import org.cufy.mmrpc.gen.kotlin.common.model.isGeneratingProperty
+import org.cufy.mmrpc.gen.kotlin.common.model.nameOfProperty
+import org.cufy.mmrpc.gen.kotlin.common.typeName
+import org.cufy.mmrpc.gen.kotlin.context.*
 import org.cufy.mmrpc.gen.kotlin.util.propertySpec
 
-context(ctx: GenContext)
-fun consumeConstDefinition() {
-    if (GenFeature.GEN_CONST_VALUE_PROPERTIES !in ctx.features)
-        return
-
+context(ctx: Context, _: FailScope, _: InitStage)
+fun doConstDefinitionGen() {
     for (element in ctx.elements) {
         if (element !is ConstDefinition) continue
-        if (element.canonicalName in ctx.ignore) continue
+        if (!element.isGeneratingProperty()) continue
 
-        failBoundary {
-            applyCreateProperty(element)
+        catch(element) {
+            addProperty(element)
         }
     }
 }
 
-context(ctx: GenContext)
-private fun applyCreateProperty(element: ConstDefinition) {
+context(_: Context, _: InitStage)
+private fun addProperty(element: ConstDefinition) {
     /*
     <namespace> {
         <kdoc>
@@ -32,15 +35,24 @@ private fun applyCreateProperty(element: ConstDefinition) {
     }
     */
 
-    injectScope(element.namespace) {
+    injectOrToplevel<MemberSpecHolder.Builder<*>>(
+        target = element.namespace,
+        declares = listOf(element.canonicalName),
+    ) {
         addProperty(propertySpec(element.nameOfProperty(), element.type.typeName()) {
-            if (element.type.isCompileConst())
+            if (element.type.isCompileConst()) {
                 addModifiers(KModifier.CONST)
+            }
 
             initializer(createLiteralCode(element.type, element.value))
 
             addKdoc(createKdocCode(element))
-            addAnnotations(createAnnotationSet(element.metadata))
+
+            for (usage in element.metadata) {
+                addAnnotation(usage.annotationSpec())
+            }
+
+            applyOf(target = element.canonicalName)
         })
     }
 }

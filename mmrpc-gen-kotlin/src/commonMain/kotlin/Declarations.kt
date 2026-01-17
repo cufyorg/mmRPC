@@ -1,32 +1,49 @@
 package org.cufy.mmrpc.gen.kotlin
 
 import com.squareup.kotlinpoet.FileSpec
-import com.squareup.kotlinpoet.MemberSpecHolder
-import com.squareup.kotlinpoet.TypeSpec
 import org.cufy.mmrpc.CanonicalName
-import org.cufy.mmrpc.ElementDefinition
+import org.cufy.mmrpc.Marker0
+import org.cufy.mmrpc.Marker1
+import org.cufy.mmrpc.Marker3
+import org.cufy.mmrpc.gen.kotlin.context.FinalStage
+import kotlin.reflect.KClass
+
+////////////////////////////////////////
+
+typealias EmitScope = Marker0
+typealias InjectScope = Marker1
+typealias ContextScope = Marker3
+
+////////////////////////////////////////
 
 enum class GenFeature {
-    /**
-     * Adds appropriate kotlinx serialization
-     * annotations to generated code.
-     */
-    KOTLINX_SERIALIZATION,
-
     /**
      * Enable debug assertions and logs.
      */
     DEBUG,
 
     /**
-     * Generate field name constant properties.
+     * Generate structures that are not part of a protocol.
      */
-    GEN_FIELD_NAME_PROPERTIES,
+    GENERATE_TYPES,
 
     /**
-     * Generate const value constant properties.
+     * Generate structures that are part of a protocol.
      */
-    GEN_CONST_VALUE_PROPERTIES,
+    GENERATE_PROTOCOLS,
+
+    /**
+     * Generate Http-specific integration structures.
+     */
+    INTEG_HTTP,
+    /**
+     * Generate Kafka-specific integration structures.
+     */
+    INTEG_KAFKA,
+    /**
+     * Generate custom integration structures.
+     */
+    INTEG_CUSTOM,
 
     /**
      * Keep original type class names.
@@ -37,6 +54,21 @@ enum class GenFeature {
      * Keep original fault class names.
      */
     KEEP_FAULT_CLASS_NAMES,
+
+    /**
+     * Keep original protocol class names.
+     */
+    KEEP_PROTOCOL_CLASS_NAMES,
+
+    /**
+     * Keep original routine class names.
+     */
+    KEEP_ROUTINE_CLASS_NAMES,
+
+    /**
+     * Keep original routine function names.
+     */
+    KEEP_ROUTINE_FUNCTION_NAMES,
 
     /**
      * Keep original field property names.
@@ -51,43 +83,40 @@ enum class GenPackaging {
     SUB_PACKAGES,
 }
 
-enum class GenRange {
-    EVERYTHING,
-    SHARED_ONLY,
-    COMM_ONLY,
-}
+////////////////////////////////////////
 
 @Suppress("serial")
 open class GenException(
-    val failure: GenFailure,
+    message: String?,
+    val refs: Set<CanonicalName?>,
     cause: Throwable? = null,
-) : Exception(failure.message, cause)
+) : Exception(message, cause)
 
-data class GenFailure(
-    val tag: String,
-    val message: String,
-    val element: ElementDefinition?,
+////////////////////////////////////////
+
+data class EmitNode(
+    val emission: context(FinalStage) () -> Unit,
 )
 
-data class CreateTypeNode(
-    val canonicalName: CanonicalName,
-    val block: () -> TypeSpec.Builder,
+data class InjectNode<T : Any>(
+    val type: KClass<T>,
+    val target: CanonicalName?,
+    val declares: List<CanonicalName>,
+    val injection: context(FinalStage) T.() -> Unit,
+    val fallback: context(FinalStage) () -> Unit,
 )
 
-data class InjectTypeNode(
-    val canonicalName: CanonicalName,
-    val block: TypeSpec.Builder.() -> Unit,
+data class NodeList(
+    val emissions: List<EmitNode>,
+    val injections: List<InjectNode<*>>,
 )
 
-data class InjectFileNode(
-    val canonicalName: CanonicalName?,
-    val block: FileSpec.Builder.() -> Unit,
+data class ResultList(
+    val files: List<FileSpec>,
+    val fails: List<GenException>,
 )
 
-data class InjectScopeNode(
-    val canonicalName: CanonicalName?,
-    val block: MemberSpecHolder.Builder<*>.() -> Unit,
-)
+////////////////////////////////////////
 
 enum class InterStrategy {
     DATA_OBJECT,
@@ -114,3 +143,5 @@ enum class TraitStrategy {
     INTERFACE,
     SEALED_INTERFACE,
 }
+
+////////////////////////////////////////

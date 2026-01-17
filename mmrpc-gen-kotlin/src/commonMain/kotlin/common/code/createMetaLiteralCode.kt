@@ -1,11 +1,13 @@
-package org.cufy.mmrpc.gen.kotlin.common
+package org.cufy.mmrpc.gen.kotlin.common.code
 
 import com.squareup.kotlinpoet.CodeBlock
 import org.cufy.mmrpc.*
-import org.cufy.mmrpc.gen.kotlin.GenContext
+import org.cufy.mmrpc.gen.kotlin.ContextScope
+import org.cufy.mmrpc.gen.kotlin.common.model.generatedClassName
+import org.cufy.mmrpc.gen.kotlin.common.model.nameOfEnumEntry
+import org.cufy.mmrpc.gen.kotlin.context.Context
+import org.cufy.mmrpc.gen.kotlin.context.fail
 import org.cufy.mmrpc.gen.kotlin.util.createCallSingleVararg
-
-private const val TAG = "createMetaLiteralCode.kt"
 
 /**
  * Returns a code block that, when executed,
@@ -14,13 +16,13 @@ private const val TAG = "createMetaLiteralCode.kt"
  *
  * > Remember: annotations does not support null values.
  */
-@Marker3
-context(ctx: GenContext)
+@ContextScope
+context(ctx: Context)
 fun createMetaLiteralCode(element: TypeDefinition, literal: Literal): CodeBlock {
     return when (element) {
         is ArrayDefinition -> when (literal) {
             is TupleLiteral -> createMetaLiteralCodeOfArray(element, literal)
-            else -> fail(TAG, element) { "illegal value: $literal" }
+            else -> fail(element, "illegal value: $literal")
         }
 
         is ScalarDefinition -> createMetaLiteralCodeOfScalar(element, literal)
@@ -33,41 +35,43 @@ fun createMetaLiteralCode(element: TypeDefinition, literal: Literal): CodeBlock 
         is InterDefinition,
         is UnionDefinition,
         is TraitDefinition,
-        -> fail(TAG, element) { "element not supported" }
+        -> fail(element, "element not supported")
     }
 }
 
 // ===================={    Literal    }==================== //
 
-@Marker3
-context(ctx: GenContext)
+@ContextScope
+context(ctx: Context)
 private fun createMetaLiteralCodeOfScalar(element: ScalarDefinition, value: Literal): CodeBlock {
     return when (value) {
-        is NullLiteral -> fail(TAG, element) { "illegal value: $value" }
+        is NullLiteral -> fail(element, "illegal value: $value")
+
         is BooleanLiteral -> CodeBlock.of("%L", value.value)
         is IntLiteral -> CodeBlock.of("%L", value.value)
         is FloatLiteral -> CodeBlock.of("%L", value.value)
         is StringLiteral -> CodeBlock.of("%S", value.value)
-        is TupleLiteral -> fail(TAG, element) { "illegal value: $value" }
-        is StructLiteral -> fail(TAG, element) { "illegal value: $value" }
+        is TupleLiteral -> fail(element, "illegal value: $value")
+
+        is StructLiteral -> fail(element, "illegal value: $value")
     }
 }
 
-@Marker3
-context(ctx: GenContext)
+@ContextScope
+context(ctx: Context)
 private fun createMetaLiteralCodeOfEnum(element: EnumDefinition, literal: Literal): CodeBlock {
     // find an entry with the same value presented
     val winner = element.entries.firstOrNull { it.value == literal }
-    winner ?: fail(TAG, element) { "illegal value: $literal (enum entry not found)" }
+    winner ?: fail(element, "illegal value: $literal (enum entry not found)")
 
     // create a reference to that entry
-    return CodeBlock.of("%T.%L", element.canonicalName.generatedClassName(), winner.nameOfEnumEntry())
+    return CodeBlock.of("%T.%L", element.generatedClassName(), winner.nameOfEnumEntry())
 }
 
 // ===================={ TupleLiteral  }==================== //
 
-@Marker3
-context(ctx: GenContext)
+@ContextScope
+context(ctx: Context)
 private fun createMetaLiteralCodeOfArray(element: ArrayDefinition, literal: TupleLiteral): CodeBlock {
     return createCallSingleVararg(
         function = CodeBlock.of("arrayOf"),

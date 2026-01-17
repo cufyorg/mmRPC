@@ -6,6 +6,7 @@ kotlin {
     jvm()
     sourceSets.commonMain.dependencies {
         implementation(projects.mmrpcDefinition)
+        implementation(projects.mmrpcRuntimeCore)
 
         implementation(kotlin("stdlib"))
         implementation(kotlin("reflect", "2.0.0"))

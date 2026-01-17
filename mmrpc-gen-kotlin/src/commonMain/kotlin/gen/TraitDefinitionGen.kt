@@ -1,34 +1,40 @@
 package org.cufy.mmrpc.gen.kotlin.gen
 
 import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.TypeSpec.Companion.interfaceBuilder
 import org.cufy.mmrpc.TraitDefinition
-import org.cufy.mmrpc.gen.kotlin.GenContext
 import org.cufy.mmrpc.gen.kotlin.TraitStrategy
-import org.cufy.mmrpc.gen.kotlin.common.*
+import org.cufy.mmrpc.gen.kotlin.common.code.createKdocCode
+import org.cufy.mmrpc.gen.kotlin.common.isGeneratingClass
+import org.cufy.mmrpc.gen.kotlin.common.model.*
+import org.cufy.mmrpc.gen.kotlin.common.nameOfClass
+import org.cufy.mmrpc.gen.kotlin.common.typeName
+import org.cufy.mmrpc.gen.kotlin.common.typeSerialName
+import org.cufy.mmrpc.gen.kotlin.context.*
+import org.cufy.mmrpc.gen.kotlin.util.createSerialName
+import org.cufy.mmrpc.gen.kotlin.util.createSerializable
+import org.cufy.mmrpc.gen.kotlin.util.interfaceSpec
 import org.cufy.mmrpc.gen.kotlin.util.propertySpec
 
-context(ctx: GenContext)
-fun consumeTraitDefinition() {
+context(ctx: Context, _: FailScope, _: InitStage)
+fun doTraitDefinitionGen() {
     for (element in ctx.elements) {
         if (element !is TraitDefinition) continue
-        if (!element.hasGeneratedClass()) continue
-        if (element.canonicalName in ctx.ignore) continue
+        if (!element.isGeneratingClass()) continue
 
-        failBoundary {
+        catch(element) {
             when (element.calculateStrategy()) {
                 TraitStrategy.INTERFACE
-                -> applyCreateInterface(element)
+                -> addInterface(element)
 
                 TraitStrategy.SEALED_INTERFACE
-                -> applyCreateSealedInterface(element)
+                -> addSealedInterface(element)
             }
         }
     }
 }
 
-context(ctx: GenContext)
-private fun applyCreateInterface(element: TraitDefinition) {
+context(_: Context, _: InitStage)
+private fun addInterface(element: TraitDefinition) {
     /*
     <namespace> {
         <kdoc>
@@ -44,26 +50,39 @@ private fun applyCreateInterface(element: TraitDefinition) {
     }
      */
 
-    createType(element.canonicalName) {
-        interfaceBuilder(element.nameOfClass()).apply {
-            addSuperinterfaces(element.traits.map { it.canonicalName.generatedClassName() })
+    declareType(
+        target = element.namespace,
+        declares = listOf(element.canonicalName),
+    ) {
+        interfaceSpec(element.nameOfClass()) {
+            for (trait in element.traits) {
+                addSuperinterface(trait.generatedClassName())
+            }
 
-            addProperties(element.fields.map {
-                propertySpec(it.nameOfProperty(), it.type.typeName()) {
-                    addKdoc(createShortKdocCode(it))
-                    addAnnotations(createAnnotationSet(it.metadata))
-                    addAnnotations(createSerialNameAnnotationSet(it.propertySerialName()))
-                }
-            })
+            for (field in element.fields) {
+                addProperty(propertySpec(field.nameOfProperty(), field.type.typeName()) {
+                    addKdoc(createKdocCode(field))
+                    addAnnotation(createSerialName(field.propertySerialName()))
+
+                    for (usage in field.metadata) {
+                        addAnnotation(usage.annotationSpec())
+                    }
+                })
+            }
 
             addKdoc(createKdocCode(element))
-            addAnnotations(createAnnotationSet(element.metadata))
+
+            for (usage in element.metadata) {
+                addAnnotation(usage.annotationSpec())
+            }
+
+            applyOf(target = element.canonicalName)
         }
     }
 }
 
-context(ctx: GenContext)
-private fun applyCreateSealedInterface(element: TraitDefinition) {
+context(_: Context, _: InitStage)
+private fun addSealedInterface(element: TraitDefinition) {
     /*
     <namespace> {
         <kdoc>
@@ -81,23 +100,37 @@ private fun applyCreateSealedInterface(element: TraitDefinition) {
     }
      */
 
-    createType(element.canonicalName) {
-        interfaceBuilder(element.nameOfClass()).apply {
+    declareType(
+        target = element.namespace,
+        declares = listOf(element.canonicalName),
+    ) {
+        interfaceSpec(element.nameOfClass()) {
             addModifiers(KModifier.SEALED)
-            addSuperinterfaces(element.traits.map { it.canonicalName.generatedClassName() })
 
-            addProperties(element.fields.map {
-                propertySpec(it.nameOfProperty(), it.type.typeName()) {
-                    addKdoc(createShortKdocCode(it))
-                    addAnnotations(createAnnotationSet(it.metadata))
-                    addAnnotations(createSerialNameAnnotationSet(it.propertySerialName()))
-                }
-            })
+            for (trait in element.traits) {
+                addSuperinterface(trait.generatedClassName())
+            }
+
+            for (field in element.fields) {
+                addProperty(propertySpec(field.nameOfProperty(), field.type.typeName()) {
+                    addKdoc(createKdocCode(field))
+                    addAnnotation(createSerialName(field.propertySerialName()))
+
+                    for (usage in field.metadata) {
+                        addAnnotation(usage.annotationSpec())
+                    }
+                })
+            }
 
             addKdoc(createKdocCode(element))
-            addAnnotations(createAnnotationSet(element.metadata))
-            addAnnotations(createSerializableAnnotationSet())
-            addAnnotations(createSerialNameAnnotationSet(element.typeSerialName()))
+            addAnnotation(createSerializable())
+            addAnnotation(createSerialName(element.typeSerialName()))
+
+            for (usage in element.metadata) {
+                addAnnotation(usage.annotationSpec())
+            }
+
+            applyOf(target = element.canonicalName)
         }
     }
 }

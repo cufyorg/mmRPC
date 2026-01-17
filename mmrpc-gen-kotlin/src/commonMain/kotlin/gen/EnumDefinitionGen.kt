@@ -1,28 +1,32 @@
 package org.cufy.mmrpc.gen.kotlin.gen
 
-import com.squareup.kotlinpoet.TypeSpec.Companion.enumBuilder
 import org.cufy.mmrpc.EnumDefinition
-import org.cufy.mmrpc.gen.kotlin.GenContext
-import org.cufy.mmrpc.gen.kotlin.common.*
-import org.cufy.mmrpc.gen.kotlin.util.anonymousClassSpec
-import org.cufy.mmrpc.gen.kotlin.util.constructorSpec
-import org.cufy.mmrpc.gen.kotlin.util.propertySpec
+import org.cufy.mmrpc.gen.kotlin.common.code.createKdocCode
+import org.cufy.mmrpc.gen.kotlin.common.code.createLiteralCode
+import org.cufy.mmrpc.gen.kotlin.common.isGeneratingClass
+import org.cufy.mmrpc.gen.kotlin.common.model.annotationSpec
+import org.cufy.mmrpc.gen.kotlin.common.model.enumEntrySerialName
+import org.cufy.mmrpc.gen.kotlin.common.model.nameOfEnumEntry
+import org.cufy.mmrpc.gen.kotlin.common.nameOfClass
+import org.cufy.mmrpc.gen.kotlin.common.typeName
+import org.cufy.mmrpc.gen.kotlin.common.typeSerialName
+import org.cufy.mmrpc.gen.kotlin.context.*
+import org.cufy.mmrpc.gen.kotlin.util.*
 
-context(ctx: GenContext)
-fun consumeEnumDefinition() {
+context(ctx: Context, _: FailScope, _: InitStage)
+fun doEnumDefinitionGen() {
     for (element in ctx.elements) {
         if (element !is EnumDefinition) continue
-        if (!element.hasGeneratedClass()) continue
-        if (element.canonicalName in ctx.ignore) continue
+        if (!element.isGeneratingClass()) continue
 
-        failBoundary {
-            applyCreateEnumClass(element)
+        catch(element) {
+            addEnumClass(element)
         }
     }
 }
 
-context(ctx: GenContext)
-private fun applyCreateEnumClass(element: EnumDefinition) {
+context(_: Context, _: InitStage)
+private fun addEnumClass(element: EnumDefinition) {
     /*
     <namespace> {
         <kdoc>
@@ -41,8 +45,11 @@ private fun applyCreateEnumClass(element: EnumDefinition) {
     }
     */
 
-    createType(element.canonicalName) {
-        enumBuilder(element.nameOfClass()).apply {
+    declareType(
+        target = element.namespace,
+        declares = listOf(element.canonicalName),
+    ) {
+        enumClassSpec(element.nameOfClass()) {
             primaryConstructor(constructorSpec {
                 addParameter("value", element.type.typeName())
             })
@@ -50,20 +57,30 @@ private fun applyCreateEnumClass(element: EnumDefinition) {
                 initializer("%L", "value")
             })
 
-            element.entries.forEach {
-                addEnumConstant(it.nameOfEnumEntry(), anonymousClassSpec {
-                    addSuperclassConstructorParameter(createLiteralCode(it.type, it.value))
+            for (entry in element.entries) {
+                addEnumConstant(entry.nameOfEnumEntry(), anonymousClassSpec {
+                    addSuperclassConstructorParameter(createLiteralCode(entry.type, entry.value))
 
-                    addKdoc(createShortKdocCode(it))
-                    addAnnotations(createAnnotationSet(it.metadata))
-                    addAnnotations(createSerialNameAnnotationSet(it.enumEntrySerialName()))
+                    addKdoc(createKdocCode(entry))
+                    addAnnotation(createSerialName(entry.enumEntrySerialName()))
+
+                    for (usage in entry.metadata) {
+                        addAnnotation(usage.annotationSpec())
+                    }
                 })
             }
 
             addKdoc(createKdocCode(element))
-            addAnnotations(createAnnotationSet(element.metadata))
-            addAnnotations(createSerializableAnnotationSet())
-            addAnnotations(createSerialNameAnnotationSet(element.typeSerialName()))
+            addAnnotation(createSerializable())
+            addAnnotation(createSerialName(element.typeSerialName()))
+
+            for (usage in element.metadata) {
+                addAnnotation(usage.annotationSpec())
+            }
+
+            addType(companionObjectSpec {
+                applyOf(target = element.canonicalName)
+            })
         }
     }
 }

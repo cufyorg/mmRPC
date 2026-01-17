@@ -1,28 +1,32 @@
 package org.cufy.mmrpc.gen.kotlin.gen
 
+import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.MAP
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.STRING
 import org.cufy.mmrpc.MapDefinition
-import org.cufy.mmrpc.gen.kotlin.GenContext
-import org.cufy.mmrpc.gen.kotlin.common.*
+import org.cufy.mmrpc.gen.kotlin.common.code.createKdocCode
+import org.cufy.mmrpc.gen.kotlin.common.model.annotationSpec
+import org.cufy.mmrpc.gen.kotlin.common.model.isGeneratingTypealias
+import org.cufy.mmrpc.gen.kotlin.common.nameOfClass
+import org.cufy.mmrpc.gen.kotlin.common.typeName
+import org.cufy.mmrpc.gen.kotlin.context.*
 import org.cufy.mmrpc.gen.kotlin.util.typealiasSpec
 
-context(ctx: GenContext)
-fun consumeMapDefinition() {
+context(ctx: Context, _: FailScope, _: InitStage)
+fun doMapDefinitionGen() {
     for (element in ctx.elements) {
         if (element !is MapDefinition) continue
-        if (!element.hasGeneratedClass()) continue
-        if (element.canonicalName in ctx.ignore) continue
+        if (!element.isGeneratingTypealias()) continue
 
-        failBoundary {
-            applyCreateTypealias(element)
+        catch(element) {
+            addTypealias(element)
         }
     }
 }
 
-context(ctx: GenContext)
-private fun applyCreateTypealias(element: MapDefinition) {
+context(_: Context, _: InitStage)
+private fun addTypealias(element: MapDefinition) {
     /*
     <namespace> {
         <kdoc>
@@ -33,10 +37,18 @@ private fun applyCreateTypealias(element: MapDefinition) {
 
     val target = MAP.parameterizedBy(STRING, element.type.typeName())
 
-    injectFile(element.namespace) {
+    injectOrToplevel<FileSpec.Builder>(
+        target = element.namespace,
+        declares = listOf(element.canonicalName),
+    ) {
         addTypeAlias(typealiasSpec(element.nameOfClass(), target) {
             addKdoc(createKdocCode(element))
-            addAnnotations(createAnnotationSet(element.metadata))
+
+            for (usage in element.metadata) {
+                addAnnotation(usage.annotationSpec())
+            }
+
+            applyOf(target = element.canonicalName)
         })
     }
 }

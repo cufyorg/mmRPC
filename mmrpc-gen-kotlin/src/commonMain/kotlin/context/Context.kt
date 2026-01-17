@@ -1,15 +1,16 @@
-package org.cufy.mmrpc.gen.kotlin
+package org.cufy.mmrpc.gen.kotlin.context
 
 import com.squareup.kotlinpoet.ClassName
 import org.cufy.mmrpc.CanonicalName
 import org.cufy.mmrpc.ElementDefinition
+import org.cufy.mmrpc.gen.kotlin.GenFeature
+import org.cufy.mmrpc.gen.kotlin.GenPackaging
 
-class GenContext(
+data class Context(
     val elements: List<ElementDefinition>,
-    val ignore: Set<CanonicalName>,
 
     //
-    val packageName: String,
+    val packageName: String?,
     val packaging: GenPackaging,
     val features: Set<GenFeature>,
 
@@ -23,7 +24,6 @@ class GenContext(
     // native classes
     val nativeScalarClasses: Map<CanonicalName, ClassName>,
     val nativeMetadataClasses: Map<CanonicalName, ClassName>,
-    val nativeConstants: Set<CanonicalName>,
 
     // userdefined classes
     val userdefinedScalarClasses: Map<CanonicalName, ClassName>,
@@ -42,11 +42,4 @@ class GenContext(
         .flatMap { it.namespace?.collect().orEmpty() }
         .minus(elementsMap.keys)
         .toSet()
-
-    val failures = mutableListOf<GenException>()
-
-    val createTypeNodes = mutableListOf<CreateTypeNode>()
-    val injectTypeNodes = mutableListOf<InjectTypeNode>()
-    val injectFileNodes = mutableListOf<InjectFileNode>()
-    val injectScopeNodes = mutableListOf<InjectScopeNode>()
 }

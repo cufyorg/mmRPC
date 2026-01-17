@@ -59,6 +59,22 @@ fun classSpec(name: String, block: TypeSpec.Builder.() -> Unit = {}): TypeSpec {
     return TypeSpec.classBuilder(name).apply(block).build()
 }
 
+fun objectSpec(name: String, block: TypeSpec.Builder.() -> Unit = {}): TypeSpec {
+    return TypeSpec.objectBuilder(name).apply(block).build()
+}
+
+fun interfaceSpec(name: String, block: TypeSpec.Builder.() -> Unit = {}): TypeSpec {
+    return TypeSpec.interfaceBuilder(name).apply(block).build()
+}
+
+fun enumClassSpec(name: String, block: TypeSpec.Builder.() -> Unit = {}): TypeSpec {
+    return TypeSpec.enumBuilder(name).apply(block).build()
+}
+
+fun annotationClassSpec(name: String, block: TypeSpec.Builder.() -> Unit = {}): TypeSpec {
+    return TypeSpec.annotationBuilder(name).apply(block).build()
+}
+
 // TypeSpec.anonymousClassBuilder
 
 fun anonymousClassSpec(block: TypeSpec.Builder.() -> Unit = {}): TypeSpec {

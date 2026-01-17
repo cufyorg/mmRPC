@@ -1,28 +1,33 @@
 package org.cufy.mmrpc.gen.kotlin.gen
 
-import com.squareup.kotlinpoet.TypeSpec.Companion.annotationBuilder
 import org.cufy.mmrpc.MetadataDefinition
-import org.cufy.mmrpc.gen.kotlin.GenContext
-import org.cufy.mmrpc.gen.kotlin.common.*
+import org.cufy.mmrpc.gen.kotlin.common.code.createKdocCode
+import org.cufy.mmrpc.gen.kotlin.common.code.createMetaLiteralCode
+import org.cufy.mmrpc.gen.kotlin.common.isGeneratingClass
+import org.cufy.mmrpc.gen.kotlin.common.metaTypeName
+import org.cufy.mmrpc.gen.kotlin.common.model.annotationSpec
+import org.cufy.mmrpc.gen.kotlin.common.model.nameOfProperty
+import org.cufy.mmrpc.gen.kotlin.common.nameOfClass
+import org.cufy.mmrpc.gen.kotlin.context.*
+import org.cufy.mmrpc.gen.kotlin.util.annotationClassSpec
 import org.cufy.mmrpc.gen.kotlin.util.constructorSpec
 import org.cufy.mmrpc.gen.kotlin.util.parameterSpec
 import org.cufy.mmrpc.gen.kotlin.util.propertySpec
 
-context(ctx: GenContext)
-fun consumeMetadataDefinition() {
+context(ctx: Context, _: FailScope, _: InitStage)
+fun doMetadataDefinitionGen() {
     for (element in ctx.elements) {
         if (element !is MetadataDefinition) continue
-        if (!element.hasGeneratedClass()) continue
-        if (element.canonicalName in ctx.ignore) continue
+        if (!element.isGeneratingClass()) continue
 
-        failBoundary {
-            applyCreateAnnotationClass(element)
+        catch(element) {
+            addAnnotationClass(element)
         }
     }
 }
 
-context(ctx: GenContext)
-private fun applyCreateAnnotationClass(element: MetadataDefinition) {
+context(_: Context, _: InitStage)
+private fun addAnnotationClass(element: MetadataDefinition) {
     /*
     <namespace> {
         <kdoc>
@@ -38,34 +43,46 @@ private fun applyCreateAnnotationClass(element: MetadataDefinition) {
     }
      */
 
-    createType(element.canonicalName) {
-        annotationBuilder(element.nameOfClass()).apply {
+    declareType(
+        target = element.namespace,
+        declares = listOf(element.canonicalName),
+    ) {
+        annotationClassSpec(element.nameOfClass()) {
             primaryConstructor(constructorSpec {
-                addParameters(element.fields.map {
-                    parameterSpec(it.nameOfProperty(), it.type.metaTypeName()) {
-                        val default = it.default
+                for (field in element.fields) {
+                    addParameter(parameterSpec(field.nameOfProperty(), field.type.metaTypeName()) {
+                        val default = field.default
 
                         if (default != null) {
-                            defaultValue(createMetaLiteralCode(it.type, default))
+                            defaultValue(createMetaLiteralCode(field.type, default))
                         }
-                    }
-                })
-            })
-            addProperties(element.fields.map {
-                propertySpec(it.nameOfProperty(), it.type.metaTypeName()) {
-                    initializer(it.nameOfProperty())
-
-                    addKdoc(createShortKdocCode(it))
-                    addAnnotations(createAnnotationSet(it.metadata))
+                    })
                 }
             })
 
+            for (field in element.fields) {
+                addProperty(propertySpec(field.nameOfProperty(), field.type.metaTypeName()) {
+                    initializer(field.nameOfProperty())
+
+                    addKdoc(createKdocCode(field))
+
+                    for (usage in field.metadata) {
+                        addAnnotation(usage.annotationSpec())
+                    }
+                })
+            }
+
             addKdoc(createKdocCode(element))
-            addAnnotations(createAnnotationSet(element.metadata))
+
+            for (usage in element.metadata) {
+                addAnnotation(usage.annotationSpec())
+            }
 
             if (element.repeated) {
                 addAnnotation(Repeatable::class)
             }
+
+            applyOf(target = element.canonicalName)
         }
     }
 }

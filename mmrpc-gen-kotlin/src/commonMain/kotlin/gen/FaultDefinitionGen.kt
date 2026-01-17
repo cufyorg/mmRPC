@@ -2,43 +2,68 @@ package org.cufy.mmrpc.gen.kotlin.gen
 
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.STRING
-import com.squareup.kotlinpoet.TypeSpec.Companion.classBuilder
+import com.squareup.kotlinpoet.typeNameOf
 import org.cufy.mmrpc.FaultDefinition
-import org.cufy.mmrpc.gen.kotlin.GenContext
-import org.cufy.mmrpc.gen.kotlin.common.*
-import org.cufy.mmrpc.gen.kotlin.util.companionObjectSpec
-import org.cufy.mmrpc.gen.kotlin.util.propertySpec
+import org.cufy.mmrpc.gen.kotlin.common.code.createKdocCode
+import org.cufy.mmrpc.gen.kotlin.common.isGeneratingClass
+import org.cufy.mmrpc.gen.kotlin.common.model.annotationSpec
+import org.cufy.mmrpc.gen.kotlin.common.nameOfClass
+import org.cufy.mmrpc.gen.kotlin.context.*
+import org.cufy.mmrpc.gen.kotlin.util.*
+import org.cufy.mmrpc.runtime.FaultException
 
-context(ctx: GenContext)
-fun consumeFaultDefinition() {
+context(ctx: Context, _: FailScope, _: InitStage)
+fun doFaultDefinitionGen() {
     for (element in ctx.elements) {
         if (element !is FaultDefinition) continue
-        if (!element.hasGeneratedClass()) continue
-        if (element.canonicalName in ctx.ignore) continue
+        if (!element.isGeneratingClass()) continue
 
-        failBoundary {
-            applyCreateDataObject(element)
+        catch(element) {
+            addExceptionClass(element)
         }
     }
 }
 
-context(ctx: GenContext)
-private fun applyCreateDataObject(element: FaultDefinition) {
+context(_: Context, _: InitStage)
+private fun addExceptionClass(element: FaultDefinition) {
     /*
     <namespace> {
         <kdoc>
         [ @<metadata> ]
-        data object <name> : FaultObject {
-            const val CANONICAL_NAME = "<canonical-name>"
+        class <name>(message: String?, cause: Throwable?) :
+            FaultException(CANONICAL_NAME, message, cause) {
 
-            override val canonicalName = CanonicalName(CANONICAL_NAME)
+            constructor(cause: Throwable?) : this(null, cause)
+
+            companion object {
+                const val CANONICAL_NAME = "<canonical-name>"
+            }
         }
     }
      */
 
-    createType(element.canonicalName) {
-        classBuilder(element.nameOfClass()).apply {
-            superclass(Exception::class)
+    declareType(
+        target = element.namespace,
+        declares = listOf(element.canonicalName),
+    ) {
+        classSpec(element.nameOfClass()) {
+            superclass(FaultException::class)
+            primaryConstructor(constructorSpec {
+                addParameter(parameterSpec("message", typeNameOf<String?>()) {
+                    defaultValue("null")
+                })
+                addParameter(parameterSpec("cause", typeNameOf<Throwable?>()) {
+                    defaultValue("null")
+                })
+            })
+            addSuperclassConstructorParameter("CANONICAL_NAME")
+            addSuperclassConstructorParameter("message")
+            addSuperclassConstructorParameter("cause")
+
+            addFunction(constructorSpec {
+                addParameter("cause", typeNameOf<Throwable?>())
+                callThisConstructor("null", "cause")
+            })
 
             addType(companionObjectSpec {
                 addProperty(propertySpec("CANONICAL_NAME", STRING) {
@@ -48,7 +73,12 @@ private fun applyCreateDataObject(element: FaultDefinition) {
             })
 
             addKdoc(createKdocCode(element))
-            addAnnotations(createAnnotationSet(element.metadata))
+
+            for (usage in element.metadata) {
+                addAnnotation(usage.annotationSpec())
+            }
+
+            applyOf(target = element.canonicalName)
         }
     }
 }

@@ -2,10 +2,8 @@ package org.cufy.mmrpc.gradle
 
 import org.cufy.mmrpc.gen.kotlin.GenFeature
 import org.cufy.mmrpc.gen.kotlin.GenPackaging
-import org.cufy.mmrpc.gen.kotlin.GenRange
 
 object Mmrpc {
-    const val VERSION = "0.0.1-experimental"
     const val GROUP_NAME = "mmrpc"
     const val EXTENSION_NAME = "mmrpc"
 
@@ -22,9 +20,8 @@ object Mmrpc {
 
         //
 
-        const val DEFAULT_PACKAGE_NAME = ""
+        val DEFAULT_PACKAGE_NAME: String? = null
         val DEFAULT_PACKAGING = GenPackaging.SUB_PACKAGES
-        val DEFAULT_RANGE = GenRange.EVERYTHING
         val DEFAULT_FEATURES = emptySet<GenFeature>()
 
         // names
@@ -52,12 +49,6 @@ object Mmrpc {
 
         val DEFAULT_NATIVE_METADATA_CLASSES = mapOf(
             "builtin.Deprecated" to "kotlin.Deprecated",
-        )
-
-        val DEFAULT_NATIVE_CONSTANTS = setOf(
-            "builtin.NULL",
-            "builtin.TRUE",
-            "builtin.FALSE",
         )
 
         // userdefined classes

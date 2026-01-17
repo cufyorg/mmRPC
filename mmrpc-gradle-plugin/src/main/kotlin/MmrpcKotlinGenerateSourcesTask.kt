@@ -9,11 +9,11 @@ import org.cufy.mmrpc.compact.CompactElementDefinition
 import org.cufy.mmrpc.compact.inflate
 import org.cufy.mmrpc.experimental.fromJsonString
 import org.cufy.mmrpc.experimental.fromYamlString
-import org.cufy.mmrpc.gen.kotlin.*
-import org.cufy.mmrpc.gen.kotlin.common.humanSignature
-import org.cufy.mmrpc.gen.kotlin.gen.*
+import org.cufy.mmrpc.gen.kotlin.GenFeature
+import org.cufy.mmrpc.gen.kotlin.GenPackaging
+import org.cufy.mmrpc.gen.kotlin.context.Context
+import org.cufy.mmrpc.gen.kotlin.solve
 import org.cufy.mmrpc.gradle.util.addToKotlinSourceSet
-import org.cufy.mmrpc.gradle.util.collectIgnored
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
@@ -22,7 +22,10 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
-import org.gradle.api.tasks.*
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.TaskAction
 import java.io.File
 import java.io.IOException
 
@@ -42,16 +45,12 @@ open class MmrpcKotlinGenerateSourcesTask : DefaultTask() {
     //
 
     @Input
-    val packageName: Property<String> =
+    val packageName: Property<String?> =
         this.project.objects.property(String::class.java)
 
     @Input
     val packaging: Property<GenPackaging> =
         this.project.objects.property(GenPackaging::class.java)
-
-    @Input
-    val range: Property<GenRange> =
-        this.project.objects.property(GenRange::class.java)
 
     @Input
     val features: SetProperty<GenFeature> =
@@ -62,10 +61,6 @@ open class MmrpcKotlinGenerateSourcesTask : DefaultTask() {
     @Input
     val classNames: MapProperty<String, String> =
         this.project.objects.mapProperty(String::class.java, String::class.java)
-
-    @Input
-    val protocolSuffix: Property<String> =
-        this.project.objects.property(String::class.java)
 
     // scalar classes
 
@@ -86,10 +81,6 @@ open class MmrpcKotlinGenerateSourcesTask : DefaultTask() {
     @Input
     val nativeMetadataClasses: MapProperty<String, String> =
         this.project.objects.mapProperty(String::class.java, String::class.java)
-
-    @Input
-    val nativeConstants: SetProperty<String> =
-        this.project.objects.setProperty(String::class.java)
 
     // userdefined classes
 
@@ -122,7 +113,6 @@ open class MmrpcKotlinGenerateSourcesTask : DefaultTask() {
         //
         this.packageName.convention(Mmrpc.Kotlin.DEFAULT_PACKAGE_NAME)
         this.packaging.convention(Mmrpc.Kotlin.DEFAULT_PACKAGING)
-        this.range.convention(Mmrpc.Kotlin.DEFAULT_RANGE)
         this.features.convention(Mmrpc.Kotlin.DEFAULT_FEATURES)
 
         // names
@@ -135,7 +125,6 @@ open class MmrpcKotlinGenerateSourcesTask : DefaultTask() {
         // native classes
         this.nativeScalarClasses.convention(Mmrpc.Kotlin.DEFAULT_NATIVE_SCALAR_CLASSES)
         this.nativeMetadataClasses.convention(Mmrpc.Kotlin.DEFAULT_NATIVE_METADATA_CLASSES)
-        this.nativeConstants.convention(Mmrpc.Kotlin.DEFAULT_NATIVE_CONSTANTS)
 
         // userdefined classes
         this.userdefinedScalarClasses.convention(Mmrpc.Kotlin.DEFAULT_USERDEFINED_SCALAR_CLASSES)
@@ -176,12 +165,10 @@ open class MmrpcKotlinGenerateSourcesTask : DefaultTask() {
         //
         this.packageName.set(extension.kotlin.packageName)
         this.packaging.set(extension.kotlin.packaging)
-        this.range.set(extension.kotlin.range)
         this.features.set(extension.kotlin.features)
 
         // names
         this.classNames.set(extension.kotlin.classNames)
-        this.protocolSuffix.set(extension.kotlin.protocolSuffix)
 
         // scalar classes
         this.defaultScalarClass.set(extension.kotlin.defaultScalarClass)
@@ -190,7 +177,6 @@ open class MmrpcKotlinGenerateSourcesTask : DefaultTask() {
         // native classes
         this.nativeScalarClasses.set(extension.kotlin.nativeScalarClasses)
         this.nativeMetadataClasses.set(extension.kotlin.nativeMetadataClasses)
-        this.nativeConstants.set(extension.kotlin.nativeConstants)
 
         // userdefined classes
         this.userdefinedScalarClasses.set(extension.kotlin.customScalarClasses)
@@ -213,7 +199,7 @@ open class MmrpcKotlinGenerateSourcesTask : DefaultTask() {
         filesGotten.iterator().let { iter ->
             for (file in iter) {
                 if (!file.isFile) {
-                    this.logger.error("$name: Specified file does not exists: ${file.absolutePath}")
+                    logger.error("$name: Specified file does not exists: ${file.absolutePath}")
                     iter.remove()
                 }
             }
@@ -242,8 +228,8 @@ open class MmrpcKotlinGenerateSourcesTask : DefaultTask() {
                 "json" -> {
                     val spec = try {
                         MmrpcSpec.fromJsonString(source)
-                    } catch (cause: Exception) {
-                        this.logger.error("$name: Couldn't decode file: ${file.absolutePath}", cause)
+                    } catch (e: Exception) {
+                        logger.error("$name: Couldn't decode file: ${file.absolutePath}", e)
                         continue
                     }
 
@@ -253,8 +239,8 @@ open class MmrpcKotlinGenerateSourcesTask : DefaultTask() {
                 "yaml", "yml" -> {
                     val spec = try {
                         MmrpcSpec.fromYamlString(source)
-                    } catch (cause: Exception) {
-                        this.logger.error("$name: Couldn't decode file: ${file.absolutePath}", cause)
+                    } catch (e: Exception) {
+                        logger.error("$name: Couldn't decode file: ${file.absolutePath}", e)
                         continue
                     }
 
@@ -262,7 +248,7 @@ open class MmrpcKotlinGenerateSourcesTask : DefaultTask() {
                 }
 
                 else -> {
-                    this.logger.error("$name: Unrecognized file extension ${file.absolutePath}")
+                    logger.error("$name: Unrecognized file extension ${file.absolutePath}")
                 }
             }
         }
@@ -274,98 +260,53 @@ open class MmrpcKotlinGenerateSourcesTask : DefaultTask() {
                 .distinctBy { it.canonicalName }
                 .toList()
         } catch (e: Exception) {
-            val message = "$name: schema inflation failure: ${e.message}"
-            throw TaskInstantiationException(message, e)
+            logger.error("$name: schema inflation failure: ${e.message}")
+            return
         }
 
-        val genContext = GenContext(
+        val genContext = Context(
             elements = elements,
-            ignore = collectIgnored(
-                elements = elements,
-                includeRange = this.range.get(),
-            ),
-            //
             packageName = this.packageName.get(),
             packaging = this.packaging.get(),
             features = this.features.get(),
-            // names
             classNames = this.classNames.get().entries
                 .associate { CanonicalName(it.key) to it.value },
-            // scalar classes
             defaultScalarClass = this.defaultScalarClass.get()
                 .let { ClassName.bestGuess(it) },
             scalarClasses = this.scalarClasses.get().entries
                 .associate { CanonicalName(it.key) to ClassName.bestGuess(it.value) },
-            // native classes
             nativeScalarClasses = this.nativeScalarClasses.get().entries
                 .associate { CanonicalName(it.key) to ClassName.bestGuess(it.value) },
             nativeMetadataClasses = this.nativeMetadataClasses.get().entries
                 .associate { CanonicalName(it.key) to ClassName.bestGuess(it.value) },
-            nativeConstants = this.nativeConstants.get()
-                .map { CanonicalName(it) }
-                .toSet(),
-            // userdefined classes
             userdefinedScalarClasses = this.userdefinedScalarClasses.get().entries
                 .associate { CanonicalName(it.key) to ClassName.bestGuess(it.value) },
             userdefinedMetadataClasses = this.userdefinedMetadataClasses.get().entries
                 .associate { CanonicalName(it.key) to ClassName.bestGuess(it.value) },
         )
 
-        try {
-            genContext.run {
-                consumeArrayDefinition()
-                consumeMapDefinition()
-                consumeConstDefinition()
-                consumeEnumDefinition()
-                consumeFaultDefinition()
-                consumeProtocolDefinition()
-                consumeRoutineDefinition()
-                consumeFieldDefinition()
-                consumeInterDefinition()
-                consumeMetadataDefinition()
-                consumeScalarDefinition()
-                consumeTraitDefinition()
-                consumeStructDefinition()
-                consumeTupleDefinition()
-                consumeUnionDefinition()
-            }
-        } catch (e: Exception) {
-            val message = "$name: fetal code generation failure: ${e.message}"
-            throw TaskInstantiationException(message, e)
-        }
+        val result = genContext.solve()
 
-        genContext.failures.forEach { e ->
+        result.fails.forEach { e ->
             val message = buildString {
-                append("$name: ")
-                append("${e.failure.tag}: ")
-                append(e.failure.message)
-                append(" (element: ${e.failure.element?.let { it.humanSignature() }})")
+                appendLine()
+                append("mmRPC code-gen fail: ")
+                e.refs.forEach {
+                    appendLine()
+                    append("- ")
+                    append(it?.value)
+                }
+                appendLine()
             }
 
             logger.error(message, e)
         }
 
-        val fileSpecSet = try {
-            genContext.run {
-                generateFileSpecSet {
-                    addFileComment("This is an automatically generated file.\n")
-                    addFileComment("Modification to this file WILL be lost everytime\n")
-                    addFileComment("the code generation task is executed\n\n")
-                    addFileComment("This file was generated with mmrpc-gen-kotlin via\n")
-                    addFileComment("gradle plugin: org.cufy.mmrpc version: ${Mmrpc.VERSION}\n")
-                }
-            }
-        } catch (e: Exception) {
-            val message = "$name: fetal code generation failure: ${e.message}"
-            throw TaskInstantiationException(message, e)
-        }
-
-        for (fileSpec in fileSpecSet) {
+        for (fileSpec in result.files) {
             try {
                 fileSpec.writeTo(outputDirectoryGotten)
             } catch (e: Exception) {
-                val message = "$name: error while generating code: ${e.message}"
-                logger.error(message, e)
+                logger.error("$name: error while generating code: ${e.message}", e)
             }
         }
     }

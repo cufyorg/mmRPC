@@ -1,37 +1,38 @@
 package org.cufy.mmrpc.gen.kotlin.gen
 
 import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.TypeSpec.Companion.classBuilder
-import com.squareup.kotlinpoet.TypeSpec.Companion.objectBuilder
 import org.cufy.mmrpc.StructDefinition
-import org.cufy.mmrpc.gen.kotlin.GenContext
 import org.cufy.mmrpc.gen.kotlin.StructStrategy
-import org.cufy.mmrpc.gen.kotlin.common.*
-import org.cufy.mmrpc.gen.kotlin.util.constructorSpec
-import org.cufy.mmrpc.gen.kotlin.util.parameterSpec
-import org.cufy.mmrpc.gen.kotlin.util.propertySpec
+import org.cufy.mmrpc.gen.kotlin.common.code.createKdocCode
+import org.cufy.mmrpc.gen.kotlin.common.code.createLiteralCode
+import org.cufy.mmrpc.gen.kotlin.common.isGeneratingClass
+import org.cufy.mmrpc.gen.kotlin.common.model.*
+import org.cufy.mmrpc.gen.kotlin.common.nameOfClass
+import org.cufy.mmrpc.gen.kotlin.common.typeName
+import org.cufy.mmrpc.gen.kotlin.common.typeSerialName
+import org.cufy.mmrpc.gen.kotlin.context.*
+import org.cufy.mmrpc.gen.kotlin.util.*
 
-context(ctx: GenContext)
-fun consumeStructDefinition() {
+context(ctx: Context, _: FailScope, _: InitStage)
+fun doStructDefinitionGen() {
     for (element in ctx.elements) {
         if (element !is StructDefinition) continue
-        if (!element.hasGeneratedClass()) continue
-        if (element.canonicalName in ctx.ignore) continue
+        if (!element.isGeneratingClass()) continue
 
-        failBoundary {
+        catch(element) {
             when (element.calculateStrategy()) {
                 StructStrategy.DATA_OBJECT
-                -> applyCreateDataObject(element)
+                -> addDataObject(element)
 
                 StructStrategy.DATA_CLASS
-                -> applyCreateDataClass(element)
+                -> addDataClass(element)
             }
         }
     }
 }
 
-context(ctx: GenContext)
-private fun applyCreateDataObject(element: StructDefinition) {
+context(_: Context, _: InitStage)
+private fun addDataObject(element: StructDefinition) {
     /*
     <namespace> {
         <kdoc>
@@ -42,21 +43,32 @@ private fun applyCreateDataObject(element: StructDefinition) {
     }
      */
 
-    createType(element.canonicalName) {
-        objectBuilder(element.nameOfClass()).apply {
+    declareType(
+        target = element.namespace,
+        declares = listOf(element.canonicalName),
+    ) {
+        objectSpec(element.nameOfClass()) {
             addModifiers(KModifier.DATA)
-            addSuperinterfaces(element.traits.map { it.canonicalName.generatedClassName() })
+
+            for (trait in element.traits) {
+                addSuperinterface(trait.generatedClassName())
+            }
 
             addKdoc(createKdocCode(element))
-            addAnnotations(createAnnotationSet(element.metadata))
-            addAnnotations(createSerializableAnnotationSet())
-            addAnnotations(createSerialNameAnnotationSet(element.typeSerialName()))
+            addAnnotation(createSerializable())
+            addAnnotation(createSerialName(element.typeSerialName()))
+
+            for (usage in element.metadata) {
+                addAnnotation(usage.annotationSpec())
+            }
+
+            applyOf(target = element.canonicalName)
         }
     }
 }
 
-context(ctx: GenContext)
-private fun applyCreateDataClass(element: StructDefinition) {
+context(_: Context, _: InitStage)
+private fun addDataClass(element: StructDefinition) {
     /*
     <namespace> {
         <kdoc>
@@ -80,56 +92,78 @@ private fun applyCreateDataClass(element: StructDefinition) {
     }
      */
 
-    createType(element.canonicalName) {
-        classBuilder(element.nameOfClass()).apply {
+    val supFields = element.collectAllSupFields().toList()
+
+    declareType(
+        target = element.namespace,
+        declares = listOf(element.canonicalName),
+    ) {
+        classSpec(element.nameOfClass()) {
             addModifiers(KModifier.DATA)
-            addSuperinterfaces(element.traits.map { it.canonicalName.generatedClassName() })
+
+            for (trait in element.traits) {
+                addSuperinterface(trait.generatedClassName())
+            }
 
             primaryConstructor(constructorSpec {
-                addParameters(element.fieldsInherited().map {
-                    parameterSpec(it.nameOfProperty(), it.type.typeName()) {
-                        val default = it.default
+                for (field in supFields) {
+                    addParameter(parameterSpec(field.nameOfProperty(), field.type.typeName()) {
+                        val default = field.default
 
                         if (default != null) {
-                            defaultValue(createLiteralCode(it.type, default))
+                            defaultValue(createLiteralCode(field.type, default))
                         }
-                    }
-                })
-                addParameters(element.fields.map {
-                    parameterSpec(it.nameOfProperty(), it.type.typeName()) {
-                        val default = it.default
+                    })
+                }
+
+                for (field in element.fields) {
+                    addParameter(parameterSpec(field.nameOfProperty(), field.type.typeName()) {
+                        val default = field.default
 
                         if (default != null) {
-                            defaultValue(createLiteralCode(it.type, default))
+                            defaultValue(createLiteralCode(field.type, default))
                         }
-                    }
-                })
+                    })
+                }
             })
-            addProperties(element.fieldsInherited().map {
-                propertySpec(it.nameOfProperty(), it.type.typeName()) {
+
+            for (field in supFields) {
+                addProperty(propertySpec(field.nameOfProperty(), field.type.typeName()) {
                     addModifiers(KModifier.OVERRIDE)
 
-                    initializer(it.nameOfProperty())
+                    initializer(field.nameOfProperty())
 
-                    addKdoc(createShortKdocCode(it))
-                    addAnnotations(createAnnotationSet(it.metadata))
-                    addAnnotations(createSerialNameAnnotationSet(it.propertySerialName()))
-                }
-            })
-            addProperties(element.fields.map {
-                propertySpec(it.nameOfProperty(), it.type.typeName()) {
-                    initializer(it.nameOfProperty())
+                    addKdoc(createKdocCode(field))
+                    addAnnotation(createSerialName(field.propertySerialName()))
 
-                    addKdoc(createShortKdocCode(it))
-                    addAnnotations(createAnnotationSet(it.metadata))
-                    addAnnotations(createSerialNameAnnotationSet(it.propertySerialName()))
-                }
-            })
+                    for (usage in field.metadata) {
+                        addAnnotation(usage.annotationSpec())
+                    }
+                })
+            }
+
+            for (field in element.fields) {
+                addProperty(propertySpec(field.nameOfProperty(), field.type.typeName()) {
+                    initializer(field.nameOfProperty())
+
+                    addKdoc(createKdocCode(field))
+                    addAnnotation(createSerialName(field.propertySerialName()))
+
+                    for (usage in field.metadata) {
+                        addAnnotation(usage.annotationSpec())
+                    }
+                })
+            }
 
             addKdoc(createKdocCode(element))
-            addAnnotations(createAnnotationSet(element.metadata))
-            addAnnotations(createSerializableAnnotationSet())
-            addAnnotations(createSerialNameAnnotationSet(element.typeSerialName()))
+            addAnnotation(createSerializable())
+            addAnnotation(createSerialName(element.typeSerialName()))
+
+            for (usage in element.metadata) {
+                addAnnotation(usage.annotationSpec())
+            }
+
+            applyOf(target = element.canonicalName)
         }
     }
 }

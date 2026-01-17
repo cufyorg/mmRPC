@@ -1,75 +1,49 @@
 package org.cufy.mmrpc.gen.kotlin.gen
 
 import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
-import com.squareup.kotlinpoet.TypeSpec.Companion.objectBuilder
-import com.squareup.kotlinpoet.asClassName
-import kotlinx.coroutines.flow.Flow
-import org.cufy.mmrpc.Comm
+import com.squareup.kotlinpoet.STRING
 import org.cufy.mmrpc.RoutineDefinition
-import org.cufy.mmrpc.gen.kotlin.GenContext
-import org.cufy.mmrpc.gen.kotlin.common.*
-import org.cufy.mmrpc.gen.kotlin.util.funSpec
+import org.cufy.mmrpc.gen.kotlin.common.code.createKdocCode
+import org.cufy.mmrpc.gen.kotlin.common.isGeneratingClass
+import org.cufy.mmrpc.gen.kotlin.common.model.annotationSpec
+import org.cufy.mmrpc.gen.kotlin.common.nameOfClass
+import org.cufy.mmrpc.gen.kotlin.context.*
+import org.cufy.mmrpc.gen.kotlin.util.objectSpec
+import org.cufy.mmrpc.gen.kotlin.util.propertySpec
 
-context(ctx: GenContext)
-fun consumeRoutineDefinition() {
+context(ctx: Context, _: FailScope, _: InitStage)
+fun doRoutineDefinitionGen() {
     for (element in ctx.elements) {
         if (element !is RoutineDefinition) continue
-        if (!element.hasGeneratedClass()) continue
-        if (element.canonicalName in ctx.ignore) continue
+        if (!element.isGeneratingClass()) continue
 
-        failBoundary {
-            applyCreateDataObject(element)
-            applyCreateAbstractFunction(element)
+        catch(element) {
+            addDataObject(element)
         }
     }
 }
 
-context(ctx: GenContext)
-private fun applyCreateDataObject(element: RoutineDefinition) {
-    createType(element.canonicalName) {
-        objectBuilder(element.nameOfClass()).apply {
+context(_: Context, _: InitStage)
+private fun addDataObject(element: RoutineDefinition) {
+    declareType(
+        target = element.namespace,
+        declares = listOf(element.canonicalName),
+    ) {
+        objectSpec(element.nameOfClass()) {
             addModifiers(KModifier.DATA)
 
             addKdoc(createKdocCode(element))
-            addAnnotations(createAnnotationSet(element.metadata))
+
+            for (usage in element.metadata) {
+                addAnnotation(usage.annotationSpec())
+            }
+
+            addProperty(propertySpec("CANONICAL_NAME", STRING) {
+                addModifiers(KModifier.CONST)
+                initializer("%S", element.canonicalName.value)
+            })
+
+            applyOf(target = element.canonicalName)
         }
-    }
-}
-
-context(ctx: GenContext)
-private fun applyCreateAbstractFunction(element: RoutineDefinition) {
-    /*
-    <namespace> {
-        <kdoc>
-        [ @<metadata> ]
-        abstract function <name>(<input-type-base-on-comm-shape>):
-                <output-type-base-on-comm-shape>
-    }
-     */
-
-    injectType(element.namespace!!) {
-        addFunction(funSpec(element.name) {
-            addModifiers(KModifier.ABSTRACT)
-
-            when (element.comm.input) {
-                Comm.Shape.Void -> {}
-
-                Comm.Shape.Unary ->
-                    addParameter("input", element.input.typeName())
-
-                Comm.Shape.Stream ->
-                    addParameter("input", Flow::class.asClassName().parameterizedBy(element.input.typeName()))
-            }
-            when (element.comm.output) {
-                Comm.Shape.Void -> {}
-
-                Comm.Shape.Unary ->
-                    addParameter("output", element.output.typeName())
-
-                Comm.Shape.Stream ->
-                    addParameter("output", Flow::class.asClassName().parameterizedBy(element.output.typeName()))
-            }
-        })
     }
 }

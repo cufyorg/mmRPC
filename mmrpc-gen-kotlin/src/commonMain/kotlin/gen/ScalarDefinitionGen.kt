@@ -1,28 +1,30 @@
 package org.cufy.mmrpc.gen.kotlin.gen
 
 import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.TypeSpec.Companion.classBuilder
 import org.cufy.mmrpc.ScalarDefinition
-import org.cufy.mmrpc.gen.kotlin.GenContext
-import org.cufy.mmrpc.gen.kotlin.common.*
-import org.cufy.mmrpc.gen.kotlin.util.constructorSpec
-import org.cufy.mmrpc.gen.kotlin.util.propertySpec
+import org.cufy.mmrpc.gen.kotlin.common.code.createKdocCode
+import org.cufy.mmrpc.gen.kotlin.common.isGeneratingClass
+import org.cufy.mmrpc.gen.kotlin.common.model.annotationSpec
+import org.cufy.mmrpc.gen.kotlin.common.model.primitiveTypeName
+import org.cufy.mmrpc.gen.kotlin.common.nameOfClass
+import org.cufy.mmrpc.gen.kotlin.common.typeSerialName
+import org.cufy.mmrpc.gen.kotlin.context.*
+import org.cufy.mmrpc.gen.kotlin.util.*
 
-context(ctx: GenContext)
-fun consumeScalarDefinition() {
+context(ctx: Context, _: FailScope, _: InitStage)
+fun doScalarDefinitionGen() {
     for (element in ctx.elements) {
         if (element !is ScalarDefinition) continue
-        if (!element.hasGeneratedClass()) continue
-        if (element.canonicalName in ctx.ignore) continue
+        if (!element.isGeneratingClass()) continue
 
-        failBoundary {
-            applyCreateValueClass(element)
+        catch(element) {
+            addValueClass(element)
         }
     }
 }
 
-context(ctx: GenContext)
-private fun applyCreateValueClass(element: ScalarDefinition) {
+context(_: Context, _: InitStage)
+private fun addValueClass(element: ScalarDefinition) {
     /*
     <namespace> {
         <kdoc>
@@ -34,8 +36,11 @@ private fun applyCreateValueClass(element: ScalarDefinition) {
     }
      */
 
-    createType(element.canonicalName) {
-        classBuilder(element.nameOfClass()).apply {
+    declareType(
+        target = element.namespace,
+        declares = listOf(element.canonicalName),
+    ) {
+        classSpec(element.nameOfClass()) {
             addModifiers(KModifier.VALUE)
             addAnnotation(JvmInline::class)
 
@@ -47,9 +52,14 @@ private fun applyCreateValueClass(element: ScalarDefinition) {
             })
 
             addKdoc(createKdocCode(element))
-            addAnnotations(createAnnotationSet(element.metadata))
-            addAnnotations(createSerializableAnnotationSet())
-            addAnnotations(createSerialNameAnnotationSet(element.typeSerialName()))
+            addAnnotation(createSerializable())
+            addAnnotation(createSerialName(element.typeSerialName()))
+
+            for (usage in element.metadata) {
+                addAnnotation(usage.annotationSpec())
+            }
+
+            applyOf(target = element.canonicalName)
         }
     }
 }

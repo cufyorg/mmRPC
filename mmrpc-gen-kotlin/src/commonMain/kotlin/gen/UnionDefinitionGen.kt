@@ -1,40 +1,44 @@
 package org.cufy.mmrpc.gen.kotlin.gen
 
 import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.TypeSpec.Companion.interfaceBuilder
-import com.squareup.kotlinpoet.TypeSpec.Companion.objectBuilder
+import com.squareup.kotlinpoet.TypeSpec
 import org.cufy.mmrpc.UnionDefinition
-import org.cufy.mmrpc.gen.kotlin.GenContext
 import org.cufy.mmrpc.gen.kotlin.UnionStrategy
-import org.cufy.mmrpc.gen.kotlin.common.*
-import org.cufy.mmrpc.gen.kotlin.util.classSpec
-import org.cufy.mmrpc.gen.kotlin.util.constructorSpec
-import org.cufy.mmrpc.gen.kotlin.util.propertySpec
+import org.cufy.mmrpc.gen.kotlin.common.code.createKdocCode
+import org.cufy.mmrpc.gen.kotlin.common.isGeneratingClass
+import org.cufy.mmrpc.gen.kotlin.common.model.annotationSpec
+import org.cufy.mmrpc.gen.kotlin.common.model.calculateStrategy
+import org.cufy.mmrpc.gen.kotlin.common.model.generatedClassName
+import org.cufy.mmrpc.gen.kotlin.common.model.nameOfUnionWrapperEntry
+import org.cufy.mmrpc.gen.kotlin.common.nameOfClass
+import org.cufy.mmrpc.gen.kotlin.common.typeName
+import org.cufy.mmrpc.gen.kotlin.common.typeSerialName
+import org.cufy.mmrpc.gen.kotlin.context.*
+import org.cufy.mmrpc.gen.kotlin.util.*
 
-context(ctx: GenContext)
-fun consumeUnionDefinition() {
+context(ctx: Context, _: FailScope, _: InitStage)
+fun doUnionDefinitionGen() {
     for (element in ctx.elements) {
         if (element !is UnionDefinition) continue
-        if (!element.hasGeneratedClass()) continue
-        if (element.canonicalName in ctx.ignore) continue
+        if (!element.isGeneratingClass()) continue
 
-        failBoundary {
+        catch(element) {
             when (element.calculateStrategy()) {
                 UnionStrategy.DATA_OBJECT
-                -> applyCreateDataObject(element)
+                -> addDataObject(element)
 
                 UnionStrategy.SEALED_INTERFACE
-                -> applyCreateSealedInterface(element)
+                -> addSealedInterface(element)
 
                 UnionStrategy.WRAPPER_SEALED_INTERFACE
-                -> applyCreateWrapperSealedInterface(element)
+                -> addWrapperSealedInterface(element)
             }
         }
     }
 }
 
-context(ctx: GenContext)
-private fun applyCreateDataObject(element: UnionDefinition) {
+context(_: Context, _: InitStage)
+private fun addDataObject(element: UnionDefinition) {
     /*
     <namespace> {
         <kdoc>
@@ -45,20 +49,28 @@ private fun applyCreateDataObject(element: UnionDefinition) {
     }
      */
 
-    createType(element.canonicalName) {
-        objectBuilder(element.nameOfClass()).apply {
+    declareType(
+        target = element.namespace,
+        declares = listOf(element.canonicalName),
+    ) {
+        objectSpec(element.nameOfClass()) {
             addModifiers(KModifier.DATA)
 
             addKdoc(createKdocCode(element))
-            addAnnotations(createAnnotationSet(element.metadata))
-            addAnnotations(createSerializableAnnotationSet())
-            addAnnotations(createSerialNameAnnotationSet(element.typeSerialName()))
+            addAnnotation(createSerializable())
+            addAnnotation(createSerialName(element.typeSerialName()))
+
+            for (usage in element.metadata) {
+                addAnnotation(usage.annotationSpec())
+            }
+
+            applyOf(target = element.canonicalName)
         }
     }
 }
 
-context(ctx: GenContext)
-private fun applyCreateSealedInterface(element: UnionDefinition) {
+context(_: Context, _: InitStage)
+private fun addSealedInterface(element: UnionDefinition) {
     /*
     <namespace> {
         <kdoc>
@@ -69,54 +81,72 @@ private fun applyCreateSealedInterface(element: UnionDefinition) {
     }
      */
 
-    createType(element.canonicalName) {
-        interfaceBuilder(element.nameOfClass()).apply {
+    declareType(
+        target = element.namespace,
+        declares = listOf(element.canonicalName),
+    ) {
+        interfaceSpec(element.nameOfClass()) {
             addModifiers(KModifier.SEALED)
 
             addKdoc(createKdocCode(element))
-            addAnnotations(createAnnotationSet(element.metadata))
-            addAnnotations(createSerializableAnnotationSet())
-            addAnnotations(createSerialNameAnnotationSet(element.typeSerialName()))
+            addAnnotation(createSerializable())
+            addAnnotation(createSerialName(element.typeSerialName()))
+
+            for (usage in element.metadata) {
+                addAnnotation(usage.annotationSpec())
+            }
+
+            applyOf(target = element.canonicalName)
         }
     }
 
     for (subtype in element.types) {
-        injectType(subtype.canonicalName) {
-            addSuperinterface(element.canonicalName.generatedClassName())
+        inject<TypeSpec.Builder>(target = subtype.canonicalName) {
+            addSuperinterface(element.generatedClassName())
         }
     }
 }
 
-context(ctx: GenContext)
-private fun applyCreateWrapperSealedInterface(element: UnionDefinition) {
-    createType(element.canonicalName) {
-        interfaceBuilder(element.nameOfClass()).apply {
+context(_: Context, _: InitStage)
+private fun addWrapperSealedInterface(element: UnionDefinition) {
+    declareType(
+        target = element.namespace,
+        declares = listOf(element.canonicalName),
+    ) {
+        interfaceSpec(element.nameOfClass()) {
             addModifiers(KModifier.SEALED)
 
-            addTypes(element.types.map {
-                classSpec(it.nameOfUnionWrapperEntry()) {
+            for (type in element.types) {
+                addType(classSpec(type.nameOfUnionWrapperEntry()) {
                     addModifiers(KModifier.VALUE)
                     addAnnotation(JvmInline::class)
-                    addSuperinterface(element.canonicalName.generatedClassName())
+                    addSuperinterface(element.generatedClassName())
 
                     primaryConstructor(constructorSpec {
-                        addParameter("value", it.typeName())
+                        addParameter("value", type.typeName())
                     })
-                    addProperty(propertySpec("value", it.typeName()) {
+                    addProperty(propertySpec("value", type.typeName()) {
                         initializer("value")
                     })
 
-                    addKdoc(createShortKdocCode(it))
-                    addAnnotations(createAnnotationSet(it.metadata))
-                    addAnnotations(createSerializableAnnotationSet())
-                    addAnnotations(createSerialNameAnnotationSet(it.typeSerialName()))
-                }
-            })
+                    addAnnotation(createSerializable())
+                    addAnnotation(createSerialName(type.typeSerialName()))
+
+                    for (usage in type.metadata) {
+                        addAnnotation(usage.annotationSpec())
+                    }
+                })
+            }
 
             addKdoc(createKdocCode(element))
-            addAnnotations(createAnnotationSet(element.metadata))
-            addAnnotations(createSerializableAnnotationSet())
-            addAnnotations(createSerialNameAnnotationSet(element.typeSerialName()))
+            addAnnotation(createSerializable())
+            addAnnotation(createSerialName(element.typeSerialName()))
+
+            for (usage in element.metadata) {
+                addAnnotation(usage.annotationSpec())
+            }
+
+            applyOf(target = element.canonicalName)
         }
     }
 }
