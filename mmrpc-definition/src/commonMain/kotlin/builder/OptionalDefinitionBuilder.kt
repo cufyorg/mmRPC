@@ -1,6 +1,7 @@
 package org.cufy.mmrpc.builder
 
 import org.cufy.mmrpc.*
+import org.cufy.mmrpc.internal.asSiblingOf
 
 ////////////////////////////////////////
 
@@ -18,7 +19,7 @@ class OptionalDefinitionBuilder :
             description = this.description,
             metadata = this.metadata.toList(),
             type = this::type.getOrThrow()
-                .get(cn, name = "type"),
+                .asSiblingOf(cn, suffix = "_type"),
         )
     }
 }

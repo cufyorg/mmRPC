@@ -5,6 +5,7 @@ import org.cufy.mmrpc.StructDefinition
 import org.cufy.mmrpc.UnionDefinition
 import org.cufy.mmrpc.Unnamed
 import org.cufy.mmrpc.internal.VARARG_VARIANTS_DEPRECATED_MSG
+import org.cufy.mmrpc.internal.asSiblingOf
 
 ////////////////////////////////////////
 
@@ -29,7 +30,7 @@ class UnionDefinitionBuilder :
             metadata = this.metadata.toList(),
             discriminator = this.discriminator,
             types = this.types.mapIndexed { i, it ->
-                it.get(cn, name = "type$i")
+                it.asSiblingOf(cn, suffix = "_type$i")
             },
         )
     }

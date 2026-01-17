@@ -5,6 +5,7 @@ import org.cufy.mmrpc.TupleDefinition
 import org.cufy.mmrpc.TypeDefinition
 import org.cufy.mmrpc.Unnamed
 import org.cufy.mmrpc.internal.VARARG_VARIANTS_DEPRECATED_MSG
+import org.cufy.mmrpc.internal.asSiblingOf
 
 ////////////////////////////////////////
 
@@ -27,7 +28,7 @@ class TupleDefinitionBuilder :
             description = this.description,
             metadata = this.metadata.toList(),
             types = this.types.mapIndexed { i, it ->
-                it.get(cn, name = "type$i")
+                it.asSiblingOf(cn, suffix = "_type$i")
             },
         )
     }

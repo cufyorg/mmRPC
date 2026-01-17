@@ -1,6 +1,7 @@
 package org.cufy.mmrpc.builder
 
 import org.cufy.mmrpc.*
+import org.cufy.mmrpc.internal.asSiblingOf
 
 ////////////////////////////////////////
 
@@ -21,7 +22,7 @@ class FieldDefinitionBuilder :
             metadata = this.metadata.toList(),
             key = this.key,
             type = this::type.getOrThrow()
-                .get(cn, name = "type"),
+                .asSiblingOf(cn, suffix = "_type"),
             default = this::default.getOrNull(),
         )
     }
