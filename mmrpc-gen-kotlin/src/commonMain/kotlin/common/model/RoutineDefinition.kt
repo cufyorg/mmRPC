@@ -9,8 +9,11 @@ import org.cufy.mmrpc.RoutineDefinition
 import org.cufy.mmrpc.StructDefinition
 import org.cufy.mmrpc.gen.kotlin.ContextScope
 import org.cufy.mmrpc.gen.kotlin.GenFeature
-import org.cufy.mmrpc.gen.kotlin.common.*
+import org.cufy.mmrpc.gen.kotlin.common.assumedPackageName
+import org.cufy.mmrpc.gen.kotlin.common.assumedSimpleNames
 import org.cufy.mmrpc.gen.kotlin.common.code.createKdocCode
+import org.cufy.mmrpc.gen.kotlin.common.hasGeneratedClass
+import org.cufy.mmrpc.gen.kotlin.common.typeName
 import org.cufy.mmrpc.gen.kotlin.context.Context
 import org.cufy.mmrpc.gen.kotlin.debug
 import org.cufy.mmrpc.gen.kotlin.util.createCall
@@ -49,38 +52,38 @@ fun RoutineDefinition.abstractFunSpec(): FunSpec {
 
     when (comm) {
         Comm.VoidUnary -> {
-            request = output.generatedClassName()
+            request = output.className()
             response = UNIT
         }
 
         Comm.UnaryVoid -> {
-            request = input.generatedClassName()
+            request = input.className()
             response = UNIT
         }
 
         Comm.UnaryUnary -> {
-            request = input.generatedClassName()
-            response = output.generatedClassName()
+            request = input.className()
+            response = output.className()
         }
 
         Comm.UnaryStream -> {
-            request = input.generatedClassName()
+            request = input.className()
             response = Flow::class.asClassName()
-                .parameterizedBy(output.generatedClassName())
+                .parameterizedBy(output.className())
         }
 
         Comm.StreamUnary -> {
             request = Flow::class.asClassName()
-                .parameterizedBy(input.generatedClassName())
-            response = output.generatedClassName()
+                .parameterizedBy(input.className())
+            response = output.className()
         }
 
         Comm.StreamStream,
         -> {
             request = Flow::class.asClassName()
-                .parameterizedBy(input.generatedClassName())
+                .parameterizedBy(input.className())
             response = Flow::class.asClassName()
-                .parameterizedBy(output.generatedClassName())
+                .parameterizedBy(output.className())
         }
     }
 
@@ -101,43 +104,43 @@ fun RoutineDefinition.clientExecImplFunSpec(): FunSpec {
 
     when (comm) {
         Comm.VoidUnary -> {
-            request = output.generatedClassName()
+            request = output.className()
             response = UNIT
             n = 0
         }
 
         Comm.UnaryVoid -> {
-            request = input.generatedClassName()
+            request = input.className()
             response = UNIT
             n = 0
         }
 
         Comm.UnaryUnary -> {
-            request = input.generatedClassName()
-            response = output.generatedClassName()
+            request = input.className()
+            response = output.className()
             n = 1
         }
 
         Comm.UnaryStream -> {
-            request = input.generatedClassName()
+            request = input.className()
             response = Flow::class.asClassName()
-                .parameterizedBy(output.generatedClassName())
+                .parameterizedBy(output.className())
             n = 2
         }
 
         Comm.StreamUnary -> {
             request = Flow::class.asClassName()
-                .parameterizedBy(input.generatedClassName())
-            response = output.generatedClassName()
+                .parameterizedBy(input.className())
+            response = output.className()
             n = 3
         }
 
         Comm.StreamStream,
         -> {
             request = Flow::class.asClassName()
-                .parameterizedBy(input.generatedClassName())
+                .parameterizedBy(input.className())
             response = Flow::class.asClassName()
-                .parameterizedBy(output.generatedClassName())
+                .parameterizedBy(output.className())
             n = 4
         }
     }
@@ -247,13 +250,13 @@ fun RoutineDefinition.clientFlatInputExecFunSpec(receiver: ClassName): FunSpec {
 
         Comm.UnaryUnary -> {
             request = input
-            response = output.generatedClassName()
+            response = output.className()
         }
 
         Comm.UnaryStream -> {
             request = input
             response = Flow::class.asClassName()
-                .parameterizedBy(output.generatedClassName())
+                .parameterizedBy(output.className())
         }
 
         Comm.StreamUnary,
@@ -274,7 +277,7 @@ fun RoutineDefinition.clientFlatInputExecFunSpec(receiver: ClassName): FunSpec {
 
         // Implementation
         addStatement("♢return %L(\n⇥%L⇤\n)", nameOfFunction(), createCall(
-            function = CodeBlock.of("%T", request.generatedClassName()),
+            function = CodeBlock.of("%T", request.className()),
             parameters = fields.associate {
                 val name = it.nameOfProperty()
                 name to CodeBlock.of(name)
@@ -293,44 +296,44 @@ fun RoutineDefinition.serverDirectRegisterFunSpec(receiver: ClassName): FunSpec 
 
     when (comm) {
         Comm.VoidUnary -> {
-            request = output.generatedClassName()
+            request = output.className()
             response = UNIT
             n = 0
         }
 
         Comm.UnaryVoid -> {
-            request = input.generatedClassName()
+            request = input.className()
             response = UNIT
             n = 0
         }
 
         Comm.UnaryUnary -> {
-            request = input.generatedClassName()
-            response = output.generatedClassName()
+            request = input.className()
+            response = output.className()
             n = 1
         }
 
         Comm.UnaryStream -> {
-            request = input.generatedClassName()
+            request = input.className()
             response = Flow::class.asClassName()
-                .parameterizedBy(output.generatedClassName())
+                .parameterizedBy(output.className())
             n = 2
         }
 
         Comm.StreamUnary,
         -> {
             request = Flow::class.asClassName()
-                .parameterizedBy(input.generatedClassName())
-            response = output.generatedClassName()
+                .parameterizedBy(input.className())
+            response = output.className()
             n = 3
         }
 
         Comm.StreamStream,
         -> {
             request = Flow::class.asClassName()
-                .parameterizedBy(input.generatedClassName())
+                .parameterizedBy(input.className())
             response = Flow::class.asClassName()
-                .parameterizedBy(output.generatedClassName())
+                .parameterizedBy(output.className())
             n = 4
         }
     }

@@ -1,15 +1,17 @@
 package org.cufy.mmrpc.gen.kotlin.common.model
 
 import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.UNIT
 import org.cufy.mmrpc.FieldDefinition
 import org.cufy.mmrpc.StructDefinition
+import org.cufy.mmrpc.builtin
 import org.cufy.mmrpc.gen.kotlin.ContextScope
 import org.cufy.mmrpc.gen.kotlin.StructStrategy
 import org.cufy.mmrpc.gen.kotlin.common.assumedPackageName
 import org.cufy.mmrpc.gen.kotlin.common.assumedSimpleNames
-import org.cufy.mmrpc.gen.kotlin.debug
 import org.cufy.mmrpc.gen.kotlin.common.hasGeneratedClass
 import org.cufy.mmrpc.gen.kotlin.context.Context
+import org.cufy.mmrpc.gen.kotlin.debug
 
 ////////////////////////////////////////
 
@@ -20,6 +22,13 @@ fun StructDefinition.generatedClassName(): ClassName {
     val pkg = canonicalName.assumedPackageName()
     val simpleNames = canonicalName.assumedSimpleNames()
     return ClassName(pkg, simpleNames)
+}
+
+@ContextScope
+context(ctx: Context)
+fun StructDefinition.className(): ClassName {
+    if (canonicalName == builtin.Unit.canonicalName) return UNIT
+    return generatedClassName()
 }
 
 ////////////////////////////////////////

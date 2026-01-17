@@ -246,12 +246,7 @@ fun TypeDefinition.typeName(): TypeName {
         }
 
         is ScalarDefinition -> className()
-
-        is StructDefinition -> when {
-            canonicalName == builtin.Unit.canonicalName -> Unit::class.asClassName()
-            hasGeneratedClass() -> generatedClassName()
-            else -> ANY
-        }
+        is StructDefinition -> className()
 
         is UnionDefinition -> generatedClassName()
         is EnumDefinition -> generatedClassName()

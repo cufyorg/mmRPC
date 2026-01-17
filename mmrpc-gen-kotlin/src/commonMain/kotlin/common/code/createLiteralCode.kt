@@ -154,7 +154,7 @@ private fun createLiteralCodeOfStruct(element: StructDefinition, literal: Struct
 
     when (element.calculateStrategy()) {
         StructStrategy.DATA_OBJECT ->
-            return CodeBlock.of("%T", element.generatedClassName())
+            return CodeBlock.of("%T", element.className())
 
         StructStrategy.DATA_CLASS -> {
             fun fieldOfOrThrow(name: String): FieldDefinition {
@@ -164,7 +164,7 @@ private fun createLiteralCodeOfStruct(element: StructDefinition, literal: Struct
             }
 
             return createCall(
-                function = CodeBlock.of("%T", element.generatedClassName()),
+                function = CodeBlock.of("%T", element.className()),
                 literal.value.entries.associate { (name, value) ->
                     val field = fieldOfOrThrow(name)
                     field.nameOfProperty() to createLiteralCode(field.type, value)
