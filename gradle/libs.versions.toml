@@ -31,7 +31,7 @@ kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", v
 
 kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
 
-# Client and Server Dependencies
+# Runtime Dependencies
 
 ktor-server-core = { module = "io.ktor:ktor-server-core", version = "3.2.3" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version = "3.2.3" }
@@ -40,6 +40,3 @@ kafka-clients = { module = "org.apache.kafka:kafka-clients", version = "4.0.0" }
 kafka-streams = { module = "org.apache.kafka:kafka-streams", version = "4.0.0" }
 
 kaftor = { module = "org.cufy.kaftor:kaftor", version = "0.2.2" }
-josekt = { module = "org.cufy.josekt:josekt", version = "0.1.2" }
-extkt-json = { module = "org.cufy.extkt:extkt-json", version = "0.1.4" }
-extkt-crypto = { module = "org.cufy.extkt:extkt-crypto", version = "0.1.4" }
