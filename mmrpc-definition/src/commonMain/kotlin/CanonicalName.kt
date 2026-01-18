@@ -52,6 +52,11 @@ value class CanonicalName(val value: String) : Comparable<CanonicalName> {
 
     inline val isAnonymous get() = '-' in value
 
+    /**
+     * The name stripped from all modifiers.
+     */
+    val simpleName get() = name.removePrefix("-")
+
     fun segments() = value.split(".")
     fun segmentsCount() = 1 + value.count { it == '.' }
 
