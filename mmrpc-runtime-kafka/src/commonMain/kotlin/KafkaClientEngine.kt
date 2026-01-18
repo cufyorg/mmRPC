@@ -11,6 +11,8 @@ class KafkaClientEngine(
     val producer: KafkaProducer<*, *>,
     val contentNegotiator: KafkaClientContentNegotiator =
         KafkaClientContentNegotiator.Default,
+    val interceptors: List<KafkaClientInterceptor> =
+        emptyList(),
 ) : ClientEngine.Kafka {
     override fun is0Supported() = true
 
@@ -19,11 +21,13 @@ class KafkaClientEngine(
         request: Req,
         reqSerial: KSerializer<Req>,
     ) {
-        val record = contentNegotiator.buildReq(
-            topic = canonicalName,
-            reqSerial = reqSerial,
-            request = request,
-        )
+        val record = KafkaRequestBuilder()
+            .apply {
+                topic = canonicalName
+                contentNegotiator.setReq(this, reqSerial, request)
+                interceptors.forEach { it.onReq(this, canonicalName, request) }
+            }
+            .build()
 
         withContext(Dispatchers.IO) {
             @Suppress("UNCHECKED_CAST")

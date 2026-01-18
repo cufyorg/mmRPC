@@ -10,6 +10,8 @@ class KafkaServerEngine(
     val route: KafkaRoute,
     val contentNegotiator: KafkaServerContentNegotiator =
         KafkaServerContentNegotiator.Default,
+    val interceptors: List<KafkaServerInterceptor> =
+        emptyList(),
 ) : ServerEngine.Kafka {
     override fun is0Supported() = true
 
@@ -20,6 +22,10 @@ class KafkaServerEngine(
     ) {
         route.consume(canonicalName) {
             val request = contentNegotiator.getReq(event, reqSerial)
+
+            if (!interceptors.all { it.onReq(event, canonicalName, request) })
+                return@consume
+
             handler(request)
             event.commit()
         }

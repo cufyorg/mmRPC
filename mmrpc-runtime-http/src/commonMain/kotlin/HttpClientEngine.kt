@@ -11,7 +11,9 @@ import org.cufy.mmrpc.runtime.FaultException
 class HttpClientEngine(
     val client: HttpClient,
     val contentNegotiator: HttpClientContentNegotiator =
-        HttpClientContentNegotiator.Default
+        HttpClientContentNegotiator.Default,
+    val interceptors: List<HttpClientInterceptor> =
+        emptyList(),
 ) : ClientEngine.Http {
     override fun is0Supported() = true
     override fun is1Supported() = true
@@ -24,6 +26,7 @@ class HttpClientEngine(
         client.post {
             this.url.appendPathSegments(canonicalName)
             contentNegotiator.setReq(this, reqSerial, request)
+            interceptors.forEach { it.onReq(this, canonicalName, request) }
         }
     }
 
@@ -37,9 +40,11 @@ class HttpClientEngine(
             val result = client.post {
                 this.url.appendPathSegments(canonicalName)
                 contentNegotiator.setReq(this, reqSerial, request)
+                interceptors.forEach { it.onReq(this, canonicalName, request) }
             }
 
             val response = contentNegotiator.getRes(result, resSerial)
+            interceptors.forEach { it.onRes(result, canonicalName, request, response) }
             return response
         } catch (cause: ResponseException) {
             if (cause.response.status.value in 400..<600) {
@@ -48,6 +53,8 @@ class HttpClientEngine(
                 } catch (_: Exception) {
                     throw cause
                 }
+
+                interceptors.forEach { it.onErr(cause.response, canonicalName, request, error) }
 
                 throw FaultException(
                     canonicalName = error.canonicalName,

@@ -12,6 +12,8 @@ class HttpServerEngine(
     val route: Route,
     val contentNegotiator: HttpServerContentNegotiator =
         HttpServerContentNegotiator.Default,
+    val interceptors: List<HttpServerInterceptor> =
+        emptyList(),
 ) : ServerEngine.Http {
     override fun is0Supported() = true
     override fun is1Supported() = true
@@ -23,6 +25,10 @@ class HttpServerEngine(
     ) {
         route.post(canonicalName) {
             val request = contentNegotiator.getReq(call, reqSerial)
+
+            if (!interceptors.all { it.onReq(call, canonicalName, request) })
+                return@post
+
             handler(request)
             call.respond(HttpStatusCode.OK)
         }
@@ -37,6 +43,9 @@ class HttpServerEngine(
         route.post(canonicalName) {
             val request = contentNegotiator.getReq(call, reqSerial)
 
+            if (!interceptors.all { it.onReq(call, canonicalName, request) })
+                return@post
+
             val response = try {
                 handler(request)
             } catch (e: FaultException) {
@@ -45,9 +54,15 @@ class HttpServerEngine(
                     message = e.message,
                 )
 
+                if (!interceptors.all { it.onErr(call, canonicalName, request, error) })
+                    return@post
+
                 contentNegotiator.setErr(call, error)
                 return@post
             }
+
+            if (!interceptors.all { it.onRes(call, canonicalName, request, response) })
+                return@post
 
             contentNegotiator.setRes(call, resSerial, response)
         }
