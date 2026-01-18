@@ -2,6 +2,7 @@ package org.cufy.mmrpc.gen.kotlin.common.model
 
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import net.pearx.kasechange.toCamelCase
 import org.cufy.mmrpc.Comm
@@ -344,6 +345,9 @@ fun RoutineDefinition.serverDirectRegisterFunSpec(receiver: ClassName): FunSpec 
         addParameter(
             "handler",
             LambdaTypeName.get(
+                contextParameters = listOf(
+                    typeNameOf<CoroutineScope>()
+                ),
                 parameters = listOf(
                     parameterSpec("request", request)
                 ),
@@ -354,7 +358,13 @@ fun RoutineDefinition.serverDirectRegisterFunSpec(receiver: ClassName): FunSpec 
         // Implementation
         beginControlFlow("if (engine.is%LSupported())", n)
         addStatement("%L", serverRegisterImplCode(
-            handler = CodeBlock.of("handler"),
+            handler = CodeBlock.of(
+                "%M(handler)",
+                MemberName(
+                    "org.cufy.mmrpc.runtime",
+                    "_wrap_cs"
+                ),
+            ),
         ))
         endControlFlow()
     }

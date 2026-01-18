@@ -54,7 +54,7 @@ private fun addInterface(element: ProtocolDefinition) {
         }
     }
     toplevel(target = element.namespace, name = element.nameOfServerExtFile()) {
-        // <protocol>.Companion.<routine>.invoke( handler: (Req) -> Res )
+        // <protocol>.Companion.<routine>.invoke( handler: context(CoroutineScope) (Req) -> Res )
         for (routine in regularRoutines) {
             addFunction(routine.serverDirectRegisterFunSpec(
                 receiver = element.generatedClassName()
@@ -62,7 +62,7 @@ private fun addInterface(element: ProtocolDefinition) {
             ))
         }
 
-        // <protocol>.Reflux.Companion.<routine>.invoke( handler: (Req) -> Res )
+        // <protocol>.Reflux.Companion.<routine>.invoke( handler: context(CoroutineScope) (Req) -> Res )
         for (routine in refluxRoutines) {
             addFunction(routine.serverDirectRegisterFunSpec(
                 receiver = element.generatedRefluxClassName()

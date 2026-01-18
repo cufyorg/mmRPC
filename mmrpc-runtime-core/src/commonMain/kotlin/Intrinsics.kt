@@ -1,7 +1,14 @@
 package org.cufy.mmrpc.runtime
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.serializer
+
+@Suppress("FunctionName")
+inline fun <I, O> _wrap_cs(
+    crossinline block: suspend context(CoroutineScope) (I) -> O
+): suspend (I) -> O = { coroutineScope { block(it) } }
 
 suspend inline fun <reified Req : Any> exec0(
     engine: ClientEngine,
