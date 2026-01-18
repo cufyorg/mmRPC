@@ -9,7 +9,7 @@ interface KafkaServerInterceptor {
      * @return false, to prevent handling the request.
      */
     context(engine: KafkaServerEngine)
-    fun onReq(
+    suspend fun onReq(
         ctx: KafkaEvent,
         canonicalName: String,
         request: Any,

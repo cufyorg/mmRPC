@@ -10,7 +10,7 @@ interface HttpServerInterceptor {
      * @return false, to prevent handling the request.
      */
     context(engine: HttpServerEngine)
-    fun onReq(
+    suspend fun onReq(
         ctx: ApplicationCall,
         canonicalName: String,
         request: Any,
@@ -22,7 +22,7 @@ interface HttpServerInterceptor {
      * @return false, to prevent sending the response.
      */
     context(engine: HttpServerEngine)
-    fun onRes(
+    suspend fun onRes(
         ctx: ApplicationCall,
         canonicalName: String,
         request: Any,
@@ -35,7 +35,7 @@ interface HttpServerInterceptor {
      * @return false, to prevent sending the fault.
      */
     context(engine: HttpServerEngine)
-    fun onErr(
+    suspend fun onErr(
         ctx: ApplicationCall,
         canonicalName: String,
         request: Any,

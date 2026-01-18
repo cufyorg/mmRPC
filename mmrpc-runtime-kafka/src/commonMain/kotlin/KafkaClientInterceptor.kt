@@ -5,9 +5,10 @@ interface KafkaClientInterceptor {
      * Called before sending the request.
      */
     context(engine: KafkaClientEngine)
-    fun onReq(
+    suspend fun onReq(
         ctx: KafkaRequestBuilder,
         canonicalName: String,
         request: Any,
-    )
+    ) {
+    }
 }
