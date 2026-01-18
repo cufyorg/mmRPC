@@ -44,7 +44,7 @@ fun StructDefinition.collectAllSupFields(): Sequence<FieldDefinition> {
 @ContextScope
 context(ctx: Context)
 fun StructDefinition.collectAllFields(): Sequence<FieldDefinition> {
-    return fields.asSequence() + collectAllSupFields()
+    return collectAllSupFields() + fields.asSequence()
 }
 
 ////////////////////////////////////////
