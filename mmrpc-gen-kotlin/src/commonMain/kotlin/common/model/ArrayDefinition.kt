@@ -7,15 +7,15 @@ import org.cufy.mmrpc.gen.kotlin.ContextScope
 import org.cufy.mmrpc.gen.kotlin.GenFeature
 import org.cufy.mmrpc.gen.kotlin.common.assumedPackageName
 import org.cufy.mmrpc.gen.kotlin.common.assumedSimpleNames
-import org.cufy.mmrpc.gen.kotlin.debug
 import org.cufy.mmrpc.gen.kotlin.context.Context
+import org.cufy.mmrpc.gen.kotlin.debug
 
 ////////////////////////////////////////
 
 @ContextScope
 context(ctx: Context)
 fun ArrayDefinition.isGeneratingTypealias(): Boolean {
-    if (name[0] == '-') return false
+    if (canonicalName.isAnonymous) return false
     if (namespace !in ctx.roots) return false
     return GenFeature.GENERATE_TYPES in ctx.features
 }
@@ -23,7 +23,7 @@ fun ArrayDefinition.isGeneratingTypealias(): Boolean {
 @ContextScope
 context(ctx: Context)
 fun ArrayDefinition.hasGeneratedTypealias(): Boolean {
-    if (name[0] == '-') return false
+    if (canonicalName.isAnonymous) return false
     if (namespace !in ctx.roots) return false
     return true
 }

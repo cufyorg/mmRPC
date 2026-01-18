@@ -2,6 +2,7 @@ package org.cufy.mmrpc.builder
 
 import org.cufy.mmrpc.*
 import org.cufy.mmrpc.internal.VARARG_VARIANTS_DEPRECATED_MSG
+import org.cufy.mmrpc.internal.asAnonChildOf
 
 ////////////////////////////////////////
 
@@ -30,10 +31,10 @@ class StructDefinitionBuilder :
             description = this.description,
             metadata = this.metadata.toList(),
             traits = this.traits.mapIndexed { i, it ->
-                it.get(cn, name = "trait$i")
+                it.asAnonChildOf(cn, "trait", i)
             },
             fields = this.fields.mapIndexed { i, it ->
-                it.get(cn, name = "field$i")
+                it.asAnonChildOf(cn, "field", i)
             },
         )
     }

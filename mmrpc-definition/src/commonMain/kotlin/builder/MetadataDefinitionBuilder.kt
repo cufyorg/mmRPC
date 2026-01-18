@@ -5,6 +5,7 @@ import org.cufy.mmrpc.Marker2
 import org.cufy.mmrpc.MetadataDefinition
 import org.cufy.mmrpc.Unnamed
 import org.cufy.mmrpc.internal.VARARG_VARIANTS_DEPRECATED_MSG
+import org.cufy.mmrpc.internal.asAnonChildOf
 
 ////////////////////////////////////////
 
@@ -29,7 +30,7 @@ class MetadataDefinitionBuilder :
             metadata = this.metadata.toList(),
             repeated = this.repeated,
             fields = this.fields.mapIndexed { i, it ->
-                it.get(cn, name = "field$i")
+                it.asAnonChildOf(cn, "field", i)
             },
         )
     }

@@ -4,6 +4,7 @@ import org.cufy.mmrpc.FieldDefinition
 import org.cufy.mmrpc.Marker2
 import org.cufy.mmrpc.TraitDefinition
 import org.cufy.mmrpc.Unnamed
+import org.cufy.mmrpc.internal.asAnonChildOf
 
 ////////////////////////////////////////
 
@@ -34,10 +35,10 @@ class TraitDefinitionBuilder :
             metadata = this.metadata.toList(),
             discriminator = this.discriminator,
             traits = this.traits.mapIndexed { i, it ->
-                it.get(cn, name = "trait$i")
+                it.asAnonChildOf(cn, "trait", i)
             },
             fields = this.fields.mapIndexed { i, it ->
-                it.get(cn, name = "field$i")
+                it.asAnonChildOf(cn, "field", i)
             },
         )
     }

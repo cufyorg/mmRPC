@@ -5,6 +5,7 @@ import org.cufy.mmrpc.ProtocolDefinition
 import org.cufy.mmrpc.RoutineDefinition
 import org.cufy.mmrpc.Unnamed
 import org.cufy.mmrpc.internal.VARARG_VARIANTS_DEPRECATED_MSG
+import org.cufy.mmrpc.internal.asAnonChildOf
 
 ////////////////////////////////////////
 
@@ -27,7 +28,7 @@ class ProtocolDefinitionBuilder :
             description = this.description,
             metadata = this.metadata.toList(),
             routines = this.routines.mapIndexed { i, it ->
-                it.get(cn, name = "routine$i")
+                it.asAnonChildOf(cn, "routine", i)
             }
         )
     }

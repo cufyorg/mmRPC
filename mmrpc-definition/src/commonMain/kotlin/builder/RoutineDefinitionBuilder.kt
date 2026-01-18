@@ -1,6 +1,7 @@
 package org.cufy.mmrpc.builder
 
 import org.cufy.mmrpc.*
+import org.cufy.mmrpc.internal.asAnonChildOf
 
 ////////////////////////////////////////
 
@@ -45,7 +46,7 @@ class RoutineDefinitionBuilder :
             metadata = this.metadata.toList(),
             comm = comm,
             faults = this.faults.mapIndexed { i, it ->
-                it.get(cn, name = "fault$i")
+                it.asAnonChildOf(cn, "fault", i)
             },
             input = this.input.let { blocks ->
                 if (blocks.isEmpty()) builtin.Unit

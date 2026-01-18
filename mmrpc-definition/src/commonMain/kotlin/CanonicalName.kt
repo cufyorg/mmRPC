@@ -50,6 +50,8 @@ value class CanonicalName(val value: String) : Comparable<CanonicalName> {
     inline val name get() = value.substringAfterLast(".")
     inline val namespace get() = dropLastOrNull(1)
 
+    inline val isAnonymous get() = '-' in value
+
     fun segments() = value.split(".")
     fun segmentsCount() = 1 + value.count { it == '.' }
 

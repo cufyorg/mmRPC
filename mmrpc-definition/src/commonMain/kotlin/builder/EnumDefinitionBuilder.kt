@@ -2,6 +2,7 @@ package org.cufy.mmrpc.builder
 
 import org.cufy.mmrpc.*
 import org.cufy.mmrpc.internal.VARARG_VARIANTS_DEPRECATED_MSG
+import org.cufy.mmrpc.internal.asAnonChildOf
 
 ////////////////////////////////////////
 
@@ -25,9 +26,9 @@ open class EnumDefinitionBuilder :
             description = this.description,
             metadata = this.metadata.toList(),
             type = this::type.getOrThrow()
-                .get(cn, name = "type"),
+                .asAnonChildOf(cn, "type"),
             entries = this.entries.mapIndexed { i, it ->
-                it.get(cn, name = "entry$i")
+                it.asAnonChildOf(cn, "entry", i)
             },
         )
     }
