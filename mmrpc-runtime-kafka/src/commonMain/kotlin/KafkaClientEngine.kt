@@ -9,11 +9,14 @@ import org.cufy.mmrpc.runtime.ClientEngine
 
 class KafkaClientEngine(
     val producer: KafkaProducer<*, *>,
-    val contentNegotiator: KafkaClientContentNegotiator =
-        KafkaClientContentNegotiator.Default,
-    val interceptors: List<KafkaClientInterceptor> =
-        emptyList(),
+    val contentNegotiator: KafkaClientContentNegotiator,
+    val interceptors: List<KafkaClientInterceptor>,
 ) : ClientEngine.Kafka {
+    interface Builder {
+        fun install(interceptor: KafkaClientInterceptor)
+        fun install(negotiator: KafkaClientContentNegotiator)
+    }
+
     override fun is0Supported() = true
 
     override suspend fun <Req : Any> exec0(

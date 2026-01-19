@@ -8,11 +8,15 @@ import org.cufy.mmrpc.runtime.ServerEngine
 
 class KafkaServerEngine(
     val route: KafkaRoute,
-    val contentNegotiator: KafkaServerContentNegotiator =
-        KafkaServerContentNegotiator.Default,
-    val interceptors: List<KafkaServerInterceptor> =
-        emptyList(),
+    val contentNegotiator: KafkaServerContentNegotiator,
+    val interceptors: List<KafkaServerInterceptor>,
 ) : ServerEngine.Kafka {
+    interface Builder {
+        fun install(interceptor: KafkaServerInterceptor)
+        fun install(negotiator: KafkaServerContentNegotiator)
+        fun routing(block: context(KafkaServerEngine) () -> Unit)
+    }
+
     override fun is0Supported() = true
 
     override fun <Req : Any> register0(

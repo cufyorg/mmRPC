@@ -10,11 +10,14 @@ import org.cufy.mmrpc.runtime.FaultException
 
 class HttpClientEngine(
     val client: HttpClient,
-    val contentNegotiator: HttpClientContentNegotiator =
-        HttpClientContentNegotiator.Default,
-    val interceptors: List<HttpClientInterceptor> =
-        emptyList(),
+    val contentNegotiator: HttpClientContentNegotiator,
+    val interceptors: List<HttpClientInterceptor>,
 ) : ClientEngine.Http {
+    interface Builder {
+        fun install(interceptor: HttpClientInterceptor)
+        fun install(negotiator: HttpClientContentNegotiator)
+    }
+
     override fun is0Supported() = true
     override fun is1Supported() = true
 

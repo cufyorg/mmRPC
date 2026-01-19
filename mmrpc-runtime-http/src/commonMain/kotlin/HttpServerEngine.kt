@@ -10,11 +10,15 @@ import org.cufy.mmrpc.runtime.ServerEngine
 
 class HttpServerEngine(
     val route: Route,
-    val contentNegotiator: HttpServerContentNegotiator =
-        HttpServerContentNegotiator.Default,
-    val interceptors: List<HttpServerInterceptor> =
-        emptyList(),
+    val contentNegotiator: HttpServerContentNegotiator,
+    val interceptors: List<HttpServerInterceptor>,
 ) : ServerEngine.Http {
+    interface Builder {
+        fun install(interceptor: HttpServerInterceptor)
+        fun install(negotiator: HttpServerContentNegotiator)
+        fun routing(block: context(HttpServerEngine) () -> Unit)
+    }
+
     override fun is0Supported() = true
     override fun is1Supported() = true
 
