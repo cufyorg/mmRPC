@@ -6,6 +6,10 @@ kotlinpoet = "2.2.0"
 
 java = "17"
 
+ktor = "3.2.3"
+kafka = "4.0.0"
+kaftor = "0.2.2"
+
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -33,10 +37,9 @@ kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
 
 # Runtime Dependencies
 
-ktor-server-core = { module = "io.ktor:ktor-server-core", version = "3.2.3" }
-ktor-client-core = { module = "io.ktor:ktor-client-core", version = "3.2.3" }
+ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 
-kafka-clients = { module = "org.apache.kafka:kafka-clients", version = "4.0.0" }
-kafka-streams = { module = "org.apache.kafka:kafka-streams", version = "4.0.0" }
-
-kaftor = { module = "org.cufy.kaftor:kaftor", version = "0.2.2" }
+kafka-clients = { module = "org.apache.kafka:kafka-clients", version.ref = "kafka" }
+kafka-streams = { module = "org.apache.kafka:kafka-streams", version.ref = "kafka" }
+kaftor = { module = "org.cufy.kaftor:kaftor", version.ref = "kaftor" }
