@@ -41,7 +41,7 @@ sealed interface ClientEngine {
         error("$this doesn't support: (Flow<Req>) -> Res")
     }
 
-    suspend fun <Req : Any, Res : Any> exec3(
+    fun <Req : Any, Res : Any> exec3(
         canonicalName: String,
         request: Req,
         reqSerial: KSerializer<Req>,
@@ -50,7 +50,7 @@ sealed interface ClientEngine {
         error("$this doesn't support: (Req) -> Flow<Res>")
     }
 
-    suspend fun <Req : Any, Res : Any> exec4(
+    fun <Req : Any, Res : Any> exec4(
         canonicalName: String,
         request: Flow<Req>,
         reqSerial: KSerializer<Req>,

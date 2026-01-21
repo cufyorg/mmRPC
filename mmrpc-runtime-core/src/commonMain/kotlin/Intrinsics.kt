@@ -48,7 +48,7 @@ suspend inline fun <reified Req : Any, reified Res : Any> exec2(
     )
 }
 
-suspend inline fun <reified Req : Any, reified Res : Any> exec3(
+inline fun <reified Req : Any, reified Res : Any> exec3(
     engine: ClientEngine,
     canonicalName: String,
     request: Req,
@@ -61,7 +61,7 @@ suspend inline fun <reified Req : Any, reified Res : Any> exec3(
     )
 }
 
-suspend inline fun <reified Req : Any, reified Res : Any> exec4(
+inline fun <reified Req : Any, reified Res : Any> exec4(
     engine: ClientEngine,
     canonicalName: String,
     request: Flow<Req>,
@@ -115,7 +115,7 @@ inline fun <reified Req : Any, reified Res : Any> register2(
 context(engine: ServerEngine)
 inline fun <reified Req : Any, reified Res : Any> register3(
     canonicalName: String,
-    noinline handler: suspend (Req) -> Flow<Res>,
+    noinline handler: (Req) -> Flow<Res>,
 ) {
     engine.register3(
         canonicalName = canonicalName,
@@ -128,7 +128,7 @@ inline fun <reified Req : Any, reified Res : Any> register3(
 context(engine: ServerEngine)
 inline fun <reified Req : Any, reified Res : Any> register4(
     canonicalName: String,
-    noinline handler: suspend (Flow<Req>) -> Flow<Res>,
+    noinline handler: (Flow<Req>) -> Flow<Res>,
 ) {
     engine.register4(
         canonicalName = canonicalName,

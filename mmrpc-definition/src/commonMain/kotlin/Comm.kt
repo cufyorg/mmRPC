@@ -10,10 +10,10 @@ enum class Comm(val input: Shape, val output: Shape) {
     UnaryVoid(Shape.Unary, Shape.Void),
     /** Traditional single Request-Response */
     UnaryUnary(Shape.Unary, Shape.Unary),
-    /** Stream responses started by a single request */
-    UnaryStream(Shape.Unary, Shape.Stream),
     /** Stream requests finished by a single response */
     StreamUnary(Shape.Stream, Shape.Unary),
+    /** Stream responses started by a single request */
+    UnaryStream(Shape.Unary, Shape.Stream),
     /** Bidi Streaming */
     StreamStream(Shape.Stream, Shape.Stream);
 

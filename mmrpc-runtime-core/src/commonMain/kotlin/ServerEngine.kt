@@ -45,7 +45,7 @@ interface ServerEngine {
         canonicalName: String,
         reqSerial: KSerializer<Req>,
         resSerial: KSerializer<Res>,
-        handler: suspend (Req) -> Flow<Res>,
+        handler: (Req) -> Flow<Res>,
     ) {
         error("$this doesn't support: (Req) -> Flow<Res>")
     }
@@ -54,7 +54,7 @@ interface ServerEngine {
         canonicalName: String,
         reqSerial: KSerializer<Req>,
         resSerial: KSerializer<Res>,
-        handler: suspend (Flow<Req>) -> Flow<Res>,
+        handler: (Flow<Req>) -> Flow<Res>,
     ) {
         error("$this doesn't support: (Flow<Req>) -> Flow<Res>")
     }

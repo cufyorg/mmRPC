@@ -50,33 +50,39 @@ context(_: Context)
 fun RoutineDefinition.abstractFunSpec(): FunSpec {
     val request: TypeName
     val response: TypeName
+    val isSuspend: Boolean
 
     when (comm) {
         Comm.VoidUnary -> {
             request = output.className()
             response = UNIT
+            isSuspend = true
         }
 
         Comm.UnaryVoid -> {
             request = input.className()
             response = UNIT
+            isSuspend = true
         }
 
         Comm.UnaryUnary -> {
             request = input.className()
             response = output.className()
-        }
-
-        Comm.UnaryStream -> {
-            request = input.className()
-            response = Flow::class.asClassName()
-                .parameterizedBy(output.className())
+            isSuspend = true
         }
 
         Comm.StreamUnary -> {
             request = Flow::class.asClassName()
                 .parameterizedBy(input.className())
             response = output.className()
+            isSuspend = true
+        }
+
+        Comm.UnaryStream -> {
+            request = input.className()
+            response = Flow::class.asClassName()
+                .parameterizedBy(output.className())
+            isSuspend = false
         }
 
         Comm.StreamStream,
@@ -85,11 +91,13 @@ fun RoutineDefinition.abstractFunSpec(): FunSpec {
                 .parameterizedBy(input.className())
             response = Flow::class.asClassName()
                 .parameterizedBy(output.className())
+            isSuspend = false
         }
     }
 
     return funSpec(nameOfFunction()) {
-        addModifiers(KModifier.ABSTRACT, KModifier.SUSPEND)
+        addModifiers(KModifier.ABSTRACT)
+        if (isSuspend) addModifiers(KModifier.SUSPEND)
         addKdoc(createKdocCode(this@abstractFunSpec))
         addParameter("request", request)
         returns(response)
@@ -101,38 +109,44 @@ context(_: Context)
 fun RoutineDefinition.clientExecImplFunSpec(): FunSpec {
     val request: TypeName
     val response: TypeName
+    val isSuspend: Boolean
     val n: Int // function overload number
 
     when (comm) {
         Comm.VoidUnary -> {
             request = output.className()
             response = UNIT
+            isSuspend = true
             n = 0
         }
 
         Comm.UnaryVoid -> {
             request = input.className()
             response = UNIT
+            isSuspend = true
             n = 0
         }
 
         Comm.UnaryUnary -> {
             request = input.className()
             response = output.className()
+            isSuspend = true
             n = 1
-        }
-
-        Comm.UnaryStream -> {
-            request = input.className()
-            response = Flow::class.asClassName()
-                .parameterizedBy(output.className())
-            n = 2
         }
 
         Comm.StreamUnary -> {
             request = Flow::class.asClassName()
                 .parameterizedBy(input.className())
             response = output.className()
+            isSuspend = true
+            n = 2
+        }
+
+        Comm.UnaryStream -> {
+            request = input.className()
+            response = Flow::class.asClassName()
+                .parameterizedBy(output.className())
+            isSuspend = false
             n = 3
         }
 
@@ -142,12 +156,14 @@ fun RoutineDefinition.clientExecImplFunSpec(): FunSpec {
                 .parameterizedBy(input.className())
             response = Flow::class.asClassName()
                 .parameterizedBy(output.className())
+            isSuspend = false
             n = 4
         }
     }
 
     return funSpec(nameOfFunction()) {
-        addModifiers(KModifier.OVERRIDE, KModifier.SUSPEND)
+        addModifiers(KModifier.OVERRIDE)
+        if (isSuspend) addModifiers(KModifier.SUSPEND)
 
         addParameter("request", request)
         returns(response)
@@ -207,11 +223,11 @@ fun RoutineDefinition.serverRegisterImplCode(handler: CodeBlock): CodeBlock {
             n = 1
         }
 
-        Comm.UnaryStream -> {
+        Comm.StreamUnary -> {
             n = 2
         }
 
-        Comm.StreamUnary -> {
+        Comm.UnaryStream -> {
             n = 3
         }
 
@@ -237,27 +253,32 @@ context(_: Context)
 fun RoutineDefinition.clientFlatInputExecFunSpec(receiver: ClassName): FunSpec {
     val request: StructDefinition
     val response: TypeName
+    val isSuspend: Boolean
 
     when (comm) {
         Comm.VoidUnary -> {
             request = output
             response = UNIT
+            isSuspend = true
         }
 
         Comm.UnaryVoid -> {
             request = input
             response = UNIT
+            isSuspend = true
         }
 
         Comm.UnaryUnary -> {
             request = input
             response = output.className()
+            isSuspend = true
         }
 
         Comm.UnaryStream -> {
             request = input
             response = Flow::class.asClassName()
                 .parameterizedBy(output.className())
+            isSuspend = false
         }
 
         Comm.StreamUnary,
@@ -266,7 +287,7 @@ fun RoutineDefinition.clientFlatInputExecFunSpec(receiver: ClassName): FunSpec {
     }
 
     return funSpec(nameOfFunction()) {
-        addModifiers(KModifier.SUSPEND)
+        if (isSuspend) addModifiers(KModifier.SUSPEND)
         receiver(receiver)
 
         val fields = request.collectAllFields()
@@ -293,32 +314,29 @@ context(_: Context)
 fun RoutineDefinition.serverDirectRegisterFunSpec(receiver: ClassName): FunSpec {
     val request: TypeName
     val response: TypeName
+    val isSuspend: Boolean
     val n: Int // function overload number
 
     when (comm) {
         Comm.VoidUnary -> {
             request = output.className()
             response = UNIT
+            isSuspend = true
             n = 0
         }
 
         Comm.UnaryVoid -> {
             request = input.className()
             response = UNIT
+            isSuspend = true
             n = 0
         }
 
         Comm.UnaryUnary -> {
             request = input.className()
             response = output.className()
+            isSuspend = true
             n = 1
-        }
-
-        Comm.UnaryStream -> {
-            request = input.className()
-            response = Flow::class.asClassName()
-                .parameterizedBy(output.className())
-            n = 2
         }
 
         Comm.StreamUnary,
@@ -326,6 +344,15 @@ fun RoutineDefinition.serverDirectRegisterFunSpec(receiver: ClassName): FunSpec 
             request = Flow::class.asClassName()
                 .parameterizedBy(input.className())
             response = output.className()
+            isSuspend = true
+            n = 2
+        }
+
+        Comm.UnaryStream -> {
+            request = input.className()
+            response = Flow::class.asClassName()
+                .parameterizedBy(output.className())
+            isSuspend = false
             n = 3
         }
 
@@ -335,6 +362,7 @@ fun RoutineDefinition.serverDirectRegisterFunSpec(receiver: ClassName): FunSpec 
                 .parameterizedBy(input.className())
             response = Flow::class.asClassName()
                 .parameterizedBy(output.className())
+            isSuspend = false
             n = 4
         }
     }
@@ -352,20 +380,24 @@ fun RoutineDefinition.serverDirectRegisterFunSpec(receiver: ClassName): FunSpec 
                     parameterSpec("request", request)
                 ),
                 returnType = response,
-            ).copy(suspending = true)
+            ).copy(suspending = isSuspend)
         )
 
         // Implementation
         beginControlFlow("if (engine.is%LSupported())", n)
-        addStatement("%L", serverRegisterImplCode(
-            handler = CodeBlock.of(
-                "%M(handler)",
-                MemberName(
-                    "org.cufy.mmrpc.runtime",
-                    "_wrap_cs"
+        if (isSuspend) {
+            addStatement("%L", serverRegisterImplCode(
+                handler = CodeBlock.of(
+                    "%M(handler)",
+                    MemberName(
+                        "org.cufy.mmrpc.runtime",
+                        "_wrap_cs"
+                    ),
                 ),
-            ),
-        ))
+            ))
+        } else {
+            addStatement("%L", serverRegisterImplCode(CodeBlock.of("handler")))
+        }
         endControlFlow()
     }
 }
