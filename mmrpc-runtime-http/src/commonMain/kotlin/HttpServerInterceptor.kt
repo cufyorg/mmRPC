@@ -1,6 +1,7 @@
 package org.cufy.mmrpc.runtime.http
 
 import io.ktor.server.application.*
+import org.cufy.mmrpc.runtime.ExperimentalMmrpcApi
 import org.cufy.mmrpc.runtime.FaultObject
 
 interface HttpServerInterceptor {
@@ -9,6 +10,7 @@ interface HttpServerInterceptor {
      *
      * @return false, to prevent handling the request.
      */
+    @ExperimentalMmrpcApi
     context(engine: HttpServerEngine)
     suspend fun onReq(
         ctx: ApplicationCall,
@@ -21,6 +23,7 @@ interface HttpServerInterceptor {
      *
      * @return false, to prevent sending the response.
      */
+    @ExperimentalMmrpcApi
     context(engine: HttpServerEngine)
     suspend fun onRes(
         ctx: ApplicationCall,
@@ -34,6 +37,7 @@ interface HttpServerInterceptor {
      *
      * @return false, to prevent sending the fault.
      */
+    @ExperimentalMmrpcApi
     context(engine: HttpServerEngine)
     suspend fun onErr(
         ctx: ApplicationCall,

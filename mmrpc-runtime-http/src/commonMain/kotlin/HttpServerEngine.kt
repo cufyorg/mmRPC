@@ -4,17 +4,21 @@ import io.ktor.http.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.KSerializer
+import org.cufy.mmrpc.runtime.ExperimentalMmrpcApi
 import org.cufy.mmrpc.runtime.FaultException
 import org.cufy.mmrpc.runtime.FaultObject
 import org.cufy.mmrpc.runtime.ServerEngine
 
-class HttpServerEngine(
+@OptIn(ExperimentalMmrpcApi::class)
+class HttpServerEngine @ExperimentalMmrpcApi constructor(
     val route: Route,
     val contentNegotiator: HttpServerContentNegotiator,
     val interceptors: List<HttpServerInterceptor>,
 ) : ServerEngine.Http {
     interface Builder {
+        @ExperimentalMmrpcApi
         fun install(interceptor: HttpServerInterceptor)
+        @ExperimentalMmrpcApi
         fun install(negotiator: HttpServerContentNegotiator)
         fun routing(block: context(HttpServerEngine) () -> Unit)
     }

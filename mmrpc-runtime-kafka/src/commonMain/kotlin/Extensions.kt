@@ -3,8 +3,10 @@ package org.cufy.mmrpc.runtime.kafka
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.cufy.kaftor.KafkaRoute
 import org.cufy.kaftor.utils.dsl.KaftorDsl
+import org.cufy.mmrpc.runtime.ExperimentalMmrpcApi
 
 @KaftorDsl
+@OptIn(ExperimentalMmrpcApi::class)
 context(route: KafkaRoute)
 fun mmrpc(block: KafkaServerEngine.Builder.() -> Unit) {
     // Just a reminder: engines in mmrpc are just thin wrappers
@@ -42,6 +44,7 @@ fun mmrpc(block: KafkaServerEngine.Builder.() -> Unit) {
     }
 }
 
+@OptIn(ExperimentalMmrpcApi::class)
 fun KafkaProducer<*, *>.mmrpc(block: KafkaClientEngine.Builder.() -> Unit = {}): KafkaClientEngine {
     // Just a reminder: engines in mmrpc are just thin wrappers
 

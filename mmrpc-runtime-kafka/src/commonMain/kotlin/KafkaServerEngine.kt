@@ -4,15 +4,19 @@ import kotlinx.serialization.KSerializer
 import org.cufy.kaftor.KafkaRoute
 import org.cufy.kaftor.commit
 import org.cufy.kaftor.consume
+import org.cufy.mmrpc.runtime.ExperimentalMmrpcApi
 import org.cufy.mmrpc.runtime.ServerEngine
 
-class KafkaServerEngine(
+@OptIn(ExperimentalMmrpcApi::class)
+class KafkaServerEngine @ExperimentalMmrpcApi constructor(
     val route: KafkaRoute,
     val contentNegotiator: KafkaServerContentNegotiator,
     val interceptors: List<KafkaServerInterceptor>,
 ) : ServerEngine.Kafka {
     interface Builder {
+        @ExperimentalMmrpcApi
         fun install(interceptor: KafkaServerInterceptor)
+        @ExperimentalMmrpcApi
         fun install(negotiator: KafkaServerContentNegotiator)
         fun routing(block: context(KafkaServerEngine) () -> Unit)
     }

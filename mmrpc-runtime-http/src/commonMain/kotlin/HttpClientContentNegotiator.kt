@@ -5,14 +5,19 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
+import org.cufy.mmrpc.runtime.ExperimentalMmrpcApi
 import org.cufy.mmrpc.runtime.FaultObject
 
 interface HttpClientContentNegotiator {
+    @ExperimentalMmrpcApi
     suspend fun <Req> setReq(ctx: HttpRequestBuilder, reqSerial: KSerializer<Req>, request: Req)
+    @ExperimentalMmrpcApi
     suspend fun <Res> getRes(ctx: HttpResponse, resSerial: KSerializer<Res>): Res
-    suspend fun getErr(ctx: HttpResponse): FaultObject
+    @ExperimentalMmrpcApi
+    suspend fun getErr(ctx: HttpResponse): FaultObject?
 
     object Default : HttpClientContentNegotiator {
+        @OptIn(ExperimentalMmrpcApi::class)
         override suspend fun <Req> setReq(
             ctx: HttpRequestBuilder,
             reqSerial: KSerializer<Req>,
@@ -23,6 +28,7 @@ interface HttpClientContentNegotiator {
             ctx.setBody(reqStr)
         }
 
+        @OptIn(ExperimentalMmrpcApi::class)
         override suspend fun <Res> getRes(
             ctx: HttpResponse,
             resSerial: KSerializer<Res>
@@ -37,14 +43,15 @@ interface HttpClientContentNegotiator {
             }
         }
 
-        override suspend fun getErr(ctx: HttpResponse): FaultObject {
-            when (val type = ctx.headers[HttpHeaders.ContentType]) {
+        @OptIn(ExperimentalMmrpcApi::class)
+        override suspend fun getErr(ctx: HttpResponse): FaultObject? {
+            return when (ctx.headers[HttpHeaders.ContentType]) {
                 "application/json" -> {
                     val errStr = ctx.bodyAsText()
-                    return Json.decodeFromString<FaultObject>(errStr)
+                    Json.decodeFromString<FaultObject>(errStr)
                 }
 
-                else -> error("Unsupported Content Type: $type")
+                else -> null
             }
         }
     }

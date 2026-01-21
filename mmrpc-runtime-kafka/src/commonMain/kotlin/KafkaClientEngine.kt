@@ -6,14 +6,18 @@ import kotlinx.serialization.KSerializer
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.cufy.mmrpc.runtime.ClientEngine
+import org.cufy.mmrpc.runtime.ExperimentalMmrpcApi
 
-class KafkaClientEngine(
+@OptIn(ExperimentalMmrpcApi::class)
+class KafkaClientEngine @ExperimentalMmrpcApi constructor(
     val producer: KafkaProducer<*, *>,
     val contentNegotiator: KafkaClientContentNegotiator,
     val interceptors: List<KafkaClientInterceptor>,
 ) : ClientEngine.Kafka {
     interface Builder {
+        @ExperimentalMmrpcApi
         fun install(interceptor: KafkaClientInterceptor)
+        @ExperimentalMmrpcApi
         fun install(negotiator: KafkaClientContentNegotiator)
     }
 

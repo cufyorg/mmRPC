@@ -6,15 +6,19 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.serialization.KSerializer
 import org.cufy.mmrpc.runtime.ClientEngine
+import org.cufy.mmrpc.runtime.ExperimentalMmrpcApi
 import org.cufy.mmrpc.runtime.FaultException
 
-class HttpClientEngine(
+@OptIn(ExperimentalMmrpcApi::class)
+class HttpClientEngine @ExperimentalMmrpcApi constructor(
     val client: HttpClient,
     val contentNegotiator: HttpClientContentNegotiator,
     val interceptors: List<HttpClientInterceptor>,
 ) : ClientEngine.Http {
     interface Builder {
+        @ExperimentalMmrpcApi
         fun install(interceptor: HttpClientInterceptor)
+        @ExperimentalMmrpcApi
         fun install(negotiator: HttpClientContentNegotiator)
     }
 
@@ -39,20 +43,17 @@ class HttpClientEngine(
         reqSerial: KSerializer<Req>,
         resSerial: KSerializer<Res>,
     ): Res {
-        try {
-            val result = client.post {
+        val result = try {
+            client.post {
                 this.url.appendPathSegments(canonicalName)
                 contentNegotiator.setReq(this, reqSerial, request)
                 interceptors.forEach { it.onReq(this, canonicalName, request) }
             }
-
-            val response = contentNegotiator.getRes(result, resSerial)
-            interceptors.forEach { it.onRes(result, canonicalName, request, response) }
-            return response
         } catch (cause: ResponseException) {
             if (cause.response.status.value in 400..<600) {
                 val error = try {
                     contentNegotiator.getErr(cause.response)
+                        ?: throw cause
                 } catch (_: Exception) {
                     throw cause
                 }
@@ -68,5 +69,9 @@ class HttpClientEngine(
 
             throw cause
         }
+
+        val response = contentNegotiator.getRes(result, resSerial)
+        interceptors.forEach { it.onRes(result, canonicalName, request, response) }
+        return response
     }
 }

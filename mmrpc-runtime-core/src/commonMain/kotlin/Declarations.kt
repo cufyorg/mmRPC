@@ -2,6 +2,9 @@ package org.cufy.mmrpc.runtime
 
 import kotlinx.serialization.Serializable
 
+@RequiresOptIn
+annotation class ExperimentalMmrpcApi
+
 open class FaultException(
     val canonicalName: String,
     message: String? = null,

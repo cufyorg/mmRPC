@@ -3,8 +3,10 @@ package org.cufy.mmrpc.runtime.http
 import io.ktor.client.*
 import io.ktor.server.routing.*
 import io.ktor.utils.io.*
+import org.cufy.mmrpc.runtime.ExperimentalMmrpcApi
 
 @KtorDsl
+@OptIn(ExperimentalMmrpcApi::class)
 context(route: Route)
 fun mmrpc(block: HttpServerEngine.Builder.() -> Unit) {
     // Just a reminder: engines in mmrpc are just thin wrappers
@@ -42,6 +44,7 @@ fun mmrpc(block: HttpServerEngine.Builder.() -> Unit) {
     }
 }
 
+@OptIn(ExperimentalMmrpcApi::class)
 fun HttpClient.mmrpc(block: HttpClientEngine.Builder.() -> Unit = {}): HttpClientEngine {
     // Just a reminder: engines in mmrpc are just thin wrappers
 
