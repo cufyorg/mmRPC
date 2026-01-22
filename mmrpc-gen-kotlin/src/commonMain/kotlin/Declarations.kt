@@ -52,6 +52,16 @@ enum class GenFeature {
     GENERATE_PROTOCOLS,
 
     /**
+     * Include element description in kdoc.
+     */
+    KDOC_DESCRIPTION,
+
+    /**
+     * Include element signature in kdoc.
+     */
+    KDOC_SIGNATURE,
+
+    /**
      * Keep original type class names.
      */
     KEEP_TYPE_CLASS_NAMES,

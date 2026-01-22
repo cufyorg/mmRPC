@@ -91,6 +91,9 @@ open class MmrpcExtension {
         fun generateTypes() { features += GenFeature.GENERATE_TYPES }
         fun generateProtocols() { features += GenFeature.GENERATE_PROTOCOLS }
 
+        fun kdocDescription() { features += GenFeature.KDOC_DESCRIPTION }
+        fun kdocSignature() { features += GenFeature.KDOC_SIGNATURE }
+
         fun keepTypeClassNames() { features += GenFeature.KEEP_TYPE_CLASS_NAMES }
         fun keepFaultClassNames() { features += GenFeature.KEEP_FAULT_CLASS_NAMES }
         fun keepProtocolClassNames() { features += GenFeature.KEEP_PROTOCOL_CLASS_NAMES }
