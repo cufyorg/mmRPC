@@ -12,10 +12,9 @@ package org.cufy.mmrpc.runtime
  * - Supporting flows of requests and responses.
  * - Capability to handle various interaction styles, such as request-response and streaming.
  */
-abstract class FdxClientEngine : ClientEngine {
-    final override fun is0Supported() = true
-    final override fun is1Supported() = true
-    final override fun is2Supported() = true
-    final override fun is3Supported() = true
-    final override fun is4Supported() = true
-}
+abstract class FdxClientEngine :
+    ClientEngine.N0,
+    ClientEngine.N1,
+    ClientEngine.N2,
+    ClientEngine.N3,
+    ClientEngine.N4

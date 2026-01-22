@@ -13,10 +13,10 @@ import org.cufy.mmrpc.gen.kotlin.util.*
 import org.cufy.mmrpc.runtime.SxClientEngine
 import org.cufy.mmrpc.runtime.SxServerEngine
 
-private const val INTEG_NAME = Names.SX
+private const val INTEG_NAME = Names.SX_REFLUX
 
 context(ctx: Context, _: FailScope, _: InitStage)
-fun doProtocolSxGen() {
+fun doProtocolSxRefluxGen() {
     for (element in ctx.elements) {
         if (element !is ProtocolDefinition) continue
         if (!element.isGeneratingClass()) continue
@@ -30,21 +30,21 @@ fun doProtocolSxGen() {
 @OptIn(ExperimentalKotlinPoetApi::class)
 context(ctx: Context, _: InitStage)
 private fun apply(element: ProtocolDefinition) {
-    if (element.routines.none { it.comm == Comms.N0 })
+    if (element.routines.none { it.comm == Comms.N0R })
         return
 
-    inject<TypeSpec.Builder>(target = element.canonicalName) {
+    inject<TypeSpec.Builder>(target = element.refluxCanonicalName) {
         addSuperinterface(element.generatedIntegClassName(INTEG_NAME))
     }
     toplevel(target = element.namespace, name = element.nameOfMainFile()) {
         addType(interfaceSpec(element.nameOfIntegClass(INTEG_NAME)) {
-            addSuperinterface(element.generatedBaseClassName(Names.N0))
+            addSuperinterface(element.generatedBaseClassName(Names.N0R))
         })
     }
     toplevel(target = element.namespace, name = element.nameOfStubFile()) {
         addType(classSpec(element.nameOfIntegStubClass(INTEG_NAME)) {
             addSuperinterface(element.generatedIntegClassName(INTEG_NAME))
-            addSuperinterface(element.generatedBaseStubClassName(Names.N0))
+            addSuperinterface(element.generatedBaseStubClassName(Names.N0R))
 
             primaryConstructor(constructorSpec {
                 addParameter("engine", SxClientEngine::class)
@@ -56,18 +56,18 @@ private fun apply(element: ProtocolDefinition) {
         })
     }
     toplevel(target = element.namespace, name = element.nameOfServerExtFile()) {
-        // SxServerEngine.register( impl: <sx-protocol> )
+        // SxServerEngine.register( impl: <sx-reflux-protocol> )
         addFunction(funSpec("register") {
             contextParameter("_", SxServerEngine::class)
             addParameter("impl", element.generatedIntegClassName(INTEG_NAME))
-            addCode("register0(impl)")
+            addStatement("register0(impl)")
         })
     }
     toplevel(target = element.namespace, name = element.nameOfClientExtFile()) {
-        // <protocol>.Companion.invoke( engine: SxClientEngine ): <sx-protocol>
+        // <protocol>.Reflux.Companion.invoke( engine: SxClientEngine ): <sx-reflux-protocol>
         addFunction(funSpec("invoke") {
             addModifiers(KModifier.OPERATOR)
-            receiver(element.generatedClassName().nestedClass("Companion"))
+            receiver(element.generatedRefluxClassName().nestedClass("Companion"))
             addParameter("engine", SxClientEngine::class)
             returns(element.generatedIntegClassName(INTEG_NAME))
             addStatement(

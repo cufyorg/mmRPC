@@ -1,25 +1,17 @@
 package org.cufy.mmrpc.gen.kotlin.common.model
 
 import com.squareup.kotlinpoet.*
-import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
-import kotlinx.coroutines.flow.Flow
 import net.pearx.kasechange.toCamelCase
-import org.cufy.mmrpc.Comm
 import org.cufy.mmrpc.RoutineDefinition
-import org.cufy.mmrpc.StructDefinition
 import org.cufy.mmrpc.gen.kotlin.ContextScope
 import org.cufy.mmrpc.gen.kotlin.GenFeature
 import org.cufy.mmrpc.gen.kotlin.common.assumedPackageName
 import org.cufy.mmrpc.gen.kotlin.common.assumedSimpleNames
-import org.cufy.mmrpc.gen.kotlin.common.code.createKdocCode
 import org.cufy.mmrpc.gen.kotlin.common.hasGeneratedClass
-import org.cufy.mmrpc.gen.kotlin.common.typeName
 import org.cufy.mmrpc.gen.kotlin.context.Context
 import org.cufy.mmrpc.gen.kotlin.debug
 import org.cufy.mmrpc.gen.kotlin.util.createCall
-import org.cufy.mmrpc.gen.kotlin.util.funSpec
 import org.cufy.mmrpc.runtime.FaultException
-import org.cufy.mmrpc.runtime.ServerEngine
 
 ////////////////////////////////////////
 
@@ -45,146 +37,58 @@ fun RoutineDefinition.generatedClassName(): ClassName {
 
 @ContextScope
 context(_: Context)
-fun RoutineDefinition.abstractFunSpec(): FunSpec {
-    val request: TypeName
-    val response: TypeName
-    val isSuspend: Boolean
-
-    when (comm) {
-        Comm.VoidUnary -> {
-            request = output.className()
-            response = UNIT
-            isSuspend = true
-        }
-
-        Comm.UnaryVoid -> {
-            request = input.className()
-            response = UNIT
-            isSuspend = true
-        }
-
-        Comm.UnaryUnary -> {
-            request = input.className()
-            response = output.className()
-            isSuspend = true
-        }
-
-        Comm.StreamUnary -> {
-            request = Flow::class.asClassName()
-                .parameterizedBy(input.className())
-            response = output.className()
-            isSuspend = true
-        }
-
-        Comm.UnaryStream -> {
-            request = input.className()
-            response = Flow::class.asClassName()
-                .parameterizedBy(output.className())
-            isSuspend = false
-        }
-
-        Comm.StreamStream,
-        -> {
-            request = Flow::class.asClassName()
-                .parameterizedBy(input.className())
-            response = Flow::class.asClassName()
-                .parameterizedBy(output.className())
-            isSuspend = false
-        }
-    }
-
-    return funSpec(nameOfFunction()) {
-        addModifiers(KModifier.ABSTRACT)
-        if (isSuspend) addModifiers(KModifier.SUSPEND)
-        addKdoc(createKdocCode(this@abstractFunSpec))
-        addParameter("request", request)
-        returns(response)
-    }
+fun RoutineDefinition.serverRegisterCode(
+    register: MemberName,
+    handler: CodeBlock,
+): CodeBlock {
+    return CodeBlock.of(
+        "%M(%T.CANONICAL_NAME, %L)",
+        register,
+        generatedClassName(),
+        handler,
+    )
 }
 
 @ContextScope
 context(_: Context)
-fun RoutineDefinition.clientExecImplFunSpec(): FunSpec {
-    val request: TypeName
-    val response: TypeName
-    val isSuspend: Boolean
-    val n: Int // function overload number
-
-    when (comm) {
-        Comm.VoidUnary -> {
-            request = output.className()
-            response = UNIT
-            isSuspend = true
-            n = 0
-        }
-
-        Comm.UnaryVoid -> {
-            request = input.className()
-            response = UNIT
-            isSuspend = true
-            n = 0
-        }
-
-        Comm.UnaryUnary -> {
-            request = input.className()
-            response = output.className()
-            isSuspend = true
-            n = 1
-        }
-
-        Comm.StreamUnary -> {
-            request = Flow::class.asClassName()
-                .parameterizedBy(input.className())
-            response = output.className()
-            isSuspend = true
-            n = 2
-        }
-
-        Comm.UnaryStream -> {
-            request = input.className()
-            response = Flow::class.asClassName()
-                .parameterizedBy(output.className())
-            isSuspend = false
-            n = 3
-        }
-
-        Comm.StreamStream,
-        -> {
-            request = Flow::class.asClassName()
-                .parameterizedBy(input.className())
-            response = Flow::class.asClassName()
-                .parameterizedBy(output.className())
-            isSuspend = false
-            n = 4
-        }
+fun RoutineDefinition.serverDirectRegisterCode(
+    condition: CodeBlock,
+    register: MemberName,
+    wrap: MemberName,
+    handler: CodeBlock,
+): CodeBlock {
+    return buildCodeBlock {
+        beginControlFlow("if (%L)", condition)
+        addStatement(
+            "%M(%T.CANONICAL_NAME, %M(%L))",
+            register,
+            generatedClassName(),
+            wrap,
+            handler,
+        )
+        endControlFlow()
     }
+}
 
-    return funSpec(nameOfFunction()) {
-        addModifiers(KModifier.OVERRIDE)
-        if (isSuspend) addModifiers(KModifier.SUSPEND)
+////////////////////////////////////////
 
-        addParameter("request", request)
-        returns(response)
-
-        // Implementation
+@ContextScope
+context(_: Context)
+fun RoutineDefinition.clientStubImplCode(
+    engine: CodeBlock,
+    exec: MemberName,
+): CodeBlock {
+    return buildCodeBlock {
         if (faults.isEmpty()) {
             addStatement(
-                "♢return %M(this.engine, %T.CANONICAL_NAME, request)",
-                MemberName(
-                    packageName = "org.cufy.mmrpc.runtime.internal",
-                    simpleName = "exec$n",
-                ),
-                generatedClassName(),
+                "♢return %M(%L, %T.CANONICAL_NAME, request)",
+                exec, engine, generatedClassName(),
             )
         } else {
             beginControlFlow("try")
             addStatement(
-                "return %M(this.engine, %T.CANONICAL_NAME, request)",
-                MemberName(
-                    packageName = "org.cufy.mmrpc.runtime.internal",
-                    simpleName = "exec$n",
-                ),
-                generatedClassName(),
+                "return %M(%L, %T.CANONICAL_NAME, request)",
+                exec, engine, generatedClassName(),
             )
             endControlFlow()
             beginControlFlow("catch (e: %T)", FaultException::class)
@@ -205,169 +109,17 @@ fun RoutineDefinition.clientExecImplFunSpec(): FunSpec {
 
 @ContextScope
 context(_: Context)
-fun RoutineDefinition.serverRegisterImplCode(handler: CodeBlock): CodeBlock {
-    val n: Int // function overload number
-
-    when (comm) {
-        Comm.VoidUnary -> {
-            n = 0
-        }
-
-        Comm.UnaryVoid -> {
-            n = 0
-        }
-
-        Comm.UnaryUnary -> {
-            n = 1
-        }
-
-        Comm.StreamUnary -> {
-            n = 2
-        }
-
-        Comm.UnaryStream -> {
-            n = 3
-        }
-
-        Comm.StreamStream,
-        -> {
-            n = 4
-        }
-    }
-
-    return CodeBlock.of(
-        "%M(%T.CANONICAL_NAME, %L)",
-        MemberName(
-            packageName = "org.cufy.mmrpc.runtime.internal",
-            simpleName = "register$n",
-        ),
-        generatedClassName(),
-        handler,
-    )
-}
-
-@ContextScope
-context(_: Context)
-fun RoutineDefinition.clientFlatInputExecFunSpec(receiver: ClassName): FunSpec {
-    val request: StructDefinition
-    val response: TypeName
-    val isSuspend: Boolean
-
-    when (comm) {
-        Comm.VoidUnary -> {
-            request = output
-            response = UNIT
-            isSuspend = true
-        }
-
-        Comm.UnaryVoid -> {
-            request = input
-            response = UNIT
-            isSuspend = true
-        }
-
-        Comm.UnaryUnary -> {
-            request = input
-            response = output.className()
-            isSuspend = true
-        }
-
-        Comm.UnaryStream -> {
-            request = input
-            response = Flow::class.asClassName()
-                .parameterizedBy(output.className())
-            isSuspend = false
-        }
-
-        Comm.StreamUnary,
-        Comm.StreamStream,
-        -> error("Cannot create shortcut function for routines with stream input")
-    }
-
-    return funSpec(nameOfFunction()) {
-        if (isSuspend) addModifiers(KModifier.SUSPEND)
-        receiver(receiver)
-
-        val fields = request.collectAllFields()
-        fields.forEach { field ->
-            val name = field.nameOfProperty()
-            addParameter(name, field.type.typeName())
-        }
-        returns(response)
-
-        // Implementation
+fun RoutineDefinition.clientFlatImplCode(
+    request: TypeName,
+    fields: List<String>,
+): CodeBlock {
+    return buildCodeBlock {
         addStatement("♢return %L(\n⇥%L⇤\n)", nameOfFunction(), createCall(
-            function = CodeBlock.of("%T", request.className()),
-            parameters = fields.associate {
-                val name = it.nameOfProperty()
-                name to CodeBlock.of(name)
-            }
+            function = CodeBlock.of("%T", request),
+            parameters = fields.associateWith {
+                CodeBlock.of(it)
+            },
         ))
-    }
-}
-
-@OptIn(ExperimentalKotlinPoetApi::class)
-@ContextScope
-context(_: Context)
-fun RoutineDefinition.serverDirectRegisterFunSpec(receiver: ClassName): FunSpec {
-    val lambda: TypeName
-    val n: Int // function overload number
-
-    when (comm) {
-        Comm.VoidUnary -> {
-            lambda = ClassName("org.cufy.mmrpc.runtime.internal", "WrapHandler0")
-                .parameterizedBy(output.className())
-            n = 0
-        }
-
-        Comm.UnaryVoid -> {
-            lambda = ClassName("org.cufy.mmrpc.runtime.internal", "WrapHandler0")
-                .parameterizedBy(input.className())
-            n = 0
-        }
-
-        Comm.UnaryUnary -> {
-            lambda = ClassName("org.cufy.mmrpc.runtime.internal", "WrapHandler1")
-                .parameterizedBy(input.className(), output.className())
-            n = 1
-        }
-
-        Comm.StreamUnary -> {
-            lambda = ClassName("org.cufy.mmrpc.runtime.internal", "WrapHandler2")
-                .parameterizedBy(input.className(), output.className())
-            n = 2
-        }
-
-        Comm.UnaryStream -> {
-            lambda = ClassName("org.cufy.mmrpc.runtime.internal", "WrapHandler3")
-                .parameterizedBy(input.className(), output.className())
-            n = 3
-        }
-
-        Comm.StreamStream -> {
-            lambda = ClassName("org.cufy.mmrpc.runtime.internal", "WrapHandler4")
-                .parameterizedBy(input.className(), output.className())
-            n = 4
-        }
-    }
-
-    return funSpec(nameOfFunction()) {
-        contextParameter("engine", ServerEngine::class)
-        receiver(receiver)
-
-        // Implementation
-        beginControlFlow("if (engine.is%LSupported())", n)
-        addParameter("handler", lambda)
-        addStatement("%L", serverRegisterImplCode(
-            handler = CodeBlock.of(
-                "%M(handler)",
-                MemberName(
-                    "org.cufy.mmrpc.runtime.internal",
-                    "wrap$n"
-                ),
-            ),
-        ))
-        endControlFlow()
     }
 }
 

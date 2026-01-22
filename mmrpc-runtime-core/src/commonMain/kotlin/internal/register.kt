@@ -4,16 +4,16 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.serializer
 import org.cufy.mmrpc.runtime.ServerEngine
 
-typealias Handler0<Req> = suspend (Req) -> Unit
-typealias Handler1<Req, Res> = suspend (Req) -> Res
-typealias Handler2<Req, Res> = suspend (Flow<Req>) -> Res
-typealias Handler3<Req, Res> = (Req) -> Flow<Res>
-typealias Handler4<Req, Res> = (Flow<Req>) -> Flow<Res>
+typealias Register0<Req> = suspend (Req) -> Unit
+typealias Register1<Req, Res> = suspend (Req) -> Res
+typealias Register2<Req, Res> = suspend (Flow<Req>) -> Res
+typealias Register3<Req, Res> = (Req) -> Flow<Res>
+typealias Register4<Req, Res> = (Flow<Req>) -> Flow<Res>
 
-context(engine: ServerEngine)
+context(engine: ServerEngine.N0)
 inline fun <reified Req : Any> register0(
     canonicalName: String,
-    noinline handler: Handler0<Req>,
+    noinline handler: Register0<Req>,
 ) {
     engine.register0(
         canonicalName = canonicalName,
@@ -22,10 +22,10 @@ inline fun <reified Req : Any> register0(
     )
 }
 
-context(engine: ServerEngine)
+context(engine: ServerEngine.N1)
 inline fun <reified Req : Any, reified Res : Any> register1(
     canonicalName: String,
-    noinline handler: Handler1<Req, Res>,
+    noinline handler: Register1<Req, Res>,
 ) {
     engine.register1(
         canonicalName = canonicalName,
@@ -35,10 +35,10 @@ inline fun <reified Req : Any, reified Res : Any> register1(
     )
 }
 
-context(engine: ServerEngine)
+context(engine: ServerEngine.N2)
 inline fun <reified Req : Any, reified Res : Any> register2(
     canonicalName: String,
-    noinline handler: Handler2<Req, Res>,
+    noinline handler: Register2<Req, Res>,
 ) {
     engine.register2(
         canonicalName = canonicalName,
@@ -48,10 +48,10 @@ inline fun <reified Req : Any, reified Res : Any> register2(
     )
 }
 
-context(engine: ServerEngine)
+context(engine: ServerEngine.N3)
 inline fun <reified Req : Any, reified Res : Any> register3(
     canonicalName: String,
-    noinline handler: Handler3<Req, Res>,
+    noinline handler: Register3<Req, Res>,
 ) {
     engine.register3(
         canonicalName = canonicalName,
@@ -61,10 +61,10 @@ inline fun <reified Req : Any, reified Res : Any> register3(
     )
 }
 
-context(engine: ServerEngine)
+context(engine: ServerEngine.N4)
 inline fun <reified Req : Any, reified Res : Any> register4(
     canonicalName: String,
-    noinline handler: Handler4<Req, Res>,
+    noinline handler: Register4<Req, Res>,
 ) {
     engine.register4(
         canonicalName = canonicalName,

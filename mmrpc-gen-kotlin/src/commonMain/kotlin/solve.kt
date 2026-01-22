@@ -3,9 +3,11 @@ package org.cufy.mmrpc.gen.kotlin
 import com.squareup.kotlinpoet.FileSpec
 import org.cufy.mmrpc.gen.kotlin.context.*
 import org.cufy.mmrpc.gen.kotlin.gen.*
+import org.cufy.mmrpc.gen.kotlin.gen.base.*
 import org.cufy.mmrpc.gen.kotlin.gen.integ.doProtocolFdxGen
 import org.cufy.mmrpc.gen.kotlin.gen.integ.doProtocolHdxGen
 import org.cufy.mmrpc.gen.kotlin.gen.integ.doProtocolSxGen
+import org.cufy.mmrpc.gen.kotlin.gen.integ.doProtocolSxRefluxGen
 
 private const val GENERATED_FILE_NOTICE = """
 This is an automatically generated file.
@@ -45,8 +47,16 @@ private fun initStage(): NodeList {
         doUnionDefinitionGen()
 
         doProtocolSxGen()
+        doProtocolSxRefluxGen()
         doProtocolHdxGen()
         doProtocolFdxGen()
+
+        doProtocolN0Gen()
+        doProtocolN0RGen()
+        doProtocolN1Gen()
+        doProtocolN2Gen()
+        doProtocolN3Gen()
+        doProtocolN4Gen()
     }
     sort(stage.injections)
     return NodeList(

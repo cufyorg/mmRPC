@@ -5,7 +5,7 @@ import kotlinx.serialization.serializer
 import org.cufy.mmrpc.runtime.ClientEngine
 
 suspend inline fun <reified Req : Any> exec0(
-    engine: ClientEngine,
+    engine: ClientEngine.N0,
     canonicalName: String,
     request: Req,
 ) {
@@ -17,7 +17,7 @@ suspend inline fun <reified Req : Any> exec0(
 }
 
 suspend inline fun <reified Req : Any, reified Res : Any> exec1(
-    engine: ClientEngine,
+    engine: ClientEngine.N1,
     canonicalName: String,
     request: Req,
 ): Res {
@@ -30,7 +30,7 @@ suspend inline fun <reified Req : Any, reified Res : Any> exec1(
 }
 
 suspend inline fun <reified Req : Any, reified Res : Any> exec2(
-    engine: ClientEngine,
+    engine: ClientEngine.N2,
     canonicalName: String,
     request: Flow<Req>,
 ): Res {
@@ -43,7 +43,7 @@ suspend inline fun <reified Req : Any, reified Res : Any> exec2(
 }
 
 inline fun <reified Req : Any, reified Res : Any> exec3(
-    engine: ClientEngine,
+    engine: ClientEngine.N3,
     canonicalName: String,
     request: Req,
 ): Flow<Res> {
@@ -56,7 +56,7 @@ inline fun <reified Req : Any, reified Res : Any> exec3(
 }
 
 inline fun <reified Req : Any, reified Res : Any> exec4(
-    engine: ClientEngine,
+    engine: ClientEngine.N4,
     canonicalName: String,
     request: Flow<Req>,
 ): Flow<Res> {

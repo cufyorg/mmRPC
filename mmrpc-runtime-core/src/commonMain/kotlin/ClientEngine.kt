@@ -11,45 +11,49 @@ import kotlinx.serialization.KSerializer
  * (unary, stream-based, etc.) with serialization and deserialization capabilities.
  */
 sealed interface ClientEngine {
-    companion object
+    companion object;
 
-    fun is0Supported(): Boolean
-    fun is1Supported(): Boolean
-    fun is2Supported(): Boolean
-    fun is3Supported(): Boolean
-    fun is4Supported(): Boolean
+    sealed interface N0 : ClientEngine {
+        suspend fun <Req : Any> exec0(
+            canonicalName: String,
+            request: Req,
+            reqSerial: KSerializer<Req>,
+        )
+    }
 
-    suspend fun <Req : Any> exec0(
-        canonicalName: String,
-        request: Req,
-        reqSerial: KSerializer<Req>,
-    )
+    sealed interface N1 : ClientEngine {
+        suspend fun <Req : Any, Res : Any> exec1(
+            canonicalName: String,
+            request: Req,
+            reqSerial: KSerializer<Req>,
+            resSerial: KSerializer<Res>,
+        ): Res
+    }
 
-    suspend fun <Req : Any, Res : Any> exec1(
-        canonicalName: String,
-        request: Req,
-        reqSerial: KSerializer<Req>,
-        resSerial: KSerializer<Res>,
-    ): Res
+    sealed interface N2 : ClientEngine {
+        suspend fun <Req : Any, Res : Any> exec2(
+            canonicalName: String,
+            request: Flow<Req>,
+            reqSerial: KSerializer<Req>,
+            resSerial: KSerializer<Res>,
+        ): Res
+    }
 
-    suspend fun <Req : Any, Res : Any> exec2(
-        canonicalName: String,
-        request: Flow<Req>,
-        reqSerial: KSerializer<Req>,
-        resSerial: KSerializer<Res>,
-    ): Res
+    sealed interface N3 : ClientEngine {
+        fun <Req : Any, Res : Any> exec3(
+            canonicalName: String,
+            request: Req,
+            reqSerial: KSerializer<Req>,
+            resSerial: KSerializer<Res>,
+        ): Flow<Res>
+    }
 
-    fun <Req : Any, Res : Any> exec3(
-        canonicalName: String,
-        request: Req,
-        reqSerial: KSerializer<Req>,
-        resSerial: KSerializer<Res>,
-    ): Flow<Res>
-
-    fun <Req : Any, Res : Any> exec4(
-        canonicalName: String,
-        request: Flow<Req>,
-        reqSerial: KSerializer<Req>,
-        resSerial: KSerializer<Res>,
-    ): Flow<Res>
+    sealed interface N4 : ClientEngine {
+        fun <Req : Any, Res : Any> exec4(
+            canonicalName: String,
+            request: Flow<Req>,
+            reqSerial: KSerializer<Req>,
+            resSerial: KSerializer<Res>,
+        ): Flow<Res>
+    }
 }

@@ -10,10 +10,9 @@ package org.cufy.mmrpc.runtime
  * It is typically implemented in scenarios where high-performance, asynchronous, and parallel communication
  * is required, such as in real-time applications or distributed systems.
  */
-abstract class FdxServerEngine : ServerEngine {
-    final override fun is0Supported() = true
-    final override fun is1Supported() = true
-    final override fun is2Supported() = true
-    final override fun is3Supported() = true
-    final override fun is4Supported() = true
-}
+abstract class FdxServerEngine :
+    ServerEngine.N0,
+    ServerEngine.N1,
+    ServerEngine.N2,
+    ServerEngine.N3,
+    ServerEngine.N4

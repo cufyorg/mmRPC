@@ -88,7 +88,7 @@ fun toplevel(
     dummy: Unit = Unit,
     target: CanonicalName?,
     name: String,
-    block: FileSpec.Builder.() -> Unit,
+    block: context(FinalStage) FileSpec.Builder.() -> Unit,
 ) {
     stage.emissions += EmitNode(
         emission = {

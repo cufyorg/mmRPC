@@ -14,45 +14,49 @@ import kotlinx.serialization.KSerializer
  * operations.
  */
 sealed interface ServerEngine {
-    companion object
+    companion object;
 
-    fun is0Supported(): Boolean
-    fun is1Supported(): Boolean
-    fun is2Supported(): Boolean
-    fun is3Supported(): Boolean
-    fun is4Supported(): Boolean
+    sealed interface N0 : ServerEngine {
+        fun <Req : Any> register0(
+            canonicalName: String,
+            reqSerial: KSerializer<Req>,
+            handler: suspend (Req) -> Unit,
+        )
+    }
 
-    fun <Req : Any> register0(
-        canonicalName: String,
-        reqSerial: KSerializer<Req>,
-        handler: suspend (Req) -> Unit,
-    )
+    sealed interface N1 : ServerEngine {
+        fun <Req : Any, Res : Any> register1(
+            canonicalName: String,
+            reqSerial: KSerializer<Req>,
+            resSerial: KSerializer<Res>,
+            handler: suspend (Req) -> Res,
+        )
+    }
 
-    fun <Req : Any, Res : Any> register1(
-        canonicalName: String,
-        reqSerial: KSerializer<Req>,
-        resSerial: KSerializer<Res>,
-        handler: suspend (Req) -> Res,
-    )
+    sealed interface N2 : ServerEngine {
+        fun <Req : Any, Res : Any> register2(
+            canonicalName: String,
+            reqSerial: KSerializer<Req>,
+            resSerial: KSerializer<Res>,
+            handler: suspend (Flow<Req>) -> Res,
+        )
+    }
 
-    fun <Req : Any, Res : Any> register2(
-        canonicalName: String,
-        reqSerial: KSerializer<Req>,
-        resSerial: KSerializer<Res>,
-        handler: suspend (Flow<Req>) -> Res,
-    )
+    sealed interface N3 : ServerEngine {
+        fun <Req : Any, Res : Any> register3(
+            canonicalName: String,
+            reqSerial: KSerializer<Req>,
+            resSerial: KSerializer<Res>,
+            handler: (Req) -> Flow<Res>,
+        )
+    }
 
-    fun <Req : Any, Res : Any> register3(
-        canonicalName: String,
-        reqSerial: KSerializer<Req>,
-        resSerial: KSerializer<Res>,
-        handler: (Req) -> Flow<Res>,
-    )
-
-    fun <Req : Any, Res : Any> register4(
-        canonicalName: String,
-        reqSerial: KSerializer<Req>,
-        resSerial: KSerializer<Res>,
-        handler: (Flow<Req>) -> Flow<Res>,
-    )
+    sealed interface N4 : ServerEngine {
+        fun <Req : Any, Res : Any> register4(
+            canonicalName: String,
+            reqSerial: KSerializer<Req>,
+            resSerial: KSerializer<Res>,
+            handler: (Flow<Req>) -> Flow<Res>,
+        )
+    }
 }

@@ -1,12 +1,11 @@
 package org.cufy.mmrpc.gen.kotlin.gen.integ
 
-import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.ExperimentalKotlinPoetApi
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.TypeSpec
-import org.cufy.mmrpc.Comm
 import org.cufy.mmrpc.ProtocolDefinition
-import org.cufy.mmrpc.experimental.isHdxSupported
+import org.cufy.mmrpc.gen.kotlin.Comms
+import org.cufy.mmrpc.gen.kotlin.Names
 import org.cufy.mmrpc.gen.kotlin.common.isGeneratingClass
 import org.cufy.mmrpc.gen.kotlin.common.model.*
 import org.cufy.mmrpc.gen.kotlin.context.*
@@ -31,60 +30,50 @@ fun doProtocolHdxGen() {
 @OptIn(ExperimentalKotlinPoetApi::class)
 context(ctx: Context, _: InitStage)
 private fun apply(element: ProtocolDefinition) {
-    val routines = element.routines
-        .filter { it.comm.isHdxSupported() }
-        .ifEmpty { return }
-    val (_, regularRoutines) = routines
-        .partition { it.comm == Comm.VoidUnary }
+    val n0 = element.routines.any { it.comm == Comms.N0 }
+    val n1 = element.routines.any { it.comm == Comms.N1 }
+
+    if (!(n0 || n1))
+        return
 
     inject<TypeSpec.Builder>(target = element.canonicalName) {
         addSuperinterface(element.generatedIntegClassName(INTEG_NAME))
     }
-    declareType(target = element.namespace) {
-        interfaceSpec(element.nameOfIntegClass(INTEG_NAME)) {
-            for (routine in regularRoutines) {
-                addFunction(routine.abstractFunSpec())
-            }
-        }
+    toplevel(target = element.namespace, name = element.nameOfMainFile()) {
+        addType(interfaceSpec(element.nameOfIntegClass(INTEG_NAME)) {
+            if (n0) addSuperinterface(element.generatedBaseClassName(Names.N0))
+            if (n1) addSuperinterface(element.generatedBaseClassName(Names.N1))
+        })
     }
     toplevel(target = element.namespace, name = element.nameOfStubFile()) {
         addType(classSpec(element.nameOfIntegStubClass(INTEG_NAME)) {
             addSuperinterface(element.generatedIntegClassName(INTEG_NAME))
+            if (n0) addSuperinterface(element.generatedBaseStubClassName(Names.N0))
+            if (n1) addSuperinterface(element.generatedBaseStubClassName(Names.N1))
 
             primaryConstructor(constructorSpec {
                 addParameter("engine", HdxClientEngine::class)
             })
             addProperty(propertySpec("engine", HdxClientEngine::class) {
-                addModifiers(KModifier.PRIVATE)
+                addModifiers(KModifier.OVERRIDE)
                 initializer("engine")
             })
-
-            for (routine in regularRoutines) {
-                addFunction(routine.clientExecImplFunSpec())
-            }
         })
     }
     toplevel(target = element.namespace, name = element.nameOfServerExtFile()) {
-        // HdxServerEngine.register( impl: <Hdx*Impl> )
+        // HdxServerEngine.register( impl: <hdx-protocol> )
         addFunction(funSpec("register") {
             contextParameter("_", HdxServerEngine::class)
             addParameter("impl", element.generatedIntegClassName(INTEG_NAME))
-
-            for (routine in regularRoutines) {
-                addStatement("%L", routine.serverRegisterImplCode(
-                    handler = CodeBlock.of("impl::%L", routine.nameOfFunction()),
-                ))
-            }
+            if (n0) addStatement("register0(impl)")
+            if (n1) addStatement("register1(impl)")
         })
     }
     toplevel(target = element.namespace, name = element.nameOfClientExtFile()) {
-        // <protocol>.Companion.invoke( engine: HdxClientEngine ): Hdx<protocol>
+        // <protocol>.Companion.invoke( engine: HdxClientEngine ): <hdx-protocol>
         addFunction(funSpec("invoke") {
             addModifiers(KModifier.OPERATOR)
-            receiver(
-                element.generatedClassName()
-                    .nestedClass("Companion")
-            )
+            receiver(element.generatedClassName().nestedClass("Companion"))
             addParameter("engine", HdxClientEngine::class)
             returns(element.generatedIntegClassName(INTEG_NAME))
             addStatement(
@@ -92,11 +81,5 @@ private fun apply(element: ProtocolDefinition) {
                 element.generatedIntegStubClassName(INTEG_NAME),
             )
         })
-        // Hdx<protocol>.<routine>(<request-fields>): <response>
-        for (routine in regularRoutines) {
-            addFunction(routine.clientFlatInputExecFunSpec(
-                receiver = element.generatedIntegClassName(INTEG_NAME)
-            ))
-        }
     }
 }

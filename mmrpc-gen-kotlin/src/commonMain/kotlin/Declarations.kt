@@ -1,10 +1,7 @@
 package org.cufy.mmrpc.gen.kotlin
 
 import com.squareup.kotlinpoet.FileSpec
-import org.cufy.mmrpc.CanonicalName
-import org.cufy.mmrpc.Marker0
-import org.cufy.mmrpc.Marker1
-import org.cufy.mmrpc.Marker3
+import org.cufy.mmrpc.*
 import org.cufy.mmrpc.gen.kotlin.context.FinalStage
 import kotlin.reflect.KClass
 
@@ -13,6 +10,28 @@ import kotlin.reflect.KClass
 typealias EmitScope = Marker0
 typealias InjectScope = Marker1
 typealias ContextScope = Marker3
+
+internal object Names {
+    const val N0 = "N0"
+    const val N0R = "N0R"
+    const val N1 = "N1"
+    const val N2 = "N2"
+    const val N3 = "N3"
+    const val N4 = "N4"
+    const val SX = "Sx"
+    const val SX_REFLUX = "SxReflux"
+    const val HDX = "Hdx"
+    const val FDX = "Fdx"
+}
+
+internal object Comms {
+    val N0 = Comm.UnaryVoid
+    val N0R = Comm.VoidUnary
+    val N1 = Comm.UnaryUnary
+    val N2 = Comm.StreamUnary
+    val N3 = Comm.UnaryStream
+    val N4 = Comm.StreamStream
+}
 
 ////////////////////////////////////////
 

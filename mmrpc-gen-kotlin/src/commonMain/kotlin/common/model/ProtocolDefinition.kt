@@ -3,7 +3,10 @@ package org.cufy.mmrpc.gen.kotlin.common.model
 import com.squareup.kotlinpoet.ClassName
 import org.cufy.mmrpc.ProtocolDefinition
 import org.cufy.mmrpc.gen.kotlin.ContextScope
-import org.cufy.mmrpc.gen.kotlin.common.*
+import org.cufy.mmrpc.gen.kotlin.common.assumedPackageName
+import org.cufy.mmrpc.gen.kotlin.common.assumedSimpleNames
+import org.cufy.mmrpc.gen.kotlin.common.hasGeneratedClass
+import org.cufy.mmrpc.gen.kotlin.common.nameOfClass
 import org.cufy.mmrpc.gen.kotlin.context.Context
 import org.cufy.mmrpc.gen.kotlin.debug
 
@@ -15,6 +18,12 @@ val ProtocolDefinition.refluxCanonicalName
     get() = canonicalName + "-reflux"
 
 ////////////////////////////////////////
+
+@ContextScope
+context(ctx: Context)
+fun ProtocolDefinition.nameOfMainFile(): String {
+    return $$"$${nameOfClass()}$Main"
+}
 
 @ContextScope
 context(ctx: Context)
@@ -55,6 +64,36 @@ fun ProtocolDefinition.generatedRefluxClassName(): ClassName {
 
 @ContextScope
 context(ctx: Context)
+fun ProtocolDefinition.nameOfBaseClass(baseName: String): String {
+    return "_${nameOfClass()}_${baseName}"
+}
+
+@ContextScope
+context(ctx: Context)
+fun ProtocolDefinition.nameOfBaseStubClass(baseName: String): String {
+    return "_${nameOfClass()}_${baseName}Stub"
+}
+
+@ContextScope
+context(ctx: Context)
+fun ProtocolDefinition.generatedBaseClassName(baseName: String): ClassName {
+    val pkg = canonicalName.assumedPackageName()
+    val simpleNames = canonicalName.assumedSimpleNames()
+    return ClassName(pkg, simpleNames.dropLast(1) + nameOfBaseClass(baseName))
+}
+
+@ContextScope
+context(ctx: Context)
+fun ProtocolDefinition.generatedBaseStubClassName(baseName: String): ClassName {
+    val pkg = canonicalName.assumedPackageName()
+    val simpleNames = canonicalName.assumedSimpleNames()
+    return ClassName(pkg, simpleNames.dropLast(1) + nameOfBaseStubClass(baseName))
+}
+
+////////////////////////////////////////
+
+@ContextScope
+context(ctx: Context)
 fun ProtocolDefinition.nameOfIntegClass(integName: String): String {
     return "${integName}${nameOfClass()}"
 }
@@ -67,12 +106,6 @@ fun ProtocolDefinition.nameOfIntegStubClass(integName: String): String {
 
 @ContextScope
 context(ctx: Context)
-fun ProtocolDefinition.nameOfIntegRefluxStubClass(integName: String): String {
-    return "${integName}${nameOfClass()}RefluxStub"
-}
-
-@ContextScope
-context(ctx: Context)
 fun ProtocolDefinition.generatedIntegClassName(integName: String): ClassName {
     val pkg = canonicalName.assumedPackageName()
     val simpleNames = canonicalName.assumedSimpleNames()
@@ -81,25 +114,10 @@ fun ProtocolDefinition.generatedIntegClassName(integName: String): ClassName {
 
 @ContextScope
 context(ctx: Context)
-fun ProtocolDefinition.generatedIntegRefluxClassName(integName: String): ClassName {
-    return generatedIntegClassName(integName)
-        .nestedClass(NAME_OF_REFLUX_CLASS)
-}
-
-@ContextScope
-context(ctx: Context)
 fun ProtocolDefinition.generatedIntegStubClassName(integName: String): ClassName {
     val pkg = canonicalName.assumedPackageName()
     val simpleNames = canonicalName.assumedSimpleNames()
     return ClassName(pkg, simpleNames.dropLast(1) + nameOfIntegStubClass(integName))
-}
-
-@ContextScope
-context(ctx: Context)
-fun ProtocolDefinition.generatedIntegRefluxStubClassName(integName: String): ClassName {
-    val pkg = canonicalName.assumedPackageName()
-    val simpleNames = canonicalName.assumedSimpleNames()
-    return ClassName(pkg, simpleNames.dropLast(1) + nameOfIntegRefluxStubClass(integName))
 }
 
 ////////////////////////////////////////
