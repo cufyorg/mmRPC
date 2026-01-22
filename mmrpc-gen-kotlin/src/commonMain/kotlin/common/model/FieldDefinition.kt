@@ -13,7 +13,12 @@ fun FieldDefinition.propertySerialName(): String {
 @ContextScope
 context(ctx: Context)
 fun FieldDefinition.nameOfProperty(): String {
-    key?.let { return it }
+    key?.let { key ->
+        if (GenFeature.KEEP_FIELD_PROPERTY_NAMES in ctx.features)
+            return key
+
+        return key.toCamelCase()
+    }
 
     if (GenFeature.KEEP_FIELD_PROPERTY_NAMES in ctx.features)
         return name
