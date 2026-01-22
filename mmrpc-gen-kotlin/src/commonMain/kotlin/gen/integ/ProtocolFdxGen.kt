@@ -6,22 +6,18 @@ import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.TypeSpec
 import org.cufy.mmrpc.Comm
 import org.cufy.mmrpc.ProtocolDefinition
-import org.cufy.mmrpc.experimental.isHttpSupported
-import org.cufy.mmrpc.gen.kotlin.GenFeature
+import org.cufy.mmrpc.experimental.isFdxSupported
 import org.cufy.mmrpc.gen.kotlin.common.isGeneratingClass
 import org.cufy.mmrpc.gen.kotlin.common.model.*
 import org.cufy.mmrpc.gen.kotlin.context.*
 import org.cufy.mmrpc.gen.kotlin.util.*
-import org.cufy.mmrpc.runtime.ClientEngine
-import org.cufy.mmrpc.runtime.ServerEngine
+import org.cufy.mmrpc.runtime.FdxClientEngine
+import org.cufy.mmrpc.runtime.FdxServerEngine
 
-private const val INTEG_NAME = "Http"
+private const val INTEG_NAME = "Fdx"
 
 context(ctx: Context, _: FailScope, _: InitStage)
-fun doProtocolHttpGen() {
-    if (GenFeature.INTEG_HTTP !in ctx.features)
-        return
-
+fun doProtocolFdxGen() {
     for (element in ctx.elements) {
         if (element !is ProtocolDefinition) continue
         if (!element.isGeneratingClass()) continue
@@ -36,7 +32,7 @@ fun doProtocolHttpGen() {
 context(ctx: Context, _: InitStage)
 private fun apply(element: ProtocolDefinition) {
     val routines = element.routines
-        .filter { it.comm.isHttpSupported() }
+        .filter { it.comm.isFdxSupported() }
         .ifEmpty { return }
     val (_, regularRoutines) = routines
         .partition { it.comm == Comm.VoidUnary }
@@ -56,9 +52,9 @@ private fun apply(element: ProtocolDefinition) {
             addSuperinterface(element.generatedIntegClassName(INTEG_NAME))
 
             primaryConstructor(constructorSpec {
-                addParameter("engine", ClientEngine.Http::class)
+                addParameter("engine", FdxClientEngine::class)
             })
-            addProperty(propertySpec("engine", ClientEngine.Http::class) {
+            addProperty(propertySpec("engine", FdxClientEngine::class) {
                 addModifiers(KModifier.PRIVATE)
                 initializer("engine")
             })
@@ -69,9 +65,9 @@ private fun apply(element: ProtocolDefinition) {
         })
     }
     toplevel(target = element.namespace, name = element.nameOfServerExtFile()) {
-        // ServerEngine.Http.register( impl: <Http*Impl> )
+        // FdxServerEngine.register( impl: <Fdx*Impl> )
         addFunction(funSpec("register") {
-            contextParameter("_", ServerEngine.Http::class)
+            contextParameter("_", FdxServerEngine::class)
             addParameter("impl", element.generatedIntegClassName(INTEG_NAME))
 
             for (routine in regularRoutines) {
@@ -82,25 +78,27 @@ private fun apply(element: ProtocolDefinition) {
         })
     }
     toplevel(target = element.namespace, name = element.nameOfClientExtFile()) {
-        // <protocol>.Companion.invoke( engine: ClientEngine.Http ): Http<protocol>
+        // <protocol>.Companion.invoke( engine: FdxClientEngine ): Fdx<protocol>
         addFunction(funSpec("invoke") {
             addModifiers(KModifier.OPERATOR)
             receiver(
                 element.generatedClassName()
                     .nestedClass("Companion")
             )
-            addParameter("engine", ClientEngine.Http::class)
+            addParameter("engine", FdxClientEngine::class)
             returns(element.generatedIntegClassName(INTEG_NAME))
             addStatement(
                 "♢return %T(engine)",
                 element.generatedIntegStubClassName(INTEG_NAME),
             )
         })
-        // Http<protocol>.<routine>(<request-fields>): <response>
+        // Fdx<protocol>.<routine>(<request-fields>): <response>
         for (routine in regularRoutines) {
-            addFunction(routine.clientFlatInputExecFunSpec(
-                receiver = element.generatedIntegClassName(INTEG_NAME)
-            ))
+            if (routine.comm.input != Comm.Shape.Stream) {
+                addFunction(routine.clientFlatInputExecFunSpec(
+                    receiver = element.generatedIntegClassName(INTEG_NAME)
+                ))
+            }
         }
     }
 }

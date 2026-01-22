@@ -16,7 +16,7 @@ class HttpServerEngine @ExperimentalMmrpcApi constructor(
     val route: Route,
     val negotiator: HttpServerNegotiator,
     val interceptors: List<Interceptor.Server>,
-) : ServerEngine.Http {
+) : HdxServerEngine() {
     interface Builder {
         @ExperimentalMmrpcApi
         fun install(interceptor: Interceptor.Server)
@@ -24,9 +24,6 @@ class HttpServerEngine @ExperimentalMmrpcApi constructor(
         fun install(negotiator: HttpServerNegotiator)
         fun routing(block: context(HttpServerEngine) () -> Unit)
     }
-
-    override fun is0Supported() = true
-    override fun is1Supported() = true
 
     override fun <Req : Any> register0(
         canonicalName: String,

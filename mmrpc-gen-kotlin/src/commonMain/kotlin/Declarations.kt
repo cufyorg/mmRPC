@@ -33,19 +33,6 @@ enum class GenFeature {
     GENERATE_PROTOCOLS,
 
     /**
-     * Generate Http-specific integration structures.
-     */
-    INTEG_HTTP,
-    /**
-     * Generate Kafka-specific integration structures.
-     */
-    INTEG_KAFKA,
-    /**
-     * Generate custom integration structures.
-     */
-    INTEG_CUSTOM,
-
-    /**
      * Keep original type class names.
      */
     KEEP_TYPE_CLASS_NAMES,

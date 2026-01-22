@@ -6,22 +6,18 @@ import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.TypeSpec
 import org.cufy.mmrpc.Comm
 import org.cufy.mmrpc.ProtocolDefinition
-import org.cufy.mmrpc.experimental.isKafkaSupported
-import org.cufy.mmrpc.gen.kotlin.GenFeature
+import org.cufy.mmrpc.experimental.isSxSupported
 import org.cufy.mmrpc.gen.kotlin.common.isGeneratingClass
 import org.cufy.mmrpc.gen.kotlin.common.model.*
 import org.cufy.mmrpc.gen.kotlin.context.*
 import org.cufy.mmrpc.gen.kotlin.util.*
-import org.cufy.mmrpc.runtime.ClientEngine
-import org.cufy.mmrpc.runtime.ServerEngine
+import org.cufy.mmrpc.runtime.SxClientEngine
+import org.cufy.mmrpc.runtime.SxServerEngine
 
-private const val INTEG_NAME = "Kafka"
+private const val INTEG_NAME = "Sx"
 
 context(ctx: Context, _: FailScope, _: InitStage)
-fun doProtocolKafkaGen() {
-    if (GenFeature.INTEG_KAFKA !in ctx.features)
-        return
-
+fun doProtocolSxGen() {
     for (element in ctx.elements) {
         if (element !is ProtocolDefinition) continue
         if (!element.isGeneratingClass()) continue
@@ -36,7 +32,7 @@ fun doProtocolKafkaGen() {
 context(ctx: Context, _: InitStage)
 private fun apply(element: ProtocolDefinition) {
     val routines = element.routines
-        .filter { it.comm.isKafkaSupported() }
+        .filter { it.comm.isSxSupported() }
         .ifEmpty { return }
     val (refluxRoutines, regularRoutines) = routines
         .partition { it.comm == Comm.VoidUnary }
@@ -65,9 +61,9 @@ private fun apply(element: ProtocolDefinition) {
             addSuperinterface(element.generatedIntegClassName(INTEG_NAME))
 
             primaryConstructor(constructorSpec {
-                addParameter("engine", ClientEngine.Kafka::class)
+                addParameter("engine", SxClientEngine::class)
             })
-            addProperty(propertySpec("engine", ClientEngine.Kafka::class) {
+            addProperty(propertySpec("engine", SxClientEngine::class) {
                 addModifiers(KModifier.PRIVATE)
                 initializer("engine")
             })
@@ -80,9 +76,9 @@ private fun apply(element: ProtocolDefinition) {
             addSuperinterface(element.generatedIntegRefluxClassName(INTEG_NAME))
 
             primaryConstructor(constructorSpec {
-                addParameter("engine", ClientEngine.Kafka::class)
+                addParameter("engine", SxClientEngine::class)
             })
-            addProperty(propertySpec("engine", ClientEngine.Kafka::class) {
+            addProperty(propertySpec("engine", SxClientEngine::class) {
                 addModifiers(KModifier.PRIVATE)
                 initializer("engine")
             })
@@ -93,9 +89,9 @@ private fun apply(element: ProtocolDefinition) {
         })
     }
     toplevel(target = element.namespace, name = element.nameOfServerExtFile()) {
-        // ServerEngine.Kafka.register( impl: <Kafka*Impl> )
+        // SxServerEngine.register( impl: <Sx*Impl> )
         addFunction(funSpec("register") {
-            contextParameter("_", ServerEngine.Kafka::class)
+            contextParameter("_", SxServerEngine::class)
             addParameter("impl", element.generatedIntegClassName(INTEG_NAME))
 
             for (routine in regularRoutines) {
@@ -104,9 +100,9 @@ private fun apply(element: ProtocolDefinition) {
                 ))
             }
         })
-        // ServerEngine.Kafka.register( impl: <Kafka*RefluxImpl> )
+        // SxServerEngine.register( impl: <Sx*RefluxImpl> )
         addFunction(funSpec("register") {
-            contextParameter("_", ServerEngine.Kafka::class)
+            contextParameter("_", SxServerEngine::class)
             addParameter("impl", element.generatedIntegRefluxClassName(INTEG_NAME))
 
             for (routine in refluxRoutines) {
@@ -117,41 +113,41 @@ private fun apply(element: ProtocolDefinition) {
         })
     }
     toplevel(target = element.namespace, name = element.nameOfClientExtFile()) {
-        // <protocol>.Companion.invoke( engine: ClientEngine.Kafka ): Kafka<protocol>
+        // <protocol>.Companion.invoke( engine: SxClientEngine ): Sx<protocol>
         addFunction(funSpec("invoke") {
             addModifiers(KModifier.OPERATOR)
             receiver(
                 element.generatedClassName()
                     .nestedClass("Companion")
             )
-            addParameter("engine", ClientEngine.Kafka::class)
+            addParameter("engine", SxClientEngine::class)
             returns(element.generatedIntegClassName(INTEG_NAME))
             addStatement(
                 "♢return %T(engine)",
                 element.generatedIntegStubClassName(INTEG_NAME),
             )
         })
-        // <protocol>.Reflux.Companion.invoke( engine: ClientEngine.Kafka ): Kafka<protocol>.Reflux
+        // <protocol>.Reflux.Companion.invoke( engine: SxClientEngine ): Sx<protocol>.Reflux
         addFunction(funSpec("invoke") {
             addModifiers(KModifier.OPERATOR)
             receiver(
                 element.generatedRefluxClassName()
                     .nestedClass("Companion")
             )
-            addParameter("engine", ClientEngine.Kafka::class)
+            addParameter("engine", SxClientEngine::class)
             returns(element.generatedIntegRefluxClassName(INTEG_NAME))
             addStatement(
                 "♢return %T(engine)",
                 element.generatedIntegRefluxStubClassName(INTEG_NAME),
             )
         })
-        // Kafka<protocol>.<routine>(<request-fields>): <response>
+        // Sx<protocol>.<routine>(<request-fields>): <response>
         for (routine in regularRoutines) {
             addFunction(routine.clientFlatInputExecFunSpec(
                 receiver = element.generatedIntegClassName(INTEG_NAME)
             ))
         }
-        // Kafka<protocol>.Reflux.<routine>(<request-fields>): <response>
+        // Sx<protocol>.Reflux.<routine>(<request-fields>): <response>
         for (routine in refluxRoutines) {
             addFunction(routine.clientFlatInputExecFunSpec(
                 receiver = element.generatedIntegRefluxClassName(INTEG_NAME)

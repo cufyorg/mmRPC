@@ -91,10 +91,6 @@ open class MmrpcExtension {
         fun generateTypes() { features += GenFeature.GENERATE_TYPES }
         fun generateProtocols() { features += GenFeature.GENERATE_PROTOCOLS }
 
-        fun integHttp() { features += GenFeature.INTEG_HTTP }
-        fun integKafka() { features += GenFeature.INTEG_KAFKA }
-        fun integCustom() { features += GenFeature.INTEG_CUSTOM }
-
         fun keepTypeClassNames() { features += GenFeature.KEEP_TYPE_CLASS_NAMES }
         fun keepFaultClassNames() { features += GenFeature.KEEP_FAULT_CLASS_NAMES }
         fun keepProtocolClassNames() { features += GenFeature.KEEP_PROTOCOL_CLASS_NAMES }

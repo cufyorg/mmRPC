@@ -3,59 +3,53 @@ package org.cufy.mmrpc.runtime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.KSerializer
 
+/**
+ * Represents a client engine for executing remote procedure calls (RPC) with different modes
+ * of data transmission (simplex, half-duplex, full-duplex).
+ *
+ * The [ClientEngine] interface provides methods for executing various types of RPC calls
+ * (unary, stream-based, etc.) with serialization and deserialization capabilities.
+ */
 sealed interface ClientEngine {
-    interface Http : ClientEngine
-    interface Kafka : ClientEngine
-    interface Custom : ClientEngine
     companion object
 
-    fun is0Supported() = false
-    fun is1Supported() = false
-    fun is2Supported() = false
-    fun is3Supported() = false
-    fun is4Supported() = false
+    fun is0Supported(): Boolean
+    fun is1Supported(): Boolean
+    fun is2Supported(): Boolean
+    fun is3Supported(): Boolean
+    fun is4Supported(): Boolean
 
     suspend fun <Req : Any> exec0(
         canonicalName: String,
         request: Req,
         reqSerial: KSerializer<Req>,
-    ) {
-        error("$this doesn't support: (Req) -> Unit")
-    }
+    )
 
     suspend fun <Req : Any, Res : Any> exec1(
         canonicalName: String,
         request: Req,
         reqSerial: KSerializer<Req>,
         resSerial: KSerializer<Res>,
-    ): Res {
-        error("$this doesn't support: (Req) -> Res")
-    }
+    ): Res
 
     suspend fun <Req : Any, Res : Any> exec2(
         canonicalName: String,
         request: Flow<Req>,
         reqSerial: KSerializer<Req>,
         resSerial: KSerializer<Res>,
-    ): Res {
-        error("$this doesn't support: (Flow<Req>) -> Res")
-    }
+    ): Res
 
     fun <Req : Any, Res : Any> exec3(
         canonicalName: String,
         request: Req,
         reqSerial: KSerializer<Req>,
         resSerial: KSerializer<Res>,
-    ): Flow<Res> {
-        error("$this doesn't support: (Req) -> Flow<Res>")
-    }
+    ): Flow<Res>
 
     fun <Req : Any, Res : Any> exec4(
         canonicalName: String,
         request: Flow<Req>,
         reqSerial: KSerializer<Req>,
         resSerial: KSerializer<Res>,
-    ): Flow<Res> {
-        error("$this doesn't support: (Flow<Req>) -> Flow<Res>")
-    }
+    ): Flow<Res>
 }

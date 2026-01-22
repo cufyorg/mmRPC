@@ -6,8 +6,8 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
-import org.cufy.mmrpc.runtime.ClientEngine
 import org.cufy.mmrpc.runtime.ExperimentalMmrpcApi
+import org.cufy.mmrpc.runtime.HdxClientEngine
 import org.cufy.mmrpc.runtime.Interceptor
 import org.cufy.mmrpc.runtime.Interceptor.Companion.foldError
 import org.cufy.mmrpc.runtime.Interceptor.Companion.foldRequest
@@ -20,16 +20,13 @@ class HttpClientEngine @ExperimentalMmrpcApi constructor(
     val client: HttpClient,
     val negotiator: HttpClientNegotiator,
     val interceptors: List<Interceptor.Client>,
-) : ClientEngine.Http {
+) : HdxClientEngine() {
     interface Builder {
         @ExperimentalMmrpcApi
         fun install(interceptor: Interceptor.Client)
         @ExperimentalMmrpcApi
         fun install(negotiator: HttpClientNegotiator)
     }
-
-    override fun is0Supported() = true
-    override fun is1Supported() = true
 
     override suspend fun <Req : Any> exec0(
         canonicalName: String,

@@ -8,7 +8,7 @@ import org.cufy.kaftor.consume
 import org.cufy.mmrpc.runtime.ExperimentalMmrpcApi
 import org.cufy.mmrpc.runtime.Interceptor
 import org.cufy.mmrpc.runtime.Interceptor.Companion.foldRequest
-import org.cufy.mmrpc.runtime.ServerEngine
+import org.cufy.mmrpc.runtime.SxServerEngine
 import org.cufy.mmrpc.runtime.kafka.util.KafkaServerNegotiator
 
 @OptIn(ExperimentalMmrpcApi::class)
@@ -16,7 +16,7 @@ class KafkaServerEngine @ExperimentalMmrpcApi constructor(
     val route: KafkaRoute,
     val negotiator: KafkaServerNegotiator,
     val interceptors: List<Interceptor.Server>,
-) : ServerEngine.Kafka {
+) : SxServerEngine() {
     interface Builder {
         @ExperimentalMmrpcApi
         fun install(interceptor: Interceptor.Server)
@@ -24,8 +24,6 @@ class KafkaServerEngine @ExperimentalMmrpcApi constructor(
         fun install(negotiator: KafkaServerNegotiator)
         fun routing(block: context(KafkaServerEngine) () -> Unit)
     }
-
-    override fun is0Supported() = true
 
     override fun <Req : Any> register0(
         canonicalName: String,
