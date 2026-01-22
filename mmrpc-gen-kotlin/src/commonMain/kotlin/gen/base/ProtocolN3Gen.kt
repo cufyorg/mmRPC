@@ -85,7 +85,7 @@ private fun apply(element: ProtocolDefinition) {
             addParameter("impl", element.generatedBaseClassName(BASE_NAME))
 
             for (routine in routines) {
-                addCode(routine.serverRegisterCode(
+                addStatement("%L", routine.serverRegisterCode(
                     register = Intrinsics.REGISTER3,
                     handler = CodeBlock.of("impl::%L", routine.nameOfFunction()),
                 ))
