@@ -2,16 +2,15 @@ package org.cufy.mmrpc.gen.kotlin.gen
 
 import org.cufy.mmrpc.MetadataDefinition
 import org.cufy.mmrpc.gen.kotlin.common.code.createKdocCode
-import org.cufy.mmrpc.gen.kotlin.common.code.createMetaLiteralCode
 import org.cufy.mmrpc.gen.kotlin.common.isGeneratingClass
 import org.cufy.mmrpc.gen.kotlin.common.metaTypeName
 import org.cufy.mmrpc.gen.kotlin.common.model.annotationSpec
+import org.cufy.mmrpc.gen.kotlin.common.model.metaParameterSpec
 import org.cufy.mmrpc.gen.kotlin.common.model.nameOfProperty
 import org.cufy.mmrpc.gen.kotlin.common.nameOfClass
 import org.cufy.mmrpc.gen.kotlin.context.*
 import org.cufy.mmrpc.gen.kotlin.util.annotationClassSpec
 import org.cufy.mmrpc.gen.kotlin.util.constructorSpec
-import org.cufy.mmrpc.gen.kotlin.util.parameterSpec
 import org.cufy.mmrpc.gen.kotlin.util.propertySpec
 
 context(ctx: Context, _: FailScope, _: InitStage)
@@ -50,13 +49,7 @@ private fun addAnnotationClass(element: MetadataDefinition) {
         annotationClassSpec(element.nameOfClass()) {
             primaryConstructor(constructorSpec {
                 for (field in element.fields) {
-                    addParameter(parameterSpec(field.nameOfProperty(), field.type.metaTypeName()) {
-                        val default = field.default
-
-                        if (default != null) {
-                            defaultValue(createMetaLiteralCode(field.type, default))
-                        }
-                    })
+                    addParameter(field.metaParameterSpec())
                 }
             })
 

@@ -11,7 +11,6 @@ import org.cufy.mmrpc.gen.kotlin.Names
 import org.cufy.mmrpc.gen.kotlin.common.code.createKdocCode
 import org.cufy.mmrpc.gen.kotlin.common.isGeneratingClass
 import org.cufy.mmrpc.gen.kotlin.common.model.*
-import org.cufy.mmrpc.gen.kotlin.common.typeName
 import org.cufy.mmrpc.gen.kotlin.context.*
 import org.cufy.mmrpc.gen.kotlin.util.FLOW
 import org.cufy.mmrpc.gen.kotlin.util.funSpec
@@ -122,10 +121,7 @@ private fun apply(element: ProtocolDefinition) {
             addFunction(funSpec(routine.nameOfFunction()) {
                 receiver(element.generatedBaseClassName(BASE_NAME))
                 for (field in fields) {
-                    addParameter(
-                        field.nameOfProperty(),
-                        field.type.typeName(),
-                    )
+                    addParameter(field.parameterSpec())
                 }
                 returns(FLOW.parameterizedBy(routine.output.className()))
 

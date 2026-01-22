@@ -4,7 +4,6 @@ import com.squareup.kotlinpoet.KModifier
 import org.cufy.mmrpc.StructDefinition
 import org.cufy.mmrpc.gen.kotlin.StructStrategy
 import org.cufy.mmrpc.gen.kotlin.common.code.createKdocCode
-import org.cufy.mmrpc.gen.kotlin.common.code.createLiteralCode
 import org.cufy.mmrpc.gen.kotlin.common.isGeneratingClass
 import org.cufy.mmrpc.gen.kotlin.common.model.*
 import org.cufy.mmrpc.gen.kotlin.common.nameOfClass
@@ -107,23 +106,11 @@ private fun addDataClass(element: StructDefinition) {
 
             primaryConstructor(constructorSpec {
                 for (field in supFields) {
-                    addParameter(parameterSpec(field.nameOfProperty(), field.type.typeName()) {
-                        val default = field.default
-
-                        if (default != null) {
-                            defaultValue(createLiteralCode(field.type, default))
-                        }
-                    })
+                    addParameter(field.parameterSpec())
                 }
 
                 for (field in element.fields) {
-                    addParameter(parameterSpec(field.nameOfProperty(), field.type.typeName()) {
-                        val default = field.default
-
-                        if (default != null) {
-                            defaultValue(createLiteralCode(field.type, default))
-                        }
-                    })
+                    addParameter(field.parameterSpec())
                 }
             })
 
