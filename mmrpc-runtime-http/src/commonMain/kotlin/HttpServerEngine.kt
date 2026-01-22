@@ -3,23 +3,25 @@ package org.cufy.mmrpc.runtime.http
 import io.ktor.http.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
-import org.cufy.mmrpc.runtime.ExperimentalMmrpcApi
-import org.cufy.mmrpc.runtime.FaultException
-import org.cufy.mmrpc.runtime.FaultObject
-import org.cufy.mmrpc.runtime.ServerEngine
+import org.cufy.mmrpc.runtime.*
+import org.cufy.mmrpc.runtime.Interceptor.Companion.foldError
+import org.cufy.mmrpc.runtime.Interceptor.Companion.foldRequest
+import org.cufy.mmrpc.runtime.Interceptor.Companion.foldResponse
+import org.cufy.mmrpc.runtime.http.util.HttpServerNegotiator
 
 @OptIn(ExperimentalMmrpcApi::class)
 class HttpServerEngine @ExperimentalMmrpcApi constructor(
     val route: Route,
-    val contentNegotiator: HttpServerContentNegotiator,
-    val interceptors: List<HttpServerInterceptor>,
+    val negotiator: HttpServerNegotiator,
+    val interceptors: List<Interceptor.Server>,
 ) : ServerEngine.Http {
     interface Builder {
         @ExperimentalMmrpcApi
-        fun install(interceptor: HttpServerInterceptor)
+        fun install(interceptor: Interceptor.Server)
         @ExperimentalMmrpcApi
-        fun install(negotiator: HttpServerContentNegotiator)
+        fun install(negotiator: HttpServerNegotiator)
         fun routing(block: context(HttpServerEngine) () -> Unit)
     }
 
@@ -32,13 +34,13 @@ class HttpServerEngine @ExperimentalMmrpcApi constructor(
         handler: suspend (Req) -> Unit
     ) {
         route.post(canonicalName) {
-            val request = contentNegotiator.getReq(call, reqSerial)
-
-            if (!interceptors.all { it.onReq(call, canonicalName, request) })
-                return@post
-
-            handler(request)
-            call.respond(HttpStatusCode.OK)
+            val ctx = HttpServerContext(call, canonicalName)
+            withContext(ctx) {
+                val request = with(ctx) { negotiator.getRequest(reqSerial) }
+                val foldReq = foldRequest(interceptors, canonicalName, request)
+                handler(foldReq)
+                call.respond(HttpStatusCode.OK)
+            }
         }
     }
 
@@ -49,30 +51,20 @@ class HttpServerEngine @ExperimentalMmrpcApi constructor(
         handler: suspend (Req) -> Res
     ) {
         route.post(canonicalName) {
-            val request = contentNegotiator.getReq(call, reqSerial)
-
-            if (!interceptors.all { it.onReq(call, canonicalName, request) })
-                return@post
-
-            val response = try {
-                handler(request)
-            } catch (e: FaultException) {
-                val error = FaultObject(
-                    canonicalName = e.canonicalName,
-                    message = e.message,
-                )
-
-                if (!interceptors.all { it.onErr(call, canonicalName, request, error) })
-                    return@post
-
-                contentNegotiator.setErr(call, error)
-                return@post
+            val ctx = HttpServerContext(call, canonicalName)
+            withContext(ctx) {
+                try {
+                    val request = with(ctx) { negotiator.getRequest(reqSerial) }
+                    val foldReq = foldRequest(interceptors, canonicalName, request)
+                    val response = handler(foldReq)
+                    val foldRes = foldResponse(interceptors, canonicalName, response)
+                    with(ctx) { negotiator.setResponse(resSerial, foldRes) }
+                } catch (e: FaultException) {
+                    val error = e.toFaultObject()
+                    val foldErr = foldError(interceptors, canonicalName, error)
+                    with(ctx) { negotiator.setError(foldErr) }
+                }
             }
-
-            if (!interceptors.all { it.onRes(call, canonicalName, request, response) })
-                return@post
-
-            contentNegotiator.setRes(call, resSerial, response)
         }
     }
 }

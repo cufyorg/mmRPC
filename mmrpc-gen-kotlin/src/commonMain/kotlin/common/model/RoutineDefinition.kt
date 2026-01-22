@@ -2,7 +2,6 @@ package org.cufy.mmrpc.gen.kotlin.common.model
 
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import net.pearx.kasechange.toCamelCase
 import org.cufy.mmrpc.Comm
@@ -19,7 +18,6 @@ import org.cufy.mmrpc.gen.kotlin.context.Context
 import org.cufy.mmrpc.gen.kotlin.debug
 import org.cufy.mmrpc.gen.kotlin.util.createCall
 import org.cufy.mmrpc.gen.kotlin.util.funSpec
-import org.cufy.mmrpc.gen.kotlin.util.parameterSpec
 import org.cufy.mmrpc.runtime.FaultException
 import org.cufy.mmrpc.runtime.ServerEngine
 
@@ -173,7 +171,7 @@ fun RoutineDefinition.clientExecImplFunSpec(): FunSpec {
             addStatement(
                 "♢return %M(this.engine, %T.CANONICAL_NAME, request)",
                 MemberName(
-                    packageName = "org.cufy.mmrpc.runtime",
+                    packageName = "org.cufy.mmrpc.runtime.internal",
                     simpleName = "exec$n",
                 ),
                 generatedClassName(),
@@ -183,7 +181,7 @@ fun RoutineDefinition.clientExecImplFunSpec(): FunSpec {
             addStatement(
                 "return %M(this.engine, %T.CANONICAL_NAME, request)",
                 MemberName(
-                    packageName = "org.cufy.mmrpc.runtime",
+                    packageName = "org.cufy.mmrpc.runtime.internal",
                     simpleName = "exec$n",
                 ),
                 generatedClassName(),
@@ -240,7 +238,7 @@ fun RoutineDefinition.serverRegisterImplCode(handler: CodeBlock): CodeBlock {
     return CodeBlock.of(
         "%M(%T.CANONICAL_NAME, %L)",
         MemberName(
-            packageName = "org.cufy.mmrpc.runtime",
+            packageName = "org.cufy.mmrpc.runtime.internal",
             simpleName = "register$n",
         ),
         generatedClassName(),
@@ -312,57 +310,43 @@ fun RoutineDefinition.clientFlatInputExecFunSpec(receiver: ClassName): FunSpec {
 @ContextScope
 context(_: Context)
 fun RoutineDefinition.serverDirectRegisterFunSpec(receiver: ClassName): FunSpec {
-    val request: TypeName
-    val response: TypeName
-    val isSuspend: Boolean
+    val lambda: TypeName
     val n: Int // function overload number
 
     when (comm) {
         Comm.VoidUnary -> {
-            request = output.className()
-            response = UNIT
-            isSuspend = true
+            lambda = ClassName("org.cufy.mmrpc.runtime.internal", "WrapHandler0")
+                .parameterizedBy(output.className())
             n = 0
         }
 
         Comm.UnaryVoid -> {
-            request = input.className()
-            response = UNIT
-            isSuspend = true
+            lambda = ClassName("org.cufy.mmrpc.runtime.internal", "WrapHandler0")
+                .parameterizedBy(input.className())
             n = 0
         }
 
         Comm.UnaryUnary -> {
-            request = input.className()
-            response = output.className()
-            isSuspend = true
+            lambda = ClassName("org.cufy.mmrpc.runtime.internal", "WrapHandler1")
+                .parameterizedBy(input.className(), output.className())
             n = 1
         }
 
-        Comm.StreamUnary,
-        -> {
-            request = Flow::class.asClassName()
-                .parameterizedBy(input.className())
-            response = output.className()
-            isSuspend = true
+        Comm.StreamUnary -> {
+            lambda = ClassName("org.cufy.mmrpc.runtime.internal", "WrapHandler2")
+                .parameterizedBy(input.className(), output.className())
             n = 2
         }
 
         Comm.UnaryStream -> {
-            request = input.className()
-            response = Flow::class.asClassName()
-                .parameterizedBy(output.className())
-            isSuspend = false
+            lambda = ClassName("org.cufy.mmrpc.runtime.internal", "WrapHandler3")
+                .parameterizedBy(input.className(), output.className())
             n = 3
         }
 
-        Comm.StreamStream,
-        -> {
-            request = Flow::class.asClassName()
-                .parameterizedBy(input.className())
-            response = Flow::class.asClassName()
-                .parameterizedBy(output.className())
-            isSuspend = false
+        Comm.StreamStream -> {
+            lambda = ClassName("org.cufy.mmrpc.runtime.internal", "WrapHandler4")
+                .parameterizedBy(input.className(), output.className())
             n = 4
         }
     }
@@ -370,34 +354,19 @@ fun RoutineDefinition.serverDirectRegisterFunSpec(receiver: ClassName): FunSpec 
     return funSpec(nameOfFunction()) {
         contextParameter("engine", ServerEngine::class)
         receiver(receiver)
-        addParameter(
-            "handler",
-            LambdaTypeName.get(
-                contextParameters = listOf(
-                    typeNameOf<CoroutineScope>()
-                ),
-                parameters = listOf(
-                    parameterSpec("request", request)
-                ),
-                returnType = response,
-            ).copy(suspending = isSuspend)
-        )
 
         // Implementation
         beginControlFlow("if (engine.is%LSupported())", n)
-        if (isSuspend) {
-            addStatement("%L", serverRegisterImplCode(
-                handler = CodeBlock.of(
-                    "%M(handler)",
-                    MemberName(
-                        "org.cufy.mmrpc.runtime",
-                        "_wrap_cs"
-                    ),
+        addParameter("handler", lambda)
+        addStatement("%L", serverRegisterImplCode(
+            handler = CodeBlock.of(
+                "%M(handler)",
+                MemberName(
+                    "org.cufy.mmrpc.runtime.internal",
+                    "wrap$n"
                 ),
-            ))
-        } else {
-            addStatement("%L", serverRegisterImplCode(CodeBlock.of("handler")))
-        }
+            ),
+        ))
         endControlFlow()
     }
 }

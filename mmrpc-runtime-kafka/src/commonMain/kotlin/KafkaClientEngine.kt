@@ -1,24 +1,26 @@
 package org.cufy.mmrpc.runtime.kafka
 
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
 import org.apache.kafka.clients.producer.KafkaProducer
-import org.apache.kafka.clients.producer.ProducerRecord
 import org.cufy.mmrpc.runtime.ClientEngine
 import org.cufy.mmrpc.runtime.ExperimentalMmrpcApi
+import org.cufy.mmrpc.runtime.Interceptor
+import org.cufy.mmrpc.runtime.Interceptor.Companion.foldRequest
+import org.cufy.mmrpc.runtime.kafka.internal.send
+import org.cufy.mmrpc.runtime.kafka.util.KafkaClientNegotiator
 
 @OptIn(ExperimentalMmrpcApi::class)
 class KafkaClientEngine @ExperimentalMmrpcApi constructor(
     val producer: KafkaProducer<*, *>,
-    val contentNegotiator: KafkaClientContentNegotiator,
-    val interceptors: List<KafkaClientInterceptor>,
+    val negotiator: KafkaClientNegotiator,
+    val interceptors: List<Interceptor.Client>,
 ) : ClientEngine.Kafka {
     interface Builder {
         @ExperimentalMmrpcApi
-        fun install(interceptor: KafkaClientInterceptor)
+        fun install(interceptor: Interceptor.Client)
         @ExperimentalMmrpcApi
-        fun install(negotiator: KafkaClientContentNegotiator)
+        fun install(negotiator: KafkaClientNegotiator)
     }
 
     override fun is0Supported() = true
@@ -28,20 +30,18 @@ class KafkaClientEngine @ExperimentalMmrpcApi constructor(
         request: Req,
         reqSerial: KSerializer<Req>,
     ) {
-        val record = KafkaRequestBuilder()
-            .apply {
-                topic = canonicalName
-                contentNegotiator.setReq(this, reqSerial, request)
-                interceptors.forEach { it.onReq(this, canonicalName, request) }
-            }
-            .build()
-
-        withContext(Dispatchers.IO) {
-            @Suppress("UNCHECKED_CAST")
-            producer as KafkaProducer<Any?, Any?>
-            @Suppress("UNCHECKED_CAST")
-            record as ProducerRecord<Any?, Any?>
-            producer.send(record)
+        val ctx = KafkaClientContext(canonicalName)
+        withContext(ctx) {
+            val foldReq = foldRequest(interceptors, canonicalName, request)
+            with(ctx) { negotiator.setRequest(reqSerial, foldReq) }
+            producer.send(
+                topic = canonicalName,
+                partition = ctx.request.partition,
+                timestamp = ctx.request.timestamp,
+                key = ctx.request.key,
+                value = ctx.request.value,
+                headers = ctx.request.headers,
+            )
         }
     }
 }

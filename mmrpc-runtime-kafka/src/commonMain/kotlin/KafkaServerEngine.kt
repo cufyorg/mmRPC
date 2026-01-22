@@ -1,23 +1,27 @@
 package org.cufy.mmrpc.runtime.kafka
 
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
 import org.cufy.kaftor.KafkaRoute
 import org.cufy.kaftor.commit
 import org.cufy.kaftor.consume
 import org.cufy.mmrpc.runtime.ExperimentalMmrpcApi
+import org.cufy.mmrpc.runtime.Interceptor
+import org.cufy.mmrpc.runtime.Interceptor.Companion.foldRequest
 import org.cufy.mmrpc.runtime.ServerEngine
+import org.cufy.mmrpc.runtime.kafka.util.KafkaServerNegotiator
 
 @OptIn(ExperimentalMmrpcApi::class)
 class KafkaServerEngine @ExperimentalMmrpcApi constructor(
     val route: KafkaRoute,
-    val contentNegotiator: KafkaServerContentNegotiator,
-    val interceptors: List<KafkaServerInterceptor>,
+    val negotiator: KafkaServerNegotiator,
+    val interceptors: List<Interceptor.Server>,
 ) : ServerEngine.Kafka {
     interface Builder {
         @ExperimentalMmrpcApi
-        fun install(interceptor: KafkaServerInterceptor)
+        fun install(interceptor: Interceptor.Server)
         @ExperimentalMmrpcApi
-        fun install(negotiator: KafkaServerContentNegotiator)
+        fun install(negotiator: KafkaServerNegotiator)
         fun routing(block: context(KafkaServerEngine) () -> Unit)
     }
 
@@ -29,13 +33,13 @@ class KafkaServerEngine @ExperimentalMmrpcApi constructor(
         handler: suspend (Req) -> Unit
     ) {
         route.consume(canonicalName) {
-            val request = contentNegotiator.getReq(event, reqSerial)
-
-            if (!interceptors.all { it.onReq(event, canonicalName, request) })
-                return@consume
-
-            handler(request)
-            event.commit()
+            val ctx = KafkaServerContext(event, canonicalName)
+            withContext(ctx) {
+                val request = with(ctx) { negotiator.getRequest(reqSerial) }
+                val foldReq = foldRequest(interceptors, canonicalName, request)
+                handler(foldReq)
+                event.commit()
+            }
         }
     }
 }

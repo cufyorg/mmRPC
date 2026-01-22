@@ -4,22 +4,28 @@ import io.ktor.client.*
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.http.*
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
 import org.cufy.mmrpc.runtime.ClientEngine
 import org.cufy.mmrpc.runtime.ExperimentalMmrpcApi
-import org.cufy.mmrpc.runtime.FaultException
+import org.cufy.mmrpc.runtime.Interceptor
+import org.cufy.mmrpc.runtime.Interceptor.Companion.foldError
+import org.cufy.mmrpc.runtime.Interceptor.Companion.foldRequest
+import org.cufy.mmrpc.runtime.Interceptor.Companion.foldResponse
+import org.cufy.mmrpc.runtime.http.util.HttpClientNegotiator
+import org.cufy.mmrpc.runtime.toFaultException
 
 @OptIn(ExperimentalMmrpcApi::class)
 class HttpClientEngine @ExperimentalMmrpcApi constructor(
     val client: HttpClient,
-    val contentNegotiator: HttpClientContentNegotiator,
-    val interceptors: List<HttpClientInterceptor>,
+    val negotiator: HttpClientNegotiator,
+    val interceptors: List<Interceptor.Client>,
 ) : ClientEngine.Http {
     interface Builder {
         @ExperimentalMmrpcApi
-        fun install(interceptor: HttpClientInterceptor)
+        fun install(interceptor: Interceptor.Client)
         @ExperimentalMmrpcApi
-        fun install(negotiator: HttpClientContentNegotiator)
+        fun install(negotiator: HttpClientNegotiator)
     }
 
     override fun is0Supported() = true
@@ -30,10 +36,14 @@ class HttpClientEngine @ExperimentalMmrpcApi constructor(
         request: Req,
         reqSerial: KSerializer<Req>,
     ) {
-        client.post {
-            this.url.appendPathSegments(canonicalName)
-            contentNegotiator.setReq(this, reqSerial, request)
-            interceptors.forEach { it.onReq(this, canonicalName, request) }
+        val ctx = HttpClientContext(canonicalName)
+        withContext(ctx) {
+            client.post {
+                ctx.request = this
+                this.url.appendPathSegments(canonicalName)
+                val foldReq = foldRequest(interceptors, canonicalName, request)
+                with(ctx) { negotiator.setRequest(reqSerial, foldReq) }
+            }
         }
     }
 
@@ -43,35 +53,26 @@ class HttpClientEngine @ExperimentalMmrpcApi constructor(
         reqSerial: KSerializer<Req>,
         resSerial: KSerializer<Res>,
     ): Res {
-        val result = try {
-            client.post {
-                this.url.appendPathSegments(canonicalName)
-                contentNegotiator.setReq(this, reqSerial, request)
-                interceptors.forEach { it.onReq(this, canonicalName, request) }
-            }
-        } catch (cause: ResponseException) {
-            if (cause.response.status.value in 400..<600) {
-                val error = try {
-                    contentNegotiator.getErr(cause.response)
-                        ?: throw cause
-                } catch (_: Exception) {
-                    throw cause
+        val ctx = HttpClientContext(canonicalName)
+        return withContext(ctx) {
+            val result = try {
+                client.post {
+                    ctx.request = this
+                    this.url.appendPathSegments(canonicalName)
+                    val foldReq = foldRequest(interceptors, canonicalName, request)
+                    with(ctx) { negotiator.setRequest(reqSerial, foldReq) }
                 }
-
-                interceptors.forEach { it.onErr(cause.response, canonicalName, request, error) }
-
-                throw FaultException(
-                    canonicalName = error.canonicalName,
-                    message = error.message,
-                    cause = cause,
-                )
+            } catch (cause: ResponseException) {
+                ctx.response = cause.response
+                val error = with(ctx) { negotiator.getError() } ?: throw cause
+                val foldErr = foldError(interceptors, canonicalName, error)
+                throw foldErr.toFaultException(cause)
             }
 
-            throw cause
+            ctx.response = result
+            val response = with(ctx) { negotiator.getResponse(resSerial) }
+            val foldRes = foldResponse(interceptors, canonicalName, response)
+            foldRes
         }
-
-        val response = contentNegotiator.getRes(result, resSerial)
-        interceptors.forEach { it.onRes(result, canonicalName, request, response) }
-        return response
     }
 }
