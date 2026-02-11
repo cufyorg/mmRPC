@@ -26,8 +26,8 @@ class UnionDefinitionBuilder :
         val cn = buildCanonicalName()
         return UnionDefinition(
             canonicalName = cn,
-            description = this.description,
-            metadata = this.metadata.toList(),
+            description = buildDescription(),
+            metadata = buildMetadata(),
             discriminator = this.discriminator,
             types = this.types.mapIndexed { i, it ->
                 it.asAnonSiblingOf(cn, "type", i)

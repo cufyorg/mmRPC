@@ -15,8 +15,8 @@ class FaultDefinitionBuilder :
         val cn = buildCanonicalName()
         return FaultDefinition(
             canonicalName = cn,
-            description = this.description,
-            metadata = this.metadata.toList(),
+            description = buildDescription(),
+            metadata = buildMetadata(),
         )
     }
 }

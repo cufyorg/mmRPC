@@ -18,8 +18,8 @@ class FieldDefinitionBuilder :
         val cn = buildCanonicalName()
         return FieldDefinition(
             canonicalName = cn,
-            description = this.description,
-            metadata = this.metadata.toList(),
+            description = buildDescription(),
+            metadata = buildMetadata(),
             key = this.key,
             type = this::type.getOrThrow()
                 .asAnonSiblingOf(cn, "type"),

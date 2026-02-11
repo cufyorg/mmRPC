@@ -25,8 +25,8 @@ class ProtocolDefinitionBuilder :
         val cn = buildCanonicalName()
         return ProtocolDefinition(
             canonicalName = cn,
-            description = this.description,
-            metadata = this.metadata.toList(),
+            description = buildDescription(),
+            metadata = buildMetadata(),
             routines = this.routines.mapIndexed { i, it ->
                 it.asAnonChildOf(cn, "routine", i)
             }

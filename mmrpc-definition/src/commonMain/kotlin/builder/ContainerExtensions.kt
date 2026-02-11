@@ -20,4 +20,4 @@ fun traitList(block: context(TraitDefinitionContainerBuilder) () -> Unit): List<
 
 @Marker2
 fun markdown(block: context(MarkdownContainerBuilder) () -> Unit): String =
-    buildString { block { append(it) } }
+    buildList { block { add(it) } }.joinToString("\n")

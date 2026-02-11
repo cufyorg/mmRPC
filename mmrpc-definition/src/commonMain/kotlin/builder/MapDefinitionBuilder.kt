@@ -16,8 +16,8 @@ class MapDefinitionBuilder :
         val cn = buildCanonicalName()
         return MapDefinition(
             canonicalName = cn,
-            description = this.description,
-            metadata = this.metadata.toList(),
+            description = buildDescription(),
+            metadata = buildMetadata(),
             type = this::type.getOrThrow()
                 .asAnonSiblingOf(cn, "type"),
         )

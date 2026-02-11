@@ -25,8 +25,8 @@ class TupleDefinitionBuilder :
         val cn = buildCanonicalName()
         return TupleDefinition(
             canonicalName = cn,
-            description = this.description,
-            metadata = this.metadata.toList(),
+            description = buildDescription(),
+            metadata = buildMetadata(),
             types = this.types.mapIndexed { i, it ->
                 it.asAnonSiblingOf(cn, "type", i)
             },

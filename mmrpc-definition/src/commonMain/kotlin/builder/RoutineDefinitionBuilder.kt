@@ -42,8 +42,8 @@ class RoutineDefinitionBuilder :
         val cn = buildCanonicalName()
         return RoutineDefinition(
             canonicalName = cn,
-            description = this.description,
-            metadata = this.metadata.toList(),
+            description = buildDescription(),
+            metadata = buildMetadata(),
             comm = comm,
             faults = this.faults.mapIndexed { i, it ->
                 it.asAnonChildOf(cn, "fault", i)

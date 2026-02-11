@@ -23,8 +23,8 @@ open class EnumDefinitionBuilder :
         val cn = buildCanonicalName()
         return EnumDefinition(
             canonicalName = cn,
-            description = this.description,
-            metadata = this.metadata.toList(),
+            description = buildDescription(),
+            metadata = buildMetadata(),
             type = this::type.getOrThrow()
                 .asAnonChildOf(cn, "type"),
             entries = this.entries.mapIndexed { i, it ->

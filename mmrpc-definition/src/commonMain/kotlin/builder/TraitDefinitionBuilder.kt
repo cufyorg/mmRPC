@@ -31,8 +31,8 @@ class TraitDefinitionBuilder :
         val cn = buildCanonicalName()
         return TraitDefinition(
             canonicalName = cn,
-            description = this.description,
-            metadata = this.metadata.toList(),
+            description = buildDescription(),
+            metadata = buildMetadata(),
             discriminator = this.discriminator,
             traits = this.traits.mapIndexed { i, it ->
                 it.asAnonChildOf(cn, "trait", i)

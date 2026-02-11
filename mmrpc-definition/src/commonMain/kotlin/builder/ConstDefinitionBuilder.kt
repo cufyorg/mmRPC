@@ -17,8 +17,8 @@ class ConstDefinitionBuilder :
         val cn = buildCanonicalName()
         return ConstDefinition(
             canonicalName = cn,
-            description = this.description,
-            metadata = this.metadata.toList(),
+            description = buildDescription(),
+            metadata = buildMetadata(),
             type = this::type.getOrThrow()
                 .asAnonSiblingOf(cn, "type"),
             value = this::value.getOrThrow(),

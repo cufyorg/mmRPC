@@ -28,8 +28,8 @@ class StructDefinitionBuilder :
         val cn = buildCanonicalName()
         return StructDefinition(
             canonicalName = cn,
-            description = this.description,
-            metadata = this.metadata.toList(),
+            description = buildDescription(),
+            metadata = buildMetadata(),
             traits = this.traits.mapIndexed { i, it ->
                 it.asAnonChildOf(cn, "trait", i)
             },

@@ -16,8 +16,8 @@ class OptionalDefinitionBuilder :
         val cn = buildCanonicalName()
         return OptionalDefinition(
             canonicalName = cn,
-            description = this.description,
-            metadata = this.metadata.toList(),
+            description = buildDescription(),
+            metadata = buildMetadata(),
             type = this::type.getOrThrow()
                 .asAnonSiblingOf(cn, "type"),
         )

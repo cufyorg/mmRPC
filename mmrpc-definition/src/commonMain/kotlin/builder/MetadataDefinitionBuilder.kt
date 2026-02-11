@@ -26,8 +26,8 @@ class MetadataDefinitionBuilder :
         val cn = buildCanonicalName()
         return MetadataDefinition(
             canonicalName = cn,
-            description = this.description,
-            metadata = this.metadata.toList(),
+            description = buildDescription(),
+            metadata = buildMetadata(),
             repeated = this.repeated,
             fields = this.fields.mapIndexed { i, it ->
                 it.asAnonChildOf(cn, "field", i)

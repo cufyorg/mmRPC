@@ -16,8 +16,8 @@ class ScalarDefinitionBuilder :
         val cn = buildCanonicalName()
         return ScalarDefinition(
             canonicalName = cn,
-            description = this.description,
-            metadata = this.metadata.toList(),
+            description = buildDescription(),
+            metadata = buildMetadata(),
             type = this::type.getOrNull()
                 ?.asAnonSiblingOf(cn, "type"),
         )

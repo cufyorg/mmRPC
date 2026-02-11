@@ -16,8 +16,8 @@ class ArrayDefinitionBuilder :
         val cn = buildCanonicalName()
         return ArrayDefinition(
             canonicalName = cn,
-            description = this.description,
-            metadata = this.metadata.toList(),
+            description = buildDescription(),
+            metadata = buildMetadata(),
             type = this::type.getOrThrow()
                 .asAnonSiblingOf(cn, "type"),
         )

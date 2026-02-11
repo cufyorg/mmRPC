@@ -10,7 +10,7 @@ sealed class ElementDefinitionBuilder :
     MetadataUsageContainerBuilder {
     lateinit var name: String
     var namespace: CanonicalName? = null
-    var description = ""
+    val description = mutableListOf<String>()
     val metadata = mutableListOf<MetadataUsage>()
 
     override fun addMarkdown(value: String) {
@@ -23,4 +23,10 @@ sealed class ElementDefinitionBuilder :
 
     protected fun buildCanonicalName() =
         CanonicalName(namespace, name)
+
+    protected fun buildDescription() =
+        description.joinToString("\n")
+
+    protected fun buildMetadata() =
+        metadata.toList()
 }
