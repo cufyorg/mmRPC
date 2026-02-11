@@ -32,7 +32,7 @@ kotlin-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-co
 charleskorn-kaml = { module = "com.charleskorn.kaml:kaml", version = "0.93.0" }
 pearx-kasechange = { module = "net.pearx.kasechange:kasechange-jvm", version = "1.4.1" }
 
-jetbrains-annotations = { module = "org.jetbrains:annotations", version = "26.0.2" }
+jetbrains-annotations = { module = "org.jetbrains:annotations", version = "26.0.2-1" }
 
 # Code Generation Dependencies
 
