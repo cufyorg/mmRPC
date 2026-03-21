@@ -3,7 +3,7 @@ package org.cufy.mmrpc
 import kotlin.reflect.KProperty
 
 interface Unnamed<out T : Any> {
-    fun get(ns: CanonicalName?, name: String?): T
+    fun get(ns: CanonicalName? = null, name: String?): T
 }
 
 fun <T : Any> Unnamed(value: T): Unnamed<T> {
