@@ -36,6 +36,8 @@ operator fun <T : Any> Unnamed<T>.getValue(obj: NamespaceObject, property: KProp
 
 operator fun <T : Any> Unnamed<T>.getValue(obj: Any?, property: KProperty<*>): T {
     val splits = property.name.split("__")
+    if (splits.size == 1)
+        return get(null, splits[0])
     val ns = CanonicalName(splits.dropLast(1))
     val n = splits.last()
     return get(ns, n)
