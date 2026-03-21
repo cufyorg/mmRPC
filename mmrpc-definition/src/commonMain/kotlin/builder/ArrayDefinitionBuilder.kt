@@ -58,13 +58,3 @@ fun array(
 }
 
 ////////////////////////////////////////
-
-@Marker2
-val TypeDefinition.array: Unnamed<ArrayDefinition>
-    get() = array(this)
-
-@Marker2
-val Unnamed<TypeDefinition>.array: Unnamed<ArrayDefinition>
-    get() = array(this)
-
-////////////////////////////////////////

@@ -58,13 +58,3 @@ fun optional(
 }
 
 ////////////////////////////////////////
-
-@Marker2
-val TypeDefinition.optional: Unnamed<OptionalDefinition>
-    get() = optional(this)
-
-@Marker2
-val Unnamed<TypeDefinition>.optional: Unnamed<OptionalDefinition>
-    get() = optional(this)
-
-////////////////////////////////////////
