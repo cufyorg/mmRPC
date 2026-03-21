@@ -11,6 +11,8 @@ import org.cufy.mmrpc.internal.asAnonChildOf
 
 typealias ProtocolDefinitionBlock = context(ProtocolDefinitionBuilder) () -> Unit
 
+context(ctx: ProtocolDefinitionBuilder) val builder get() = ctx
+
 @Marker2
 class ProtocolDefinitionBuilder :
     RoutineDefinitionContainerBuilder,

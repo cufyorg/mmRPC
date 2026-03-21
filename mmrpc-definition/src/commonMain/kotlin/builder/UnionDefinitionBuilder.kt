@@ -11,6 +11,8 @@ import org.cufy.mmrpc.internal.asAnonSiblingOf
 
 typealias UnionDefinitionBlock = context(UnionDefinitionBuilder) () -> Unit
 
+context(ctx: UnionDefinitionBuilder) val builder get() = ctx
+
 @Marker2
 class UnionDefinitionBuilder :
     StructDefinitionContainerBuilder,

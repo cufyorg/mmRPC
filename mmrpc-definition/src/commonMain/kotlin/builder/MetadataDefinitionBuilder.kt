@@ -11,6 +11,8 @@ import org.cufy.mmrpc.internal.asAnonChildOf
 
 typealias MetadataDefinitionBlock = context(MetadataDefinitionBuilder) () -> Unit
 
+context(ctx: MetadataDefinitionBuilder) val builder get() = ctx
+
 @Marker2
 class MetadataDefinitionBuilder :
     FieldDefinitionContainerBuilder,

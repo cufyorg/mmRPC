@@ -7,6 +7,8 @@ import org.cufy.mmrpc.internal.asAnonSiblingOf
 
 typealias MapDefinitionBlock = context(MapDefinitionBuilder) () -> Unit
 
+context(ctx: MapDefinitionBuilder) val builder get() = ctx
+
 @Marker2
 class MapDefinitionBuilder :
     ElementDefinitionBuilder() {

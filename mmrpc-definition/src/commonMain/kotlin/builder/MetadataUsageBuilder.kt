@@ -6,6 +6,8 @@ import org.cufy.mmrpc.*
 
 typealias MetadataUsageBlock = context(MetadataUsageBuilder) () -> Unit
 
+context(ctx: MetadataUsageBuilder) val builder get() = ctx
+
 @Marker2
 class MetadataUsageBuilder :
     FieldUsageContainerBuilder {

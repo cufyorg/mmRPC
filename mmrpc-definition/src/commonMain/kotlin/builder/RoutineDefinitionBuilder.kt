@@ -7,6 +7,8 @@ import org.cufy.mmrpc.internal.asAnonChildOf
 
 typealias RoutineDefinitionBlock = context(RoutineDefinitionBuilder) () -> Unit
 
+context(ctx: RoutineDefinitionBuilder) val builder get() = ctx
+
 @Marker2
 class RoutineDefinitionBuilder :
     FaultDefinitionContainerBuilder,

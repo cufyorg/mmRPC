@@ -7,6 +7,8 @@ import org.cufy.mmrpc.internal.asAnonSiblingOf
 
 typealias ScalarDefinitionBlock = context(ScalarDefinitionBuilder) () -> Unit
 
+context(ctx: ScalarDefinitionBuilder) val builder get() = ctx
+
 @Marker2
 class ScalarDefinitionBuilder :
     ElementDefinitionBuilder() {

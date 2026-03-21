@@ -7,6 +7,8 @@ import org.cufy.mmrpc.internal.asAnonSiblingOf
 
 typealias FieldDefinitionBlock = context(FieldDefinitionBuilder) () -> Unit
 
+context(ctx: FieldDefinitionBuilder) val builder get() = ctx
+
 @Marker2
 class FieldDefinitionBuilder :
     ElementDefinitionBuilder() {

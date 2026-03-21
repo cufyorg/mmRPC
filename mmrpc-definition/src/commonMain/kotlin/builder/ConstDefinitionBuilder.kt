@@ -7,6 +7,8 @@ import org.cufy.mmrpc.internal.asAnonSiblingOf
 
 typealias ConstDefinitionBlock = context(ConstDefinitionBuilder) () -> Unit
 
+context(ctx: ConstDefinitionBuilder) val builder get() = ctx
+
 @Marker2
 class ConstDefinitionBuilder :
     ElementDefinitionBuilder() {

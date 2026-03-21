@@ -7,6 +7,8 @@ import org.cufy.mmrpc.internal.asAnonSiblingOf
 
 typealias OptionalDefinitionBlock = context(OptionalDefinitionBuilder) () -> Unit
 
+context(ctx: OptionalDefinitionBuilder) val builder get() = ctx
+
 @Marker2
 class OptionalDefinitionBuilder :
     ElementDefinitionBuilder() {

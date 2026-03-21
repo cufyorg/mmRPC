@@ -8,6 +8,8 @@ import org.cufy.mmrpc.internal.asAnonChildOf
 
 typealias EnumDefinitionBlock = context(EnumDefinitionBuilder) () -> Unit
 
+context(ctx: EnumDefinitionBuilder) val builder get() = ctx
+
 @Marker2
 open class EnumDefinitionBuilder :
     ConstDefinitionContainerBuilder,

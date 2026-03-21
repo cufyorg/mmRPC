@@ -7,6 +7,8 @@ import org.cufy.mmrpc.internal.asAnonSiblingOf
 
 typealias ArrayDefinitionBlock = context(ArrayDefinitionBuilder) () -> Unit
 
+context(ctx: ArrayDefinitionBuilder) val builder get() = ctx
+
 @Marker2
 class ArrayDefinitionBuilder :
     ElementDefinitionBuilder() {

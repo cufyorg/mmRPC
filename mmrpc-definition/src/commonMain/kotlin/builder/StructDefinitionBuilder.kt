@@ -8,6 +8,8 @@ import org.cufy.mmrpc.internal.asAnonChildOf
 
 typealias StructDefinitionBlock = context(StructDefinitionBuilder) () -> Unit
 
+context(ctx: StructDefinitionBuilder) val builder get() = ctx
+
 @Marker2
 class StructDefinitionBuilder :
     FieldDefinitionContainerBuilder,

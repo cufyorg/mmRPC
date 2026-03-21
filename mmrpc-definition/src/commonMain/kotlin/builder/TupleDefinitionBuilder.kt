@@ -11,6 +11,8 @@ import org.cufy.mmrpc.internal.asAnonSiblingOf
 
 typealias TupleDefinitionBlock = context(TupleDefinitionBuilder) () -> Unit
 
+context(ctx: TupleDefinitionBuilder) val builder get() = ctx
+
 @Marker2
 class TupleDefinitionBuilder :
     TypeDefinitionContainerBuilder,

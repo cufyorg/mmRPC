@@ -10,6 +10,8 @@ import org.cufy.mmrpc.internal.asAnonChildOf
 
 typealias TraitDefinitionBlock = context(TraitDefinitionBuilder) () -> Unit
 
+context(ctx: TraitDefinitionBuilder) val builder get() = ctx
+
 @Marker2
 class TraitDefinitionBuilder :
     FieldDefinitionContainerBuilder,

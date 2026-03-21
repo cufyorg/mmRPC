@@ -6,6 +6,8 @@ import org.cufy.mmrpc.*
 
 typealias FieldUsageBlock = context(FieldUsageBuilder) () -> Unit
 
+context(ctx: FieldUsageBuilder) val builder get() = ctx
+
 @Marker2
 class FieldUsageBuilder {
     val definition = Box<FieldDefinition>()

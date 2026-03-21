@@ -8,6 +8,8 @@ import org.cufy.mmrpc.Unnamed
 
 typealias FaultDefinitionBlock = context(FaultDefinitionBuilder) () -> Unit
 
+context(ctx: FaultDefinitionBuilder) val builder get() = ctx
+
 @Marker2
 class FaultDefinitionBuilder :
     ElementDefinitionBuilder() {
