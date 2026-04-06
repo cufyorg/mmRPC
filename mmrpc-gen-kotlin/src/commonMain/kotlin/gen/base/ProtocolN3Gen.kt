@@ -100,7 +100,7 @@ private fun apply(element: ProtocolDefinition) {
                     Intrinsics.WRAP_BLOCK3
                         .parameterizedBy(
                             routine.input.className(),
-                            FLOW.parameterizedBy(routine.output.className()),
+                            routine.output.className(),
                         )
                 )
 

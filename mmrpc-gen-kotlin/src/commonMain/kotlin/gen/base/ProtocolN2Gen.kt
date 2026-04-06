@@ -99,7 +99,7 @@ private fun apply(element: ProtocolDefinition) {
                     "handler",
                     Intrinsics.WRAP_BLOCK2
                         .parameterizedBy(
-                            FLOW.parameterizedBy(routine.input.className()),
+                            routine.input.className(),
                             routine.output.className(),
                         )
                 )
