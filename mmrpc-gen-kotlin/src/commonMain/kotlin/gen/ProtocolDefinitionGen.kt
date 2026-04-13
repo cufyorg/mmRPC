@@ -1,5 +1,7 @@
 package org.cufy.mmrpc.gen.kotlin.gen
 
+import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.STRING
 import org.cufy.mmrpc.ProtocolDefinition
 import org.cufy.mmrpc.gen.kotlin.common.code.createKdocCode
 import org.cufy.mmrpc.gen.kotlin.common.isGeneratingClass
@@ -11,6 +13,7 @@ import org.cufy.mmrpc.gen.kotlin.common.nameOfClass
 import org.cufy.mmrpc.gen.kotlin.context.*
 import org.cufy.mmrpc.gen.kotlin.util.companionObjectSpec
 import org.cufy.mmrpc.gen.kotlin.util.interfaceSpec
+import org.cufy.mmrpc.gen.kotlin.util.propertySpec
 
 context(ctx: Context, _: FailScope, _: InitStage)
 fun doProtocolDefinitionGen() {
@@ -35,13 +38,19 @@ private fun addInterface(element: ProtocolDefinition) {
                 addAnnotation(usage.annotationSpec())
             }
 
+            addType(companionObjectSpec {
+                addProperty(propertySpec("CANONICAL_NAME", STRING) {
+                    addModifiers(KModifier.CONST)
+                    initializer("%S", element.canonicalName.value)
+                })
+            })
+
             addType(interfaceSpec(NAME_OF_REFLUX_CLASS) {
                 applyOf(target = element.refluxCanonicalName)
                 addType(companionObjectSpec()) // this must be last for syntax compatibility
             })
 
             applyOf(target = element.canonicalName)
-            addType(companionObjectSpec()) // this must be last for syntax compatibility
         })
     }
 }
