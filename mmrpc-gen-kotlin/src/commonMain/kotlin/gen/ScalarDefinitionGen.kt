@@ -59,7 +59,9 @@ private fun addValueClass(element: ScalarDefinition) {
                 addAnnotation(usage.annotationSpec())
             }
 
-            applyOf(target = element.canonicalName)
+            addType(companionObjectSpec {
+                applyOf(target = element.canonicalName)
+            })
         }
     }
 }
