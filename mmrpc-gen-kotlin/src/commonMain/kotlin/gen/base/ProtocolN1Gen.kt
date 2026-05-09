@@ -46,7 +46,7 @@ private fun apply(element: ProtocolDefinition) {
 
             // abstract N1 functions
             for (routine in routines) {
-                addFunction(funSpec(routine.nameOfFunction()) {
+                addFunction(funSpec(routine.nameOfBaseFunction()) {
                     addModifiers(KModifier.ABSTRACT, KModifier.SUSPEND)
                     addKdoc(createKdocCode(routine))
                     addParameter("request", routine.input.className())
@@ -63,7 +63,7 @@ private fun apply(element: ProtocolDefinition) {
 
             // impl N1 functions
             for (routine in routines) {
-                addFunction(funSpec(routine.nameOfFunction()) {
+                addFunction(funSpec(routine.nameOfBaseFunction()) {
                     addModifiers(KModifier.OVERRIDE, KModifier.SUSPEND)
                     addParameter("request", routine.input.className())
                     returns(routine.output.className())
@@ -85,13 +85,13 @@ private fun apply(element: ProtocolDefinition) {
             for (routine in routines) {
                 addStatement("%L", routine.serverRegisterCode(
                     register = Intrinsics.REGISTER1,
-                    handler = CodeBlock.of("impl::%L", routine.nameOfFunction()),
+                    handler = CodeBlock.of("impl::%L", routine.nameOfBaseFunction()),
                 ))
             }
         })
         // <protocol>.Companion.<routine>.invoke( handler: WrapHandler1<request> )
         for (routine in routines) {
-            addFunction(funSpec(routine.nameOfFunction()) {
+            addFunction(funSpec(routine.nameOfExtFunction()) {
                 contextParameter("engine", ServerEngine::class)
                 receiver(element.generatedClassName().nestedClass("Companion"))
                 addParameter(
@@ -117,7 +117,7 @@ private fun apply(element: ProtocolDefinition) {
         for (routine in routines) {
             val fields = routine.input.collectAllFields().toList()
 
-            addFunction(funSpec(routine.nameOfFunction()) {
+            addFunction(funSpec(routine.nameOfExtFunction()) {
                 addModifiers(KModifier.SUSPEND)
                 receiver(element.generatedBaseClassName(BASE_NAME))
                 for (field in fields) {

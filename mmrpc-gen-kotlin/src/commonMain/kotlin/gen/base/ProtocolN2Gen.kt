@@ -47,7 +47,7 @@ private fun apply(element: ProtocolDefinition) {
 
             // abstract N2 functions
             for (routine in routines) {
-                addFunction(funSpec(routine.nameOfFunction()) {
+                addFunction(funSpec(routine.nameOfBaseFunction()) {
                     addModifiers(KModifier.ABSTRACT, KModifier.SUSPEND)
                     addKdoc(createKdocCode(routine))
                     addParameter("request", FLOW.parameterizedBy(routine.input.className()))
@@ -64,7 +64,7 @@ private fun apply(element: ProtocolDefinition) {
 
             // impl N2 functions
             for (routine in routines) {
-                addFunction(funSpec(routine.nameOfFunction()) {
+                addFunction(funSpec(routine.nameOfBaseFunction()) {
                     addModifiers(KModifier.OVERRIDE, KModifier.SUSPEND)
                     addParameter("request", FLOW.parameterizedBy(routine.input.className()))
                     returns(routine.output.className())
@@ -86,13 +86,13 @@ private fun apply(element: ProtocolDefinition) {
             for (routine in routines) {
                 addStatement("%L", routine.serverRegisterCode(
                     register = Intrinsics.REGISTER2,
-                    handler = CodeBlock.of("impl::%L", routine.nameOfFunction()),
+                    handler = CodeBlock.of("impl::%L", routine.nameOfBaseFunction()),
                 ))
             }
         })
         // <protocol>.Companion.<routine>.invoke( handler: WrapHandler2<request> )
         for (routine in routines) {
-            addFunction(funSpec(routine.nameOfFunction()) {
+            addFunction(funSpec(routine.nameOfExtFunction()) {
                 contextParameter("engine", ServerEngine::class)
                 receiver(element.generatedClassName().nestedClass("Companion"))
                 addParameter(

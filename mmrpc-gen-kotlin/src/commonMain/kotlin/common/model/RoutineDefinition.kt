@@ -2,6 +2,7 @@ package org.cufy.mmrpc.gen.kotlin.common.model
 
 import com.squareup.kotlinpoet.*
 import net.pearx.kasechange.toCamelCase
+import net.pearx.kasechange.toPascalCase
 import org.cufy.mmrpc.RoutineDefinition
 import org.cufy.mmrpc.gen.kotlin.ContextScope
 import org.cufy.mmrpc.gen.kotlin.GenFeature
@@ -17,9 +18,21 @@ import org.cufy.mmrpc.runtime.FaultException
 
 @ContextScope
 context(ctx: Context)
-fun RoutineDefinition.nameOfFunction(): String {
+fun RoutineDefinition.nameOfExtFunction(): String {
     if (GenFeature.KEEP_ROUTINE_FUNCTION_NAMES in ctx.features)
         return name
+
+    return name.toCamelCase()
+}
+
+@ContextScope
+context(ctx: Context)
+fun RoutineDefinition.nameOfBaseFunction(): String {
+    if (GenFeature.KEEP_ROUTINE_FUNCTION_NAMES in ctx.features)
+        return name
+
+    if (GenFeature.PASCAL_CASE_ROUTINE_BASE_NAMES in ctx.features)
+        return name.toPascalCase()
 
     return name.toCamelCase()
 }
@@ -114,7 +127,7 @@ fun RoutineDefinition.clientFlatImplCode(
     fields: List<String>,
 ): CodeBlock {
     return buildCodeBlock {
-        addStatement("♢return %L(\n⇥%L⇤\n)", nameOfFunction(), createCall(
+        addStatement("♢return %L(\n⇥%L⇤\n)", nameOfBaseFunction(), createCall(
             function = CodeBlock.of("%T", request),
             parameters = fields.associateWith {
                 CodeBlock.of(it)

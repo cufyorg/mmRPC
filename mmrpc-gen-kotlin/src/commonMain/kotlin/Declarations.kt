@@ -62,6 +62,11 @@ enum class GenFeature {
     KDOC_SIGNATURE,
 
     /**
+     * Use PascalCase for routine functions inside a protocol.
+     */
+    PASCAL_CASE_ROUTINE_BASE_NAMES,
+
+    /**
      * Keep original type class names.
      */
     KEEP_TYPE_CLASS_NAMES,

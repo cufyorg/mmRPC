@@ -94,6 +94,8 @@ open class MmrpcExtension {
         fun kdocDescription() { features += GenFeature.KDOC_DESCRIPTION }
         fun kdocSignature() { features += GenFeature.KDOC_SIGNATURE }
 
+        fun pascalCaseRoutineBaseNames() { features += GenFeature.PASCAL_CASE_ROUTINE_BASE_NAMES }
+
         fun keepTypeClassNames() { features += GenFeature.KEEP_TYPE_CLASS_NAMES }
         fun keepFaultClassNames() { features += GenFeature.KEEP_FAULT_CLASS_NAMES }
         fun keepProtocolClassNames() { features += GenFeature.KEEP_PROTOCOL_CLASS_NAMES }
