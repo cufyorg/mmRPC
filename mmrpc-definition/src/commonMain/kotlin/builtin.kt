@@ -29,12 +29,20 @@ object builtin : NamespaceObject() {
     val Boolean by scalar { +"builtin boolean" }
     val TRUE by const(true.literal) { +"builtin true" }
     val FALSE by const(false.literal) { +"builtin false" }
+    val Byte by scalar { +"builtin byte" }
+    val ByteArray by scalar { +"builtin byte array" }
     val Int32 by scalar { +"builtin 32bit int" }
+    val Int32Array by scalar { +"builtin 32bit int array" }
     val UInt32 by scalar { +"builtin unsigned 32bit int" }
+    val UInt32Array by scalar { +"builtin unsigned 32bit int array" }
     val Int64 by scalar { +"builtin 64bit int" }
+    val Int64Array by scalar { +"builtin 64bit int array" }
     val UInt64 by scalar { +"builtin unsigned 64bit int" }
+    val UInt64Array by scalar { +"builtin unsigned 64bit int array" }
     val Float32 by scalar { +"builtin 32bit float" }
+    val Float32Array by scalar { +"builtin 32bit float array" }
     val Float64 by scalar { +"builtin 64bit float" }
+    val Float64Array by scalar { +"builtin 64bit float array" }
 
     val Deprecated__message by prop(String) { +"The deprecation message" }
     val Deprecated by metadata { +Deprecated__message }
@@ -53,12 +61,20 @@ object builtin : NamespaceObject() {
         Boolean,
         TRUE,
         FALSE,
+        Byte,
+        ByteArray,
         Int32,
+        Int32Array,
         UInt32,
+        UInt32Array,
         Int64,
+        Int64Array,
         UInt64,
+        UInt64Array,
         Float32,
+        Float32Array,
         Float64,
+        Float64Array,
         Deprecated__message,
         Deprecated,
         Experimental__message,

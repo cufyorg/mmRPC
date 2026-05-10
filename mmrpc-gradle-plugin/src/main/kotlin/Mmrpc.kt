@@ -39,12 +39,20 @@ object Mmrpc {
             "builtin.Any" to "kotlin.Any",
             "builtin.String" to "kotlin.String",
             "builtin.Boolean" to "kotlin.Boolean",
+            "builtin.Byte" to "kotlin.Byte",
+            "builtin.ByteArray" to "kotlin.ByteArray",
             "builtin.Int32" to "kotlin.Int",
+            "builtin.Int32Array" to "kotlin.IntArray",
             "builtin.UInt32" to "kotlin.UInt",
+            "builtin.UInt32Array" to "kotlin.UIntArray",
             "builtin.Int64" to "kotlin.Long",
+            "builtin.Int64Array" to "kotlin.LongArray",
             "builtin.UInt64" to "kotlin.ULong",
+            "builtin.UInt64Array" to "kotlin.ULongArray",
             "builtin.Float32" to "kotlin.Float",
+            "builtin.Float32Array" to "kotlin.FloatArray",
             "builtin.Float64" to "kotlin.Double",
+            "builtin.Float64Array" to "kotlin.DoubleArray",
         )
 
         val DEFAULT_NATIVE_METADATA_CLASSES = mapOf(
