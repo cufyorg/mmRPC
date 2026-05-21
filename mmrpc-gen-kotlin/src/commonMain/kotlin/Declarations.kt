@@ -129,8 +129,14 @@ data class EmitNode(
     val emission: context(FinalStage) () -> Unit,
 )
 
+enum class InjectKind {
+    ELEMENT,
+    COMPANION,
+}
+
 data class InjectNode<T : Any>(
     val type: KClass<T>,
+    val kind: InjectKind,
     val target: CanonicalName?,
     val declares: List<CanonicalName>,
     val injection: context(FinalStage) T.() -> Unit,

@@ -4,6 +4,8 @@ import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.typeNameOf
 import org.cufy.mmrpc.FaultDefinition
+import org.cufy.mmrpc.gen.kotlin.InjectKind.COMPANION
+import org.cufy.mmrpc.gen.kotlin.InjectKind.ELEMENT
 import org.cufy.mmrpc.gen.kotlin.common.code.createKdocCode
 import org.cufy.mmrpc.gen.kotlin.common.isGeneratingClass
 import org.cufy.mmrpc.gen.kotlin.common.model.annotationSpec
@@ -65,12 +67,14 @@ private fun addExceptionClass(element: FaultDefinition) {
                 callThisConstructor("null", "cause")
             })
 
-            addType(companionObjectSpec {
+            addCompanionObject {
                 addProperty(propertySpec("CANONICAL_NAME", STRING) {
                     addModifiers(KModifier.CONST)
                     initializer("%S", element.canonicalName.value)
                 })
-            })
+
+                applyOf(COMPANION, target = element.canonicalName)
+            }
 
             addKdoc(createKdocCode(element))
 
@@ -78,7 +82,7 @@ private fun addExceptionClass(element: FaultDefinition) {
                 addAnnotation(usage.annotationSpec())
             }
 
-            applyOf(target = element.canonicalName)
+            applyOf(ELEMENT, target = element.canonicalName)
         }
     }
 }

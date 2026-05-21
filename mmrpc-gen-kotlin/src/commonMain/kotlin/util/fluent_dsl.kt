@@ -87,6 +87,15 @@ fun companionObjectSpec(block: TypeSpec.Builder.() -> Unit = {}): TypeSpec {
     return TypeSpec.companionObjectBuilder().apply(block).build()
 }
 
+private val EMPTY_COMPANION = companionObjectSpec()
+
+context(builder: TypeSpecHolder.Builder<*>)
+fun addCompanionObject(prune: Boolean = true, block: TypeSpec.Builder.() -> Unit) {
+    val obj = companionObjectSpec(block)
+    if (prune && obj == EMPTY_COMPANION) return
+    builder.addType(obj)
+}
+
 // FileSpec.builder
 
 fun fileSpec(className: ClassName, block: FileSpec.Builder.() -> Unit = {}): FileSpec {

@@ -2,6 +2,8 @@ package org.cufy.mmrpc.gen.kotlin.gen
 
 import com.squareup.kotlinpoet.KModifier
 import org.cufy.mmrpc.TraitDefinition
+import org.cufy.mmrpc.gen.kotlin.InjectKind.COMPANION
+import org.cufy.mmrpc.gen.kotlin.InjectKind.ELEMENT
 import org.cufy.mmrpc.gen.kotlin.TraitStrategy
 import org.cufy.mmrpc.gen.kotlin.common.code.createKdocCode
 import org.cufy.mmrpc.gen.kotlin.common.isGeneratingClass
@@ -10,10 +12,7 @@ import org.cufy.mmrpc.gen.kotlin.common.nameOfClass
 import org.cufy.mmrpc.gen.kotlin.common.typeName
 import org.cufy.mmrpc.gen.kotlin.common.typeSerialName
 import org.cufy.mmrpc.gen.kotlin.context.*
-import org.cufy.mmrpc.gen.kotlin.util.createSerialName
-import org.cufy.mmrpc.gen.kotlin.util.createSerializable
-import org.cufy.mmrpc.gen.kotlin.util.interfaceSpec
-import org.cufy.mmrpc.gen.kotlin.util.propertySpec
+import org.cufy.mmrpc.gen.kotlin.util.*
 
 context(ctx: Context, _: FailScope, _: InitStage)
 fun doTraitDefinitionGen() {
@@ -24,10 +23,10 @@ fun doTraitDefinitionGen() {
         catch(element) {
             when (element.calculateStrategy()) {
                 TraitStrategy.INTERFACE
-                -> addInterface(element)
+                    -> addInterface(element)
 
                 TraitStrategy.SEALED_INTERFACE
-                -> addSealedInterface(element)
+                    -> addSealedInterface(element)
             }
         }
     }
@@ -76,7 +75,11 @@ private fun addInterface(element: TraitDefinition) {
                 addAnnotation(usage.annotationSpec())
             }
 
-            applyOf(target = element.canonicalName)
+            applyOf(ELEMENT, target = element.canonicalName)
+
+            addCompanionObject {
+                applyOf(COMPANION, target = element.canonicalName)
+            }
         }
     }
 }
@@ -130,7 +133,11 @@ private fun addSealedInterface(element: TraitDefinition) {
                 addAnnotation(usage.annotationSpec())
             }
 
-            applyOf(target = element.canonicalName)
+            applyOf(ELEMENT, target = element.canonicalName)
+
+            addCompanionObject {
+                applyOf(COMPANION, target = element.canonicalName)
+            }
         }
     }
 }

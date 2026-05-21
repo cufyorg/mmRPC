@@ -4,6 +4,7 @@ import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.LIST
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import org.cufy.mmrpc.ArrayDefinition
+import org.cufy.mmrpc.gen.kotlin.InjectKind.ELEMENT
 import org.cufy.mmrpc.gen.kotlin.common.code.createKdocCode
 import org.cufy.mmrpc.gen.kotlin.common.model.annotationSpec
 import org.cufy.mmrpc.gen.kotlin.common.model.isGeneratingTypealias
@@ -37,6 +38,7 @@ private fun addTypealias(element: ArrayDefinition) {
     val target = LIST.parameterizedBy(element.type.typeName())
 
     injectOrToplevel<FileSpec.Builder>(
+        ELEMENT,
         target = element.namespace,
         declares = listOf(element.canonicalName),
     ) {
@@ -47,7 +49,7 @@ private fun addTypealias(element: ArrayDefinition) {
                 addAnnotation(usage.annotationSpec())
             }
 
-            applyOf(target = element.canonicalName)
+            applyOf(ELEMENT, target = element.canonicalName)
         })
     }
 }

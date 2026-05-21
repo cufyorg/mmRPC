@@ -2,6 +2,8 @@ package org.cufy.mmrpc.gen.kotlin.gen
 
 import com.squareup.kotlinpoet.KModifier
 import org.cufy.mmrpc.StructDefinition
+import org.cufy.mmrpc.gen.kotlin.InjectKind.COMPANION
+import org.cufy.mmrpc.gen.kotlin.InjectKind.ELEMENT
 import org.cufy.mmrpc.gen.kotlin.StructStrategy
 import org.cufy.mmrpc.gen.kotlin.common.code.createKdocCode
 import org.cufy.mmrpc.gen.kotlin.common.isGeneratingClass
@@ -21,10 +23,10 @@ fun doStructDefinitionGen() {
         catch(element) {
             when (element.calculateStrategy()) {
                 StructStrategy.DATA_OBJECT
-                -> addDataObject(element)
+                    -> addDataObject(element)
 
                 StructStrategy.DATA_CLASS
-                -> addDataClass(element)
+                    -> addDataClass(element)
             }
         }
     }
@@ -61,7 +63,8 @@ private fun addDataObject(element: StructDefinition) {
                 addAnnotation(usage.annotationSpec())
             }
 
-            applyOf(target = element.canonicalName)
+            applyOf(ELEMENT, target = element.canonicalName)
+            applyOf(COMPANION, target = element.canonicalName)
         }
     }
 }
@@ -150,7 +153,11 @@ private fun addDataClass(element: StructDefinition) {
                 addAnnotation(usage.annotationSpec())
             }
 
-            applyOf(target = element.canonicalName)
+            applyOf(ELEMENT, target = element.canonicalName)
+
+            addCompanionObject {
+                applyOf(COMPANION, target = element.canonicalName)
+            }
         }
     }
 }

@@ -2,6 +2,8 @@ package org.cufy.mmrpc.gen.kotlin.gen
 
 import com.squareup.kotlinpoet.KModifier
 import org.cufy.mmrpc.ScalarDefinition
+import org.cufy.mmrpc.gen.kotlin.InjectKind.COMPANION
+import org.cufy.mmrpc.gen.kotlin.InjectKind.ELEMENT
 import org.cufy.mmrpc.gen.kotlin.common.code.createKdocCode
 import org.cufy.mmrpc.gen.kotlin.common.isGeneratingClass
 import org.cufy.mmrpc.gen.kotlin.common.model.annotationSpec
@@ -59,9 +61,11 @@ private fun addValueClass(element: ScalarDefinition) {
                 addAnnotation(usage.annotationSpec())
             }
 
-            addType(companionObjectSpec {
-                applyOf(target = element.canonicalName)
-            })
+            applyOf(ELEMENT, target = element.canonicalName)
+
+            addCompanionObject {
+                applyOf(COMPANION, target = element.canonicalName)
+            }
         }
     }
 }

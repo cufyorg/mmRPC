@@ -3,6 +3,8 @@ package org.cufy.mmrpc.gen.kotlin.gen
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.STRING
 import org.cufy.mmrpc.RoutineDefinition
+import org.cufy.mmrpc.gen.kotlin.InjectKind.COMPANION
+import org.cufy.mmrpc.gen.kotlin.InjectKind.ELEMENT
 import org.cufy.mmrpc.gen.kotlin.common.code.createKdocCode
 import org.cufy.mmrpc.gen.kotlin.common.isGeneratingClass
 import org.cufy.mmrpc.gen.kotlin.common.model.annotationSpec
@@ -43,7 +45,8 @@ private fun addDataObject(element: RoutineDefinition) {
                 initializer("%S", element.canonicalName.value)
             })
 
-            applyOf(target = element.canonicalName)
+            applyOf(ELEMENT, target = element.canonicalName)
+            applyOf(COMPANION, target = element.canonicalName)
         }
     }
 }

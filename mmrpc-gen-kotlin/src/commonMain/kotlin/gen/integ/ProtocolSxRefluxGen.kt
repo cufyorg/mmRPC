@@ -5,6 +5,7 @@ import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.TypeSpec
 import org.cufy.mmrpc.ProtocolDefinition
 import org.cufy.mmrpc.gen.kotlin.Comms
+import org.cufy.mmrpc.gen.kotlin.InjectKind.ELEMENT
 import org.cufy.mmrpc.gen.kotlin.Names
 import org.cufy.mmrpc.gen.kotlin.common.isGeneratingClass
 import org.cufy.mmrpc.gen.kotlin.common.model.*
@@ -33,7 +34,7 @@ private fun apply(element: ProtocolDefinition) {
     if (element.routines.none { it.comm == Comms.N0R })
         return
 
-    inject<TypeSpec.Builder>(target = element.refluxCanonicalName) {
+    inject<TypeSpec.Builder>(ELEMENT, target = element.refluxCanonicalName) {
         addSuperinterface(element.generatedIntegClassName(INTEG_NAME))
     }
     toplevel(target = element.namespace, name = element.nameOfMainFile()) {

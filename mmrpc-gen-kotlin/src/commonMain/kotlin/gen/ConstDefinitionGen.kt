@@ -3,6 +3,8 @@ package org.cufy.mmrpc.gen.kotlin.gen
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.MemberSpecHolder
 import org.cufy.mmrpc.ConstDefinition
+import org.cufy.mmrpc.gen.kotlin.InjectKind.COMPANION
+import org.cufy.mmrpc.gen.kotlin.InjectKind.ELEMENT
 import org.cufy.mmrpc.gen.kotlin.common.code.createKdocCode
 import org.cufy.mmrpc.gen.kotlin.common.code.createLiteralCode
 import org.cufy.mmrpc.gen.kotlin.common.isCompileConst
@@ -36,6 +38,7 @@ private fun addProperty(element: ConstDefinition) {
     */
 
     injectOrToplevel<MemberSpecHolder.Builder<*>>(
+        COMPANION,
         target = element.namespace,
         declares = listOf(element.canonicalName),
     ) {
@@ -52,7 +55,7 @@ private fun addProperty(element: ConstDefinition) {
                 addAnnotation(usage.annotationSpec())
             }
 
-            applyOf(target = element.canonicalName)
+            applyOf(ELEMENT, target = element.canonicalName)
         })
     }
 }

@@ -4,6 +4,7 @@ import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import org.cufy.mmrpc.CanonicalName
 import org.cufy.mmrpc.gen.kotlin.EmitScope
+import org.cufy.mmrpc.gen.kotlin.InjectKind
 import org.cufy.mmrpc.gen.kotlin.InjectNode
 import org.cufy.mmrpc.gen.kotlin.NodeList
 
@@ -15,11 +16,14 @@ class FinalStage(val nodes: NodeList) {
 @EmitScope
 context(ctx: FinalStage)
 fun <T : Any> T.applyOf(
+    kind: InjectKind,
     dummy: Unit = Unit,
     target: CanonicalName?,
 ) {
     for (node in ctx.nodes.injections) {
         if (node.target != target)
+            continue
+        if (node.kind != kind)
             continue
         if (!node.type.isInstance(this))
             continue

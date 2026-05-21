@@ -1,6 +1,8 @@
 package org.cufy.mmrpc.gen.kotlin.gen
 
 import org.cufy.mmrpc.EnumDefinition
+import org.cufy.mmrpc.gen.kotlin.InjectKind.COMPANION
+import org.cufy.mmrpc.gen.kotlin.InjectKind.ELEMENT
 import org.cufy.mmrpc.gen.kotlin.common.code.createKdocCode
 import org.cufy.mmrpc.gen.kotlin.common.code.createLiteralCode
 import org.cufy.mmrpc.gen.kotlin.common.isGeneratingClass
@@ -78,9 +80,11 @@ private fun addEnumClass(element: EnumDefinition) {
                 addAnnotation(usage.annotationSpec())
             }
 
-            addType(companionObjectSpec {
-                applyOf(target = element.canonicalName)
-            })
+            applyOf(ELEMENT, target = element.canonicalName)
+
+            addCompanionObject {
+                applyOf(COMPANION, target = element.canonicalName)
+            }
         }
     }
 }

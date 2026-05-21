@@ -3,6 +3,8 @@ package org.cufy.mmrpc.gen.kotlin.gen
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.TypeSpec
 import org.cufy.mmrpc.UnionDefinition
+import org.cufy.mmrpc.gen.kotlin.InjectKind.COMPANION
+import org.cufy.mmrpc.gen.kotlin.InjectKind.ELEMENT
 import org.cufy.mmrpc.gen.kotlin.UnionStrategy
 import org.cufy.mmrpc.gen.kotlin.common.code.createKdocCode
 import org.cufy.mmrpc.gen.kotlin.common.isGeneratingClass
@@ -25,13 +27,13 @@ fun doUnionDefinitionGen() {
         catch(element) {
             when (element.calculateStrategy()) {
                 UnionStrategy.DATA_OBJECT
-                -> addDataObject(element)
+                    -> addDataObject(element)
 
                 UnionStrategy.SEALED_INTERFACE
-                -> addSealedInterface(element)
+                    -> addSealedInterface(element)
 
                 UnionStrategy.WRAPPER_SEALED_INTERFACE
-                -> addWrapperSealedInterface(element)
+                    -> addWrapperSealedInterface(element)
             }
         }
     }
@@ -64,7 +66,8 @@ private fun addDataObject(element: UnionDefinition) {
                 addAnnotation(usage.annotationSpec())
             }
 
-            applyOf(target = element.canonicalName)
+            applyOf(ELEMENT, target = element.canonicalName)
+            applyOf(COMPANION, target = element.canonicalName)
         }
     }
 }
@@ -96,12 +99,16 @@ private fun addSealedInterface(element: UnionDefinition) {
                 addAnnotation(usage.annotationSpec())
             }
 
-            applyOf(target = element.canonicalName)
+            applyOf(ELEMENT, target = element.canonicalName)
+
+            addCompanionObject {
+                applyOf(COMPANION, target = element.canonicalName)
+            }
         }
     }
 
     for (subtype in element.types) {
-        inject<TypeSpec.Builder>(target = subtype.canonicalName) {
+        inject<TypeSpec.Builder>(ELEMENT, target = subtype.canonicalName) {
             addSuperinterface(element.generatedClassName())
         }
     }
@@ -146,7 +153,11 @@ private fun addWrapperSealedInterface(element: UnionDefinition) {
                 addAnnotation(usage.annotationSpec())
             }
 
-            applyOf(target = element.canonicalName)
+            applyOf(ELEMENT, target = element.canonicalName)
+
+            addCompanionObject {
+                applyOf(COMPANION, target = element.canonicalName)
+            }
         }
     }
 }

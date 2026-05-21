@@ -5,6 +5,8 @@ import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.TypeSpecHolder
 import org.cufy.mmrpc.CanonicalName
 import org.cufy.mmrpc.gen.kotlin.EmitNode
+import org.cufy.mmrpc.gen.kotlin.InjectKind
+import org.cufy.mmrpc.gen.kotlin.InjectKind.ELEMENT
 import org.cufy.mmrpc.gen.kotlin.InjectNode
 import org.cufy.mmrpc.gen.kotlin.InjectScope
 import org.cufy.mmrpc.gen.kotlin.common.toPackageName
@@ -18,6 +20,7 @@ class InitStage {
 @InjectScope
 context(stage: InitStage)
 inline fun <reified T : Any> inject(
+    kind: InjectKind,
     dummy: Unit = Unit,
     target: CanonicalName?,
     declares: List<CanonicalName> = emptyList(),
@@ -26,6 +29,7 @@ inline fun <reified T : Any> inject(
     val e = RuntimeException("Injection failed")
     stage.injections += InjectNode(
         type = T::class,
+        kind = kind,
         target = target,
         declares = declares,
         injection = injection,
@@ -38,6 +42,7 @@ inline fun <reified T : Any> inject(
 @InjectScope
 context(stage: InitStage, _: Context)
 inline fun <reified T : Any> injectOrToplevel(
+    kind: InjectKind,
     dummy: Unit = Unit,
     target: CanonicalName?,
     declares: List<CanonicalName> = emptyList(),
@@ -48,6 +53,7 @@ inline fun <reified T : Any> injectOrToplevel(
     }
     stage.injections += InjectNode(
         type = T::class,
+        kind = kind,
         target = target,
         declares = declares,
         injection = injection,
@@ -70,6 +76,7 @@ fun declareType(
 ) {
     stage.injections += InjectNode(
         type = TypeSpecHolder.Builder::class,
+        kind = ELEMENT,
         target = target,
         declares = declares,
         injection = { addType(block()) },

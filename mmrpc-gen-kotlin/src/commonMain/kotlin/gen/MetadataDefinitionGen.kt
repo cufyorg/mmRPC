@@ -1,6 +1,8 @@
 package org.cufy.mmrpc.gen.kotlin.gen
 
 import org.cufy.mmrpc.MetadataDefinition
+import org.cufy.mmrpc.gen.kotlin.InjectKind.COMPANION
+import org.cufy.mmrpc.gen.kotlin.InjectKind.ELEMENT
 import org.cufy.mmrpc.gen.kotlin.common.code.createKdocCode
 import org.cufy.mmrpc.gen.kotlin.common.isGeneratingClass
 import org.cufy.mmrpc.gen.kotlin.common.metaTypeName
@@ -9,6 +11,7 @@ import org.cufy.mmrpc.gen.kotlin.common.model.metaParameterSpec
 import org.cufy.mmrpc.gen.kotlin.common.model.nameOfProperty
 import org.cufy.mmrpc.gen.kotlin.common.nameOfClass
 import org.cufy.mmrpc.gen.kotlin.context.*
+import org.cufy.mmrpc.gen.kotlin.util.addCompanionObject
 import org.cufy.mmrpc.gen.kotlin.util.annotationClassSpec
 import org.cufy.mmrpc.gen.kotlin.util.constructorSpec
 import org.cufy.mmrpc.gen.kotlin.util.propertySpec
@@ -75,7 +78,11 @@ private fun addAnnotationClass(element: MetadataDefinition) {
                 addAnnotation(Repeatable::class)
             }
 
-            applyOf(target = element.canonicalName)
+            applyOf(ELEMENT, target = element.canonicalName)
+
+            addCompanionObject {
+                applyOf(COMPANION, target = element.canonicalName)
+            }
         }
     }
 }
