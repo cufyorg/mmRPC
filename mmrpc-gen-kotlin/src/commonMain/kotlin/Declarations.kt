@@ -47,6 +47,11 @@ enum class GenFeature {
     GENERATE_TYPES,
 
     /**
+     * Generate a 'Type' enum in traits.
+     */
+    GENERATE_TRAIT_TYPE_ENUM,
+
+    /**
      * Generate structures that are part of a protocol.
      */
     GENERATE_PROTOCOLS,

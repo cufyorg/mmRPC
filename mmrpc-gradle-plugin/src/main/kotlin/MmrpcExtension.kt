@@ -89,6 +89,7 @@ open class MmrpcExtension {
         fun debug() { features += GenFeature.DEBUG }
 
         fun generateTypes() { features += GenFeature.GENERATE_TYPES }
+        fun generateTraitTypeEnum() { features += GenFeature.GENERATE_TRAIT_TYPE_ENUM }
         fun generateProtocols() { features += GenFeature.GENERATE_PROTOCOLS }
 
         fun kdocDescription() { features += GenFeature.KDOC_DESCRIPTION }

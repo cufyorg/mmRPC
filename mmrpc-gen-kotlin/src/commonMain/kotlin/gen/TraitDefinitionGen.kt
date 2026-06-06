@@ -2,6 +2,7 @@ package org.cufy.mmrpc.gen.kotlin.gen
 
 import com.squareup.kotlinpoet.KModifier
 import org.cufy.mmrpc.TraitDefinition
+import org.cufy.mmrpc.gen.kotlin.GenFeature
 import org.cufy.mmrpc.gen.kotlin.InjectKind.COMPANION
 import org.cufy.mmrpc.gen.kotlin.InjectKind.ELEMENT
 import org.cufy.mmrpc.gen.kotlin.TraitStrategy
@@ -32,7 +33,7 @@ fun doTraitDefinitionGen() {
     }
 }
 
-context(_: Context, _: InitStage)
+context(ctx: Context, _: InitStage)
 private fun addInterface(element: TraitDefinition) {
     /*
     <namespace> {
@@ -75,6 +76,10 @@ private fun addInterface(element: TraitDefinition) {
                 addAnnotation(usage.annotationSpec())
             }
 
+            if (GenFeature.GENERATE_TRAIT_TYPE_ENUM in ctx.features) {
+                addType(element.typeEnumSpec())
+            }
+
             applyOf(ELEMENT, target = element.canonicalName)
 
             addCompanionObject {
@@ -84,7 +89,7 @@ private fun addInterface(element: TraitDefinition) {
     }
 }
 
-context(_: Context, _: InitStage)
+context(ctx: Context, _: InitStage)
 private fun addSealedInterface(element: TraitDefinition) {
     /*
     <namespace> {
@@ -131,6 +136,10 @@ private fun addSealedInterface(element: TraitDefinition) {
 
             for (usage in element.metadata) {
                 addAnnotation(usage.annotationSpec())
+            }
+
+            if (GenFeature.GENERATE_TRAIT_TYPE_ENUM in ctx.features) {
+                addType(element.typeEnumSpec())
             }
 
             applyOf(ELEMENT, target = element.canonicalName)
