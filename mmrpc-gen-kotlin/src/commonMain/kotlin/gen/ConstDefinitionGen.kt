@@ -10,6 +10,7 @@ import org.cufy.mmrpc.gen.kotlin.common.code.createLiteralCode
 import org.cufy.mmrpc.gen.kotlin.common.isCompileConst
 import org.cufy.mmrpc.gen.kotlin.common.model.annotationSpec
 import org.cufy.mmrpc.gen.kotlin.common.model.isGeneratingProperty
+import org.cufy.mmrpc.gen.kotlin.common.model.isOfSymbolicScalar
 import org.cufy.mmrpc.gen.kotlin.common.model.nameOfProperty
 import org.cufy.mmrpc.gen.kotlin.common.typeName
 import org.cufy.mmrpc.gen.kotlin.context.*
@@ -30,7 +31,7 @@ fun doConstDefinitionGen() {
 context(_: Context, _: InitStage)
 private fun addProperty(element: ConstDefinition) {
     /*
-    <namespace> {
+    <namespace-or-symbolic-scalar-canonical-name> {
         <kdoc>
         [ @<metadata> ]
         const val <name> = <value>
@@ -39,7 +40,10 @@ private fun addProperty(element: ConstDefinition) {
 
     injectOrToplevel<MemberSpecHolder.Builder<*>>(
         COMPANION,
-        target = element.namespace,
+        target = when {
+            element.isOfSymbolicScalar() -> element.type.canonicalName
+            else -> element.namespace
+        },
         declares = listOf(element.canonicalName),
     ) {
         addProperty(propertySpec(element.nameOfProperty(), element.type.typeName()) {

@@ -12,6 +12,7 @@ context(ctx: ScalarDefinitionBuilder) val builder get() = ctx
 @Marker2
 class ScalarDefinitionBuilder :
     ElementDefinitionBuilder() {
+    var symbolic = false
     val type = Box<Unnamed<ScalarDefinition>>()
 
     fun build(): ScalarDefinition {
@@ -20,6 +21,7 @@ class ScalarDefinitionBuilder :
             canonicalName = cn,
             description = buildDescription(),
             metadata = buildMetadata(),
+            symbolic = this.symbolic,
             type = this::type.getOrNull()
                 ?.asAnonSiblingOf(cn, "type"),
         )
@@ -28,6 +30,11 @@ class ScalarDefinitionBuilder :
 
 context(ctx: ScalarDefinitionBuilder)
 val type get() = ctx.type
+
+context(ctx: ScalarDefinitionBuilder)
+fun symbolic() {
+    ctx.symbolic = true
+}
 
 ////////////////////////////////////////
 

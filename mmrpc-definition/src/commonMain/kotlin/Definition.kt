@@ -148,6 +148,7 @@ data class ScalarDefinition(
     override val description: String = "",
     override val metadata: List<MetadataUsage> = emptyList(),
 
+    val symbolic: Boolean = false,
     val type: ScalarDefinition? = null,
 ) : TypeDefinition()
 

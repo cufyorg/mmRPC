@@ -14,6 +14,7 @@ data class CompactScalarDefinition(
     override val description: String = "",
     override val metadata: List<CompactMetadataUsage> = emptyList(),
 
+    val symbolic: Boolean = false,
     val type_ref: CanonicalName? = null,
 ) : CompactElementDefinition
 
@@ -22,6 +23,7 @@ fun ScalarDefinition.toCompact(): CompactScalarDefinition {
         canonical_name = this.canonicalName,
         description = this.description,
         metadata = this.metadata.map { it.toCompact() },
+        symbolic = this.symbolic,
         type_ref = this.type?.canonicalName,
     )
 }
@@ -35,6 +37,7 @@ fun CompactScalarDefinition.inflateOrNull(
         metadata = this.metadata.map {
             it.inflateOrNull(onLookup) ?: return null
         },
+        symbolic = this.symbolic,
         type = this.type_ref?.let {
             val item = onLookup(it) ?: return null
             require(item is ScalarDefinition) {
