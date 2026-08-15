@@ -1,4 +1,11 @@
-# mmRPC [![](https://jitpack.io/v/org.cufy/mmrpc.svg)](https://jitpack.io/#org.cufy/mmrpc)
+<h3>
+mmRPC
+
+<a href="https://central.sonatype.com/namespace/org.cufy.mmrpc">
+<img src="https://img.shields.io/maven-central/v/org.cufy.mmrpc/mmrpc-definition?color=green"/>
+</a>
+</h3>
+</h3>
 
 Dsl for defining api specifications regardless of the underlying communication technology.
 This enables API specification writers to not think about anything but the functionality of
