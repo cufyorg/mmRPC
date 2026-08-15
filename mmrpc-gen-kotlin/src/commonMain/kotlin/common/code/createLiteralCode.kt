@@ -63,7 +63,17 @@ context(ctx: Context)
 private fun createLiteralCodeOfScalar(element: ScalarDefinition, literal: Literal): CodeBlock {
     val valueCode = when (literal) {
         is BooleanLiteral -> CodeBlock.of("%L", literal.value)
-        is IntLiteral -> CodeBlock.of("%L", literal.value)
+
+        is IntLiteral -> {
+            val suffix = when (element.type ?: element) {
+                builtin.Int64 -> "L"
+                builtin.UInt32 -> "u"
+                builtin.UInt64 -> "uL"
+                else -> ""
+            }
+            CodeBlock.of("%L", "${literal.value}${suffix}")
+        }
+
         is FloatLiteral -> CodeBlock.of("%L", literal.value)
         is StringLiteral -> CodeBlock.of("%S", literal.value)
         is NullLiteral -> fail(element, "illegal value: $literal")
