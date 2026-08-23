@@ -19,7 +19,8 @@ kotlin {
 
 mavenPublishing {
     publishToMavenCentral(automaticRelease = true)
-    signAllPublications()
+    if (project.properties["doSign"] == "yes")
+        signAllPublications()
     coordinates(
         groupId = group.toString(),
         artifactId = project.name,
