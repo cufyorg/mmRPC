@@ -109,7 +109,7 @@ class GrpcClientEngine(
     ): Flow<Res> {
         return flow {
             val ctx = GrpcClientContext(canonicalName)
-            withContext(ctx) {
+            val foldRes = withContext(ctx) {
                 val response = try {
                     val foldReq = foldRequest(interceptors, canonicalName, request)
                     ClientCalls.serverStreamingRpc(
@@ -125,9 +125,9 @@ class GrpcClientEngine(
                     throw foldErr.toFaultException(cause)
                 }
 
-                val foldRes = foldResponse(interceptors, canonicalName, response)
-                emitAll(foldRes)
+                foldResponse(interceptors, canonicalName, response)
             }
+            emitAll(foldRes)
         }
     }
 
@@ -139,7 +139,7 @@ class GrpcClientEngine(
     ): Flow<Res> {
         return flow {
             val ctx = GrpcClientContext(canonicalName)
-            withContext(ctx) {
+            val foldRes = withContext(ctx) {
                 val response = try {
                     val foldReq = foldRequest(interceptors, canonicalName, request)
                     ClientCalls.bidiStreamingRpc(
@@ -155,9 +155,9 @@ class GrpcClientEngine(
                     throw foldErr.toFaultException(cause)
                 }
 
-                val foldRes = foldResponse(interceptors, canonicalName, response)
-                emitAll(foldRes)
+                foldResponse(interceptors, canonicalName, response)
             }
+            emitAll(foldRes)
         }
     }
 }
