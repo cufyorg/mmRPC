@@ -1,6 +1,7 @@
 package org.cufy.mmrpc.runtime.grpc
 
 import io.grpc.ManagedChannel
+import io.grpc.StatusException
 import io.grpc.StatusRuntimeException
 import io.grpc.kotlin.ClientCalls
 import kotlinx.coroutines.flow.Flow
@@ -66,6 +67,10 @@ class GrpcClientEngine(
                 val error = cause.toFaultObjectOrNull() ?: throw cause
                 val foldErr = foldError(interceptors, canonicalName, error)
                 throw foldErr.toFaultException(cause)
+            } catch (cause: StatusException) {
+                val error = cause.toFaultObjectOrNull() ?: throw cause
+                val foldErr = foldError(interceptors, canonicalName, error)
+                throw foldErr.toFaultException(cause)
             }
 
             val foldRes = foldResponse(interceptors, canonicalName, response)
@@ -91,6 +96,10 @@ class GrpcClientEngine(
                     headers = ctx.request.headers,
                 )
             } catch (cause: StatusRuntimeException) {
+                val error = cause.toFaultObjectOrNull() ?: throw cause
+                val foldErr = foldError(interceptors, canonicalName, error)
+                throw foldErr.toFaultException(cause)
+            } catch (cause: StatusException) {
                 val error = cause.toFaultObjectOrNull() ?: throw cause
                 val foldErr = foldError(interceptors, canonicalName, error)
                 throw foldErr.toFaultException(cause)
@@ -123,6 +132,10 @@ class GrpcClientEngine(
                     val error = cause.toFaultObjectOrNull() ?: throw cause
                     val foldErr = foldError(interceptors, canonicalName, error)
                     throw foldErr.toFaultException(cause)
+                } catch (cause: StatusException) {
+                    val error = cause.toFaultObjectOrNull() ?: throw cause
+                    val foldErr = foldError(interceptors, canonicalName, error)
+                    throw foldErr.toFaultException(cause)
                 }
 
                 foldResponse(interceptors, canonicalName, response)
@@ -150,6 +163,10 @@ class GrpcClientEngine(
                         headers = ctx.request.headers,
                     )
                 } catch (cause: StatusRuntimeException) {
+                    val error = cause.toFaultObjectOrNull() ?: throw cause
+                    val foldErr = foldError(interceptors, canonicalName, error)
+                    throw foldErr.toFaultException(cause)
+                } catch (cause: StatusException) {
                     val error = cause.toFaultObjectOrNull() ?: throw cause
                     val foldErr = foldError(interceptors, canonicalName, error)
                     throw foldErr.toFaultException(cause)
