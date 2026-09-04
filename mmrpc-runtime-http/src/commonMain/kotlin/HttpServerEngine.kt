@@ -7,6 +7,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
 import org.cufy.mmrpc.runtime.*
 import org.cufy.mmrpc.runtime.Interceptor.Companion.foldError
+import org.cufy.mmrpc.runtime.Interceptor.Companion.foldException
 import org.cufy.mmrpc.runtime.Interceptor.Companion.foldRequest
 import org.cufy.mmrpc.runtime.Interceptor.Companion.foldResponse
 import org.cufy.mmrpc.runtime.http.util.HttpServerNegotiator
@@ -20,6 +21,7 @@ class HttpServerEngine @ExperimentalMmrpcApi constructor(
     interface Builder {
         @ExperimentalMmrpcApi
         fun install(interceptor: Interceptor.Server)
+
         @ExperimentalMmrpcApi
         fun install(negotiator: HttpServerNegotiator)
         fun routing(block: context(HttpServerEngine) () -> Unit)
@@ -50,18 +52,33 @@ class HttpServerEngine @ExperimentalMmrpcApi constructor(
         route.post(canonicalName) {
             val ctx = HttpServerContext(call, canonicalName)
             withContext(ctx) {
-                try {
+                wrapInCatch(ctx, canonicalName) {
                     val request = with(ctx) { negotiator.getRequest(reqSerial) }
                     val foldReq = foldRequest(interceptors, canonicalName, request)
                     val response = handler(foldReq)
                     val foldRes = foldResponse(interceptors, canonicalName, response)
                     with(ctx) { negotiator.setResponse(resSerial, foldRes) }
-                } catch (e: FaultException) {
-                    val error = e.toFaultObject()
-                    val foldErr = foldError(interceptors, canonicalName, error)
-                    with(ctx) { negotiator.setError(foldErr) }
                 }
             }
+        }
+    }
+
+    private suspend inline fun wrapInCatch(
+        ctx: HttpServerContext,
+        canonicalName: String,
+        block: () -> Unit,
+    ) {
+        try {
+            return block()
+        } catch (e: FaultException) {
+            val error = e.toFaultObject()
+            val foldErr = foldError(interceptors, canonicalName, error)
+            with(ctx) { negotiator.setError(foldErr) }
+        } catch (e: Throwable) {
+            // [[ Fallback foldException ]] //
+            val foldErr = foldException(interceptors, canonicalName, e)
+            foldErr ?: throw e
+            with(ctx) { negotiator.setError(foldErr) }
         }
     }
 }

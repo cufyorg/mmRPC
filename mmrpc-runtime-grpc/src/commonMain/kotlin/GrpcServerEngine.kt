@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.KSerializer
 import org.cufy.mmrpc.runtime.*
 import org.cufy.mmrpc.runtime.Interceptor.Companion.foldError
+import org.cufy.mmrpc.runtime.Interceptor.Companion.foldException
 import org.cufy.mmrpc.runtime.Interceptor.Companion.foldRequest
 import org.cufy.mmrpc.runtime.Interceptor.Companion.foldResponse
 import org.cufy.mmrpc.runtime.grpc.internal.*
@@ -54,15 +55,11 @@ class GrpcServerEngine @ExperimentalMmrpcApi constructor(
             descriptor = descriptor1(canonicalName, reqSerial, resSerial),
             implementation = { request ->
                 // btw: context is injected via grpc interceptor
-                try {
+                wrapInCatch(canonicalName) {
                     val foldReq = foldRequest(interceptors, canonicalName, request)
                     val response = handler(foldReq)
                     val foldRes = foldResponse(interceptors, canonicalName, response)
                     foldRes
-                } catch (e: FaultException) {
-                    val error = e.toFaultObject()
-                    val foldErr = foldError(interceptors, canonicalName, error)
-                    throw foldErr.toStatusRuntimeException()
                 }
             }
         ))
@@ -79,15 +76,11 @@ class GrpcServerEngine @ExperimentalMmrpcApi constructor(
             descriptor = descriptor2(canonicalName, reqSerial, resSerial),
             implementation = { request ->
                 // btw: context is injected via grpc interceptor
-                try {
+                wrapInCatch(canonicalName) {
                     val foldReq = foldRequest(interceptors, canonicalName, request)
                     val response = handler(foldReq)
                     val foldRes = foldResponse(interceptors, canonicalName, response)
                     foldRes
-                } catch (e: FaultException) {
-                    val error = e.toFaultObject()
-                    val foldErr = foldError(interceptors, canonicalName, error)
-                    throw foldErr.toStatusRuntimeException()
                 }
             }
         ))
@@ -105,15 +98,11 @@ class GrpcServerEngine @ExperimentalMmrpcApi constructor(
             implementation = { request ->
                 // btw: context is injected via grpc interceptor
                 flow {
-                    try {
+                    wrapInCatch(canonicalName) {
                         val foldReq = foldRequest(interceptors, canonicalName, request)
                         val response = handler(foldReq)
                         val foldRes = foldResponse(interceptors, canonicalName, response)
                         emitAll(foldRes)
-                    } catch (e: FaultException) {
-                        val error = e.toFaultObject()
-                        val foldErr = foldError(interceptors, canonicalName, error)
-                        throw foldErr.toStatusRuntimeException()
                     }
                 }
             }
@@ -132,18 +121,32 @@ class GrpcServerEngine @ExperimentalMmrpcApi constructor(
             implementation = { request ->
                 // btw: context is injected via grpc interceptor
                 flow {
-                    try {
+                    wrapInCatch(canonicalName) {
                         val foldReq = foldRequest(interceptors, canonicalName, request)
                         val response = handler(foldReq)
                         val foldRes = foldResponse(interceptors, canonicalName, response)
                         emitAll(foldRes)
-                    } catch (e: FaultException) {
-                        val error = e.toFaultObject()
-                        val foldErr = foldError(interceptors, canonicalName, error)
-                        throw foldErr.toStatusRuntimeException()
                     }
                 }
             }
         ))
+    }
+
+    private suspend inline fun <R> wrapInCatch(
+        canonicalName: String,
+        block: () -> R,
+    ): R {
+        try {
+            return block()
+        } catch (e: FaultException) {
+            val error = e.toFaultObject()
+            val foldErr = foldError(interceptors, canonicalName, error)
+            throw foldErr.toStatusRuntimeException()
+        } catch (e: Throwable) {
+            // [[ Fallback foldException ]] //
+            val foldErr = foldException(interceptors, canonicalName, e)
+            foldErr ?: throw e
+            throw foldErr.toStatusRuntimeException()
+        }
     }
 }

@@ -51,6 +51,15 @@ interface Interceptor {
         ): FaultObject = interceptors.fold(error) { acc, next ->
             next.onError(canonicalName, acc)
         }
+
+        @ExperimentalMmrpcApi
+        suspend fun foldException(
+            interceptors: List<Interceptor>,
+            canonicalName: String,
+            exception: Throwable,
+        ): FaultObject? = interceptors
+            .firstNotNullOfOrNull { it.onException(canonicalName, exception) }
+            ?.let { foldError(interceptors, canonicalName, it) }
     }
 
     /**
@@ -102,4 +111,16 @@ interface Interceptor {
      */
     @ExperimentalMmrpcApi
     suspend fun onError(canonicalName: String, error: FaultObject): FaultObject = error
+
+    /**
+     * Intercepts and processes an exception.
+     *
+     * @param canonicalName The canonical name of the routine.
+     * @param exception The exception that was caught.
+     * @return A fault object from the exception, or null to just observe it.
+     *   Note: returning not null will cause next interceptors to not receive this call
+     *         and will cause all interceptors to receive [onError]
+     */
+    @ExperimentalMmrpcApi
+    suspend fun onException(canonicalName: String, exception: Throwable): FaultObject? = null
 }
